@@ -1,0 +1,9 @@
+{
+  "appId": "ar.com.eldefe.app",
+  "appName": "El Defe",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  }
+}
