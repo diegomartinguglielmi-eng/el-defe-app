@@ -1,0 +1,502 @@
+]633;E;echo "===== app/sync.py =====";8be664c6-3df6-4b0e-b8a7-033cfe9eb49f]633;C===== app/sync.py =====
+import re
+from io import StringIO
+import requests
+import pandas as pd
+from bs4 import BeautifulSoup
+from sqlalchemy.orm import Session
+from .models import Match, Standing, SyncRun
+
+UA={"User-Agent":"Mozilla/5.0 ElDefe/2.0"}
+TEAM_FEFI="DEF. DE SANTOS LUGARES"
+TEAM_LAAMBA="Defensores de SL"
+
+def clean(x): return re.sub(r"\s+"," ",str(x)).strip()
+def as_int(x):
+    try:
+        if pd.isna(x): return None
+        return int(float(str(x).strip()))
+    except: return None
+
+def upsert_match(db:Session,m):
+    obj=db.query(Match).filter(Match.external_key==m["external_key"]).first()
+    if not obj:
+        obj=Match(**m); db.add(obj)
+    else:
+        for k,v in m.items():
+            setattr(obj,k,v)
+    db.commit()
+
+def upsert_standing(db:Session,s):
+    obj=db.query(Standing).filter(Standing.unique_key==s["unique_key"]).first()
+    if not obj:
+        obj=Standing(**s); db.add(obj)
+    else:
+        for k,v in s.items(): setattr(obj,k,v)
+    db.commit()
+
+def log(db,source,status,detail):
+    db.add(SyncRun(source=source,status=status,detail=detail)); db.commit()
+
+def sync_fefi(db:Session):
+    url="https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/"
+    saved=0
+    try:
+        r=requests.get(url,headers=UA,timeout=25); r.raise_for_status()
+        soup=BeautifulSoup(r.text,"html.parser")
+        lines=[clean(x) for x in soup.get_text("\n",strip=True).splitlines() if clean(x)]
+        months={"enero":"01","febrero":"02","marzo":"03","abril":"04","mayo":"05","junio":"06","julio":"07","agosto":"08","septiembre":"09","octubre":"10","noviembre":"11","diciembre":"12"}
+        round_name=date=None
+        for i,line in enumerate(lines):
+            m=re.match(r"Fecha\s+(\d+)\s*-\s*(\d{1,2})\s+de\s+([A-Za-zÁÉÍÓÚáéíóúñÑ]+)",line,re.I)
+            if m:
+                round_name=f"Fecha {m.group(1)}"
+                mon=months.get(m.group(3).lower())
+                date=f"2026-{mon}-{int(m.group(2)):02d}" if mon else None
+                continue
+            if line.lower()=="vs" and round_name and i>0 and i<len(lines)-1:
+                h,a=lines[i-1],lines[i+1]
+                if TEAM_FEFI in (h,a):
+                    upsert_match(db,dict(external_key=f"FEFI|2026|{round_name}|{h}|{a}",competition="FEFI",
+                        division="Zona H",round_name=round_name,date=date,home=h,away=a,status="scheduled",
+                        source_url=url,source_kind="sync"))
+                    saved+=1
+        log(db,"FEFI","ok",f"{saved} partidos actualizados")
+        return {"ok":True,"saved":saved}
+    except Exception as e:
+        log(db,"FEFI","error",str(e))
+        return {"ok":False,"error":str(e)}
+
+def col(cols, term):
+    for c in cols:
+        if term in str(c).lower(): return c
+
+def sync_laamba(db:Session):
+    divisions=["1ra","3ra","4ta","5ta","6ta","7ma","8va"]
+    ms=st=0; errors=[]
+    for div in divisions:
+        url=f"https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/{div}/torneo/m-elitei/?db=2026"
+        try:
+            r=requests.get(url,headers=UA,timeout=25);r.raise_for_status()
+            tables=pd.read_html(StringIO(r.text))
+            ri=0
+            for df in tables:
+                cols=list(df.columns); lc=col(cols,"local"); vc=col(cols,"visitante"); rc=col(cols,"resultado")
+                if lc is not None and vc is not None:
+                    ri+=1
+                    for _,row in df.iterrows():
+                        h,a=clean(row[lc]),clean(row[vc])
+                        if TEAM_LAAMBA not in (h,a): continue
+                        hs=aw=None; status="scheduled"
+                        if rc is not None:
+                            mm=re.search(r"(\d+)\s*-\s*(\d+)",clean(row[rc]))
+                            if mm: hs,aw,status=int(mm.group(1)),int(mm.group(2)),"final"
+                        upsert_match(db,dict(external_key=f"LAAMBA|2026|{div}|{ri}|{h}|{a}",competition="LAAMBA",
+                            division=div,round_name=f"Fecha {ri}",date=None,home=h,away=a,home_score=hs,away_score=aw,
+                            status=status,source_url=url,source_kind="sync"))
+                        ms+=1
+                teamc=col(cols,"equipo");ptsc=col(cols,"pts")
+                if teamc is not None and ptsc is not None:
+                    jc=col(cols," j")
+                    for _,row in df.iterrows():
+                        team=clean(row[teamc])
+                        if not team or team=="nan": continue
+                        upsert_standing(db,dict(unique_key=f"LAAMBA|2026|{div}|{team}",competition="LAAMBA",
+                            division=div,season=2026,team=team,pts=as_int(row[ptsc]),played=as_int(row[jc]) if jc else None,
+                            won=None,drawn=None,lost=None,gf=None,gc=None,gd=None,source_url=url))
+                        st+=1
+        except Exception as e:
+            errors.append(f"{div}: {e}")
+    status="ok" if not errors else "partial"
+    log(db,"LAAMBA",status,f"{ms} partidos / {st} filas tabla")
+    return {"ok":not bool(errors),"status":status,"matches":ms,"standings":st,"errors":errors[:5]}
+
+===== app/config.py =====
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+class Settings(BaseSettings):
+    database_url: str = "sqlite:///./el_defe.db"
+    secret_key: str = "dev-secret-change-me"
+    access_token_minutes: int = 720
+    admin_email: str = "admin@elde.fe"
+    admin_password: str = "Cambiar123!"
+    sync_hour: int = 7
+    sync_minute: int = 30
+    allowed_origins: str = "capacitor://localhost,http://localhost,https://localhost"
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    @property
+    def origins(self):
+        return [x.strip() for x in self.allowed_origins.split(",") if x.strip()]
+
+settings = Settings()
+
+===== app/db.py =====
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from .config import settings
+
+connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
+engine = create_engine(settings.database_url, pool_pre_ping=True, connect_args=connect_args)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
+class Base(DeclarativeBase):
+    pass
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+===== PARTES RELEVANTES app/main.py =====
+3-from fastapi.staticfiles import StaticFiles
+4-from fastapi.responses import FileResponse
+5-from fastapi.middleware.cors import CORSMiddleware
+6-from sqlalchemy.orm import Session
+7:from apscheduler.schedulers.background import BackgroundScheduler
+8-from .db import Base, engine, get_db, SessionLocal
+9-from .models import User, Match, Standing, News, AuditLog, Team, Person, TeamMember, CallUp, CallUpPlayer, PlayerMatchStat, Suspension, Favorite, NotificationPreference, MediaItem, PlayerOfMatch
+10-from .config import settings
+11-from .auth import hash_password, verify_password, create_token, get_current_user, require_roles
+12-from .schemas import UserCreate, NewsIn, MatchIn, ArgenImport, TeamIn, PersonIn, TeamMemberIn, CallUpIn, AttendanceIn, PlayerStatIn, SuspensionIn, FavoriteIn, NotificationPrefsIn, MediaIn, PlayerOfMatchIn
+13:from .sync import sync_fefi, sync_laamba, upsert_match
+14-
+15-BASE=Path(__file__).resolve().parent
+16-app=FastAPI(title="El Defe API",version="4.0")
+17-app.add_middleware(
+--
+22-    allow_headers=["*"],
+23-)
+24-
+25-@app.middleware("http")
+26:async def security_headers(request, call_next):
+27-    response = await call_next(request)
+28-    response.headers["X-Content-Type-Options"] = "nosniff"
+29-    response.headers["X-Frame-Options"] = "DENY"
+30-    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+31-    return response
+32-
+33:scheduler=BackgroundScheduler()
+34-
+35-def audit(db,user,action,entity,entity_id=None,detail=None):
+36-    db.add(AuditLog(user_id=user.id if user else None,action=action,entity=entity,entity_id=str(entity_id) if entity_id else None,detail=detail))
+37-    db.commit()
+38-
+39:def scheduled_sync():
+40-    db=SessionLocal()
+41-    try:
+42:        sync_fefi(db); sync_laamba(db)
+43-    finally:
+44-        db.close()
+45-
+46:@app.on_event("startup")
+47:def startup():
+48-    Base.metadata.create_all(bind=engine)
+49-    db=SessionLocal()
+50-    try:
+51:        if not db.query(User).filter(User.email==settings.admin_email).first():
+52:            db.add(User(email=settings.admin_email,password_hash=hash_password(settings.admin_password),role="admin"))
+53-            db.commit()
+54-        if not db.query(News).first():
+55-            db.add(News(title="Bienvenidos a El Defe",body="FEFI, LAAMBA y Argenliga en una sola aplicación."))
+56-            db.commit()
+57-    finally:
+58-        db.close()
+59:    if not scheduler.running:
+60:        scheduler.add_job(scheduled_sync,"cron",hour=settings.sync_hour,minute=settings.sync_minute,id="daily-sync",replace_existing=True)
+61:        scheduler.start()
+62-
+63-@app.get("/api/health")
+64-def health(): return {"ok":True,"version":"9.0","app":"El Defe"}
+65-
+--
+78-@app.get("/api/me")
+79-def me(user=Depends(get_current_user)): return {"id":user.id,"email":user.email,"role":user.role}
+80-
+81-@app.post("/api/users")
+82:def create_user(payload:UserCreate,db:Session=Depends(get_db),user=Depends(require_roles("admin"))):
+83-    if db.query(User).filter(User.email==payload.email).first():
+84-        raise HTTPException(status_code=409,detail="Ya existe")
+85-    u=User(email=payload.email,password_hash=hash_password(payload.password),role=payload.role)
+86-    db.add(u);db.commit();db.refresh(u);audit(db,user,"create","user",u.id,payload.role)
+87-    return {"ok":True,"id":u.id}
+88-
+89:@app.get("/api/matches")
+90:def get_matches(competition:str|None=None,division:str|None=None,db:Session=Depends(get_db)):
+91-    q=db.query(Match)
+92-    if competition: q=q.filter(Match.competition==competition)
+93-    if division: q=q.filter(Match.division==division)
+94-    rows=q.order_by(Match.date.desc().nullslast(),Match.id.desc()).all()
+95-    return [{c.name:getattr(x,c.name) for c in x.__table__.columns} for x in rows]
+96-
+97:@app.post("/api/matches")
+98:def add_match(payload:MatchIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado"))):
+99-    key=f"MANUAL|{payload.competition}|{payload.date}|{payload.home}|{payload.away}"
+100-    d=payload.model_dump();d.update(external_key=key,source_kind="manual",source_url=None)
+101-    upsert_match(db,d)
+102-    obj=db.query(Match).filter(Match.external_key==key).first()
+--
+115-    rows=db.query(News).order_by(News.id.desc()).all()
+116-    return [{"id":x.id,"title":x.title,"body":x.body,"published_at":x.published_at} for x in rows]
+117-
+118-@app.post("/api/news")
+119:def add_news(payload:NewsIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado"))):
+120-    n=News(title=payload.title,body=payload.body,author_id=user.id);db.add(n);db.commit();db.refresh(n)
+121-    audit(db,user,"create","news",n.id,payload.title)
+122-    return {"ok":True,"id":n.id}
+123-
+124:@app.post("/api/sync/fefi")
+125:def do_fefi(db:Session=Depends(get_db),user=Depends(require_roles("admin"))):
+126:    r=sync_fefi(db);audit(db,user,"sync","FEFI",detail=str(r));return r
+127-
+128:@app.post("/api/sync/laamba")
+129:def do_laamba(db:Session=Depends(get_db),user=Depends(require_roles("admin"))):
+130:    r=sync_laamba(db);audit(db,user,"sync","LAAMBA",detail=str(r));return r
+131-
+132:@app.post("/api/sync/all")
+133:def do_all(db:Session=Depends(get_db),user=Depends(require_roles("admin"))):
+134:    a=sync_fefi(db);b=sync_laamba(db);audit(db,user,"sync","ALL",detail=f"{a}|{b}");return {"fefi":a,"laamba":b}
+135-
+136-@app.post("/api/import/argenliga")
+137:def import_argen(payload:ArgenImport,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado"))):
+138-    n=0
+139:    for m in payload.matches:
+140-        d=m.model_dump()
+141-        d.update(external_key=f"ARGENLIGA|{m.date}|{m.home}|{m.away}",competition="ARGENLIGA",division="A Z1",
+142-                 round_name=None,venue=None,source_url=None,source_kind="import")
+143-        upsert_match(db,d);n+=1
+144-    audit(db,user,"import","ARGENLIGA",detail=f"{n} partidos")
+145-    return {"ok":True,"imported":n}
+146-
+147-@app.get("/api/audit")
+148:def audit_log(db:Session=Depends(get_db),user=Depends(require_roles("admin"))):
+149-    rows=db.query(AuditLog).order_by(AuditLog.id.desc()).limit(100).all()
+150-    return [{c.name:getattr(x,c.name) for c in x.__table__.columns} for x in rows]
+151-
+152-
+--
+158-    rows=db.query(Team).filter(Team.is_active==True).order_by(Team.competition,Team.division).all()
+159-    return [{c.name:getattr(x,c.name) for c in x.__table__.columns} for x in rows]
+160-
+161-@app.post("/api/teams")
+162:def create_team(payload:TeamIn,db:Session=Depends(get_db),user=Depends(require_roles("admin"))):
+163-    t=Team(**payload.model_dump());db.add(t);db.commit();db.refresh(t)
+164-    audit(db,user,"create","team",t.id,f"{t.competition} {t.division}")
+165-    return {"ok":True,"id":t.id}
+166-
+--
+171-    rows=q.order_by(Person.last_name,Person.first_name).all()
+172-    return [{c.name:getattr(x,c.name) for c in x.__table__.columns} for x in rows]
+173-
+174-@app.post("/api/people")
+175:def create_person(payload:PersonIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado","dt"))):
+176-    p=Person(**payload.model_dump());db.add(p);db.commit();db.refresh(p)
+177-    audit(db,user,"create","person",p.id,f"{p.first_name} {p.last_name}")
+178-    return {"ok":True,"id":p.id}
+179-
+--
+183-    return [{"membership_id":tm.id,"person_id":p.id,"first_name":p.first_name,"last_name":p.last_name,
+184-             "role":tm.member_role,"position":p.position,"shirt_number":p.shirt_number} for tm,p in rows]
+185-
+186-@app.post("/api/teams/{team_id}/members")
+187:def add_team_member(team_id:int,payload:TeamMemberIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado","dt"))):
+188-    exists=db.query(TeamMember).filter(TeamMember.team_id==team_id,TeamMember.person_id==payload.person_id,TeamMember.season==2026).first()
+189-    if exists:return {"ok":True,"id":exists.id}
+190-    tm=TeamMember(team_id=team_id,person_id=payload.person_id,season=2026,member_role=payload.member_role)
+191-    db.add(tm);db.commit();db.refresh(tm);audit(db,user,"add_member","team",team_id,str(payload.person_id))
+192-    return {"ok":True,"id":tm.id}
+193-
+194-@app.post("/api/callups")
+195:def create_callup(payload:CallUpIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado","dt"))):
+196-    c=CallUp(match_id=payload.match_id,team_id=payload.team_id,created_by=user.id,status="published",notes=payload.notes)
+197-    db.add(c);db.commit();db.refresh(c)
+198-    for pid in payload.person_ids:
+199-        db.add(CallUpPlayer(callup_id=c.id,person_id=pid))
+--
+209-            "players":[{"id":cp.id,"person_id":p.id,"name":f"{p.first_name} {p.last_name}",
+210-                        "attendance":cp.attendance,"starter":cp.starter,"minutes":cp.minutes} for cp,p in rows]}
+211-
+212-@app.patch("/api/callup-players/{row_id}")
+213:def update_attendance(row_id:int,payload:AttendanceIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado","dt"))):
+214-    cp=db.get(CallUpPlayer,row_id)
+215-    if not cp:raise HTTPException(status_code=404,detail="Registro inexistente")
+216-    cp.attendance=payload.attendance;cp.starter=payload.starter;cp.minutes=payload.minutes
+217-    db.commit();audit(db,user,"update","attendance",row_id,payload.attendance)
+218-    return {"ok":True}
+219-
+220-@app.post("/api/player-stats")
+221:def save_player_stat(payload:PlayerStatIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado","dt"))):
+222-    s=db.query(PlayerMatchStat).filter(PlayerMatchStat.match_id==payload.match_id,PlayerMatchStat.person_id==payload.person_id).first()
+223-    if not s:
+224-        s=PlayerMatchStat(**payload.model_dump());db.add(s)
+225-    else:
+--
+233-    if competition:q=q.filter(Match.competition==competition)
+234-    rows=q.all()
+235-    agg={}
+236-    for p,s,m in rows:
+237:        a=agg.setdefault(p.id,{"person_id":p.id,"name":f"{p.first_name} {p.last_name}","goals":0,"assists":0,"yellow_cards":0,"red_cards":0,"matches":set()})
+238:        a["goals"]+=s.goals or 0;a["assists"]+=s.assists or 0;a["yellow_cards"]+=s.yellow_cards or 0;a["red_cards"]+=s.red_cards or 0;a["matches"].add(m.id)
+239-    out=[]
+240-    for a in agg.values():
+241:        a["matches"]=len(a["matches"]);out.append(a)
+242-    return sorted(out,key=lambda x:(-x["goals"],-x["assists"],x["name"]))
+243-
+244-@app.post("/api/suspensions")
+245:def create_suspension(payload:SuspensionIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado"))):
+246-    s=Suspension(**payload.model_dump());db.add(s);db.commit();db.refresh(s)
+247-    audit(db,user,"create","suspension",s.id,payload.reason)
+248-    return {"ok":True,"id":s.id}
+249-
+--
+263-def player_profile(person_id:int, db:Session=Depends(get_db)):
+264-    p=db.get(Person,person_id)
+265-    if not p: raise HTTPException(status_code=404,detail="Jugador inexistente")
+266-    stats=db.query(PlayerMatchStat,Match).join(Match,Match.id==PlayerMatchStat.match_id).filter(PlayerMatchStat.person_id==person_id).all()
+267:    total={"matches":0,"goals":0,"assists":0,"yellow_cards":0,"red_cards":0}
+268-    seen=set()
+269-    for s,m in stats:
+270-        seen.add(m.id)
+271-        total["goals"]+=s.goals or 0; total["assists"]+=s.assists or 0
+272-        total["yellow_cards"]+=s.yellow_cards or 0; total["red_cards"]+=s.red_cards or 0
+273:    total["matches"]=len(seen)
+274-    teams=db.query(TeamMember,Team).join(Team,Team.id==TeamMember.team_id).filter(TeamMember.person_id==person_id).all()
+275-    awards=db.query(PlayerOfMatch).filter(PlayerOfMatch.person_id==person_id).count()
+276-    media=db.query(MediaItem).filter(MediaItem.person_id==person_id,MediaItem.published==True).order_by(MediaItem.id.desc()).limit(20).all()
+277-    return {
+--
+291-        a["goals"]+=s.goals or 0;a["assists"]+=s.assists or 0
+292-    return sorted(agg.values(),key=lambda x:(-x["goals"],-x["assists"],x["name"]))[:limit]
+293-
+294-@app.post("/api/community/player-of-match")
+295:def set_player_of_match(payload:PlayerOfMatchIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado","dt"))):
+296-    obj=db.query(PlayerOfMatch).filter(PlayerOfMatch.match_id==payload.match_id).first()
+297-    if not obj:
+298-        obj=PlayerOfMatch(**payload.model_dump());db.add(obj)
+299-    else:
+--
+307-    return [{"id":pom.id,"match_id":m.id,"person_id":p.id,"name":f"{p.first_name} {p.last_name}",
+308-             "competition":m.competition,"division":m.division,"home":m.home,"away":m.away,"note":pom.note} for pom,p,m in rows]
+309-
+310-@app.post("/api/media")
+311:def add_media(payload:MediaIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado","dt"))):
+312-    x=MediaItem(**payload.model_dump());db.add(x);db.commit();db.refresh(x);audit(db,user,"create","media",x.id,payload.url)
+313-    return {"ok":True,"id":x.id}
+314-
+315-@app.get("/api/media")
+
+===== MODELOS =====
+15:class Match(Base):
+16-    __tablename__="matches"
+17-    id: Mapped[int]=mapped_column(primary_key=True)
+18-    external_key: Mapped[str|None]=mapped_column(String(500),unique=True,index=True)
+19-    competition: Mapped[str]=mapped_column(String(50),index=True)
+20-    division: Mapped[str|None]=mapped_column(String(100),index=True)
+21-    round_name: Mapped[str|None]=mapped_column(String(100))
+22-    date: Mapped[str|None]=mapped_column(String(30),index=True)
+23-    home: Mapped[str]=mapped_column(String(200))
+24-    away: Mapped[str]=mapped_column(String(200))
+25-    home_score: Mapped[int|None]=mapped_column(Integer)
+26-    away_score: Mapped[int|None]=mapped_column(Integer)
+27-    status: Mapped[str]=mapped_column(String(30),default="scheduled")
+28-    venue: Mapped[str|None]=mapped_column(String(300))
+29-    source_url: Mapped[str|None]=mapped_column(Text)
+30-    source_kind: Mapped[str]=mapped_column(String(30),default="manual")
+31-    updated_at: Mapped[str]=mapped_column(DateTime(timezone=True),server_default=func.now(),onupdate=func.now())
+32-
+33:class Standing(Base):
+34-    __tablename__="standings"
+35-    id: Mapped[int]=mapped_column(primary_key=True)
+36-    unique_key: Mapped[str]=mapped_column(String(500),unique=True,index=True)
+37-    competition: Mapped[str]=mapped_column(String(50),index=True)
+38-    division: Mapped[str|None]=mapped_column(String(100),index=True)
+39-    season: Mapped[int|None]=mapped_column(Integer)
+40-    team: Mapped[str]=mapped_column(String(200))
+41-    pts: Mapped[int|None]=mapped_column(Integer)
+42-    played: Mapped[int|None]=mapped_column(Integer)
+43-    won: Mapped[int|None]=mapped_column(Integer)
+44-    drawn: Mapped[int|None]=mapped_column(Integer)
+45-    lost: Mapped[int|None]=mapped_column(Integer)
+46-    gf: Mapped[int|None]=mapped_column(Integer)
+47-    gc: Mapped[int|None]=mapped_column(Integer)
+48-    gd: Mapped[int|None]=mapped_column(Integer)
+49-    source_url: Mapped[str|None]=mapped_column(Text)
+50-    updated_at: Mapped[str]=mapped_column(DateTime(timezone=True),server_default=func.now(),onupdate=func.now())
+51-
+52-class News(Base):
+53-    __tablename__="news"
+54-    id: Mapped[int]=mapped_column(primary_key=True)
+55-    title: Mapped[str]=mapped_column(String(250))
+56-    body: Mapped[str]=mapped_column(Text)
+57-    author_id: Mapped[int|None]=mapped_column(ForeignKey("users.id"))
+58-    published_at: Mapped[str]=mapped_column(DateTime(timezone=True),server_default=func.now())
+59-
+60-class AuditLog(Base):
+61-    __tablename__="audit_logs"
+62-    id: Mapped[int]=mapped_column(primary_key=True)
+63-    user_id: Mapped[int|None]=mapped_column(ForeignKey("users.id"))
+64-    action: Mapped[str]=mapped_column(String(100))
+65-    entity: Mapped[str]=mapped_column(String(100))
+66-    entity_id: Mapped[str|None]=mapped_column(String(100))
+67-    detail: Mapped[str|None]=mapped_column(Text)
+68-    created_at: Mapped[str]=mapped_column(DateTime(timezone=True),server_default=func.now())
+--
+79:class Team(Base):
+80-    __tablename__="teams"
+81-    id: Mapped[int]=mapped_column(primary_key=True)
+82-    competition: Mapped[str]=mapped_column(String(50),index=True)
+83-    division: Mapped[str]=mapped_column(String(100),index=True)
+84-    season: Mapped[int]=mapped_column(Integer,default=2026)
+85-    gender: Mapped[str|None]=mapped_column(String(30))
+86-    is_active: Mapped[bool]=mapped_column(Boolean,default=True)
+87-
+88-class Person(Base):
+89-    __tablename__="people"
+90-    id: Mapped[int]=mapped_column(primary_key=True)
+91-    first_name: Mapped[str]=mapped_column(String(100))
+92-    last_name: Mapped[str]=mapped_column(String(100))
+93-    birth_year: Mapped[int|None]=mapped_column(Integer)
+94-    role: Mapped[str]=mapped_column(String(30),default="player")
+95-    position: Mapped[str|None]=mapped_column(String(60))
+96-    shirt_number: Mapped[int|None]=mapped_column(Integer)
+97-    photo_url: Mapped[str|None]=mapped_column(Text)
+98-    is_active: Mapped[bool]=mapped_column(Boolean,default=True)
+99-
+100:class TeamMember(Base):
+101-    __tablename__="team_members"
+102-    id: Mapped[int]=mapped_column(primary_key=True)
+103-    team_id: Mapped[int]=mapped_column(ForeignKey("teams.id"),index=True)
+104-    person_id: Mapped[int]=mapped_column(ForeignKey("people.id"),index=True)
+105-    season: Mapped[int]=mapped_column(Integer,default=2026)
+106-    member_role: Mapped[str]=mapped_column(String(30),default="player")
+107-    __table_args__=(UniqueConstraint("team_id","person_id","season",name="uq_team_person_season"),)
+108-
+109-class CallUp(Base):
+110-    __tablename__="callups"
+111-    id: Mapped[int]=mapped_column(primary_key=True)
+112-    match_id: Mapped[int]=mapped_column(ForeignKey("matches.id"),index=True)
+113-    team_id: Mapped[int]=mapped_column(ForeignKey("teams.id"),index=True)
+114-    created_by: Mapped[int|None]=mapped_column(ForeignKey("users.id"))
+115-    status: Mapped[str]=mapped_column(String(30),default="draft")
+116-    notes: Mapped[str|None]=mapped_column(Text)
+117-    created_at: Mapped[str]=mapped_column(DateTime(timezone=True),server_default=func.now())
+118-
+119-class CallUpPlayer(Base):
+120-    __tablename__="callup_players"
+121-    id: Mapped[int]=mapped_column(primary_key=True)
+122-    callup_id: Mapped[int]=mapped_column(ForeignKey("callups.id"),index=True)
+123-    person_id: Mapped[int]=mapped_column(ForeignKey("people.id"),index=True)
+124-    attendance: Mapped[str]=mapped_column(String(30),default="pending")
+125-    starter: Mapped[bool]=mapped_column(Boolean,default=False)
+126-    minutes: Mapped[int|None]=mapped_column(Integer)
+127-    __table_args__=(UniqueConstraint("callup_id","person_id",name="uq_callup_person"),)
+128-
+129-class PlayerMatchStat(Base):
+130-    __tablename__="player_match_stats"
+131-    id: Mapped[int]=mapped_column(primary_key=True)
+132-    match_id: Mapped[int]=mapped_column(ForeignKey("matches.id"),index=True)
+133-    person_id: Mapped[int]=mapped_column(ForeignKey("people.id"),index=True)
+134-    goals: Mapped[int]=mapped_column(Integer,default=0)
+135-    assists: Mapped[int]=mapped_column(Integer,default=0)
