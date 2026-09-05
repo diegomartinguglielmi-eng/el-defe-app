@@ -1,0 +1,24 @@
+# Checklist de lanzamiento
+
+- [x] Identidad El Defe y escudo
+- [x] PWA instalable
+- [x] Iconos 192/512
+- [x] Splash Android
+- [x] Capacitor
+- [x] Package `ar.com.eldefe.app`
+- [x] API configurable
+- [x] CORS para Android
+- [x] HTTPS-only desde Android
+- [x] PostgreSQL compatible
+- [x] Docker
+- [x] Railway config
+- [x] Health/readiness endpoints
+- [x] Roles y JWT
+- [x] Datos FEFI / LAAMBA + import Argenliga
+- [x] Planteles, convocatorias y estadísticas
+- [x] Comunidad, favoritos y preferencias
+- [ ] Publicar backend y obtener URL HTTPS
+- [ ] Pegar URL en `mobile/www/config.js`
+- [ ] Compilar APK en Android Studio
+- [ ] Probar en teléfono real
+- [ ] Generar AAB firmado para Play Store

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#342c7c">
+<link rel="manifest" href="./manifest.json">
+<title>El Defe</title>
+<script src="./config.js"></script>
+<style>
+:root{
+ --c:#3f368d;--c2:#28215f;--c3:#6658c8;--bg:#f3f4f7;--card:#fff;--ink:#11151e;
+ --mut:#717985;--line:#e3e6eb;--soft:#efedfb;--ok:#17825d;--warn:#cf8a1a;--red:#c63847;
+ --shadow:0 12px 34px rgba(37,30,96,.10)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:#dfe3e8;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--ink)}
+.app{max-width:440px;min-height:100vh;margin:auto;background:var(--bg);padding-bottom:78px;box-shadow:0 0 45px #0002;position:relative}
+.top{
+ background:
+ radial-gradient(circle at 96% 5%,#ffffff12 0 80px,transparent 81px),
+ linear-gradient(145deg,var(--c2),var(--c));
+ color:#fff;padding:18px 16px 26px;border-radius:0 0 30px 30px
+}
+.head{display:flex;align-items:center;gap:12px}.logo{width:62px;height:62px;background:#fff;border-radius:18px;padding:5px;object-fit:contain;box-shadow:0 6px 20px #0003}
+.brand h1{margin:0;font-size:22px;letter-spacing:.2px}.brand p{font-size:10px;opacity:.72;margin:4px 0 0}
+.top-actions{margin-left:auto;display:flex;gap:7px}.iconbtn{width:36px;height:36px;border:1px solid #ffffff1f;background:#ffffff12;color:#fff;border-radius:12px}
+.hero-kicker{margin-top:18px;font-size:9px;letter-spacing:1.4px;text-transform:uppercase;opacity:.68;font-weight:900}
+.hero-card{margin-top:8px;background:#ffffff12;border:1px solid #ffffff22;border-radius:20px;padding:14px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:8.5px;font-weight:950;padding:5px 8px;border-radius:999px;background:var(--soft);color:var(--c)}
+.badge.white{background:#fff;color:var(--c2)} .badge.ok{background:#e7f5ef;color:#167358}.badge.gold{background:#fff2d8;color:#875b08}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}.date{font-size:9px;color:var(--mut)}.top .date{color:#fff;opacity:.7}
+.teams{display:grid;grid-template-columns:1fr 54px 1fr;gap:8px;align-items:center;margin-top:14px}.team{font-size:14px;font-weight:950;line-height:1.2}.team.r{text-align:right}.score{text-align:center;font-size:23px;font-weight:1000}.score.vs{font-size:10px;opacity:.66}
+.meta{font-size:9px;color:var(--mut);line-height:1.45;margin-top:5px}.top .meta{color:#fff;opacity:.66}
+.main{padding:18px 15px 0}.section{margin-bottom:21px}.sectop{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}h2{font-size:17px;margin:0}.link{border:0;background:none;color:var(--c);font-size:10px;font-weight:950}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.quick button{border:1px solid var(--line);background:#fff;border-radius:17px;padding:11px 4px 10px;box-shadow:0 3px 12px #00000008}.quick span{display:block;font-size:20px;margin-bottom:5px}.quick small{font-size:8.5px;font-weight:900}
+.card{background:#fff;border:1px solid var(--line);border-radius:19px;padding:13px;margin-bottom:9px;box-shadow:var(--shadow)}
+.week{display:flex;gap:7px;overflow:auto;scrollbar-width:none}.daychip{min-width:62px;border:1px solid var(--line);background:#fff;border-radius:15px;padding:9px 7px;text-align:center}.daychip b{font-size:11px;display:block}.daychip small{font-size:8px;color:var(--mut)}.daychip.active{background:var(--c2);color:#fff;border-color:var(--c2)}.daychip.active small{color:#fff;opacity:.7}
+.player{display:flex;align-items:center;gap:10px}.avatar{width:42px;height:42px;border-radius:50%;background:var(--soft);color:var(--c);display:grid;place-items:center;font-weight:950;flex:0 0 42px}.grow{flex:1;min-width:0}.player b{font-size:12px}
+.rank{width:27px;height:27px;border-radius:9px;background:#f1f2f5;display:grid;place-items:center;font-size:10px;font-weight:950;color:#7b838f}.rank.first{background:#fff0cc;color:#9a6600}.rank.second{background:#eef0f4;color:#68717f}.rank.third{background:#f4e7dc;color:#985d34}
+.comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.comp{background:#fff;border:1px solid var(--line);border-radius:17px;padding:13px 8px;text-align:center}.compmark{width:38px;height:38px;border-radius:12px;background:var(--soft);color:var(--c);display:grid;place-items:center;margin:auto;font-weight:1000}.comp b{display:block;font-size:11px;margin-top:7px}.comp small{font-size:8px;color:var(--mut)}
+.screen{display:none}.screen.on{display:block}.sub{padding:15px 15px 4px;display:flex;align-items:center;gap:10px}.back{width:35px;height:35px;border:1px solid var(--line);background:#fff;border-radius:11px}.sub h1{margin:0;font-size:20px}.sub p{margin:3px 0 0;font-size:9.5px;color:var(--mut)}
+.heroPlayer{background:linear-gradient(135deg,var(--c2),var(--c3));color:#fff;border-radius:22px;padding:18px;text-align:center}.heroPlayer .avatar{width:88px;height:88px;margin:auto;background:#fff;color:var(--c);font-size:26px;border:4px solid #ffffff55}.heroPlayer h2{font-size:20px;margin:10px 0 3px}.heroPlayer p{font-size:10px;opacity:.75;margin:0}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:14px}.metric{background:#ffffff12;border-radius:12px;padding:9px 4px}.metric strong{display:block;font-size:15px}.metric small{font-size:7.5px;opacity:.74}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.photo{aspect-ratio:1/1;border-radius:13px;background:#e7e9ee;overflow:hidden}.photo img{width:100%;height:100%;object-fit:cover}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(440px,100%);height:70px;background:#fff;border-top:1px solid var(--line);display:flex;z-index:20}.nav button{flex:1;border:0;background:transparent;color:#7d8591;font-size:8px;font-weight:900}.nav button span{display:block;font-size:19px;margin-bottom:2px}.nav button.on{color:var(--c)}
+.btn{width:100%;border:0;border-radius:13px;background:var(--c2);color:#fff;padding:11px;font-weight:950}.light{width:100%;border:1px solid var(--line);border-radius:13px;background:#fff;padding:10px;font-weight:900}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;background:#fff;padding:10px;margin:5px 0 10px;font:inherit;font-size:11px}.hidden{display:none}
+.newsHero{background:linear-gradient(135deg,#fff,#f6f4ff);border:1px solid #e6e2fa}.newsHero b{font-size:13px}.newsHero p{font-size:9.5px;color:var(--mut);line-height:1.5;margin:5px 0 0}
+.toggle{display:flex;align-items:center;justify-content:space-between}.toggle input{width:auto;margin:0}
+</style></head>
+<body>
+<div class="app">
+
+<section id="home" class="screen on">
+<header class="top">
+ <div class="head"><img class="logo" src="./escudo.jpg"><div class="brand"><h1>EL DEFE</h1><p>Defensores de Santos Lugares · desde 1922</p></div><div class="top-actions"><button class="iconbtn" onclick="show('profile')">♥</button><button class="iconbtn" onclick="show('profile')">🔔</button></div></div>
+ <div class="hero-kicker">Próximo partido</div>
+ <div id="heroMatch" class="hero-card"><div class="row"><span class="badge white">CARGANDO</span><span class="date">—</span></div><div class="meta">Buscando próximo compromiso...</div></div>
+</header>
+<main class="main">
+<section class="section"><div class="quick">
+<button onclick="show('matches')"><span>⚽</span><small>Partidos</small></button>
+<button onclick="show('teams')"><span>👥</span><small>Planteles</small></button>
+<button onclick="show('community')"><span>⭐</span><small>Comunidad</small></button>
+<button onclick="show('profile')"><span>♥</span><small>Mi Defe</small></button>
+</div></section>
+
+<section class="section"><div class="sectop"><h2>Esta semana</h2><button class="link" onclick="show('matches')">Ver agenda</button></div><div class="week" id="week"></div></section>
+
+<section class="section"><div class="sectop"><h2>Competiciones</h2></div><div class="comp-grid">
+<div class="comp" onclick="show('matches')"><div class="compmark">F</div><b>FEFI</b><small>Baby fútbol</small></div>
+<div class="comp" onclick="show('matches')"><div class="compmark">L</div><b>LAAMBA</b><small>Elite I</small></div>
+<div class="comp" onclick="show('matches')"><div class="compmark">A</div><b>Argenliga</b><small>Futsal</small></div>
+</div></section>
+
+<section class="section"><div class="sectop"><h2>Jugador de la fecha</h2><button class="link" onclick="show('community')">Ver más</button></div><div id="pomHome"></div></section>
+<section class="section"><div class="sectop"><h2>Goleadores</h2><button class="link" onclick="show('community')">Ranking</button></div><div id="scorersHome"></div></section>
+<section class="section"><div class="sectop"><h2>Novedades</h2></div><div id="newsHome"></div></section>
+</main></section>
+
+<section id="matches" class="screen"><div class="sub"><button class="back" onclick="show('home')">←</button><div><h1>Partidos</h1><p>Agenda completa del club</p></div></div><main class="main"><div id="allMatches"></div></main></section>
+
+<section id="teams" class="screen"><div class="sub"><button class="back" onclick="show('home')">←</button><div><h1>Planteles</h1><p>Competencias y categorías</p></div></div><main class="main"><div id="teamsList"></div><div id="teamDetail" class="hidden"><button class="light" onclick="teamDetail.classList.add('hidden');teamsList.classList.remove('hidden')">← Volver</button><h2 id="teamTitle" style="margin:14px 0 10px"></h2><div id="teamMembers"></div></div></main></section>
+
+<section id="community" class="screen"><div class="sub"><button class="back" onclick="show('home')">←</button><div><h1>Comunidad</h1><p>Jugadores, destacados y fotos</p></div></div><main class="main">
+<h2>Ranking de goleadores</h2><div class="card" id="allScorers"></div>
+<h2>Jugador de la fecha</h2><div id="pomList"></div>
+<h2>Galería</h2><div id="gallery" class="gallery"></div>
+</main></section>
+
+<section id="player" class="screen"><div class="sub"><button class="back" onclick="show('community')">←</button><div><h1>Jugador</h1><p>Perfil deportivo</p></div></div><main class="main"><div id="playerProfile"></div></main></section>
+
+<section id="profile" class="screen"><div class="sub"><button class="back" onclick="show('home')">←</button><div><h1>Mi Defe</h1><p>Favoritos y notificaciones</p></div></div><main class="main">
+<div id="loginBox" class="card"><input id="email" placeholder="Email"><input id="password" type="password" placeholder="Contraseña"><button class="btn" onclick="login()">Ingresar</button><div id="loginMsg" class="meta"></div></div>
+<div id="prefsBox" class="hidden"><div class="card"><b>Preferencias</b><div style="height:9px"></div>
+<label class="toggle">Cambios de partido <input id="pMatch" type="checkbox"></label>
+<label class="toggle">Resultados <input id="pResults" type="checkbox"></label>
+<label class="toggle">Novedades <input id="pNews" type="checkbox"></label>
+<label class="toggle">Convocatorias <input id="pCallups" type="checkbox"></label>
+<label class="toggle">Solo favoritos <input id="pFavOnly" type="checkbox"></label>
+<button class="btn" style="margin-top:10px" onclick="savePrefs()">Guardar</button></div>
+<div class="card"><button class="light" onclick="enableNotifications()">Activar notificaciones del dispositivo</button></div></div>
+</main></section>
+
+<section id="admin" class="screen"><div class="sub"><button class="back" onclick="show('home')">←</button><div><h1>Gestión</h1><p>Contenido y destacados</p></div></div><main class="main">
+<div id="adminLogin" class="card">Iniciá sesión desde <b>Mi Defe</b>.</div>
+<div id="adminTools" class="hidden">
+<div class="card"><b>Publicar foto</b><input id="mediaUrl" placeholder="URL de imagen"><input id="mediaTitle" placeholder="Título"><textarea id="mediaCaption" placeholder="Descripción"></textarea><button class="btn" onclick="addMedia()">Publicar</button></div>
+<div class="card"><b>Jugador de la fecha</b><input id="pomMatch" placeholder="ID partido"><input id="pomPerson" placeholder="ID jugador"><textarea id="pomNote" placeholder="Comentario"></textarea><button class="btn" onclick="setPOM()">Guardar</button></div>
+</div></main></section>
+
+<nav class="nav">
+<button class="on" onclick="nav('home',this)"><span>⌂</span>Inicio</button>
+<button onclick="nav('matches',this)"><span>⚽</span>Partidos</button>
+<button onclick="nav('teams',this)"><span>👥</span>Planteles</button>
+<button onclick="nav('community',this)"><span>⭐</span>Comunidad</button>
+<button onclick="nav('profile',this)"><span>♥</span>Mi Defe</button>
+</nav>
+</div>
+<script>
+let token=localStorage.getItem('defe_token')||'',role=localStorage.getItem('defe_role')||'';
+const API_BASE=(window.EL_DEFE_API_URL||'').replace(/\/$/,'');
+const api=async(u,o={})=>{u=API_BASE+u;o.headers=o.headers||{};if(token)o.headers.Authorization='Bearer '+token;let r=await fetch(u,o);let j=await r.json();if(!r.ok)throw new Error(j.detail||'Error');return j}
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));document.getElementById(id).classList.add('on');if(id==='matches')loadMatches();if(id==='teams')loadTeams();if(id==='community')loadCommunity();if(id==='profile')refreshProfile();if(id==='admin')refreshAdmin();scrollTo(0,0)}
+function nav(id,b){show(id);document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
+function mcard(m){let s=m.home_score==null?'VS':`${m.home_score}–${m.away_score}`;return `<div class="card"><div class="row"><span class="badge">${m.competition}${m.division?' · '+m.division:''}</span><span class="date">${m.date||''}</span></div><div class="teams"><div class="team">${m.home}</div><div class="score">${s}</div><div class="team r">${m.away}</div></div><div class="meta">${m.round_name||''}${m.venue?' · '+m.venue:''}</div></div>`}
+function playerRow(x,i=0){let cls=i===0?'first':i===1?'second':i===2?'third':'';return `<div class="player" style="padding:8px 0;cursor:pointer" onclick="openPlayer(${x.person_id})"><div class="rank ${cls}">${i+1}</div><div class="grow"><b>${x.name}</b><div class="meta">${x.goals} goles · ${x.assists} asistencias</div></div>${x.shirt_number?`<span class="badge">#${x.shirt_number}</span>`:''}</div>`}
+function niceDate(d){if(!d)return '';try{let x=new Date(d+'T12:00:00');return x.toLocaleDateString('es-AR',{day:'2-digit',month:'short'}).toUpperCase()}catch{return d}}
+async function loadHome(){
+ let [m,s,p,n]=await Promise.all([api('/api/matches'),api('/api/community/top-scorers?limit=3'),api('/api/community/player-of-match?limit=1'),api('/api/news')]);
+ let upcoming=m.filter(x=>x.home_score==null&&x.away_score==null).sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
+ let hero=upcoming[0]||m[0];
+ heroMatch.innerHTML=hero?`<div class="row"><span class="badge white">${hero.competition}${hero.division?' · '+hero.division:''}</span><span class="date">${niceDate(hero.date)}</span></div><div class="teams"><div class="team">${hero.home}</div><div class="score vs">${hero.home_score==null?'VS':hero.home_score+'–'+hero.away_score}</div><div class="team r">${hero.away}</div></div><div class="meta">${hero.round_name||'Próximo compromiso'}</div>`:'<div class="meta">Sin próximos partidos cargados.</div>';
+ let days=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];week.innerHTML=days.map((d,i)=>`<div class="daychip ${i===5?'active':''}"><b>${d}</b><small>${i===5?'Partido':'—'}</small></div>`).join('');
+ scorersHome.innerHTML='<div class="card">'+(s.map(playerRow).join('')||'<div class="meta">Todavía sin estadísticas.</div>')+'</div>';
+ pomHome.innerHTML=p.length?`<div class="card player" onclick="openPlayer(${p[0].person_id})"><div class="avatar">⭐</div><div class="grow"><b>${p[0].name}</b><div class="meta">${p[0].competition} · ${p[0].home} vs ${p[0].away}</div></div><span class="badge gold">Figura</span></div>`:'<div class="card">Todavía no se eligió jugador de la fecha.</div>';
+ newsHome.innerHTML=n.slice(0,2).map(x=>`<div class="card newsHero"><b>${x.title}</b><p>${x.body}</p></div>`).join('');
+}
+async function loadMatches(){let m=await api('/api/matches');allMatches.innerHTML=m.map(mcard).join('')||'<div class="card">Sin partidos cargados.</div>'}
+async function loadTeams(){let ts=await api('/api/teams');teamsList.classList.remove('hidden');teamDetail.classList.add('hidden');teamsList.innerHTML=ts.map(t=>`<div class="card player" onclick="openTeam(${t.id},'${t.competition} · ${t.division}')"><div class="avatar">${t.competition[0]}</div><div class="grow"><b>${t.competition} · ${t.division}</b><div class="meta">Temporada ${t.season}</div></div><span>›</span></div>`).join('')||'<div class="card">Todavía no hay planteles.</div>'}
+async function openTeam(id,title){let ms=await api('/api/teams/'+id+'/members');teamTitle.textContent=title;teamMembers.innerHTML=ms.map(p=>`<div class="card player" onclick="openPlayer(${p.person_id})"><div class="avatar">${p.first_name[0]}${p.last_name[0]}</div><div class="grow"><b>${p.first_name} ${p.last_name}</b><div class="meta">${p.position||p.role||''}</div></div>${p.shirt_number?`<span class="badge">#${p.shirt_number}</span>`:''}</div>`).join('')||'<div class="card">Sin integrantes.</div>';teamsList.classList.add('hidden');teamDetail.classList.remove('hidden')}
+async function loadCommunity(){let [s,p,g]=await Promise.all([api('/api/community/top-scorers'),api('/api/community/player-of-match'),api('/api/media')]);allScorers.innerHTML=s.map(playerRow).join('')||'<div class="meta">Sin estadísticas.</div>';pomList.innerHTML=p.map(x=>`<div class="card player" onclick="openPlayer(${x.person_id})"><div class="avatar">⭐</div><div class="grow"><b>${x.name}</b><div class="meta">${x.competition} · ${x.note||'Jugador destacado'}</div></div><span class="badge gold">Figura</span></div>`).join('')||'<div class="card">Sin destacados aún.</div>';gallery.innerHTML=g.filter(x=>x.media_type==='photo').map(x=>`<div class="photo"><img src="${x.url}" alt="${x.title||''}"></div>`).join('')||'<div class="card" style="grid-column:1/-1">Todavía no hay fotos.</div>'}
+async function openPlayer(id){let p=await api('/api/players/'+id+'/profile');let ini=(p.first_name[0]||'')+(p.last_name[0]||'');playerProfile.innerHTML=`<div class="heroPlayer"><div class="avatar">${ini}</div><h2>${p.first_name} ${p.last_name}</h2><p>${p.position||'Jugador'}${p.shirt_number?' · #'+p.shirt_number:''}</p><div class="metrics"><div class="metric"><strong>${p.stats.matches}</strong><small>PJ</small></div><div class="metric"><strong>${p.stats.goals}</strong><small>Goles</small></div><div class="metric"><strong>${p.stats.assists}</strong><small>Asist.</small></div><div class="metric"><strong>${p.player_of_match}</strong><small>Figuras</small></div></div></div><h2 style="margin:16px 0 10px">Equipos</h2>${p.teams.map(t=>`<div class="card"><b>${t.competition} · ${t.division}</b><div class="meta">${t.season}</div></div>`).join('')}<h2 style="margin:16px 0 10px">Galería</h2><div class="gallery">${p.media.map(x=>`<div class="photo"><img src="${x.url}"></div>`).join('')||'<div class="card" style="grid-column:1/-1">Sin fotos.</div>'}</div>`;show('player')}
+async function login(){try{let fd=new FormData();fd.append('username',email.value);fd.append('password',password.value);let r=await fetch(API_BASE+'/api/auth/login',{method:'POST',body:fd});let j=await r.json();if(!r.ok)throw new Error(j.detail);token=j.access_token;role=j.user.role;localStorage.setItem('defe_token',token);localStorage.setItem('defe_role',role);loginMsg.textContent='Ingreso correcto';refreshProfile()}catch(e){loginMsg.textContent=e.message}}
+async function refreshProfile(){loginBox.classList.toggle('hidden',!!token);prefsBox.classList.toggle('hidden',!token);if(token){let p=await api('/api/notification-preferences');pMatch.checked=p.match_changes;pResults.checked=p.results;pNews.checked=p.news;pCallups.checked=p.callups;pFavOnly.checked=p.favorite_only}}
+async function savePrefs(){await api('/api/notification-preferences',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({match_changes:pMatch.checked,results:pResults.checked,news:pNews.checked,callups:pCallups.checked,favorite_only:pFavOnly.checked})});alert('Preferencias guardadas')}
+async function enableNotifications(){if(!('Notification'in window))return alert('No soportado');let p=await Notification.requestPermission();if(p==='granted')new Notification('El Defe',{body:'Notificaciones habilitadas'});}
+function refreshAdmin(){adminLogin.classList.toggle('hidden',!!token);adminTools.classList.toggle('hidden',!token)}
+async function addMedia(){await api('/api/media',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:mediaUrl.value,title:mediaTitle.value,caption:mediaCaption.value,media_type:'photo'})});mediaUrl.value=mediaTitle.value=mediaCaption.value='';alert('Foto publicada')}
+async function setPOM(){await api('/api/community/player-of-match',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({match_id:Number(pomMatch.value),person_id:Number(pomPerson.value),note:pomNote.value})});alert('Jugador de la fecha guardado')}
+if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js');
+loadHome();
+</script>
+</body></html>
