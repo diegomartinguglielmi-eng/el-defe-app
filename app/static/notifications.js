@@ -1,20 +1,99 @@
 (function(){
   const API=()=>window.EL_DEFE_API_URL||'';
-  const LAST='defe_notification_last_id',ENABLED='defe_notifications_enabled',FOLLOW='defe_followed_v1';
-  let initialized=false,started=false;
+  const LAST='defe_notification_last_id';
+  const ENABLED='defe_notifications_enabled';
+  const FOLLOW='defe_followed_v1';
+  let initialized=false;
+
   const token=()=>localStorage.getItem('defe_token')||'';
   const role=()=>localStorage.getItem('defe_role')||'';
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const followed=()=>{try{return new Set(JSON.parse(localStorage.getItem(FOLLOW)||'[]'))}catch{return new Set()}};
-  function wants(e){if(e.urgent)return true;const f=followed();if(!f.size)return true;if(e.competition==='FEFI'&&e.category)return f.has('FEFI|'+e.category);if(e.competition==='FEFI')return [...f].some(x=>x.startsWith('FEFI|'));if(e.competition==='LAAMBA'&&e.category)return f.has('LAAMBA|'+e.category);if(e.competition==='ARGENLIGA')return f.has('ARGENLIGA|ALL');return true;}
-  async function showEvent(e){if(localStorage.getItem(ENABLED)!=='1'||!('Notification'in window)||Notification.permission!=='granted'||!wants(e))return;const opts={body:e.body,icon:'/static/icon-192.png',badge:'/static/icon-192.png',tag:'defe-'+e.id,data:{url:'/'},renotify:!!e.urgent};try{if('serviceWorker'in navigator){const reg=await navigator.serviceWorker.ready;await reg.showNotification(e.title,opts);}else new Notification(e.title,opts);}catch{}}
-  async function poll(){try{const since=Number(localStorage.getItem(LAST)||0),r=await fetch(API()+`/api/notifications/feed?since_id=${since}&limit=100`);if(!r.ok)return;const rows=await r.json();if(!rows.length){initialized=true;return;}const max=Math.max(...rows.map(x=>Number(x.id)||0));if(!initialized){localStorage.setItem(LAST,String(max));initialized=true;renderInbox(rows.slice(-3).reverse());return;}for(const e of rows)await showEvent(e);localStorage.setItem(LAST,String(max));renderInbox(rows.slice(-3).reverse());}catch{}}
-  function ensurePermissionCard(){const main=document.querySelector('#profile .main');if(!main||document.getElementById('notificationDeviceCard'))return;const card=document.createElement('div');card.id='notificationDeviceCard';card.className='card';const granted=typeof Notification!=='undefined'&&Notification.permission==='granted'&&localStorage.getItem(ENABLED)==='1';card.innerHTML=`<div class="row"><b>Avisos de El Defe</b><span id="notificationState" class="badge ${granted?'ok':''}">${granted?'ACTIVOS':'DESACTIVADOS'}</span></div><div class="meta">Recibí urgentes y cambios de horario de las categorías que seguís en este dispositivo.</div><button id="notificationEnableBtn" class="btn" style="margin-top:10px">${granted?'Avisos habilitados':'Activar avisos'}</button><div id="notificationInbox" class="meta"></div>`;main.insertBefore(card,main.firstChild);document.getElementById('notificationEnableBtn').onclick=async()=>{if(!('Notification'in window)){alert('Este navegador no soporta notificaciones.');return;}const p=await Notification.requestPermission();if(p==='granted'){localStorage.setItem(ENABLED,'1');document.getElementById('notificationState').textContent='ACTIVOS';document.getElementById('notificationState').className='badge ok';document.getElementById('notificationEnableBtn').textContent='Avisos habilitados';initialized=true;await poll();}};}
-  function renderInbox(rows){const box=document.getElementById('notificationInbox');if(!box||!rows?.length)return;box.innerHTML='<div style="margin-top:10px"><b style="font-size:10px">Últimos avisos</b>'+rows.map(e=>`<div style="margin-top:6px"><b>${esc(e.title)}</b><br>${esc(e.body)}</div>`).join('')+'</div>';}
-  async function createNotice(payload){const r=await fetch(API()+'/api/notifications/urgent',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token()},body:JSON.stringify(payload)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.detail||'No se pudo publicar');return j;}
-  async function postUrgent(){const title=document.getElementById('urgentTitle')?.value.trim(),body=document.getElementById('urgentBody')?.value.trim(),competition=document.getElementById('urgentCompetition')?.value||null,category=document.getElementById('urgentCategory')?.value.trim()||null,msg=document.getElementById('urgentMsg');if(!body){msg.textContent='Escribí el aviso.';return;}try{await createNotice({title:title||'Aviso urgente',body,competition,category});msg.textContent='Aviso publicado.';document.getElementById('urgentBody').value='';}catch(e){msg.textContent=e.message;}}
-  function ensureAdminUrgent(){const tools=document.getElementById('adminTools');if(!tools||!['admin','delegado'].includes(role())||document.getElementById('urgentNoticeCard'))return;const card=document.createElement('div');card.id='urgentNoticeCard';card.className='card';card.innerHTML=`<div class="row"><b>Aviso urgente</b><span class="badge gold">PUSH</span></div><div class="meta">Publica un aviso inmediato para los dispositivos que tengan los avisos activados.</div><input id="urgentTitle" placeholder="Título (opcional)"><textarea id="urgentBody" rows="3" placeholder="Mensaje"></textarea><select id="urgentCompetition"><option value="">Todo el club</option><option value="FEFI">FEFI</option><option value="LAAMBA">LAAMBA</option><option value="ARGENLIGA">Argenliga</option></select><input id="urgentCategory" placeholder="Categoría/división (opcional)"><button class="btn" id="urgentPublishBtn">Publicar urgente</button><div id="urgentMsg" class="meta"></div>`;tools.insertBefore(card,tools.firstChild);document.getElementById('urgentPublishBtn').onclick=postUrgent;}
-  function wrapFefiApproval(){const old=window.defeResolveFefi;if(typeof old!=='function'||old.__notifications)return;const wrapped=async function(id,action){let detail='Cambio de fixture o sede confirmado';if(action==='approve'){try{const rows=await fetch(API()+'/api/fefi/pending',{headers:{Authorization:'Bearer '+token()}}).then(r=>r.json());const x=Array.isArray(rows)?rows.find(v=>Number(v.id)===Number(id)):null;if(x?.detail)detail=x.detail;}catch{}}const result=await old.apply(this,arguments);if(action==='approve'){try{await createNotice({title:'Cambio confirmado FEFI',body:detail,competition:'FEFI',category:null});}catch{}}return result;};wrapped.__notifications=true;window.defeResolveFefi=wrapped;}
-  function init(){if(started)return;started=true;ensurePermissionCard();ensureAdminUrgent();wrapFefiApproval();setInterval(poll,45000);poll();const oldShow=window.show;if(typeof oldShow==='function'&&!oldShow.__notifications){const wrapped=function(id){const r=oldShow.apply(this,arguments);if(id==='profile')setTimeout(ensurePermissionCard,0);if(id==='admin')setTimeout(()=>{ensureAdminUrgent();wrapFefiApproval();},0);return r};wrapped.__notifications=true;window.show=wrapped;}const oldAdmin=window.refreshAdmin;if(typeof oldAdmin==='function'&&!oldAdmin.__notifications){const wrapped=function(){const r=oldAdmin.apply(this,arguments);setTimeout(()=>{ensureAdminUrgent();wrapFefiApproval();},0);return r};wrapped.__notifications=true;window.refreshAdmin=wrapped;}}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+
+  function wants(e){
+    if(e.urgent)return true;
+    const f=followed();
+    if(!f.size)return true;
+    if(e.competition==='FEFI'&&e.category)return f.has('FEFI|'+e.category);
+    if(e.competition==='FEFI')return [...f].some(x=>x.startsWith('FEFI|'));
+    if(e.competition==='LAAMBA'&&e.category)return f.has('LAAMBA|'+e.category);
+    if(e.competition==='ARGENLIGA')return f.has('ARGENLIGA|ALL');
+    return true;
+  }
+
+  async function showEvent(e){
+    if(localStorage.getItem(ENABLED)!=='1'||Notification.permission!=='granted'||!wants(e))return;
+    const opts={body:e.body,icon:'/static/icon-192.png',badge:'/static/icon-192.png',tag:'defe-'+e.id,data:{url:'/'},renotify:!!e.urgent};
+    try{
+      if('serviceWorker'in navigator){const reg=await navigator.serviceWorker.ready;await reg.showNotification(e.title,opts);}
+      else new Notification(e.title,opts);
+    }catch{}
+  }
+
+  async function poll(){
+    try{
+      const since=Number(localStorage.getItem(LAST)||0);
+      const r=await fetch(API()+`/api/notifications/feed?since_id=${since}&limit=100`);
+      if(!r.ok)return;
+      const rows=await r.json();
+      if(!rows.length)return;
+      const max=Math.max(...rows.map(x=>Number(x.id)||0));
+      if(!initialized){localStorage.setItem(LAST,String(max));initialized=true;renderInbox(rows.slice(-3).reverse());return;}
+      for(const e of rows)await showEvent(e);
+      localStorage.setItem(LAST,String(max));
+      renderInbox(rows.slice(-3).reverse());
+    }catch{}
+  }
+
+  function ensurePermissionCard(){
+    const main=document.querySelector('#profile .main');
+    if(!main||document.getElementById('notificationDeviceCard'))return;
+    const card=document.createElement('div');card.id='notificationDeviceCard';card.className='card';
+    const granted=typeof Notification!=='undefined'&&Notification.permission==='granted'&&localStorage.getItem(ENABLED)==='1';
+    card.innerHTML=`<div class="row"><b>Avisos de El Defe</b><span id="notificationState" class="badge ${granted?'ok':''}">${granted?'ACTIVOS':'DESACTIVADOS'}</span></div><div class="meta">Recibí urgentes, cambios, recordatorios y resultados de las categorías que seguís en este dispositivo.</div><button id="notificationEnableBtn" class="btn" style="margin-top:10px">${granted?'Avisos habilitados':'Activar avisos'}</button><div id="notificationInbox" class="meta"></div>`;
+    main.insertBefore(card,main.firstChild);
+    document.getElementById('notificationEnableBtn').onclick=async()=>{
+      if(!('Notification'in window)){alert('Este navegador no soporta notificaciones.');return;}
+      const p=await Notification.requestPermission();
+      if(p==='granted'){
+        localStorage.setItem(ENABLED,'1');
+        document.getElementById('notificationState').textContent='ACTIVOS';
+        document.getElementById('notificationState').className='badge ok';
+        document.getElementById('notificationEnableBtn').textContent='Avisos habilitados';
+        initialized=true;await poll();
+      }
+    };
+  }
+
+  function renderInbox(rows){
+    const box=document.getElementById('notificationInbox');if(!box||!rows?.length)return;
+    box.innerHTML='<div style="margin-top:10px"><b style="font-size:10px">Últimos avisos</b>'+rows.map(e=>`<div style="margin-top:6px"><b>${esc(e.title)}</b><br>${esc(e.body)}</div>`).join('')+'</div>';
+  }
+
+  async function postUrgent(){
+    const title=document.getElementById('urgentTitle')?.value.trim(),body=document.getElementById('urgentBody')?.value.trim(),competition=document.getElementById('urgentCompetition')?.value||null,category=document.getElementById('urgentCategory')?.value.trim()||null,msg=document.getElementById('urgentMsg');
+    if(!body){msg.textContent='Escribí el aviso.';return;}
+    const r=await fetch(API()+'/api/notifications/urgent',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token()},body:JSON.stringify({title:title||'Aviso urgente',body,competition,category})});
+    const j=await r.json().catch(()=>({}));if(!r.ok){msg.textContent=j.detail||'No se pudo publicar';return;}
+    msg.textContent='Aviso publicado.';document.getElementById('urgentBody').value='';
+  }
+
+  function ensureAdminUrgent(){
+    const tools=document.getElementById('adminTools');
+    if(!tools||!['admin','delegado'].includes(role())||document.getElementById('urgentNoticeCard'))return;
+    const card=document.createElement('div');card.id='urgentNoticeCard';card.className='card';
+    card.innerHTML=`<div class="row"><b>Aviso urgente</b><span class="badge gold">PUSH</span></div><div class="meta">Publica un aviso inmediato para los dispositivos que tengan los avisos activados.</div><input id="urgentTitle" placeholder="Título (opcional)"><textarea id="urgentBody" rows="3" placeholder="Mensaje"></textarea><select id="urgentCompetition"><option value="">Todo el club</option><option value="FEFI">FEFI</option><option value="LAAMBA">LAAMBA</option><option value="ARGENLIGA">Argenliga</option></select><input id="urgentCategory" placeholder="Categoría/división (opcional)"><button class="btn" id="urgentPublishBtn">Publicar urgente</button><div id="urgentMsg" class="meta"></div>`;
+    tools.insertBefore(card,tools.firstChild);document.getElementById('urgentPublishBtn').onclick=postUrgent;
+  }
+
+  function init(){
+    ensurePermissionCard();ensureAdminUrgent();
+    setInterval(poll,45000);poll();
+    const oldShow=window.show;
+    if(typeof oldShow==='function'&&!oldShow.__notifications){const wrapped=function(id){const r=oldShow.apply(this,arguments);if(id==='profile')setTimeout(ensurePermissionCard,0);if(id==='admin')setTimeout(ensureAdminUrgent,0);return r};wrapped.__notifications=true;window.show=wrapped;}
+    const oldAdmin=window.refreshAdmin;
+    if(typeof oldAdmin==='function'&&!oldAdmin.__notifications){const wrapped=function(){const r=oldAdmin.apply(this,arguments);setTimeout(ensureAdminUrgent,0);return r};wrapped.__notifications=true;window.refreshAdmin=wrapped;}
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
