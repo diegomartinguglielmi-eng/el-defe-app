@@ -16,7 +16,7 @@ from .models import Match, SyncRun
 FEFI_URL = "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/"
 FEFI_CLUB = "DEF. DE SANTOS LUGARES"
 FEFI_DIVISION = "Zona H"
-USER_AGENT = "ElDefeApp/0.5 (+Defensores de Santos Lugares)"
+USER_AGENT = "ElDefeApp/0.6 (+Defensores de Santos Lugares)"
 CATEGORIES = ["2019", "2013", "2018", "2014", "2017", "2016", "2015"]
 
 
@@ -26,6 +26,26 @@ def _norm(value: str | None) -> str:
 
 def _cells(row) -> list[str]:
     return [re.sub(r"\s+", " ", c.get_text(" ", strip=True)) for c in row.find_all(["th", "td"])]
+
+
+def _nearby_tournament_marker(table) -> str | None:
+    for node in table.find_all_previous(["h1","h2","h3","h4","h5","h6","button","a","span","div"], limit=40):
+        txt = _norm(node.get_text(" ", strip=True))
+        if not txt or len(txt) > 140:
+            continue
+        if "CLAUSURA" in txt:
+            return "CLAUSURA"
+        if "APERTURA" in txt:
+            return "APERTURA"
+    return None
+
+
+def _prefer_clausura(candidates: list) -> list:
+    marked = [(t, _nearby_tournament_marker(t)) for t in candidates]
+    clausura = [t for t, marker in marked if marker == "CLAUSURA"]
+    if clausura:
+        return clausura
+    return candidates[-1:] if candidates else []
 
 
 class FefiCategoryResult(Base):
@@ -44,11 +64,14 @@ class FefiCategoryResult(Base):
 
 def parse_fefi_results(html: str) -> list[dict]:
     soup = BeautifulSoup(html, "html.parser")
-    out: list[dict] = []
+    candidates = []
     for table in soup.find_all("table"):
         text = _norm(table.get_text(" ", strip=True))
-        if not (("F.T." in text or "EQUIPOS" in text) and "ESTADO" in text):
-            continue
+        if ("F.T." in text or "EQUIPOS" in text) and "ESTADO" in text:
+            candidates.append(table)
+
+    out: list[dict] = []
+    for table in _prefer_clausura(candidates):
         rows = [_cells(tr) for tr in table.find_all("tr")]
         rows = [r for r in rows if r]
         i = 0
@@ -64,14 +87,10 @@ def parse_fefi_results(html: str) -> list[dict]:
                     status = a[-1] if len(a) >= 12 else "Publicado"
                     points_a = None
                     points_b = None
-                    try:
-                        points_a = int(a[10])
-                    except Exception:
-                        pass
-                    try:
-                        points_b = int(b[9])
-                    except Exception:
-                        pass
+                    try: points_a = int(a[10])
+                    except Exception: pass
+                    try: points_b = int(b[9])
+                    except Exception: pass
                     out.append({
                         "round": rnd,
                         "home": team_a,
@@ -102,16 +121,10 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
             continue
         verified += 1
         for idx, category in enumerate(CATEGORIES):
-            key = f"FEFI|2026|H|F{result['round']}|{category}"
+            key = f"FEFI|2026|H|CLAUSURA|F{result['round']}|{category}"
             row = db.query(FefiCategoryResult).filter(FefiCategoryResult.external_key == key).first()
             if not row:
-                row = FefiCategoryResult(
-                    external_key=key,
-                    round_number=result["round"],
-                    category=category,
-                    home=result["home"],
-                    away=result["away"],
-                )
+                row = FefiCategoryResult(external_key=key,round_number=result["round"],category=category,home=result["home"],away=result["away"])
                 db.add(row)
             row.home = result["home"]
             row.away = result["away"]
@@ -121,22 +134,9 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
             category_rows += 1
 
         round_name = f"Fecha {result['round']}"
-        match = db.query(Match).filter(
-            Match.competition == "FEFI",
-            Match.division == FEFI_DIVISION,
-            Match.round_name == round_name,
-        ).order_by(Match.id.desc()).first()
+        match = db.query(Match).filter(Match.competition == "FEFI",Match.division == FEFI_DIVISION,Match.round_name == round_name).order_by(Match.id.desc()).first()
         if not match:
-            match = Match(
-                external_key=f"FEFI|2026|H|{round_name}",
-                competition="FEFI",
-                division=FEFI_DIVISION,
-                round_name=round_name,
-                home=result["home"],
-                away=result["away"],
-                source_url=FEFI_URL,
-                source_kind="verified_auto",
-            )
+            match = Match(external_key=f"FEFI|2026|H|CLAUSURA|{round_name}",competition="FEFI",division=FEFI_DIVISION,round_name=round_name,home=result["home"],away=result["away"],source_url=FEFI_URL,source_kind="verified_auto")
             db.add(match)
         match.home = result["home"]
         match.away = result["away"]
@@ -146,9 +146,9 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
         match.source_url = FEFI_URL
         match.source_kind = "verified_auto"
 
-    db.add(SyncRun(source="FEFI_RESULTS", status="ok", detail=f"{verified} resultados verificados; {category_rows} filas de categoría"))
+    db.add(SyncRun(source="FEFI_RESULTS", status="ok", detail=f"Clausura: {verified} resultados verificados; {category_rows} filas de categoría"))
     db.commit()
-    return {"verified_results": verified, "category_rows": category_rows}
+    return {"tournament":"CLAUSURA","verified_results": verified, "category_rows": category_rows}
 
 
 router = APIRouter(prefix="/api/fefi", tags=["FEFI"])
@@ -157,12 +157,4 @@ router = APIRouter(prefix="/api/fefi", tags=["FEFI"])
 @router.get("/results/{round_number}")
 def category_results(round_number: int, db: Session = Depends(get_db)):
     rows = db.query(FefiCategoryResult).filter(FefiCategoryResult.round_number == round_number).order_by(FefiCategoryResult.id).all()
-    return [{
-        "round": r.round_number,
-        "category": r.category,
-        "home": r.home,
-        "away": r.away,
-        "home_value": r.home_value,
-        "away_value": r.away_value,
-        "status": r.status,
-    } for r in rows]
+    return [{"round":r.round_number,"category":r.category,"home":r.home,"away":r.away,"home_value":r.home_value,"away_value":r.away_value,"status":r.status} for r in rows]
