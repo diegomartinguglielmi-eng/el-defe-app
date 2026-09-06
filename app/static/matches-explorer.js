@@ -1,7 +1,7 @@
 // El Defe V5.1 · Explorador de partidos
 (function(){
   const apiBase=()=>window.EL_DEFE_API_URL||'';
-  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
   const state={competition:'ALL',status:'upcoming',division:'ALL',rows:[]};
   const clubNames=['DEF. DE SANTOS LUGARES','DEFENSORES DE SANTOS LUGARES','DEFENSORES DE SL'];
 
@@ -90,6 +90,9 @@
     if(typeof oldNav==='function'&&!oldNav.__matchExplorer){
       const wrapped=function(id){const r=oldNav.apply(this,arguments);if(id==='matches')setTimeout(load,0);return r;};
       wrapped.__matchExplorer=true;window.nav=wrapped;
+    }
+    if(!document.querySelector('script[data-personalized-home]')){
+      const s=document.createElement('script');s.src='/static/personalized_home.js';s.dataset.personalizedHome='1';document.body.appendChild(s);
     }
   });
 })();
