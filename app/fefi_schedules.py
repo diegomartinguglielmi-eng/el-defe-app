@@ -4,6 +4,7 @@ from .db import get_db
 from .models import Match, FefiCategorySchedule
 from .schemas import FefiScheduleIn
 from .auth import require_roles
+from .notifications_v5 import publish_event
 
 router=APIRouter(prefix="/api/fefi",tags=["FEFI schedules"])
 CATEGORIES=["2019","2013","2018","2014","2017","2016","2015"]
@@ -23,12 +24,22 @@ def put_schedule(match_id:int,payload:FefiScheduleIn,db:Session=Depends(get_db),
     if not m or m.competition!="FEFI": raise HTTPException(status_code=404,detail="Partido FEFI inexistente")
     invalid=[x.category for x in payload.items if x.category not in CATEGORIES]
     if invalid: raise HTTPException(status_code=400,detail="Categoría FEFI inválida")
+    changed=[]
     for x in payload.items:
         if x.time and not __import__('re').match(r'^([01]\d|2[0-3]):[0-5]\d$',x.time):
             raise HTTPException(status_code=400,detail=f"Horario inválido para {x.category}. Usar HH:MM")
         row=db.query(FefiCategorySchedule).filter(FefiCategorySchedule.match_id==match_id,FefiCategorySchedule.category==x.category).first()
+        before_time=row.time if row else None
+        before_note=row.note if row else None
         if not row:
             row=FefiCategorySchedule(match_id=match_id,category=x.category);db.add(row)
         row.time=x.time or None;row.note=x.note or None;row.updated_by=user.id
+        if before_time!=row.time or before_note!=row.note:
+            changed.append((x.category,before_time,row.time,row.note))
+    for cat,before_time,new_time,note in changed:
+        body=f"{m.round_name or 'Próxima fecha'} · Cat. {cat}: {new_time or 'horario a confirmar'} hs"
+        if before_time: body+=f" (antes {before_time} hs)"
+        if note: body+=f" · {note}"
+        publish_event(db,event_type="schedule_change",title="Cambio de horario FEFI",body=body,competition="FEFI",category=cat,match_id=m.id)
     db.commit()
-    return {"ok":True,"match_id":match_id,"saved":len(payload.items)}
+    return {"ok":True,"match_id":match_id,"saved":len(payload.items),"changed":len(changed)}
