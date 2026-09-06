@@ -12,10 +12,9 @@ window.EL_DEFE_API_URL = "";
     if(!r.ok) throw new Error(j.detail||'Error');
     return j;
   }
-  function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+  function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));}
   function intOrNull(v){const x=String(v??'').trim();return /^-?\d+$/.test(x)?Number(x):null;}
 
-  // ---------- FEFI: resultados por categoría ----------
   function ensureFefiResultScreen(){
     if(document.getElementById('fefiResults')) return;
     const app=document.querySelector('.app');
@@ -72,7 +71,6 @@ window.EL_DEFE_API_URL = "";
     enhanced.__defeV5=true;window.mcard=enhanced;
   }
 
-  // ---------- Gestión FEFI ----------
   async function loadFefiAdmin(){
     const box=document.getElementById('fefiPendingBox');
     if(!box || !token()) return;
@@ -97,7 +95,6 @@ window.EL_DEFE_API_URL = "";
   window.defeResolveFefi=async(id,action)=>{try{await api(`/api/fefi/pending/${id}/${action}`,{method:'POST'});await loadFefiAdmin();if(window.loadMatches)window.loadMatches();}catch(e){alert(e.message)}};
   window.defeRunFefi=async()=>{try{await api('/api/fefi/run',{method:'POST'});await loadFefiAdmin();}catch(e){alert(e.message)}};
 
-  // ---------- Gestión LAAMBA + Argenliga ----------
   function ensureSourcesCard(){
     const tools=document.getElementById('adminTools');
     if(!tools || document.getElementById('competitionSourcesBox')) return;
@@ -168,5 +165,6 @@ window.EL_DEFE_API_URL = "";
     if(typeof oldAdmin==='function') window.refreshAdmin=function(){oldAdmin();loadFefiAdmin();ensureSourcesCard();};
     const oldProfile=window.refreshProfile;
     if(typeof oldProfile==='function') window.refreshProfile=async function(){const r=await oldProfile();ensureAdminAccess();return r;};
+    const explorer=document.createElement('script');explorer.src='/static/matches-explorer.js?v=51';explorer.defer=true;document.body.appendChild(explorer);
   });
 })();
