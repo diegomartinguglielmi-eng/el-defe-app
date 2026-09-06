@@ -36,13 +36,14 @@
         ${s.health==='error'?'<div class="meta" style="margin-top:8px"><b>Se conserva el último dato publicado válido hasta que FEFI vuelva a responder.</b></div>':''}`;
     }catch(e){box.innerHTML=`<b>Salud del dato FEFI</b><div class="meta">${esc(e.message)}</div>`;}
   }
-  window.defeLoadFefiFreshness=render;
-  document.addEventListener('DOMContentLoaded',()=>{
+  function init(){
     setTimeout(render,300);
     const oldShow=window.show;
     if(typeof oldShow==='function'&&!oldShow.__fefiFreshness){
       const wrapped=function(id){const r=oldShow.apply(this,arguments);if(id==='admin')setTimeout(render,100);return r;};
       wrapped.__fefiFreshness=true;window.show=wrapped;
     }
-  });
+  }
+  window.defeLoadFefiFreshness=render;
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
