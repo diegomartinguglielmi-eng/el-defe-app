@@ -20,12 +20,18 @@ def reminder_body(match: Match, category: str | None = None, time: str | None = 
     return base
 
 
-def run() -> dict:
+def run(force: bool = False) -> dict:
+    now = datetime.now(AR_TZ)
+    if not force and now.hour != 21:
+        result = {"ok": True, "skipped": True, "reason": "outside_21h_window", "local_time": now.isoformat()}
+        print(result)
+        return result
+
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     created = 0
     try:
-        target = datetime.now(AR_TZ).date() + timedelta(days=1)
+        target = now.date() + timedelta(days=1)
         target_s = target.isoformat()
         matches = db.query(Match).filter(
             Match.date == target_s,
@@ -80,7 +86,7 @@ def run() -> dict:
                     created += 1
 
         db.commit()
-        result = {"ok": True, "target_date": target_s, "matches": len(matches), "reminders_created": created}
+        result = {"ok": True, "target_date": target_s, "matches": len(matches), "reminders_created": created, "local_time": now.isoformat()}
         print(result)
         return result
     except Exception:
@@ -91,4 +97,4 @@ def run() -> dict:
 
 
 if __name__ == "__main__":
-    run()
+    run(force=True)
