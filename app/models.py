@@ -30,6 +30,17 @@ class Match(Base):
     source_kind: Mapped[str]=mapped_column(String(30),default="manual")
     updated_at: Mapped[str]=mapped_column(DateTime(timezone=True),server_default=func.now(),onupdate=func.now())
 
+class FefiCategorySchedule(Base):
+    __tablename__="fefi_category_schedules"
+    id: Mapped[int]=mapped_column(primary_key=True)
+    match_id: Mapped[int]=mapped_column(ForeignKey("matches.id"),index=True)
+    category: Mapped[str]=mapped_column(String(20),index=True)
+    time: Mapped[str|None]=mapped_column(String(10))
+    note: Mapped[str|None]=mapped_column(String(250))
+    updated_by: Mapped[int|None]=mapped_column(ForeignKey("users.id"))
+    updated_at: Mapped[str]=mapped_column(DateTime(timezone=True),server_default=func.now(),onupdate=func.now())
+    __table_args__=(UniqueConstraint("match_id","category",name="uq_fefi_match_category_schedule"),)
+
 class Standing(Base):
     __tablename__="standings"
     id: Mapped[int]=mapped_column(primary_key=True)
@@ -74,7 +85,6 @@ class SyncRun(Base):
     status: Mapped[str]=mapped_column(String(30))
     detail: Mapped[str|None]=mapped_column(Text)
     created_at: Mapped[str]=mapped_column(DateTime(timezone=True),server_default=func.now())
-
 
 class Team(Base):
     __tablename__="teams"
@@ -148,12 +158,11 @@ class Suspension(Base):
     end_date: Mapped[str|None]=mapped_column(String(30))
     status: Mapped[str]=mapped_column(String(30),default="active")
 
-
 class Favorite(Base):
     __tablename__="favorites"
     id: Mapped[int]=mapped_column(primary_key=True)
     user_id: Mapped[int]=mapped_column(ForeignKey("users.id"),index=True)
-    favorite_type: Mapped[str]=mapped_column(String(30),index=True)  # team/person/competition
+    favorite_type: Mapped[str]=mapped_column(String(30),index=True)
     favorite_id: Mapped[str]=mapped_column(String(100),index=True)
     created_at: Mapped[str]=mapped_column(DateTime(timezone=True),server_default=func.now())
     __table_args__=(UniqueConstraint("user_id","favorite_type","favorite_id",name="uq_user_favorite"),)
