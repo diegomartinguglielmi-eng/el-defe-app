@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import requests
 from bs4 import BeautifulSoup
@@ -12,12 +13,14 @@ from sqlalchemy.sql import func
 
 from .db import Base, get_db
 from .models import Match, SyncRun
+from .notifications_v5 import NotificationEvent, publish_event
 
 FEFI_URL = "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/"
 FEFI_CLUB = "DEF. DE SANTOS LUGARES"
 FEFI_DIVISION = "Zona H"
-USER_AGENT = "ElDefeApp/0.6 (+Defensores de Santos Lugares)"
+USER_AGENT = "ElDefeApp/0.7 (+Defensores de Santos Lugares)"
 CATEGORIES = ["2019", "2013", "2018", "2014", "2017", "2016", "2015"]
+AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 
 
 def _norm(value: str | None) -> str:
@@ -108,6 +111,25 @@ def parse_fefi_results(html: str) -> list[dict]:
     return [dedup[k] for k in sorted(dedup)]
 
 
+def _is_recent_match(match: Match) -> bool:
+    if not match.date:
+        return False
+    try:
+        match_date = datetime.strptime(match.date[:10], "%Y-%m-%d").date()
+    except Exception:
+        return False
+    today = datetime.now(AR_TZ).date()
+    return today - timedelta(days=1) <= match_date <= today
+
+
+def _result_body(result: dict, idx: int) -> str:
+    home = result["home"]
+    away = result["away"]
+    hv = result["scores_home"][idx] if idx < len(result["scores_home"]) else "—"
+    av = result["scores_away"][idx] if idx < len(result["scores_away"]) else "—"
+    return f"{home} {hv} - {av} {away} · Resultado verificado por FEFI"
+
+
 def sync_verified_results(db: Session, html: str | None = None) -> dict:
     if html is None:
         response = requests.get(FEFI_URL, timeout=30, headers={"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"})
@@ -116,28 +138,32 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
     parsed = parse_fefi_results(html)
     verified = 0
     category_rows = 0
+    notifications = 0
     for result in parsed:
         if _norm(result.get("status")) != "VERIFICADO":
             continue
         verified += 1
-        for idx, category in enumerate(CATEGORIES):
-            key = f"FEFI|2026|H|CLAUSURA|F{result['round']}|{category}"
-            row = db.query(FefiCategoryResult).filter(FefiCategoryResult.external_key == key).first()
-            if not row:
-                row = FefiCategoryResult(external_key=key,round_number=result["round"],category=category,home=result["home"],away=result["away"])
-                db.add(row)
-            row.home = result["home"]
-            row.away = result["away"]
-            row.home_value = result["scores_home"][idx] if idx < len(result["scores_home"]) else None
-            row.away_value = result["scores_away"][idx] if idx < len(result["scores_away"]) else None
-            row.status = "Verificado"
-            category_rows += 1
 
         round_name = f"Fecha {result['round']}"
-        match = db.query(Match).filter(Match.competition == "FEFI",Match.division == FEFI_DIVISION,Match.round_name == round_name).order_by(Match.id.desc()).first()
+        match = db.query(Match).filter(
+            Match.competition == "FEFI",
+            Match.division == FEFI_DIVISION,
+            Match.round_name == round_name,
+        ).order_by(Match.id.desc()).first()
         if not match:
-            match = Match(external_key=f"FEFI|2026|H|CLAUSURA|{round_name}",competition="FEFI",division=FEFI_DIVISION,round_name=round_name,home=result["home"],away=result["away"],source_url=FEFI_URL,source_kind="verified_auto")
+            match = Match(
+                external_key=f"FEFI|2026|H|CLAUSURA|{round_name}",
+                competition="FEFI",
+                division=FEFI_DIVISION,
+                round_name=round_name,
+                home=result["home"],
+                away=result["away"],
+                source_url=FEFI_URL,
+                source_kind="verified_auto",
+            )
             db.add(match)
+            db.flush()
+
         match.home = result["home"]
         match.away = result["away"]
         match.home_score = result["points_home"]
@@ -146,9 +172,52 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
         match.source_url = FEFI_URL
         match.source_kind = "verified_auto"
 
-    db.add(SyncRun(source="FEFI_RESULTS", status="ok", detail=f"Clausura: {verified} resultados verificados; {category_rows} filas de categoría"))
+        for idx, category in enumerate(CATEGORIES):
+            key = f"FEFI|2026|H|CLAUSURA|F{result['round']}|{category}"
+            row = db.query(FefiCategoryResult).filter(FefiCategoryResult.external_key == key).first()
+            new_home = result["scores_home"][idx] if idx < len(result["scores_home"]) else None
+            new_away = result["scores_away"][idx] if idx < len(result["scores_away"]) else None
+            changed = row is None or row.home_value != new_home or row.away_value != new_away or _norm(row.status) != "VERIFICADO"
+            if not row:
+                row = FefiCategoryResult(
+                    external_key=key,
+                    round_number=result["round"],
+                    category=category,
+                    home=result["home"],
+                    away=result["away"],
+                )
+                db.add(row)
+            row.home = result["home"]
+            row.away = result["away"]
+            row.home_value = new_home
+            row.away_value = new_away
+            row.status = "Verificado"
+            category_rows += 1
+
+            if changed and _is_recent_match(match):
+                body = _result_body(result, idx)
+                exists = db.query(NotificationEvent).filter(
+                    NotificationEvent.event_type == "result_final",
+                    NotificationEvent.match_id == match.id,
+                    NotificationEvent.category == category,
+                    NotificationEvent.body == body,
+                ).first()
+                if not exists:
+                    publish_event(
+                        db,
+                        event_type="result_final",
+                        title=f"Resultado FEFI · Cat. {category}",
+                        body=body,
+                        competition="FEFI",
+                        category=category,
+                        match_id=match.id,
+                        urgent=False,
+                    )
+                    notifications += 1
+
+    db.add(SyncRun(source="FEFI_RESULTS", status="ok", detail=f"Clausura: {verified} resultados verificados; {category_rows} filas de categoría; {notifications} avisos"))
     db.commit()
-    return {"tournament":"CLAUSURA","verified_results": verified, "category_rows": category_rows}
+    return {"tournament":"CLAUSURA","verified_results": verified, "category_rows": category_rows, "notifications": notifications}
 
 
 router = APIRouter(prefix="/api/fefi", tags=["FEFI"])
