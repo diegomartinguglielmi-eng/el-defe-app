@@ -1,6 +1,7 @@
 from .main import app, scheduler
 from .pending import router
 from .fefi_results import router as fefi_results_router
+from .fefi_schedules import router as fefi_schedules_router
 from .db import SessionLocal
 from .models import User
 from .auth import hash_password
@@ -8,6 +9,7 @@ from .config import settings
 
 app.include_router(router)
 app.include_router(fefi_results_router)
+app.include_router(fefi_schedules_router)
 
 @app.on_event("startup")
 def v5_startup_hardening():
