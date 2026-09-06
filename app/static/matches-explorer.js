@@ -4,12 +4,7 @@
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
   const state={competition:'ALL',status:'upcoming',division:'ALL',rows:[]};
   const clubNames=['DEF. DE SANTOS LUGARES','DEFENSORES DE SANTOS LUGARES','DEFENSORES DE SL'];
-
-  async function getMatches(){
-    const r=await fetch(apiBase()+'/api/matches');
-    if(!r.ok) throw new Error('No se pudieron cargar los partidos');
-    return r.json();
-  }
+  async function getMatches(){const r=await fetch(apiBase()+'/api/matches');if(!r.ok)throw new Error('No se pudieron cargar los partidos');return r.json();}
   function isFinal(m){return String(m.status||'').toLowerCase()==='final'||(m.home_score!==null&&m.home_score!==undefined&&m.away_score!==null&&m.away_score!==undefined);}
   function parseDate(v){if(!v)return null;const d=new Date(v+'T12:00:00');return isNaN(d)?null:d;}
   function fmtDate(v){const d=parseDate(v);return d?new Intl.DateTimeFormat('es-AR',{weekday:'short',day:'2-digit',month:'short'}).format(d):'Fecha a confirmar';}
@@ -18,81 +13,11 @@
   function normalizeTeam(s){return String(s||'').toUpperCase().trim();}
   function isDefe(s){return clubNames.includes(normalizeTeam(s));}
   function roundNumber(m){const mm=String(m.round_name||'').match(/(\d+)/);return mm?Number(mm[1]):null;}
-  function resultForDefe(m){
-    if(!isFinal(m)) return '';
-    const homeDefe=isDefe(m.home), awayDefe=isDefe(m.away);
-    const hs=m.home_score,as=m.away_score;
-    if(hs===null||hs===undefined||as===null||as===undefined)return '';
-    const own=homeDefe?hs:awayDefe?as:null,opp=homeDefe?as:awayDefe?hs:null;
-    if(own===null)return '';
-    const cls=own>opp?'ok':own<opp?'gold':'';
-    return `<span class="badge ${cls}">${own>opp?'GANÓ':own<opp?'PERDIÓ':'EMPATE'}</span>`;
-  }
-  function card(m){
-    const final=isFinal(m), rn=roundNumber(m);
-    return `<div class="card" style="margin-bottom:10px">
-      <div class="row"><div><span class="badge">${esc(compLabel(m.competition||''))}</span>${m.division?` <span class="badge">${esc(m.division)}</span>`:''}</div><span class="date">${esc(m.round_name||'')}</span></div>
-      <div class="row" style="margin-top:9px"><b style="font-size:11px">${esc(fmtDate(m.date))}</b>${resultForDefe(m)}</div>
-      <div class="teams" style="margin-top:12px"><div class="team">${esc(m.home)}</div><div class="score ${final?'':'vs'}">${final&&m.home_score!==null&&m.away_score!==null?`${esc(m.home_score)}<span style="font-size:10px;opacity:.55"> · </span>${esc(m.away_score)}`:'VS'}</div><div class="team r">${esc(m.away)}</div></div>
-      <div class="meta">${m.venue?`📍 ${esc(m.venue)}`:'📍 Sede a confirmar'}${m.date?' · '+esc(fmtDate(m.date)):''}</div>
-      ${m.competition==='FEFI'&&final&&rn?`<button class="light" style="margin-top:10px" onclick="defeOpenFefiResults(${rn})">Ver las 7 categorías FEFI</button>`:''}
-    </div>`;
-  }
-  function renderFilters(){
-    const target=document.getElementById('allMatches');if(!target)return;
-    if(!document.getElementById('matchExplorer')){
-      target.innerHTML=`<div id="matchExplorer"><div id="matchFilters"></div><div id="matchList"></div></div>`;
-    }
-    const filter=document.getElementById('matchFilters');
-    const divs=divisions(state.rows,state.competition);
-    if(state.division!=='ALL'&&!divs.includes(state.division))state.division='ALL';
-    filter.innerHTML=`<div class="card" style="padding:10px">
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
-        ${['ALL','FEFI','LAAMBA','ARGENLIGA'].map(c=>`<button class="${state.competition===c?'btn':'light'}" style="padding:9px 3px;font-size:9px" data-comp="${c}">${c==='ALL'?'Todos':compLabel(c)}</button>`).join('')}
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px">
-        <button class="${state.status==='upcoming'?'btn':'light'}" data-status="upcoming">Próximos</button>
-        <button class="${state.status==='results'?'btn':'light'}" data-status="results">Resultados</button>
-      </div>
-      ${divs.length?`<select id="matchDivisionFilter" style="margin:8px 0 0"><option value="ALL">Todas las categorías / divisiones</option>${divs.map(d=>`<option value="${esc(d)}" ${state.division===d?'selected':''}>${esc(d)}</option>`).join('')}</select>`:''}
-    </div>`;
-    filter.querySelectorAll('[data-comp]').forEach(b=>b.onclick=()=>{state.competition=b.dataset.comp;state.division='ALL';renderFilters();renderList();});
-    filter.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{state.status=b.dataset.status;renderFilters();renderList();});
-    const sel=document.getElementById('matchDivisionFilter');if(sel)sel.onchange=()=>{state.division=sel.value;renderList();};
-  }
-  function renderList(){
-    const list=document.getElementById('matchList');if(!list)return;
-    let rows=state.rows.filter(m=>state.competition==='ALL'||m.competition===state.competition);
-    if(state.division!=='ALL')rows=rows.filter(m=>m.division===state.division);
-    rows=rows.filter(m=>state.status==='results'?isFinal(m):!isFinal(m));
-    rows.sort((a,b)=>{
-      const da=parseDate(a.date),db=parseDate(b.date);
-      const av=da?da.getTime():(state.status==='results'?0:Number.MAX_SAFE_INTEGER),bv=db?db.getTime():(state.status==='results'?0:Number.MAX_SAFE_INTEGER);
-      return state.status==='results'?bv-av:av-bv;
-    });
-    const title=state.status==='results'?'Resultados':'Próximos partidos';
-    list.innerHTML=`<div class="sectop"><h2>${title}</h2><span class="meta" style="margin:0">${rows.length} partido${rows.length===1?'':'s'}</span></div>${rows.length?rows.map(card).join(''):`<div class="card"><b>No hay partidos para este filtro</b><div class="meta">Probá otra competencia o categoría.</div></div>`}`;
-  }
-  async function load(){
-    const target=document.getElementById('allMatches');if(!target)return;
-    target.innerHTML='<div class="card">Cargando partidos…</div>';
-    try{state.rows=await getMatches();renderFilters();renderList();}
-    catch(e){target.innerHTML=`<div class="card"><b>No se pudo cargar la agenda</b><div class="meta">${esc(e.message)}</div></div>`;}
-  }
+  function resultForDefe(m){if(!isFinal(m))return '';const homeDefe=isDefe(m.home),awayDefe=isDefe(m.away),hs=m.home_score,as=m.away_score;if(hs===null||hs===undefined||as===null||as===undefined)return '';const own=homeDefe?hs:awayDefe?as:null,opp=homeDefe?as:awayDefe?hs:null;if(own===null)return '';const cls=own>opp?'ok':own<opp?'gold':'';return `<span class="badge ${cls}">${own>opp?'GANÓ':own<opp?'PERDIÓ':'EMPATE'}</span>`;}
+  function card(m){const final=isFinal(m),rn=roundNumber(m);return `<div class="card" style="margin-bottom:10px"><div class="row"><div><span class="badge">${esc(compLabel(m.competition||''))}</span>${m.division?` <span class="badge">${esc(m.division)}</span>`:''}</div><span class="date">${esc(m.round_name||'')}</span></div><div class="row" style="margin-top:9px"><b style="font-size:11px">${esc(fmtDate(m.date))}</b>${resultForDefe(m)}</div><div class="teams" style="margin-top:12px"><div class="team">${esc(m.home)}</div><div class="score ${final?'':'vs'}">${final&&m.home_score!==null&&m.away_score!==null?`${esc(m.home_score)}<span style="font-size:10px;opacity:.55"> · </span>${esc(m.away_score)}`:'VS'}</div><div class="team r">${esc(m.away)}</div></div><div class="meta">${m.venue?`📍 ${esc(m.venue)}`:'📍 Sede a confirmar'}${m.date?' · '+esc(fmtDate(m.date)):''}</div>${m.competition==='FEFI'&&final&&rn?`<button class="light" style="margin-top:10px" onclick="defeOpenFefiResults(${rn})">Ver las 7 categorías FEFI</button>`:''}</div>`;}
+  function renderFilters(){const target=document.getElementById('allMatches');if(!target)return;if(!document.getElementById('matchExplorer'))target.innerHTML=`<div id="matchExplorer"><div id="matchFilters"></div><div id="matchList"></div></div>`;const filter=document.getElementById('matchFilters'),divs=divisions(state.rows,state.competition);if(state.division!=='ALL'&&!divs.includes(state.division))state.division='ALL';filter.innerHTML=`<div class="card" style="padding:10px"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">${['ALL','FEFI','LAAMBA','ARGENLIGA'].map(c=>`<button class="${state.competition===c?'btn':'light'}" style="padding:9px 3px;font-size:9px" data-comp="${c}">${c==='ALL'?'Todos':compLabel(c)}</button>`).join('')}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px"><button class="${state.status==='upcoming'?'btn':'light'}" data-status="upcoming">Próximos</button><button class="${state.status==='results'?'btn':'light'}" data-status="results">Resultados</button></div>${divs.length?`<select id="matchDivisionFilter" style="margin:8px 0 0"><option value="ALL">Todas las categorías / divisiones</option>${divs.map(d=>`<option value="${esc(d)}" ${state.division===d?'selected':''}>${esc(d)}</option>`).join('')}</select>`:''}</div>`;filter.querySelectorAll('[data-comp]').forEach(b=>b.onclick=()=>{state.competition=b.dataset.comp;state.division='ALL';renderFilters();renderList();});filter.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{state.status=b.dataset.status;renderFilters();renderList();});const sel=document.getElementById('matchDivisionFilter');if(sel)sel.onchange=()=>{state.division=sel.value;renderList();};}
+  function renderList(){const list=document.getElementById('matchList');if(!list)return;let rows=state.rows.filter(m=>state.competition==='ALL'||m.competition===state.competition);if(state.division!=='ALL')rows=rows.filter(m=>m.division===state.division);rows=rows.filter(m=>state.status==='results'?isFinal(m):!isFinal(m));rows.sort((a,b)=>{const da=parseDate(a.date),db=parseDate(b.date),av=da?da.getTime():(state.status==='results'?0:Number.MAX_SAFE_INTEGER),bv=db?db.getTime():(state.status==='results'?0:Number.MAX_SAFE_INTEGER);return state.status==='results'?bv-av:av-bv;});const title=state.status==='results'?'Resultados':'Próximos partidos';list.innerHTML=`<div class="sectop"><h2>${title}</h2><span class="meta" style="margin:0">${rows.length} partido${rows.length===1?'':'s'}</span></div>${rows.length?rows.map(card).join(''):`<div class="card"><b>No hay partidos para este filtro</b><div class="meta">Probá otra competencia o categoría.</div></div>`}`;}
+  async function load(){const target=document.getElementById('allMatches');if(!target)return;target.innerHTML='<div class="card">Cargando partidos…</div>';try{state.rows=await getMatches();renderFilters();renderList();}catch(e){target.innerHTML=`<div class="card"><b>No se pudo cargar la agenda</b><div class="meta">${esc(e.message)}</div></div>`;}}
   window.defeLoadMatchExplorer=load;
-  document.addEventListener('DOMContentLoaded',()=>{
-    const oldShow=window.show;
-    if(typeof oldShow==='function'&&!oldShow.__matchExplorer){
-      const wrapped=function(id){const r=oldShow.apply(this,arguments);if(id==='matches')setTimeout(load,0);return r;};
-      wrapped.__matchExplorer=true;window.show=wrapped;
-    }
-    const oldNav=window.nav;
-    if(typeof oldNav==='function'&&!oldNav.__matchExplorer){
-      const wrapped=function(id){const r=oldNav.apply(this,arguments);if(id==='matches')setTimeout(load,0);return r;};
-      wrapped.__matchExplorer=true;window.nav=wrapped;
-    }
-    if(!document.querySelector('script[data-personalized-home]')){
-      const s=document.createElement('script');s.src='/static/personalized_home.js';s.dataset.personalizedHome='1';document.body.appendChild(s);
-    }
-  });
+  document.addEventListener('DOMContentLoaded',()=>{const oldShow=window.show;if(typeof oldShow==='function'&&!oldShow.__matchExplorer){const wrapped=function(id){const r=oldShow.apply(this,arguments);if(id==='matches')setTimeout(load,0);return r;};wrapped.__matchExplorer=true;window.show=wrapped;}const oldNav=window.nav;if(typeof oldNav==='function'&&!oldNav.__matchExplorer){const wrapped=function(id){const r=oldNav.apply(this,arguments);if(id==='matches')setTimeout(load,0);return r;};wrapped.__matchExplorer=true;window.nav=wrapped;}if(!document.querySelector('script[data-personalized-home]')){const s=document.createElement('script');s.src='/static/personalized_home.js';s.dataset.personalizedHome='1';document.body.appendChild(s);}if(!document.querySelector('script[data-fefi-schedules]')){const s=document.createElement('script');s.src='/static/fefi-schedules.js?v=53';s.dataset.fefiSchedules='1';document.body.appendChild(s);}});
 })();
