@@ -4,6 +4,7 @@ import json
 from .db import Base, engine, SessionLocal
 from .pending import run_fefi_pending_sync, FefiPendingChange
 from .fefi_results import sync_verified_results
+from .notification_reminders import run as run_notification_reminders
 from .models import SyncRun
 
 
@@ -56,16 +57,26 @@ def _create_source_alert_after_two_failures(db):
 if __name__ == "__main__":
     Base.metadata.create_all(bind=engine)
     result = run_fefi_pending_sync()
+    output = dict(result)
 
     db = SessionLocal()
     try:
         if not result.get("ok"):
-            alerted = _create_source_alert_after_two_failures(db)
-            print({**result, "source_alert_created": alerted})
-            raise SystemExit(1)
-
-        _resolve_source_alerts(db)
-        results = sync_verified_results(db)
-        print({**result, **results, "source_health": "ok"})
+            output["source_alert_created"] = _create_source_alert_after_two_failures(db)
+        else:
+            _resolve_source_alerts(db)
+            output.update(sync_verified_results(db))
+            output["source_health"] = "ok"
     finally:
         db.close()
+
+    # The existing Railway cron runs at 00:00 UTC, which is 21:00 in Argentina.
+    # The reminder job self-skips on the other 4-hour executions.
+    try:
+        output["reminders"] = run_notification_reminders()
+    except Exception as exc:
+        output["reminders"] = {"ok": False, "error": str(exc)}
+
+    print(output)
+    if not result.get("ok"):
+        raise SystemExit(1)
