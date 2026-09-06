@@ -156,5 +156,8 @@ router = APIRouter(prefix="/api/fefi", tags=["FEFI"])
 
 @router.get("/results/{round_number}")
 def category_results(round_number: int, db: Session = Depends(get_db)):
-    rows = db.query(FefiCategoryResult).filter(FefiCategoryResult.round_number == round_number).order_by(FefiCategoryResult.id).all()
+    rows = db.query(FefiCategoryResult).filter(
+        FefiCategoryResult.round_number == round_number,
+        FefiCategoryResult.external_key.like("%|CLAUSURA|%")
+    ).order_by(FefiCategoryResult.id).all()
     return [{"round":r.round_number,"category":r.category,"home":r.home,"away":r.away,"home_value":r.home_value,"away_value":r.away_value,"status":r.status} for r in rows]
