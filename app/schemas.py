@@ -26,6 +26,14 @@ class MatchIn(BaseModel):
     status:str="scheduled"
     venue:Optional[str]=None
 
+class FefiScheduleItem(BaseModel):
+    category:str
+    time:Optional[str]=None
+    note:Optional[str]=None
+
+class FefiScheduleIn(BaseModel):
+    items:List[FefiScheduleItem]
+
 class ArgenMatch(BaseModel):
     date:Optional[str]=None
     home:str
@@ -36,7 +44,6 @@ class ArgenMatch(BaseModel):
 
 class ArgenImport(BaseModel):
     matches:List[ArgenMatch]
-
 
 class TeamIn(BaseModel):
     competition:str
@@ -84,7 +91,6 @@ class SuspensionIn(BaseModel):
     start_date:Optional[str]=None
     end_date:Optional[str]=None
     status:str="active"
-
 
 class FavoriteIn(BaseModel):
     favorite_type:str
