@@ -19,10 +19,11 @@ from .auth import hash_password
 from .config import settings
 from .sync import sync_laamba
 from .argenliga_baseline import bootstrap_argenliga_2026
+from .fefi_mayores import sync_fefi_mayores_b
 
 app.include_router(router);app.include_router(fefi_results_router);app.include_router(fefi_schedules_router);app.include_router(fefi_freshness_router);app.include_router(notifications_router);app.include_router(data_quality_router);app.include_router(home_router)
 BASE=Path(__file__).resolve().parent
-LAAMBA_BOOTSTRAP_LOCK=2026090701;ARGENLIGA_BOOTSTRAP_LOCK=2026090702;FEFI_BOOTSTRAP_LOCK=2026090703
+LAAMBA_BOOTSTRAP_LOCK=2026090701;ARGENLIGA_BOOTSTRAP_LOCK=2026090702;FEFI_BOOTSTRAP_LOCK=2026090703;FEFI_MAYORES_BOOTSTRAP_LOCK=2026090704
 
 @app.get("/sw.js",include_in_schema=False)
 def service_worker():return FileResponse(BASE/"static"/"sw.js",media_type="application/javascript",headers={"Service-Worker-Allowed":"/","Cache-Control":"no-cache"})
@@ -51,6 +52,19 @@ def _bootstrap_argenliga():
     finally:
         if locked:
             try:db.execute(text("SELECT pg_advisory_unlock(:k)"),{"k":ARGENLIGA_BOOTSTRAP_LOCK});db.commit()
+            except Exception:db.rollback()
+        db.close()
+
+def _bootstrap_fefi_mayores():
+    db=SessionLocal();locked=False
+    try:
+        locked=bool(db.execute(text("SELECT pg_try_advisory_lock(:k)"),{"k":FEFI_MAYORES_BOOTSTRAP_LOCK}).scalar())
+        if not locked:return
+        print({"fefi_mayores_bootstrap":sync_fefi_mayores_b(db)})
+    except Exception as exc:db.rollback();print({"fefi_mayores_bootstrap":"error","detail":str(exc)})
+    finally:
+        if locked:
+            try:db.execute(text("SELECT pg_advisory_unlock(:k)"),{"k":FEFI_MAYORES_BOOTSTRAP_LOCK});db.commit()
             except Exception:db.rollback()
         db.close()
 
@@ -116,4 +130,4 @@ def v5_startup_hardening():
         if legacy and legacy.email!=settings.admin_email:legacy.is_active=False;legacy.role="lector"
         db.commit()
     finally:db.close()
-    Thread(target=_bootstrap_laamba_clausura,daemon=True).start();Thread(target=_bootstrap_argenliga,daemon=True).start();Thread(target=_bootstrap_fefi_freshness,daemon=True).start();Thread(target=_cleanup_laamba_conflicts,daemon=True).start()
+    Thread(target=_bootstrap_laamba_clausura,daemon=True).start();Thread(target=_bootstrap_argenliga,daemon=True).start();Thread(target=_bootstrap_fefi_freshness,daemon=True).start();Thread(target=_bootstrap_fefi_mayores,daemon=True).start();Thread(target=_cleanup_laamba_conflicts,daemon=True).start()
