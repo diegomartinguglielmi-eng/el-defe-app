@@ -3,7 +3,7 @@ from pathlib import Path
 from threading import Thread
 
 from fastapi.responses import FileResponse
-from sqlalchemy import text
+from sqlalchemy import text, func
 
 from .main import app, scheduler
 from .pending import router, run_fefi_pending_sync, FefiPendingChange, _apply_change
@@ -69,7 +69,6 @@ def _repair_fefi_baseline(db):
 
 def _adopt_first_fefi_baseline(db):
     pending=db.query(FefiPendingChange).filter(FefiPendingChange.status=="pending").all()
-    # Only auto-adopt the original 15-row baseline; later changes must stay pending for admin approval.
     approved=db.query(FefiPendingChange).filter(FefiPendingChange.status=="approved").count()
     if approved or len(pending)!=15:return 0
     now=datetime.now(timezone.utc)
@@ -95,6 +94,24 @@ def _bootstrap_fefi_freshness():
             except Exception:db.rollback()
         db.close()
 
+def _log_duplicate_groups():
+    db=SessionLocal()
+    try:
+        groups=(db.query(Match.competition,Match.division,Match.round_name,Match.date,func.count(Match.id).label("n"))
+                .group_by(Match.competition,Match.division,Match.round_name,Match.date)
+                .having(func.count(Match.id)>1).all())
+        out=[]
+        for g in groups:
+            rows=(db.query(Match)
+                  .filter(Match.competition==g.competition,Match.division==g.division,Match.round_name==g.round_name,Match.date==g.date)
+                  .order_by(Match.id).all())
+            out.append({"group":{"competition":g.competition,"division":g.division,"round_name":g.round_name,"date":g.date,"count":g.n},
+                        "rows":[{"id":r.id,"home":r.home,"away":r.away,"score":[r.home_score,r.away_score],"status":r.status,"source_kind":r.source_kind,"external_key":r.external_key} for r in rows]})
+        print({"duplicate_diagnostic":out})
+    except Exception as exc:
+        print({"duplicate_diagnostic_error":str(exc)})
+    finally:db.close()
+
 @app.on_event("startup")
 def v5_startup_hardening():
     try:scheduler.remove_job("daily-sync")
@@ -107,4 +124,4 @@ def v5_startup_hardening():
         if legacy and legacy.email!=settings.admin_email:legacy.is_active=False;legacy.role="lector"
         db.commit()
     finally:db.close()
-    Thread(target=_bootstrap_laamba_clausura,daemon=True).start();Thread(target=_bootstrap_argenliga,daemon=True).start();Thread(target=_bootstrap_fefi_freshness,daemon=True).start()
+    Thread(target=_bootstrap_laamba_clausura,daemon=True).start();Thread(target=_bootstrap_argenliga,daemon=True).start();Thread(target=_bootstrap_fefi_freshness,daemon=True).start();Thread(target=_log_duplicate_groups,daemon=True).start()
