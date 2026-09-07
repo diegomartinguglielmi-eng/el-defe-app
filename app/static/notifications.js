@@ -3,12 +3,38 @@
   const LAST='defe_notification_last_id';
   const ENABLED='defe_notifications_enabled';
   const FOLLOW='defe_followed_v1';
-  let initialized=false;
+  let initialized=false,lastPushSync=0;
 
   const token=()=>localStorage.getItem('defe_token')||'';
   const role=()=>localStorage.getItem('defe_role')||'';
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-  const followed=()=>{try{return new Set(JSON.parse(localStorage.getItem(FOLLOW)||'[]'))}catch{return new Set()}};
+  const followedArray=()=>{try{return JSON.parse(localStorage.getItem(FOLLOW)||'[]')}catch{return []}};
+  const followed=()=>new Set(followedArray());
+
+  function b64ToBytes(base64String){
+    const padding='='.repeat((4-base64String.length%4)%4),base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/'),raw=atob(base64),out=new Uint8Array(raw.length);
+    for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out;
+  }
+
+  async function syncPushSubscription(force=false){
+    if(!('serviceWorker'in navigator)||!('PushManager'in window)||!('Notification'in window))return false;
+    if(Notification.permission!=='granted'||localStorage.getItem(ENABLED)!=='1')return false;
+    if(!force&&Date.now()-lastPushSync<300000)return true;
+    try{
+      const keyRes=await fetch(API()+'/api/notifications/push/public-key');
+      if(!keyRes.ok)return false;
+      const {public_key}=await keyRes.json();
+      const reg=await navigator.serviceWorker.ready;
+      let sub=await reg.pushManager.getSubscription();
+      if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64ToBytes(public_key)});
+      const j=sub.toJSON();
+      const r=await fetch(API()+'/api/notifications/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:j.endpoint,keys:j.keys,followed:followedArray()})});
+      if(!r.ok)return false;
+      lastPushSync=Date.now();
+      const state=document.getElementById('notificationState');if(state){state.textContent='PUSH ACTIVO';state.className='badge ok';}
+      return true;
+    }catch(e){console.warn('Web Push subscription failed',e);return false;}
+  }
 
   function wants(e){
     if(e.urgent)return true;
@@ -23,15 +49,13 @@
 
   async function showEvent(e){
     if(localStorage.getItem(ENABLED)!=='1'||Notification.permission!=='granted'||!wants(e))return;
-    const opts={body:e.body,icon:'/static/icon-192.png',badge:'/static/icon-192.png',tag:'defe-'+e.id,data:{url:'/'},renotify:!!e.urgent};
-    try{
-      if('serviceWorker'in navigator){const reg=await navigator.serviceWorker.ready;await reg.showNotification(e.title,opts);}
-      else new Notification(e.title,opts);
-    }catch{}
+    const opts={body:e.body,icon:'/static/icon-192.png',badge:'/static/icon-192.png',tag:'defe-'+e.id,data:{url:'/',id:e.id},renotify:!!e.urgent};
+    try{const reg=await navigator.serviceWorker.ready;await reg.showNotification(e.title,opts);}catch{}
   }
 
   async function poll(){
     try{
+      if(localStorage.getItem(ENABLED)==='1')syncPushSubscription(false);
       const since=Number(localStorage.getItem(LAST)||0);
       const r=await fetch(API()+`/api/notifications/feed?since_id=${since}&limit=100`);
       if(!r.ok)return;
@@ -48,16 +72,15 @@
   async function localTest(){
     const msg=document.getElementById('notificationTestMsg');
     if(!('Notification'in window)){if(msg)msg.textContent='Este navegador no soporta notificaciones.';return;}
-    let p=Notification.permission;
-    if(p!=='granted')p=await Notification.requestPermission();
+    let p=Notification.permission;if(p!=='granted')p=await Notification.requestPermission();
     if(p!=='granted'){if(msg)msg.textContent='Primero permití las notificaciones del navegador.';return;}
     localStorage.setItem(ENABLED,'1');
+    const pushOk=await syncPushSubscription(true);
     try{
       const opts={body:'Si ves este aviso, El Defe puede mostrar notificaciones en este dispositivo.',icon:'/static/icon-192.png',badge:'/static/icon-192.png',tag:'defe-local-test',data:{url:'/'}};
-      if('serviceWorker'in navigator){const reg=await navigator.serviceWorker.ready;await reg.showNotification('Prueba de El Defe',opts);}else new Notification('Prueba de El Defe',opts);
-      if(msg)msg.textContent='Prueba enviada solo a este dispositivo.';
-      const state=document.getElementById('notificationState');if(state){state.textContent='ACTIVOS';state.className='badge ok';}
-      const btn=document.getElementById('notificationEnableBtn');if(btn)btn.textContent='Avisos habilitados';
+      const reg=await navigator.serviceWorker.ready;await reg.showNotification('Prueba de El Defe',opts);
+      if(msg)msg.textContent=pushOk?'Prueba OK. Este dispositivo también quedó registrado para avisos con la app cerrada.':'Prueba local OK. El push en segundo plano todavía no pudo registrarse.';
+      const state=document.getElementById('notificationState');if(state){state.textContent=pushOk?'PUSH ACTIVO':'ACTIVOS';state.className='badge ok';}
     }catch(e){if(msg)msg.textContent='No se pudo mostrar el aviso de prueba.';}
   }
 
@@ -66,20 +89,24 @@
     if(!main||document.getElementById('notificationDeviceCard'))return;
     const card=document.createElement('div');card.id='notificationDeviceCard';card.className='card';
     const granted=typeof Notification!=='undefined'&&Notification.permission==='granted'&&localStorage.getItem(ENABLED)==='1';
-    card.innerHTML=`<div class="row"><b>Avisos de El Defe</b><span id="notificationState" class="badge ${granted?'ok':''}">${granted?'ACTIVOS':'DESACTIVADOS'}</span></div><div class="meta">Recibí urgentes, cambios, recordatorios y resultados de las categorías que seguís en este dispositivo.</div><button id="notificationEnableBtn" class="btn" style="margin-top:10px">${granted?'Avisos habilitados':'Activar avisos'}</button><button id="notificationTestBtn" class="light" style="margin-top:8px">Probar aviso en este dispositivo</button><div id="notificationTestMsg" class="meta"></div><div id="notificationInbox" class="meta"></div>`;
+    card.innerHTML=`<div class="row"><b>Avisos de El Defe</b><span id="notificationState" class="badge ${granted?'ok':''}">${granted?'ACTIVOS':'DESACTIVADOS'}</span></div><div class="meta">Recibí urgentes, cambios, recordatorios y resultados de las categorías que seguís, incluso con la app cerrada.</div><button id="notificationEnableBtn" class="btn" style="margin-top:10px">${granted?'Avisos habilitados':'Activar avisos'}</button><button id="notificationTestBtn" class="light" style="margin-top:8px">Probar aviso en este dispositivo</button><div id="notificationTestMsg" class="meta"></div><div id="notificationInbox" class="meta"></div>`;
     main.insertBefore(card,main.firstChild);
     document.getElementById('notificationEnableBtn').onclick=async()=>{
       if(!('Notification'in window)){alert('Este navegador no soporta notificaciones.');return;}
       const p=await Notification.requestPermission();
       if(p==='granted'){
         localStorage.setItem(ENABLED,'1');
-        document.getElementById('notificationState').textContent='ACTIVOS';
+        document.getElementById('notificationState').textContent='REGISTRANDO PUSH…';
+        document.getElementById('notificationState').className='badge gold';
+        const ok=await syncPushSubscription(true);
+        document.getElementById('notificationState').textContent=ok?'PUSH ACTIVO':'ACTIVOS';
         document.getElementById('notificationState').className='badge ok';
         document.getElementById('notificationEnableBtn').textContent='Avisos habilitados';
         initialized=true;await poll();
       }
     };
     document.getElementById('notificationTestBtn').onclick=localTest;
+    if(granted)setTimeout(()=>syncPushSubscription(true),250);
   }
 
   function renderInbox(rows){
@@ -92,24 +119,26 @@
     if(!body){msg.textContent='Escribí el aviso.';return;}
     const r=await fetch(API()+'/api/notifications/urgent',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token()},body:JSON.stringify({title:title||'Aviso urgente',body,competition,category})});
     const j=await r.json().catch(()=>({}));if(!r.ok){msg.textContent=j.detail||'No se pudo publicar';return;}
-    msg.textContent='Aviso publicado.';document.getElementById('urgentBody').value='';
+    const sent=j.push?.sent;
+    msg.textContent=Number.isInteger(sent)?`Aviso publicado · push enviado a ${sent} dispositivo${sent===1?'':'s'}.`:'Aviso publicado.';
+    document.getElementById('urgentBody').value='';
   }
 
   function ensureAdminUrgent(){
     const tools=document.getElementById('adminTools');
     if(!tools||!['admin','delegado'].includes(role())||document.getElementById('urgentNoticeCard'))return;
     const card=document.createElement('div');card.id='urgentNoticeCard';card.className='card';
-    card.innerHTML=`<div class="row"><b>Aviso urgente</b><span class="badge gold">AVISO</span></div><div class="meta">Publica un aviso inmediato en el feed de El Defe. Los dispositivos activos con avisos habilitados lo reciben al consultar novedades.</div><input id="urgentTitle" placeholder="Título (opcional)"><textarea id="urgentBody" rows="3" placeholder="Mensaje"></textarea><select id="urgentCompetition"><option value="">Todo el club</option><option value="FEFI">FEFI</option><option value="LAAMBA">LAAMBA</option><option value="ARGENLIGA">Argenliga</option></select><input id="urgentCategory" placeholder="Categoría/división (opcional)"><button class="btn" id="urgentPublishBtn">Publicar urgente</button><div id="urgentMsg" class="meta"></div>`;
+    card.innerHTML=`<div class="row"><b>Aviso urgente</b><span class="badge gold">PUSH</span></div><div class="meta">Envía un aviso inmediato también a los dispositivos registrados aunque la app esté cerrada.</div><input id="urgentTitle" placeholder="Título (opcional)"><textarea id="urgentBody" rows="3" placeholder="Mensaje"></textarea><select id="urgentCompetition"><option value="">Todo el club</option><option value="FEFI">FEFI</option><option value="LAAMBA">LAAMBA</option><option value="ARGENLIGA">Argenliga</option></select><input id="urgentCategory" placeholder="Categoría/división (opcional)"><button class="btn" id="urgentPublishBtn">Publicar urgente</button><div id="urgentMsg" class="meta"></div>`;
     tools.insertBefore(card,tools.firstChild);document.getElementById('urgentPublishBtn').onclick=postUrgent;
   }
 
   function init(){
-    ensurePermissionCard();ensureAdminUrgent();
-    setInterval(poll,45000);poll();
-    const oldShow=window.show;
-    if(typeof oldShow==='function'&&!oldShow.__notifications){const wrapped=function(id){const r=oldShow.apply(this,arguments);if(id==='profile')setTimeout(ensurePermissionCard,0);if(id==='admin')setTimeout(ensureAdminUrgent,0);return r};wrapped.__notifications=true;window.show=wrapped;}
-    const oldAdmin=window.refreshAdmin;
-    if(typeof oldAdmin==='function'&&!oldAdmin.__notifications){const wrapped=function(){const r=oldAdmin.apply(this,arguments);setTimeout(ensureAdminUrgent,0);return r};wrapped.__notifications=true;window.refreshAdmin=wrapped;}
+    ensurePermissionCard();ensureAdminUrgent();setInterval(poll,45000);poll();
+    navigator.serviceWorker?.addEventListener('message',e=>{if(e.data?.type==='defe-push-received'&&e.data.id){const cur=Number(localStorage.getItem(LAST)||0);if(Number(e.data.id)>cur)localStorage.setItem(LAST,String(e.data.id));}});
+    window.addEventListener('storage',e=>{if(e.key===FOLLOW)syncPushSubscription(true);});
+    document.addEventListener('defe:preferences-updated',()=>syncPushSubscription(true));
+    const oldShow=window.show;if(typeof oldShow==='function'&&!oldShow.__notifications){const wrapped=function(id){const r=oldShow.apply(this,arguments);if(id==='profile')setTimeout(ensurePermissionCard,0);if(id==='admin')setTimeout(ensureAdminUrgent,0);return r};wrapped.__notifications=true;window.show=wrapped;}
+    const oldAdmin=window.refreshAdmin;if(typeof oldAdmin==='function'&&!oldAdmin.__notifications){const wrapped=function(){const r=oldAdmin.apply(this,arguments);setTimeout(ensureAdminUrgent,0);return r};wrapped.__notifications=true;window.refreshAdmin=wrapped;}
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
