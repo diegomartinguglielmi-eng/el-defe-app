@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import text
 
 from .main import app, scheduler
-from .pending import router
+from .pending import router, run_fefi_pending_sync
 from .fefi_results import router as fefi_results_router
 from .fefi_schedules import router as fefi_schedules_router
 from .fefi_freshness import router as fefi_freshness_router
@@ -13,7 +13,7 @@ from .notifications_v5 import router as notifications_router
 from .data_quality import router as data_quality_router
 from .home_v5 import router as home_router
 from .db import SessionLocal
-from .models import User, Match
+from .models import User, Match, SyncRun
 from .auth import hash_password
 from .config import settings
 from .sync import sync_laamba
@@ -30,6 +30,7 @@ app.include_router(home_router)
 BASE = Path(__file__).resolve().parent
 LAAMBA_BOOTSTRAP_LOCK = 2026090701
 ARGENLIGA_BOOTSTRAP_LOCK = 2026090702
+FEFI_BOOTSTRAP_LOCK = 2026090703
 
 
 @app.get("/sw.js", include_in_schema=False)
@@ -93,6 +94,33 @@ def _bootstrap_argenliga():
         db.close()
 
 
+def _bootstrap_fefi_freshness():
+    db = SessionLocal()
+    locked = False
+    try:
+        locked = bool(db.execute(text("SELECT pg_try_advisory_lock(:k)"), {"k": FEFI_BOOTSTRAP_LOCK}).scalar())
+        if not locked:
+            print({"fefi_bootstrap": "skipped", "reason": "another_service_is_loading"})
+            return
+        exists = db.query(SyncRun).filter(SyncRun.source == "FEFI_PENDING").first()
+        if exists:
+            print({"fefi_bootstrap": "skipped", "reason": "sync_history_already_present"})
+            return
+        result = run_fefi_pending_sync(db)
+        print({"fefi_bootstrap": "completed", **result})
+    except Exception as exc:
+        db.rollback()
+        print({"fefi_bootstrap": "error", "detail": str(exc)})
+    finally:
+        if locked:
+            try:
+                db.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": FEFI_BOOTSTRAP_LOCK})
+                db.commit()
+            except Exception:
+                db.rollback()
+        db.close()
+
+
 @app.on_event("startup")
 def v5_startup_hardening():
     try:
@@ -117,3 +145,4 @@ def v5_startup_hardening():
 
     Thread(target=_bootstrap_laamba_clausura, daemon=True).start()
     Thread(target=_bootstrap_argenliga, daemon=True).start()
+    Thread(target=_bootstrap_fefi_freshness, daemon=True).start()
