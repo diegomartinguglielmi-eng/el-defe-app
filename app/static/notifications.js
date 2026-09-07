@@ -45,12 +45,28 @@
     }catch{}
   }
 
+  async function localTest(){
+    const msg=document.getElementById('notificationTestMsg');
+    if(!('Notification'in window)){if(msg)msg.textContent='Este navegador no soporta notificaciones.';return;}
+    let p=Notification.permission;
+    if(p!=='granted')p=await Notification.requestPermission();
+    if(p!=='granted'){if(msg)msg.textContent='Primero permití las notificaciones del navegador.';return;}
+    localStorage.setItem(ENABLED,'1');
+    try{
+      const opts={body:'Si ves este aviso, El Defe puede mostrar notificaciones en este dispositivo.',icon:'/static/icon-192.png',badge:'/static/icon-192.png',tag:'defe-local-test',data:{url:'/'}};
+      if('serviceWorker'in navigator){const reg=await navigator.serviceWorker.ready;await reg.showNotification('Prueba de El Defe',opts);}else new Notification('Prueba de El Defe',opts);
+      if(msg)msg.textContent='Prueba enviada solo a este dispositivo.';
+      const state=document.getElementById('notificationState');if(state){state.textContent='ACTIVOS';state.className='badge ok';}
+      const btn=document.getElementById('notificationEnableBtn');if(btn)btn.textContent='Avisos habilitados';
+    }catch(e){if(msg)msg.textContent='No se pudo mostrar el aviso de prueba.';}
+  }
+
   function ensurePermissionCard(){
     const main=document.querySelector('#profile .main');
     if(!main||document.getElementById('notificationDeviceCard'))return;
     const card=document.createElement('div');card.id='notificationDeviceCard';card.className='card';
     const granted=typeof Notification!=='undefined'&&Notification.permission==='granted'&&localStorage.getItem(ENABLED)==='1';
-    card.innerHTML=`<div class="row"><b>Avisos de El Defe</b><span id="notificationState" class="badge ${granted?'ok':''}">${granted?'ACTIVOS':'DESACTIVADOS'}</span></div><div class="meta">Recibí urgentes, cambios, recordatorios y resultados de las categorías que seguís en este dispositivo.</div><button id="notificationEnableBtn" class="btn" style="margin-top:10px">${granted?'Avisos habilitados':'Activar avisos'}</button><div id="notificationInbox" class="meta"></div>`;
+    card.innerHTML=`<div class="row"><b>Avisos de El Defe</b><span id="notificationState" class="badge ${granted?'ok':''}">${granted?'ACTIVOS':'DESACTIVADOS'}</span></div><div class="meta">Recibí urgentes, cambios, recordatorios y resultados de las categorías que seguís en este dispositivo.</div><button id="notificationEnableBtn" class="btn" style="margin-top:10px">${granted?'Avisos habilitados':'Activar avisos'}</button><button id="notificationTestBtn" class="light" style="margin-top:8px">Probar aviso en este dispositivo</button><div id="notificationTestMsg" class="meta"></div><div id="notificationInbox" class="meta"></div>`;
     main.insertBefore(card,main.firstChild);
     document.getElementById('notificationEnableBtn').onclick=async()=>{
       if(!('Notification'in window)){alert('Este navegador no soporta notificaciones.');return;}
@@ -63,6 +79,7 @@
         initialized=true;await poll();
       }
     };
+    document.getElementById('notificationTestBtn').onclick=localTest;
   }
 
   function renderInbox(rows){
@@ -82,7 +99,7 @@
     const tools=document.getElementById('adminTools');
     if(!tools||!['admin','delegado'].includes(role())||document.getElementById('urgentNoticeCard'))return;
     const card=document.createElement('div');card.id='urgentNoticeCard';card.className='card';
-    card.innerHTML=`<div class="row"><b>Aviso urgente</b><span class="badge gold">PUSH</span></div><div class="meta">Publica un aviso inmediato para los dispositivos que tengan los avisos activados.</div><input id="urgentTitle" placeholder="Título (opcional)"><textarea id="urgentBody" rows="3" placeholder="Mensaje"></textarea><select id="urgentCompetition"><option value="">Todo el club</option><option value="FEFI">FEFI</option><option value="LAAMBA">LAAMBA</option><option value="ARGENLIGA">Argenliga</option></select><input id="urgentCategory" placeholder="Categoría/división (opcional)"><button class="btn" id="urgentPublishBtn">Publicar urgente</button><div id="urgentMsg" class="meta"></div>`;
+    card.innerHTML=`<div class="row"><b>Aviso urgente</b><span class="badge gold">AVISO</span></div><div class="meta">Publica un aviso inmediato en el feed de El Defe. Los dispositivos activos con avisos habilitados lo reciben al consultar novedades.</div><input id="urgentTitle" placeholder="Título (opcional)"><textarea id="urgentBody" rows="3" placeholder="Mensaje"></textarea><select id="urgentCompetition"><option value="">Todo el club</option><option value="FEFI">FEFI</option><option value="LAAMBA">LAAMBA</option><option value="ARGENLIGA">Argenliga</option></select><input id="urgentCategory" placeholder="Categoría/división (opcional)"><button class="btn" id="urgentPublishBtn">Publicar urgente</button><div id="urgentMsg" class="meta"></div>`;
     tools.insertBefore(card,tools.firstChild);document.getElementById('urgentPublishBtn').onclick=postUrgent;
   }
 
