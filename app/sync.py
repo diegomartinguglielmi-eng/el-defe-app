@@ -61,6 +61,13 @@ def col(cols, term):
     for c in cols:
         if term in str(c).lower(): return c
 
+def played_col(cols):
+    """Find LAAMBA played-matches column across header variants (J, PJ, P.J., Jugados)."""
+    for c in cols:
+        n=re.sub(r"[^a-z0-9]","",str(c).lower())
+        if n in {"j","pj","jugados","partidosjugados"}: return c
+    return None
+
 def _prefer_laamba_candidate(current, candidate):
     """One match per division/round. A final result supersedes a scheduled fixture; otherwise latest source candidate wins."""
     if current is None: return candidate
@@ -94,13 +101,12 @@ def sync_laamba(db:Session):
                         candidates[ri]=_prefer_laamba_candidate(candidates.get(ri),cand)
                 teamc=col(cols,"equipo");ptsc=col(cols,"pts")
                 if teamc is not None and ptsc is not None:
-                    jc=col(cols," j")
+                    jc=played_col(cols)
                     for _,row in df.iterrows():
                         team=clean(row[teamc])
                         if not team or team=="nan": continue
-                        upsert_standing(db,dict(unique_key=f"LAAMBA|2026|CLAUSURA|{div}|{team}",competition="LAAMBA",division=div,season=2026,team=team,pts=as_int(row[ptsc]),played=as_int(row[jc]) if jc else None,won=None,drawn=None,lost=None,gf=None,gc=None,gd=None,source_url=url)); st+=1
+                        upsert_standing(db,dict(unique_key=f"LAAMBA|2026|CLAUSURA|{div}|{team}",competition="LAAMBA",division=div,season=2026,team=team,pts=as_int(row[ptsc]),played=as_int(row[jc]) if jc is not None else None,won=None,drawn=None,lost=None,gf=None,gc=None,gd=None,source_url=url)); st+=1
             for ri,cand in candidates.items():
-                # Remove stale/conflicting source rows for the same division/round before storing the canonical one.
                 stale=db.query(Match).filter(Match.competition=="LAAMBA",Match.division==div,Match.round_name==f"Fecha {ri}",Match.external_key!=cand["external_key"],Match.source_kind=="sync_clausura").all()
                 for row in stale: db.delete(row)
                 if stale: db.commit()
