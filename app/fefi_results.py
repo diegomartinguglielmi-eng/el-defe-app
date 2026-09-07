@@ -18,7 +18,7 @@ from .notifications_v5 import NotificationEvent, publish_event
 FEFI_URL = "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/"
 FEFI_CLUB = "DEF. DE SANTOS LUGARES"
 FEFI_DIVISION = "Zona H"
-USER_AGENT = "ElDefeApp/0.7 (+Defensores de Santos Lugares)"
+USER_AGENT = "ElDefeApp/0.8 (+Defensores de Santos Lugares)"
 CATEGORIES = ["2019", "2013", "2018", "2014", "2017", "2016", "2015"]
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 
@@ -29,26 +29,6 @@ def _norm(value: str | None) -> str:
 
 def _cells(row) -> list[str]:
     return [re.sub(r"\s+", " ", c.get_text(" ", strip=True)) for c in row.find_all(["th", "td"])]
-
-
-def _nearby_tournament_marker(table) -> str | None:
-    for node in table.find_all_previous(["h1","h2","h3","h4","h5","h6","button","a","span","div"], limit=40):
-        txt = _norm(node.get_text(" ", strip=True))
-        if not txt or len(txt) > 140:
-            continue
-        if "CLAUSURA" in txt:
-            return "CLAUSURA"
-        if "APERTURA" in txt:
-            return "APERTURA"
-    return None
-
-
-def _prefer_clausura(candidates: list) -> list:
-    marked = [(t, _nearby_tournament_marker(t)) for t in candidates]
-    clausura = [t for t, marker in marked if marker == "CLAUSURA"]
-    if clausura:
-        return clausura
-    return candidates[-1:] if candidates else []
 
 
 class FefiCategoryResult(Base):
@@ -66,15 +46,23 @@ class FefiCategoryResult(Base):
 
 
 def parse_fefi_results(html: str) -> list[dict]:
+    """Parse FEFI result tables.
+
+    The FEFI page renders Apertura and Clausura tables in the same HTML and the
+    surrounding tab labels are not reliable DOM ancestors.  Tables are emitted
+    in tournament order, so we parse every results table and let the last row
+    for each round win (Clausura is rendered after Apertura).  This also avoids
+    depending on the visual tab state used by WordPress/wpDataTables.
+    """
     soup = BeautifulSoup(html, "html.parser")
     candidates = []
     for table in soup.find_all("table"):
         text = _norm(table.get_text(" ", strip=True))
-        if ("F.T." in text or "EQUIPOS" in text) and "ESTADO" in text:
+        if "ESTADO" in text and ("F.T." in text or "EQUIPOS" in text):
             candidates.append(table)
 
     out: list[dict] = []
-    for table in _prefer_clausura(candidates):
+    for table in candidates:
         rows = [_cells(tr) for tr in table.find_all("tr")]
         rows = [r for r in rows if r]
         i = 0
@@ -90,10 +78,14 @@ def parse_fefi_results(html: str) -> list[dict]:
                     status = a[-1] if len(a) >= 12 else "Publicado"
                     points_a = None
                     points_b = None
-                    try: points_a = int(a[10])
-                    except Exception: pass
-                    try: points_b = int(b[9])
-                    except Exception: pass
+                    try:
+                        points_a = int(a[10])
+                    except Exception:
+                        pass
+                    try:
+                        points_b = int(b[9])
+                    except Exception:
+                        pass
                     out.append({
                         "round": rnd,
                         "home": team_a,
@@ -107,6 +99,8 @@ def parse_fefi_results(html: str) -> list[dict]:
                 i += 2
                 continue
             i += 1
+
+    # Last occurrence is Clausura on the official 2026 page.
     dedup = {r["round"]: r for r in out}
     return [dedup[k] for k in sorted(dedup)]
 
@@ -217,7 +211,7 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
 
     db.add(SyncRun(source="FEFI_RESULTS", status="ok", detail=f"Clausura: {verified} resultados verificados; {category_rows} filas de categoría; {notifications} avisos"))
     db.commit()
-    return {"tournament":"CLAUSURA","verified_results": verified, "category_rows": category_rows, "notifications": notifications}
+    return {"tournament": "CLAUSURA", "verified_results": verified, "category_rows": category_rows, "notifications": notifications}
 
 
 router = APIRouter(prefix="/api/fefi", tags=["FEFI"])
@@ -229,4 +223,4 @@ def category_results(round_number: int, db: Session = Depends(get_db)):
         FefiCategoryResult.round_number == round_number,
         FefiCategoryResult.external_key.like("%|CLAUSURA|%")
     ).order_by(FefiCategoryResult.id).all()
-    return [{"round":r.round_number,"category":r.category,"home":r.home,"away":r.away,"home_value":r.home_value,"away_value":r.away_value,"status":r.status} for r in rows]
+    return [{"round": r.round_number, "category": r.category, "home": r.home, "away": r.away, "home_value": r.home_value, "away_value": r.away_value, "status": r.status} for r in rows]
