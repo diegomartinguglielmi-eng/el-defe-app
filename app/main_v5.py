@@ -2,6 +2,7 @@ from pathlib import Path
 from threading import Thread
 
 from fastapi.responses import FileResponse
+from sqlalchemy import text
 
 from .main import app, scheduler
 from .pending import router
@@ -24,6 +25,7 @@ app.include_router(notifications_router)
 app.include_router(data_quality_router)
 
 BASE = Path(__file__).resolve().parent
+LAAMBA_BOOTSTRAP_LOCK = 2026090701
 
 
 @app.get("/sw.js", include_in_schema=False)
@@ -37,16 +39,30 @@ def service_worker():
 
 def _bootstrap_laamba_clausura():
     db = SessionLocal()
+    locked = False
     try:
+        locked = bool(db.execute(text("SELECT pg_try_advisory_lock(:k)"), {"k": LAAMBA_BOOTSTRAP_LOCK}).scalar())
+        if not locked:
+            print({"laamba_bootstrap": "skipped", "reason": "another_service_is_loading"})
+            return
         exists = db.query(Match).filter(
             Match.competition == "LAAMBA",
             Match.external_key.like("%|CLAUSURA|%"),
         ).first()
-        if not exists:
-            sync_laamba(db)
+        if exists:
+            print({"laamba_bootstrap": "skipped", "reason": "clausura_already_present"})
+            return
+        result = sync_laamba(db)
+        print({"laamba_bootstrap": "completed", **result})
     except Exception as exc:
         print({"laamba_bootstrap": "error", "detail": str(exc)})
     finally:
+        if locked:
+            try:
+                db.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": LAAMBA_BOOTSTRAP_LOCK})
+                db.commit()
+            except Exception:
+                db.rollback()
         db.close()
 
 
