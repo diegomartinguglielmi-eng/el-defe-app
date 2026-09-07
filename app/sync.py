@@ -22,8 +22,7 @@ def upsert_match(db:Session,m):
     if not obj:
         obj=Match(**m); db.add(obj)
     else:
-        for k,v in m.items():
-            setattr(obj,k,v)
+        for k,v in m.items(): setattr(obj,k,v)
     db.commit()
 
 def upsert_standing(db:Session,s):
@@ -49,22 +48,14 @@ def sync_fefi(db:Session):
         for i,line in enumerate(lines):
             m=re.match(r"Fecha\s+(\d+)\s*-\s*(\d{1,2})\s+de\s+([A-Za-zÁÉÍÓÚáéíóúñÑ]+)",line,re.I)
             if m:
-                round_name=f"Fecha {m.group(1)}"
-                mon=months.get(m.group(3).lower())
-                date=f"2026-{mon}-{int(m.group(2)):02d}" if mon else None
-                continue
+                round_name=f"Fecha {m.group(1)}"; mon=months.get(m.group(3).lower()); date=f"2026-{mon}-{int(m.group(2)):02d}" if mon else None; continue
             if line.lower()=="vs" and round_name and i>0 and i<len(lines)-1:
                 h,a=lines[i-1],lines[i+1]
                 if TEAM_FEFI in (h,a):
-                    upsert_match(db,dict(external_key=f"FEFI|2026|{round_name}|{h}|{a}",competition="FEFI",
-                        division="Zona H",round_name=round_name,date=date,home=h,away=a,status="scheduled",
-                        source_url=url,source_kind="sync"))
-                    saved+=1
-        log(db,"FEFI","ok",f"{saved} partidos actualizados")
-        return {"ok":True,"saved":saved}
+                    upsert_match(db,dict(external_key=f"FEFI|2026|{round_name}|{h}|{a}",competition="FEFI",division="Zona H",round_name=round_name,date=date,home=h,away=a,status="scheduled",source_url=url,source_kind="sync")); saved+=1
+        log(db,"FEFI","ok",f"{saved} partidos actualizados"); return {"ok":True,"saved":saved}
     except Exception as e:
-        log(db,"FEFI","error",str(e))
-        return {"ok":False,"error":str(e)}
+        log(db,"FEFI","error",str(e)); return {"ok":False,"error":str(e)}
 
 def col(cols, term):
     for c in cols:
@@ -76,9 +67,7 @@ def sync_laamba(db:Session):
     for div in divisions:
         url=f"https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/{div}/torneo/m-eliteiclausura/?db=2026"
         try:
-            r=requests.get(url,headers=UA,timeout=25);r.raise_for_status()
-            tables=pd.read_html(StringIO(r.text))
-            ri=0
+            r=requests.get(url,headers=UA,timeout=25);r.raise_for_status(); tables=pd.read_html(StringIO(r.text)); ri=0
             for df in tables:
                 cols=list(df.columns); lc=col(cols,"local"); vc=col(cols,"visitante"); rc=col(cols,"resultado"); dc=col(cols,"dirección") or col(cols,"direccion")
                 if lc is not None and vc is not None:
@@ -92,24 +81,23 @@ def sync_laamba(db:Session):
                             if mm: hs,aw,status=int(mm.group(1)),int(mm.group(2)),"final"
                         venue=None
                         if dc is not None:
-                            vv=clean(row[dc])
-                            venue=None if not vv or vv.lower()=="nan" or vv=="Fecha Libre" else vv
-                        upsert_match(db,dict(external_key=f"LAAMBA|2026|CLAUSURA|{div}|F{ri}|{h}|{a}",competition="LAAMBA",
-                            division=div,round_name=f"Fecha {ri}",date=None,home=h,away=a,home_score=hs,away_score=aw,
-                            status=status,venue=venue,source_url=url,source_kind="sync_clausura"))
-                        ms+=1
+                            vv=clean(row[dc]); venue=None if not vv or vv.lower()=="nan" or vv=="Fecha Libre" else vv
+                        upsert_match(db,dict(external_key=f"LAAMBA|2026|CLAUSURA|{div}|F{ri}|{h}|{a}",competition="LAAMBA",division=div,round_name=f"Fecha {ri}",date=None,home=h,away=a,home_score=hs,away_score=aw,status=status,venue=venue,source_url=url,source_kind="sync_clausura")); ms+=1
                 teamc=col(cols,"equipo");ptsc=col(cols,"pts")
                 if teamc is not None and ptsc is not None:
                     jc=col(cols," j")
                     for _,row in df.iterrows():
                         team=clean(row[teamc])
                         if not team or team=="nan": continue
-                        upsert_standing(db,dict(unique_key=f"LAAMBA|2026|CLAUSURA|{div}|{team}",competition="LAAMBA",
-                            division=div,season=2026,team=team,pts=as_int(row[ptsc]),played=as_int(row[jc]) if jc else None,
-                            won=None,drawn=None,lost=None,gf=None,gc=None,gd=None,source_url=url))
-                        st+=1
+                        upsert_standing(db,dict(unique_key=f"LAAMBA|2026|CLAUSURA|{div}|{team}",competition="LAAMBA",division=div,season=2026,team=team,pts=as_int(row[ptsc]),played=as_int(row[jc]) if jc else None,won=None,drawn=None,lost=None,gf=None,gc=None,gd=None,source_url=url)); st+=1
         except Exception as e:
             errors.append(f"{div}: {e}")
+    if ms>0:
+        legacy_matches=db.query(Match).filter(Match.competition=="LAAMBA",Match.source_kind=="sync").delete(synchronize_session=False)
+        legacy_standings=db.query(Standing).filter(Standing.competition=="LAAMBA",~Standing.unique_key.contains("|CLAUSURA|")).delete(synchronize_session=False)
+        db.commit()
+    else:
+        legacy_matches=legacy_standings=0
     status="ok" if not errors else "partial"
-    log(db,"LAAMBA",status,f"Clausura: {ms} partidos / {st} filas tabla")
-    return {"ok":not bool(errors),"status":status,"tournament":"CLAUSURA","matches":ms,"standings":st,"errors":errors[:5]}
+    log(db,"LAAMBA",status,f"Clausura: {ms} partidos / {st} filas tabla; legado eliminado {legacy_matches}/{legacy_standings}")
+    return {"ok":not bool(errors),"status":status,"tournament":"CLAUSURA","matches":ms,"standings":st,"legacy_removed":{"matches":legacy_matches,"standings":legacy_standings},"errors":errors[:5]}
