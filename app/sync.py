@@ -113,17 +113,44 @@ def _upsert_laamba_match_preserving_known_fields(db:Session,cand):
     for k,v in payload.items(): setattr(obj,k,v)
     db.commit()
 
+def _laamba_table_frames(html):
+    """Return LAAMBA tables together with nearby heading context.
+
+    Some division pages also render a 'Tabla General (todas las divisiones)'.
+    Keeping the nearby heading lets the sync reject that cross-division table
+    instead of writing it into the requested division.
+    """
+    soup=BeautifulSoup(html,"html.parser")
+    out=[]
+    for table in soup.find_all("table"):
+        heading=table.find_previous(["h1","h2","h3","h4","h5","h6"])
+        context=clean(heading.get_text(" ",strip=True)) if heading else ""
+        try:
+            frames=pd.read_html(StringIO(str(table)))
+        except Exception:
+            continue
+        if frames:
+            out.append((frames[0],context))
+    return out
+
+def _is_cross_division_context(context):
+    n=clean(context).lower()
+    return "tabla general" in n or "todas las divisiones" in n or "todas las categorias" in n or "todas las categorías" in n
+
 def sync_laamba(db:Session):
     divisions=["1ra","3ra","4ta","5ta","6ta","7ma","8va"]
-    ms=st=0; errors=[]; recovered_dates=0
+    ms=st=0; errors=[]; recovered_dates=0; rejected_general_tables=0
     for div in divisions:
         url=f"https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/{div}/torneo/m-eliteiclausura/?db=2026"
         try:
-            r=requests.get(url,headers=UA,timeout=25);r.raise_for_status(); tables=pd.read_html(StringIO(r.text)); ri=0
+            r=requests.get(url,headers=UA,timeout=25);r.raise_for_status(); table_frames=_laamba_table_frames(r.text); ri=0
             candidates={}
-            for df in tables:
+            for df,context in table_frames:
                 cols=list(df.columns); lc=col(cols,"local"); vc=col(cols,"visitante"); rc=col(cols,"resultado"); dc=col(cols,"dirección") or col(cols,"direccion"); datec=laamba_date_col(cols)
                 if lc is not None and vc is not None:
+                    if _is_cross_division_context(context):
+                        rejected_general_tables+=1
+                        continue
                     ri+=1
                     for _,row in df.iterrows():
                         h,a=clean(row[lc]),clean(row[vc])
@@ -141,6 +168,9 @@ def sync_laamba(db:Session):
                         candidates[ri]=_prefer_laamba_candidate(candidates.get(ri),cand)
                 teamc=col(cols,"equipo");ptsc=col(cols,"pts")
                 if teamc is not None and ptsc is not None:
+                    if _is_cross_division_context(context):
+                        rejected_general_tables+=1
+                        continue
                     jc=played_col(cols)
                     for _,row in df.iterrows():
                         team=clean(row[teamc])
@@ -148,7 +178,6 @@ def sync_laamba(db:Session):
                         upsert_standing(db,dict(unique_key=f"LAAMBA|2026|CLAUSURA|{div}|{team}",competition="LAAMBA",division=div,season=2026,team=team,pts=as_int(row[ptsc]),played=as_int(row[jc]) if jc is not None else None,won=None,drawn=None,lost=None,gf=None,gc=None,gd=None,source_url=url)); st+=1
             for ri,cand in candidates.items():
                 stale=db.query(Match).filter(Match.competition=="LAAMBA",Match.division==div,Match.round_name==f"Fecha {ri}",Match.external_key!=cand["external_key"],Match.source_kind=="sync_clausura").all()
-                # Preserve known date/venue from a stale row before removing it when the source still omits those fields.
                 if stale:
                     best=next((x for x in stale if x.date or x.venue),None)
                     if best:
@@ -166,5 +195,5 @@ def sync_laamba(db:Session):
     else:
         legacy_matches=legacy_standings=0
     status="ok" if not errors else "partial"
-    log(db,"LAAMBA",status,f"Clausura: {ms} partidos / {st} filas tabla; fechas estructuradas recuperadas {recovered_dates}; legado eliminado {legacy_matches}/{legacy_standings}")
-    return {"ok":not bool(errors),"status":status,"tournament":"CLAUSURA","matches":ms,"standings":st,"structured_dates":recovered_dates,"legacy_removed":{"matches":legacy_matches,"standings":legacy_standings},"errors":errors[:5]}
+    log(db,"LAAMBA",status,f"Clausura: {ms} partidos / {st} filas tabla; fechas estructuradas recuperadas {recovered_dates}; tablas generales rechazadas {rejected_general_tables}; legado eliminado {legacy_matches}/{legacy_standings}")
+    return {"ok":not bool(errors),"status":status,"tournament":"CLAUSURA","matches":ms,"standings":st,"structured_dates":recovered_dates,"rejected_general_tables":rejected_general_tables,"legacy_removed":{"matches":legacy_matches,"standings":legacy_standings},"errors":errors[:5]}
