@@ -1,0 +1,96 @@
+// El Defe · Stock por talle y control de carrito
+(function(){
+  const API=()=>window.EL_DEFE_API_URL||'';
+  const CART_KEY='defe_store_cart_v1';
+  let products=[];
+  const token=()=>localStorage.getItem('defe_token')||'';
+  const role=()=>localStorage.getItem('defe_role')||'';
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const readCart=()=>{try{return JSON.parse(localStorage.getItem(CART_KEY)||'[]')}catch{return []}};
+  async function api(path,opts={}){opts.headers=opts.headers||{};if(token())opts.headers.Authorization='Bearer '+token();const r=await fetch(API()+path,{...opts,cache:'no-store'}),j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.detail||'Error');return j;}
+  async function refreshProducts(admin=false){products=await api(admin?'/api/store/admin/products':'/api/store/products');return products;}
+  const byId=id=>products.find(p=>String(p.id)===String(id));
+  const byName=name=>products.find(p=>p.name===name);
+  const stockFor=(p,size)=>p?.stock_managed?Number(p.inventory?.[size]??0):null;
+
+  async function renderAdminButtons(){
+    if(!['admin','delegado'].includes(role()))return;
+    const list=document.getElementById('storeAdminList');if(!list)return;
+    try{await refreshProducts(true);}catch{return;}
+    list.querySelectorAll('[data-edit-store]').forEach(edit=>{
+      const id=edit.dataset.editStore;if(edit.parentElement?.querySelector(`[data-stock-store="${id}"]`))return;
+      const b=document.createElement('button');b.className='light';b.style.width='auto';b.style.marginLeft='6px';b.textContent='Stock';b.dataset.stockStore=id;b.onclick=()=>openStockEditor(id);edit.parentElement?.appendChild(b);
+    });
+  }
+
+  async function openStockEditor(id){
+    const box=document.getElementById('storeAdminForm');if(!box)return;
+    if(!products.length)await refreshProducts(true);
+    const p=byId(id);if(!p)return;
+    const managed=!!p.stock_managed;
+    box.innerHTML=`<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)"><div class="row"><div><b>Stock · ${esc(p.name)}</b><div class="meta">Controlá disponibilidad por talle.</div></div><span class="badge">${managed?'ACTIVO':'SIN CONTROL'}</span></div><label class="toggle" style="margin-top:10px">Controlar stock por talle <input id="stockManaged" type="checkbox" ${managed?'checked':''}></label><div id="stockFields" style="margin-top:8px">${(p.sizes||[]).map(s=>`<div class="row" style="margin:7px 0"><b>${esc(s)}</b><input data-stock-size="${esc(s)}" type="number" min="0" step="1" value="${managed?Number(p.inventory?.[s]??0):''}" placeholder="Cantidad" style="width:130px;margin:0"></div>`).join('')}</div><button id="stockSave" class="btn" style="margin-top:10px">Guardar stock</button><div id="stockMsg" class="meta"></div></div>`;
+    const managedEl=document.getElementById('stockManaged');
+    managedEl.onchange=()=>{document.querySelectorAll('[data-stock-size]').forEach(i=>i.disabled=!managedEl.checked)};
+    managedEl.onchange();
+    document.getElementById('stockSave').onclick=async()=>{
+      const msg=document.getElementById('stockMsg');msg.textContent='Guardando…';
+      try{
+        if(!managedEl.checked){await api(`/api/store/admin/products/${id}/inventory`,{method:'DELETE'});}
+        else{
+          const inventory={};document.querySelectorAll('[data-stock-size]').forEach(i=>inventory[i.dataset.stockSize]=Math.max(0,Number(i.value||0)));
+          await api(`/api/store/admin/products/${id}/inventory`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({inventory})});
+        }
+        await refreshProducts(true);msg.textContent='Stock guardado.';setTimeout(()=>openStockEditor(id),350);
+      }catch(e){msg.textContent=e.message;}
+    };
+  }
+
+  async function enhanceProductDetail(){
+    const box=document.getElementById('storeDetailBody');if(!box||!box.querySelector('h2'))return;
+    try{await refreshProducts(false);}catch{return;}
+    const p=byName(box.querySelector('h2')?.textContent?.trim());if(!p)return;
+    const sizeButtons=[...box.querySelectorAll('[data-size]')];
+    sizeButtons.forEach(b=>{
+      const q=stockFor(p,b.dataset.size);
+      b.disabled=q===0;
+      b.style.opacity=q===0?'.42':'';
+      b.title=q===0?'Agotado':q==null?'Stock a confirmar':`${q} disponible${q===1?'':'s'}`;
+      if(q===0)b.classList.remove('on');
+    });
+    if(!box.querySelector('[data-size].on')){const first=sizeButtons.find(b=>!b.disabled);if(first)first.classList.add('on');}
+    let note=document.getElementById('storeStockNote');
+    if(!note){note=document.createElement('div');note.id='storeStockNote';note.className='meta';const sizes=box.querySelector('.store-sizes');sizes?.after(note);}
+    const updateNote=()=>{const on=box.querySelector('[data-size].on');if(!on){note.textContent=p.stock_managed?'Sin stock disponible.':'Disponibilidad a confirmar.';return;}const q=stockFor(p,on.dataset.size);note.textContent=q==null?'Disponibilidad a confirmar.':q===0?'Agotado.':`${q} disponible${q===1?'':'s'} en talle ${on.dataset.size}.`;};
+    sizeButtons.forEach(b=>b.addEventListener('click',()=>setTimeout(updateNote,0)));
+    updateNote();
+    const add=document.getElementById('storeAddBtn');if(add){const any=sizeButtons.some(b=>!b.disabled);add.disabled=!any;add.textContent=any?'🛒 Agregar al carrito':'Agotado';}
+  }
+
+  document.addEventListener('click',async e=>{
+    const add=e.target?.closest?.('#storeAddBtn');if(!add)return;
+    const box=document.getElementById('storeDetailBody'),name=box?.querySelector('h2')?.textContent?.trim(),size=box?.querySelector('[data-size].on')?.dataset.size;
+    if(!name||!size)return;
+    if(!products.length)try{await refreshProducts(false)}catch{return;}
+    const p=byName(name),q=stockFor(p,size);if(q==null)return;
+    const cart=readCart(),line=cart.find(x=>String(x.id)===String(p.id)&&x.size===size),already=Number(line?.qty||0);
+    if(already>=q){e.preventDefault();e.stopImmediatePropagation();const msg=document.getElementById('storeProductMsg');if(msg)msg.textContent=`No hay más stock disponible en talle ${size}.`;}
+  },true);
+
+  function wrapCartQty(){
+    const original=window.defeStoreQty;if(typeof original!=='function'||original.__stockGuard)return;
+    const wrapped=async function(key,delta){
+      if(delta<=0)return original.apply(this,arguments);
+      try{await refreshProducts(false);}catch{return original.apply(this,arguments);}
+      const cart=readCart(),line=cart.find(x=>x.key===key),p=line&&byId(line.id);if(!line||!p)return original.apply(this,arguments);
+      const q=stockFor(p,line.size);if(q!=null&&line.qty>=q)return;
+      return original.apply(this,arguments);
+    };wrapped.__stockGuard=true;window.defeStoreQty=wrapped;
+  }
+
+  function observe(){
+    const mo=new MutationObserver(()=>{renderAdminButtons();enhanceProductDetail();wrapCartQty();});
+    mo.observe(document.body,{childList:true,subtree:true});
+  }
+  function init(){observe();setTimeout(()=>{renderAdminButtons();enhanceProductDetail();wrapCartQty();},500);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
