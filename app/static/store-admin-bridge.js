@@ -1,0 +1,53 @@
+// El Defe · Puente robusto para Gestión de Tienda
+(function(){
+  const API=()=>String(window.EL_DEFE_API_URL||'').replace(/\/$/,'');
+  const token=()=>localStorage.getItem('defe_token')||'';
+  const role=()=>localStorage.getItem('defe_role')||'';
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const money=v=>v==null?'Precio a confirmar':new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(v);
+  async function api(path,opts={}){
+    opts.headers={...(opts.headers||{})};if(token())opts.headers.Authorization='Bearer '+token();
+    const r=await fetch(API()+path,{...opts,cache:'no-store'}),j=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(j.detail||'Error');return j;
+  }
+  const slug=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  async function loadList(){
+    const box=document.getElementById('storeAdminList');if(!box)return;
+    try{
+      const rows=await api('/api/store/admin/products');
+      box.innerHTML=rows.map(p=>`<div class="store-admin-row" style="padding:10px 0;border-top:1px solid var(--line)"><div class="row"><div><b>${esc(p.name)}</b><div class="meta">${esc(p.category)} · ${esc(money(p.price))}${p.active?'':' · OCULTO'}${p.featured?' · DESTACADO':''}</div></div><div style="display:flex;gap:6px"><button class="light" style="width:auto" data-edit-store="${p.id}">Editar</button></div></div></div>`).join('')||'<div class="meta">No hay productos.</div>';
+      box.querySelectorAll('[data-edit-store]').forEach(b=>b.onclick=()=>openForm(rows.find(x=>String(x.id)===b.dataset.editStore)));
+      window.dispatchEvent(new CustomEvent('defe-store-admin-list-ready'));
+    }catch(e){box.innerHTML=`<div class="meta">${esc(e.message)}</div>`;}
+  }
+  function openForm(p=null){
+    const box=document.getElementById('storeAdminForm');if(!box)return;
+    box.innerHTML=`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line)"><div class="row"><b>${p?'Editar producto':'Nuevo producto'}</b><button class="back" id="storeFormClose">×</button></div><input id="sapName" placeholder="Nombre" value="${esc(p?.name||'')}"><input id="sapCategory" placeholder="Categoría" value="${esc(p?.category||'')}"><input id="sapPrice" type="number" placeholder="Precio ARS (vacío = a confirmar)" value="${p?.price??''}"><input id="sapImage" placeholder="URL de foto" value="${esc(p?.image_url||'')}"><input id="sapSizes" placeholder="Talles separados por coma" value="${esc((p?.sizes||[]).join(','))}"><textarea id="sapDesc" placeholder="Descripción">${esc(p?.description||'')}</textarea><label class="toggle">Destacado <input id="sapFeatured" type="checkbox" ${p?.featured?'checked':''}></label><label class="toggle">Visible <input id="sapActive" type="checkbox" ${p?.active!==false?'checked':''}></label><button id="sapSave" class="btn" style="margin-top:10px">Guardar producto</button><div id="sapMsg" class="meta"></div></div>`;
+    document.getElementById('storeFormClose').onclick=()=>box.innerHTML='';
+    document.getElementById('sapSave').onclick=async()=>{
+      const payload={slug:p?.slug||slug(sapName.value),name:sapName.value.trim(),category:sapCategory.value.trim(),description:sapDesc.value.trim()||null,image_url:sapImage.value.trim()||null,price:sapPrice.value===''?null:Number(sapPrice.value),sizes:sapSizes.value.split(',').map(x=>x.trim()).filter(Boolean),active:sapActive.checked,featured:sapFeatured.checked,sort_order:p?.sort_order||0};
+      if(!payload.name||!payload.category){sapMsg.textContent='Completá nombre y categoría.';return;}
+      sapMsg.textContent='Guardando…';
+      try{await api(p?`/api/store/admin/products/${p.id}`:'/api/store/admin/products',{method:p?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});sapMsg.textContent='Producto guardado.';await loadList();}catch(e){sapMsg.textContent=e.message;}
+    };
+  }
+  async function ensure(){
+    if(!['admin','delegado'].includes(role()))return;
+    const tools=document.getElementById('adminTools');if(!tools)return;
+    let card=document.getElementById('storeAdminCard');
+    if(!card){
+      card=document.createElement('div');card.className='card';card.id='storeAdminCard';
+      card.innerHTML=`<div class="row"><div><b>Gestión de Tienda</b><div class="meta">Pedidos, catálogo y stock.</div></div><span class="badge">TIENDA</span></div><button id="storeNewProductBridge" class="btn" style="margin-top:10px">+ Nuevo producto</button><div id="storeAdminForm"></div><div id="storeAdminList" style="margin-top:10px"></div>`;
+      tools.insertBefore(card,tools.firstChild);
+      document.getElementById('storeNewProductBridge').onclick=()=>openForm();
+      await loadList();
+    }
+    if(typeof window.defeLoadStoreOrders==='function')window.defeLoadStoreOrders();
+  }
+  window.defeEnsureStoreAdmin=ensure;
+  const oldShow=window.show;
+  if(typeof oldShow==='function'&&!oldShow.__storeAdminBridge){const w=function(id){const r=oldShow.apply(this,arguments);if(id==='admin')setTimeout(ensure,50);return r};w.__storeAdminBridge=true;window.show=w;}
+  const mo=new MutationObserver(()=>{const admin=document.getElementById('admin');if(admin?.classList.contains('on'))ensure();});
+  mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(ensure,500));
+})();
