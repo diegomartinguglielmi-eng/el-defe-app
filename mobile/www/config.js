@@ -2,8 +2,22 @@
 window.EL_DEFE_API_URL = "https://el-defe-api-deploy-production.up.railway.app";
 
 document.addEventListener('DOMContentLoaded',()=>{
-  const s=document.createElement('script');
-  s.src=window.EL_DEFE_API_URL+'/static/store-ui.js?v=3';
-  s.defer=true;
-  document.body.appendChild(s);
+  const base=window.EL_DEFE_API_URL;
+  const load=(name,version)=>new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src=`${base}/static/${name}?v=${version}`;
+    s.onload=resolve;
+    s.onerror=reject;
+    document.body.appendChild(s);
+  });
+
+  load('store.js','restore-1')
+    .then(()=>Promise.all([
+      load('store-settings.js','restore-1'),
+      load('store-visual.js','restore-1'),
+      load('store-stock.js','restore-1'),
+      load('store-orders.js','restore-1'),
+      load('store-image-upload.js','restore-1')
+    ]))
+    .catch(err=>console.error('No se pudo cargar la Tienda completa',err));
 });
