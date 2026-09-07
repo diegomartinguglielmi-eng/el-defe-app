@@ -17,6 +17,7 @@ from .models import User, Match
 from .auth import hash_password
 from .config import settings
 from .sync import sync_laamba
+from .argenliga_baseline import bootstrap_argenliga_2026
 
 app.include_router(router)
 app.include_router(fefi_results_router)
@@ -28,6 +29,7 @@ app.include_router(home_router)
 
 BASE = Path(__file__).resolve().parent
 LAAMBA_BOOTSTRAP_LOCK = 2026090701
+ARGENLIGA_BOOTSTRAP_LOCK = 2026090702
 
 
 @app.get("/sw.js", include_in_schema=False)
@@ -68,6 +70,29 @@ def _bootstrap_laamba_clausura():
         db.close()
 
 
+def _bootstrap_argenliga():
+    db = SessionLocal()
+    locked = False
+    try:
+        locked = bool(db.execute(text("SELECT pg_try_advisory_lock(:k)"), {"k": ARGENLIGA_BOOTSTRAP_LOCK}).scalar())
+        if not locked:
+            print({"argenliga_bootstrap": "skipped", "reason": "another_service_is_loading"})
+            return
+        result = bootstrap_argenliga_2026(db)
+        print({"argenliga_bootstrap": "completed", **result})
+    except Exception as exc:
+        db.rollback()
+        print({"argenliga_bootstrap": "error", "detail": str(exc)})
+    finally:
+        if locked:
+            try:
+                db.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": ARGENLIGA_BOOTSTRAP_LOCK})
+                db.commit()
+            except Exception:
+                db.rollback()
+        db.close()
+
+
 @app.on_event("startup")
 def v5_startup_hardening():
     try:
@@ -91,3 +116,4 @@ def v5_startup_hardening():
         db.close()
 
     Thread(target=_bootstrap_laamba_clausura, daemon=True).start()
+    Thread(target=_bootstrap_argenliga, daemon=True).start()
