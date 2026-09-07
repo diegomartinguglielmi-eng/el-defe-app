@@ -1,8 +1,8 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import Boolean, Integer, String, Text
-from sqlalchemy.orm import Mapped, Session, mapped_column
+from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 from .db import Base, get_db
 from .auth import require_roles
 
@@ -19,6 +19,15 @@ class StoreProduct(Base):
     active: Mapped[bool]=mapped_column(Boolean,default=True,index=True)
     featured: Mapped[bool]=mapped_column(Boolean,default=False,index=True)
     sort_order: Mapped[int]=mapped_column(Integer,default=0)
+    inventory: Mapped[list['StoreInventory']]=relationship('StoreInventory',cascade='all, delete-orphan',lazy='selectin')
+
+class StoreInventory(Base):
+    __tablename__='store_inventory'
+    id: Mapped[int]=mapped_column(Integer,primary_key=True)
+    product_id: Mapped[int]=mapped_column(ForeignKey('store_products.id',ondelete='CASCADE'),index=True)
+    size: Mapped[str]=mapped_column(String(80))
+    quantity: Mapped[int]=mapped_column(Integer,default=0)
+    __table_args__=(UniqueConstraint('product_id','size',name='uq_store_inventory_product_size'),)
 
 class ProductIn(BaseModel):
     slug:str
@@ -32,8 +41,14 @@ class ProductIn(BaseModel):
     featured:bool=False
     sort_order:int=0
 
+class InventoryIn(BaseModel):
+    inventory: dict[str,int]
+
+def _inventory_map(x):
+    return {r.size:max(0,int(r.quantity or 0)) for r in (x.inventory or [])}
+
 def _out(x):
-    return {'id':x.id,'slug':x.slug,'name':x.name,'category':x.category,'description':x.description,'image_url':x.image_url,'price':x.price,'sizes':[s for s in (x.sizes_csv or '').split(',') if s],'active':x.active,'featured':x.featured,'sort_order':x.sort_order}
+    return {'id':x.id,'slug':x.slug,'name':x.name,'category':x.category,'description':x.description,'image_url':x.image_url,'price':x.price,'sizes':[s for s in (x.sizes_csv or '').split(',') if s],'inventory':_inventory_map(x),'stock_managed':bool(x.inventory),'active':x.active,'featured':x.featured,'sort_order':x.sort_order}
 
 router=APIRouter(prefix='/api/store',tags=['Store'])
 
@@ -60,6 +75,33 @@ def update_product(product_id:int,payload:ProductIn,db:Session=Depends(get_db),u
     if duplicate: raise HTTPException(409,'Ya existe un producto con ese identificador')
     row.slug=payload.slug.strip();row.name=payload.name.strip();row.category=payload.category.strip();row.description=payload.description;row.image_url=payload.image_url;row.price=payload.price;row.sizes_csv=','.join([s.strip() for s in payload.sizes if s.strip()]);row.active=payload.active;row.featured=payload.featured;row.sort_order=payload.sort_order
     db.commit();db.refresh(row);return _out(row)
+
+@router.put('/admin/products/{product_id}/inventory')
+def update_inventory(product_id:int,payload:InventoryIn,db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):
+    row=db.query(StoreProduct).filter(StoreProduct.id==product_id).first()
+    if not row: raise HTTPException(404,'Producto no encontrado')
+    allowed=[s for s in (row.sizes_csv or '').split(',') if s]
+    clean={str(k).strip():max(0,int(v)) for k,v in payload.inventory.items() if str(k).strip()}
+    invalid=[k for k in clean if k not in allowed]
+    if invalid: raise HTTPException(400,f'Talles no configurados: {", ".join(invalid)}')
+    existing={r.size:r for r in db.query(StoreInventory).filter(StoreInventory.product_id==product_id).all()}
+    for size in allowed:
+        if size in clean:
+            item=existing.get(size)
+            if item: item.quantity=clean[size]
+            else: db.add(StoreInventory(product_id=product_id,size=size,quantity=clean[size]))
+        elif size in existing:
+            db.delete(existing[size])
+    for size,item in existing.items():
+        if size not in allowed: db.delete(item)
+    db.commit();db.refresh(row);return _out(row)
+
+@router.delete('/admin/products/{product_id}/inventory')
+def clear_inventory(product_id:int,db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):
+    row=db.query(StoreProduct).filter(StoreProduct.id==product_id).first()
+    if not row: raise HTTPException(404,'Producto no encontrado')
+    db.query(StoreInventory).filter(StoreInventory.product_id==product_id).delete(synchronize_session=False)
+    db.commit();return {'ok':True,'stock_managed':False}
 
 @router.delete('/admin/products/{product_id}')
 def delete_product(product_id:int,db:Session=Depends(get_db),user=Depends(require_roles('admin'))):
