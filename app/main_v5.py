@@ -99,22 +99,9 @@ def _cleanup_laamba_conflicts():
             scheduled=[r for r in rows if r.status!="final"]
             if len(finals)==1 and scheduled:
                 for row in scheduled:
-                    removed.append({"id":row.id,"division":row.division,"round":row.round_name,"home":row.home,"away":row.away})
-                    db.delete(row)
-        db.commit();print({"laamba_conflict_cleanup":{"removed":len(removed),"rows":removed}})
+                    removed.append(row.id);db.delete(row)
+        db.commit();print({"laamba_conflict_cleanup":{"removed":len(removed)}})
     except Exception as exc:db.rollback();print({"laamba_conflict_cleanup_error":str(exc)})
-    finally:db.close()
-
-def _log_duplicate_groups():
-    db=SessionLocal()
-    try:
-        groups=(db.query(Match.competition,Match.division,Match.round_name,Match.date,func.count(Match.id).label("n")).group_by(Match.competition,Match.division,Match.round_name,Match.date).having(func.count(Match.id)>1).all())
-        out=[]
-        for g in groups:
-            rows=db.query(Match).filter(Match.competition==g.competition,Match.division==g.division,Match.round_name==g.round_name,Match.date==g.date).order_by(Match.id).all()
-            out.append({"group":{"competition":g.competition,"division":g.division,"round_name":g.round_name,"date":g.date,"count":g.n},"rows":[{"id":r.id,"home":r.home,"away":r.away,"status":r.status,"source_kind":r.source_kind} for r in rows]})
-        print({"duplicate_diagnostic":out})
-    except Exception as exc:print({"duplicate_diagnostic_error":str(exc)})
     finally:db.close()
 
 @app.on_event("startup")
@@ -129,4 +116,4 @@ def v5_startup_hardening():
         if legacy and legacy.email!=settings.admin_email:legacy.is_active=False;legacy.role="lector"
         db.commit()
     finally:db.close()
-    Thread(target=_bootstrap_laamba_clausura,daemon=True).start();Thread(target=_bootstrap_argenliga,daemon=True).start();Thread(target=_bootstrap_fefi_freshness,daemon=True).start();Thread(target=_cleanup_laamba_conflicts,daemon=True).start();Thread(target=_log_duplicate_groups,daemon=True).start()
+    Thread(target=_bootstrap_laamba_clausura,daemon=True).start();Thread(target=_bootstrap_argenliga,daemon=True).start();Thread(target=_bootstrap_fefi_freshness,daemon=True).start();Thread(target=_cleanup_laamba_conflicts,daemon=True).start()
