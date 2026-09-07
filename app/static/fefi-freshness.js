@@ -3,7 +3,7 @@
   const token=()=>localStorage.getItem('defe_token')||'';
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   async function api(path){
-    const r=await fetch(API()+path,{headers:token()?{Authorization:'Bearer '+token()}: {}});
+    const r=await fetch(API()+path,{headers:token()?{Authorization:'Bearer '+token()}: {},cache:'no-store'});
     const j=await r.json().catch(()=>({}));
     if(!r.ok) throw new Error(j.detail||'Error');
     return j;
@@ -26,13 +26,14 @@
     try{
       const s=await api('/api/fefi/freshness');
       const cls=s.health==='ok'?'ok':s.health==='warning'?'gold':'';
-      const label=s.health==='ok'?'FUENTE OK':s.health==='warning'?'1 FALLA':'ALERTA';
+      const label=s.health==='ok'?'FUENTE OK':s.health==='warning'?'1 FALLA':s.health==='error'?'ALERTA':'SIN EJECUCIÓN';
       const lastSuccess=s.last_success?.created_at||null;
       const snapshot=s.last_snapshot?.fetched_at||null;
       box.innerHTML=`<div class="row"><b>Salud del dato FEFI</b><span class="badge ${cls}">${label}</span></div>
         <div class="meta" style="margin-top:8px"><b>Última sincronización exitosa:</b> ${esc(fmt(lastSuccess))}</div>
-        <div class="meta"><b>Último snapshot válido:</b> ${esc(fmt(snapshot))}</div>
+        <div class="meta"><b>Último snapshot:</b> ${esc(fmt(snapshot))}</div>
         <div class="meta"><b>Fallas consecutivas:</b> ${esc(s.consecutive_failures)}</div>
+        ${s.health==='unknown'?'<div class="meta" style="margin-top:8px">El sincronizador está activo, pero todavía no existe una ejecución registrada en la base.</div>':''}
         ${s.health==='error'?'<div class="meta" style="margin-top:8px"><b>Se conserva el último dato publicado válido hasta que FEFI vuelva a responder.</b></div>':''}`;
     }catch(e){box.innerHTML=`<b>Salud del dato FEFI</b><div class="meta">${esc(e.message)}</div>`;}
   }
