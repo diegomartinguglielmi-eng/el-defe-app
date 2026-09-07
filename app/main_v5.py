@@ -11,6 +11,7 @@ from .fefi_schedules import router as fefi_schedules_router
 from .fefi_freshness import router as fefi_freshness_router
 from .notifications_v5 import router as notifications_router
 from .data_quality import router as data_quality_router
+from .home_v5 import router as home_router
 from .db import SessionLocal
 from .models import User, Match
 from .auth import hash_password
@@ -23,6 +24,7 @@ app.include_router(fefi_schedules_router)
 app.include_router(fefi_freshness_router)
 app.include_router(notifications_router)
 app.include_router(data_quality_router)
+app.include_router(home_router)
 
 BASE = Path(__file__).resolve().parent
 LAAMBA_BOOTSTRAP_LOCK = 2026090701
