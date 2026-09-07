@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from pathlib import Path
 from threading import Thread
 
@@ -5,7 +6,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import text
 
 from .main import app, scheduler
-from .pending import router, run_fefi_pending_sync
+from .pending import router, run_fefi_pending_sync, FefiPendingChange, _apply_change
 from .fefi_results import router as fefi_results_router
 from .fefi_schedules import router as fefi_schedules_router
 from .fefi_freshness import router as fefi_freshness_router
@@ -94,6 +95,22 @@ def _bootstrap_argenliga():
         db.close()
 
 
+def _adopt_first_fefi_baseline(db):
+    run_count = db.query(SyncRun).filter(SyncRun.source == "FEFI_PENDING").count()
+    if run_count != 1:
+        return 0
+    pending = db.query(FefiPendingChange).filter(FefiPendingChange.status == "pending").all()
+    if not pending:
+        return 0
+    now = datetime.now(timezone.utc)
+    for change in pending:
+        _apply_change(db, change)
+        change.status = "approved"
+        change.resolved_at = now
+    db.commit()
+    return len(pending)
+
+
 def _bootstrap_fefi_freshness():
     db = SessionLocal()
     locked = False
@@ -104,10 +121,12 @@ def _bootstrap_fefi_freshness():
             return
         exists = db.query(SyncRun).filter(SyncRun.source == "FEFI_PENDING").first()
         if exists:
-            print({"fefi_bootstrap": "skipped", "reason": "sync_history_already_present"})
+            adopted = _adopt_first_fefi_baseline(db)
+            print({"fefi_bootstrap": "skipped", "reason": "sync_history_already_present", "baseline_adopted": adopted})
             return
         result = run_fefi_pending_sync(db)
-        print({"fefi_bootstrap": "completed", **result})
+        adopted = _adopt_first_fefi_baseline(db) if result.get("ok") else 0
+        print({"fefi_bootstrap": "completed", **result, "baseline_adopted": adopted})
     except Exception as exc:
         db.rollback()
         print({"fefi_bootstrap": "error", "detail": str(exc)})
