@@ -4,6 +4,7 @@ import json
 from .db import Base, engine, SessionLocal
 from .pending import run_fefi_pending_sync, FefiPendingChange
 from .fefi_results import sync_verified_results
+from .fefi_mayores import sync_fefi_mayores_b
 from .notification_reminders import run as run_notification_reminders
 from .models import SyncRun
 
@@ -61,6 +62,7 @@ if __name__ == "__main__":
 
     db = SessionLocal()
     try:
+        output["fefi_mayores_b"] = sync_fefi_mayores_b(db)
         if not result.get("ok"):
             output["source_alert_created"] = _create_source_alert_after_two_failures(db)
         else:
@@ -70,8 +72,6 @@ if __name__ == "__main__":
     finally:
         db.close()
 
-    # The existing Railway cron runs at 00:00 UTC, which is 21:00 in Argentina.
-    # The reminder job self-skips on the other 4-hour executions.
     try:
         output["reminders"] = run_notification_reminders()
     except Exception as exc:
