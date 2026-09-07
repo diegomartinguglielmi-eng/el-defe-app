@@ -30,17 +30,16 @@ def fefi_freshness(
         else:
             break
 
-    snapshot = (
-        db.query(FefiRawSnapshot)
-        .order_by(FefiRawSnapshot.id.desc())
-        .first()
-    )
+    snapshot = db.query(FefiRawSnapshot).order_by(FefiRawSnapshot.id.desc()).first()
 
-    health = "ok"
-    if consecutive_failures >= 2:
+    if latest is None:
+        health = "unknown"
+    elif consecutive_failures >= 2:
         health = "error"
     elif consecutive_failures == 1:
         health = "warning"
+    else:
+        health = "ok"
 
     return {
         "health": health,
