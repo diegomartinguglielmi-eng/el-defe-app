@@ -4,7 +4,7 @@
 
   async function registerSW(){
     if(!canSW)return;
-    try{await navigator.serviceWorker.register('/static/sw.js',{scope:'/'});}catch(e){console.warn('SW registration failed',e);}
+    try{await navigator.serviceWorker.register('/sw.js',{scope:'/'});}catch(e){console.warn('SW registration failed',e);}
   }
 
   function ensureInstallCard(){
