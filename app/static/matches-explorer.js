@@ -22,11 +22,11 @@
   function init(){
     const oldShow=window.show;if(typeof oldShow==='function'&&!oldShow.__matchExplorer){const wrapped=function(id){const r=oldShow.apply(this,arguments);if(id==='matches')setTimeout(load,0);return r;};wrapped.__matchExplorer=true;window.show=wrapped;}
     const oldNav=window.nav;if(typeof oldNav==='function'&&!oldNav.__matchExplorer){const wrapped=function(id){const r=oldNav.apply(this,arguments);if(id==='matches')setTimeout(load,0);return r;};wrapped.__matchExplorer=true;window.nav=wrapped;}
-    addScript('personalized-home','/static/personalized_home.js?v=56');
+    addScript('personalized-home','/static/personalized_home.js?v=59');
     addScript('fefi-schedules','/static/fefi-schedules.js?v=56');
     addScript('fefi-freshness','/static/fefi-freshness.js?v=56');
     addScript('pwa','/static/pwa.js?v=56');
-    addScript('notifications','/static/notifications.js?v=58');
+    addScript('notifications','/static/notifications.js?v=59');
     addScript('data-quality','/static/data-quality.js?v=57');
     addScript('argenliga-guard','/static/argenliga_guard.js?v=58');
   }
