@@ -11,13 +11,15 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.body.appendChild(s);
   });
 
-  load('store.js','restore-1')
+  load('store.js','restore-2')
+    .then(()=>load('store-admin-bridge.js','restore-2'))
     .then(()=>Promise.all([
-      load('store-settings.js','restore-1'),
-      load('store-visual.js','restore-1'),
-      load('store-stock.js','restore-1'),
-      load('store-orders.js','restore-1'),
-      load('store-image-upload.js','restore-1')
+      load('store-settings.js','restore-2'),
+      load('store-visual.js','restore-2'),
+      load('store-stock.js','restore-2'),
+      load('store-orders.js','restore-2'),
+      load('store-image-upload.js','restore-2')
     ]))
+    .then(()=>{if(typeof window.defeEnsureStoreAdmin==='function')setTimeout(window.defeEnsureStoreAdmin,250);})
     .catch(err=>console.error('No se pudo cargar la Tienda completa',err));
 });
