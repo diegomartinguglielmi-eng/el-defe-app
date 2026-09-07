@@ -3,13 +3,21 @@
   const API=()=>String(window.EL_DEFE_API_URL||'').replace(/\/$/,'');
   const token=()=>localStorage.getItem('defe_token')||'';
   const role=()=>localStorage.getItem('defe_role')||'';
-  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
   const money=v=>v==null?'Precio a confirmar':new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(v);
   let ensuring=false;
   async function api(path,opts={}){
     opts.headers={...(opts.headers||{})};if(token())opts.headers.Authorization='Bearer '+token();
     const r=await fetch(API()+path,{...opts,cache:'no-store'}),j=await r.json().catch(()=>({}));
     if(!r.ok)throw new Error(j.detail||'Error');return j;
+  }
+  function ensureRosterModule(){
+    if(document.getElementById('rosterAdminCard'))return;
+    if(document.querySelector('script[data-roster-admin-loader]'))return;
+    const s=document.createElement('script');
+    s.src=API()+'/static/roster-admin.js?v=roster-2';
+    s.dataset.rosterAdminLoader='1';
+    document.body.appendChild(s);
   }
   const slug=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   async function loadList(){
@@ -37,6 +45,7 @@
     const tools=document.getElementById('adminTools');if(!tools)return;
     ensuring=true;
     try{
+      ensureRosterModule();
       let card=document.getElementById('storeAdminCard');
       if(!card){
         card=document.createElement('div');card.className='card';card.id='storeAdminCard';
