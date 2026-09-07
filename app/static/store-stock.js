@@ -87,10 +87,11 @@
     };wrapped.__stockGuard=true;window.defeStoreQty=wrapped;
   }
 
+  function loadCheckout(){if(document.querySelector('script[data-store-checkout]'))return;const s=document.createElement('script');s.src='/static/store-checkout.js?v=1';s.dataset.storeCheckout='1';document.body.appendChild(s);}
   function observe(){
     const mo=new MutationObserver(()=>{renderAdminButtons();enhanceProductDetail();wrapCartQty();});
     mo.observe(document.body,{childList:true,subtree:true});
   }
-  function init(){observe();setTimeout(()=>{renderAdminButtons();enhanceProductDetail();wrapCartQty();},500);}
+  function init(){observe();loadCheckout();setTimeout(()=>{renderAdminButtons();enhanceProductDetail();wrapCartQty();},500);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
