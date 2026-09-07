@@ -7,6 +7,7 @@ from .fefi_results import sync_verified_results
 from .fefi_mayores import sync_fefi_mayores_b
 from .superliga_sync import sync_superliga
 from .sync import sync_laamba
+from .data_quality import build_data_quality
 from .notification_reminders import run as run_notification_reminders
 from .models import SyncRun
 
@@ -75,6 +76,14 @@ if __name__ == "__main__":
             _resolve_source_alerts(db)
             output.update(sync_verified_results(db))
             output["source_health"] = "ok"
+
+        # Produce a read-only quality snapshot on every sync so production
+        # inconsistencies can be diagnosed from logs without touching the DB.
+        try:
+            output["data_quality"] = build_data_quality(db)
+        except Exception as exc:
+            db.rollback()
+            output["data_quality"] = {"health": "error", "error": str(exc)}
     finally:
         db.close()
 
