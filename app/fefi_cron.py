@@ -6,6 +6,7 @@ from .pending import run_fefi_pending_sync, FefiPendingChange
 from .fefi_results import sync_verified_results
 from .fefi_mayores import sync_fefi_mayores_b
 from .superliga_sync import sync_superliga
+from .sync import sync_laamba
 from .notification_reminders import run as run_notification_reminders
 from .models import SyncRun
 
@@ -63,6 +64,9 @@ if __name__ == "__main__":
 
     db = SessionLocal()
     try:
+        # Keep every structurally automatable competition fresh on the same
+        # four-hour production cadence. Argenliga remains assisted/manual.
+        output["laamba"] = sync_laamba(db)
         output["fefi_mayores_b"] = sync_fefi_mayores_b(db)
         output["superliga"] = sync_superliga(db)
         if not result.get("ok"):
