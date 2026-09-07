@@ -28,6 +28,10 @@ def norm(value):
     return clean(value).upper().replace(".", "")
 
 
+def compact(value):
+    return re.sub(r"[^A-Z0-9]", "", norm(value))
+
+
 def is_defe(value):
     n = norm(value)
     return any(norm(alias) in n or n in norm(alias) for alias in TEAM_ALIASES)
@@ -79,12 +83,7 @@ def _parse_fixture(html):
         if line.lower() == "vs" and current_round and 0 < i < len(lines) - 1:
             home, away = lines[i - 1], lines[i + 1]
             if is_defe(home) or is_defe(away):
-                rows.append({
-                    "round_name": current_round,
-                    "date": current_date,
-                    "home": home,
-                    "away": away,
-                })
+                rows.append({"round_name": current_round, "date": current_date, "home": home, "away": away})
     dedup = {}
     for row in rows:
         dedup[row["round_name"]] = row
@@ -92,15 +91,15 @@ def _parse_fixture(html):
 
 
 def _result_tables(html):
+    """FEFI result tables vary between F.T./FT and P.J./PJ headings. Detect by semantic columns."""
     soup = BeautifulSoup(html, "html.parser")
     tables = []
     for table in soup.find_all("table"):
         rows = _table_rows(table)
         if not rows:
             continue
-        header = [norm(x) for x in rows[0]]
-        joined = " | ".join(header)
-        if "F T" in joined and "EQUIPOS" in joined and "GL" in joined and "P J" in joined and "PTS" in joined:
+        header = [compact(x) for x in rows[0]]
+        if "EQUIPOS" in header and "GL" in header and ("FT" in header or any(x.startswith("FT") for x in header)):
             tables.append(rows)
     return tables
 
@@ -110,18 +109,15 @@ def _parse_clausura_results(html):
     if len(tables) < 2:
         return []
     rows = tables[1]
-    header = [norm(x) for x in rows[0]]
+    header = [compact(x) for x in rows[0]]
 
-    def idx_contains(token):
+    def idx(token):
         for i, value in enumerate(header):
-            if token in value:
+            if value == token or value.startswith(token):
                 return i
         return None
 
-    ft_i = idx_contains("F T")
-    team_i = idx_contains("EQUIPOS")
-    gl_i = idx_contains("GL")
-    status_i = idx_contains("ESTADO")
+    ft_i, team_i, gl_i, status_i = idx("FT"), idx("EQUIPOS"), idx("GL"), idx("ESTADO")
     if ft_i is None or team_i is None or gl_i is None:
         return []
 
@@ -130,7 +126,8 @@ def _parse_clausura_results(html):
     while i < len(rows) - 1:
         a, b = rows[i], rows[i + 1]
         ft = a[ft_i] if ft_i < len(a) else ""
-        if re.fullmatch(r"F\d+", norm(ft)):
+        ft_norm = compact(ft)
+        if re.fullmatch(r"F\d+", ft_norm):
             home = a[team_i] if team_i < len(a) else ""
             away = b[team_i] if team_i < len(b) else ""
             if is_defe(home) or is_defe(away):
@@ -138,13 +135,10 @@ def _parse_clausura_results(html):
                 av = b[gl_i] if gl_i < len(b) else ""
                 status = a[status_i] if status_i is not None and status_i < len(a) else ""
                 out.append({
-                    "round_name": f"Fecha {int(re.sub(r'\D', '', ft))}",
-                    "home": home,
-                    "away": away,
-                    "home_raw": hv,
-                    "away_raw": av,
-                    "home_score": _as_int(hv),
-                    "away_score": _as_int(av),
+                    "round_name": f"Fecha {int(re.sub(r'\D', '', ft_norm))}",
+                    "home": home, "away": away,
+                    "home_raw": hv, "away_raw": av,
+                    "home_score": _as_int(hv), "away_score": _as_int(av),
                     "source_status": status,
                 })
             i += 2
@@ -160,11 +154,8 @@ def _standing_tables(html):
         rows = _table_rows(table)
         if not rows:
             continue
-        header = [norm(x) for x in rows[0]]
-        if len(header) != 6:
-            continue
-        joined = " | ".join(header)
-        if ("EQUIP" in joined and "PJ" in joined and "PTS" in joined) or ("EQUIP" in joined and "P J" in joined and "PTS" in joined):
+        header = [compact(x) for x in rows[0]]
+        if len(header) == 6 and "EQUIPOS" in header and "PJ" in header and "PTS" in header:
             tables.append(rows)
     return tables
 
@@ -179,145 +170,84 @@ def _parse_clausura_standings(html):
         if len(row) < 6:
             continue
         team = clean(row[0])
-        if not team or norm(team) in {"EQUIPO", "EQUIPOS"}:
+        if not team or norm(team) in {"EQUIPO", "EQUIPOS", "GENERAL"}:
             continue
         played, won, drawn, lost, pts = [_as_int(x) for x in row[1:6]]
         if played is None and pts is None:
             continue
-        out.append({
-            "team": team,
-            "played": played,
-            "won": won,
-            "drawn": drawn,
-            "lost": lost,
-            "pts": pts,
-        })
+        out.append({"team": team, "played": played, "won": won, "drawn": drawn, "lost": lost, "pts": pts})
     return out
 
 
 def _upsert_standing(db: Session, row):
     key = f"FEFI|2026|MAYORES_B_42|CLAUSURA|{row['team']}"
     obj = db.query(Standing).filter(Standing.unique_key == key).first()
-    payload = dict(
-        unique_key=key,
-        competition="FEFI",
-        division=DIVISION,
-        season=2026,
-        team=row["team"],
-        pts=row["pts"],
-        played=row["played"],
-        won=row["won"],
-        drawn=row["drawn"],
-        lost=row["lost"],
-        gf=None,
-        gc=None,
-        gd=None,
-        source_url=URL,
-    )
+    payload = dict(unique_key=key, competition="FEFI", division=DIVISION, season=2026,
+                   team=row["team"], pts=row["pts"], played=row["played"], won=row["won"],
+                   drawn=row["drawn"], lost=row["lost"], gf=None, gc=None, gd=None, source_url=URL)
     if obj is None:
         db.add(Standing(**payload))
     else:
-        for field, value in payload.items():
-            setattr(obj, field, value)
+        for field, value in payload.items(): setattr(obj, field, value)
 
 
 def sync_fefi_mayores_b(db: Session):
     try:
-        response = requests.get(URL, headers=UA, timeout=30)
-        response.raise_for_status()
-        html = response.text
+        response = requests.get(URL, headers=UA, timeout=30); response.raise_for_status(); html = response.text
         fixtures = _parse_fixture(html)
         if not fixtures:
             detail = "Mayores B +42: no se encontró a Defensores de Santos Lugares en el fixture publicado."
-            db.add(SyncRun(source="FEFI_MAYORES_B", status="warning", detail=detail))
-            db.commit()
+            db.add(SyncRun(source="FEFI_MAYORES_B", status="warning", detail=detail)); db.commit()
             return {"ok": False, "status": "warning", "matches": 0, "detail": detail}
 
         saved = 0
         for row in fixtures:
             key = f"FEFI|2026|MAYORES_B_42|{row['round_name']}|{row['home']}|{row['away']}"
             match = db.query(Match).filter(Match.external_key == key).first()
-            payload = dict(
-                external_key=key,
-                competition="FEFI",
-                division=DIVISION,
-                round_name=row["round_name"],
-                date=row["date"],
-                home=row["home"],
-                away=row["away"],
-                status="scheduled",
-                source_url=URL,
-                source_kind="fefi_mayores_b",
-            )
-            if not match:
-                match = Match(**payload)
-                db.add(match)
+            payload = dict(external_key=key, competition="FEFI", division=DIVISION, round_name=row["round_name"],
+                           date=row["date"], home=row["home"], away=row["away"], status="scheduled",
+                           source_url=URL, source_kind="fefi_mayores_b")
+            if not match: match = Match(**payload); db.add(match)
             else:
+                # Do not erase a final result on the next fixture refresh.
+                old_final = match.status == "final" and match.home_score is not None and match.away_score is not None
                 for field, value in payload.items():
+                    if old_final and field in {"status", "source_kind"}: continue
                     setattr(match, field, value)
             saved += 1
 
-        results = _parse_clausura_results(html)
-        finals = 0
-        unresolved_results = 0
+        results = _parse_clausura_results(html); finals = 0; unresolved_results = 0
         for result in results:
-            match = db.query(Match).filter(
-                Match.competition == "FEFI",
-                Match.division == DIVISION,
-                Match.round_name == result["round_name"],
-            ).order_by(Match.id.desc()).first()
-            if not match:
-                continue
-            match.home = result["home"]
-            match.away = result["away"]
+            match = db.query(Match).filter(Match.competition == "FEFI", Match.division == DIVISION,
+                                           Match.round_name == result["round_name"]).order_by(Match.id.desc()).first()
+            if not match: continue
+            match.home, match.away = result["home"], result["away"]
             if result["home_score"] is not None and result["away_score"] is not None:
-                match.home_score = result["home_score"]
-                match.away_score = result["away_score"]
-                match.status = "final"
-                match.source_kind = "fefi_mayores_b_result"
-                finals += 1
-            elif clean(result["home_raw"]) or clean(result["away_raw"]):
-                unresolved_results += 1
+                match.home_score, match.away_score = result["home_score"], result["away_score"]
+                match.status, match.source_kind = "final", "fefi_mayores_b_result"; finals += 1
+            elif clean(result["home_raw"]) or clean(result["away_raw"]): unresolved_results += 1
 
         standings = _parse_clausura_standings(html)
         standings_valid = bool(standings) and any(is_defe(x["team"]) for x in standings)
         standing_rows = 0
         if standings_valid:
-            for row in standings:
-                _upsert_standing(db, row)
-                standing_rows += 1
+            for row in standings: _upsert_standing(db, row); standing_rows += 1
 
-        status = "ok"
-        notes = []
-        if len(_result_tables(html)) < 2:
-            notes.append("resultados Clausura no identificados con seguridad")
-        if not standings_valid:
-            notes.append("tabla Clausura no identificada con Defensores")
-        if notes:
-            status = "partial"
-
-        detail = (
-            f"Mayores B +42: {saved} fixture; {finals} resultados Clausura numéricos; "
-            f"{unresolved_results} resultados no numéricos; {standing_rows} filas tabla Clausura. "
-            f"{'; '.join(notes) if notes else 'Fuente validada por estructura.'} "
-            f"{datetime.now(AR_TZ).isoformat()}"
-        )
-        db.add(SyncRun(source="FEFI_MAYORES_B", status=status, detail=detail))
-        db.commit()
-        return {
-            "ok": True,
-            "status": status,
-            "matches": saved,
-            "results": finals,
-            "unresolved_results": unresolved_results,
-            "standings": standing_rows,
-            "division": DIVISION,
-        }
+        result_table_count = len(_result_tables(html))
+        status = "ok"; notes = []
+        if result_table_count < 2: notes.append(f"resultados Clausura no identificados con seguridad (tablas={result_table_count})")
+        if not standings_valid: notes.append("tabla Clausura no identificada con Defensores")
+        if notes: status = "partial"
+        detail = (f"Mayores B +42: {saved} fixture; {finals} resultados Clausura numéricos; "
+                  f"{unresolved_results} resultados no numéricos; {standing_rows} filas tabla Clausura; "
+                  f"tablas_resultados={result_table_count}. {'; '.join(notes) if notes else 'Fuente validada por estructura.'} "
+                  f"{datetime.now(AR_TZ).isoformat()}")
+        db.add(SyncRun(source="FEFI_MAYORES_B", status=status, detail=detail)); db.commit()
+        return {"ok": True, "status": status, "matches": saved, "results": finals,
+                "unresolved_results": unresolved_results, "standings": standing_rows,
+                "result_tables": result_table_count, "division": DIVISION}
     except Exception as exc:
         db.rollback()
-        try:
-            db.add(SyncRun(source="FEFI_MAYORES_B", status="error", detail=str(exc)))
-            db.commit()
-        except Exception:
-            db.rollback()
+        try: db.add(SyncRun(source="FEFI_MAYORES_B", status="error", detail=str(exc))); db.commit()
+        except Exception: db.rollback()
         return {"ok": False, "status": "error", "matches": 0, "error": str(exc)}
