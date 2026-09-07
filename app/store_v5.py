@@ -6,6 +6,8 @@ from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 from .db import Base, get_db
 from .auth import require_roles
 
+DEFAULT_STORE_WHATSAPP='5491140811194'
+
 class StoreProduct(Base):
     __tablename__='store_products'
     id: Mapped[int]=mapped_column(Integer,primary_key=True)
@@ -29,6 +31,12 @@ class StoreInventory(Base):
     quantity: Mapped[int]=mapped_column(Integer,default=0)
     __table_args__=(UniqueConstraint('product_id','size',name='uq_store_inventory_product_size'),)
 
+class StoreSetting(Base):
+    __tablename__='store_settings'
+    id: Mapped[int]=mapped_column(Integer,primary_key=True)
+    key: Mapped[str]=mapped_column(String(80),unique=True,index=True)
+    value: Mapped[str]=mapped_column(Text)
+
 class ProductIn(BaseModel):
     slug:str
     name:str
@@ -44,13 +52,40 @@ class ProductIn(BaseModel):
 class InventoryIn(BaseModel):
     inventory: dict[str,int]
 
+class StoreSettingsIn(BaseModel):
+    whatsapp_number:str
+
 def _inventory_map(x):
     return {r.size:max(0,int(r.quantity or 0)) for r in (x.inventory or [])}
 
 def _out(x):
     return {'id':x.id,'slug':x.slug,'name':x.name,'category':x.category,'description':x.description,'image_url':x.image_url,'price':x.price,'sizes':[s for s in (x.sizes_csv or '').split(',') if s],'inventory':_inventory_map(x),'stock_managed':bool(x.inventory),'active':x.active,'featured':x.featured,'sort_order':x.sort_order}
 
+def _clean_phone(value:str)->str:
+    return ''.join(ch for ch in str(value or '') if ch.isdigit())
+
+def _setting(db:Session,key:str,default:str='')->str:
+    row=db.query(StoreSetting).filter(StoreSetting.key==key).first()
+    return row.value if row else default
+
 router=APIRouter(prefix='/api/store',tags=['Store'])
+
+@router.get('/settings')
+def public_settings(db:Session=Depends(get_db)):
+    return {'whatsapp_number':_setting(db,'whatsapp_number',DEFAULT_STORE_WHATSAPP)}
+
+@router.get('/admin/settings')
+def admin_settings(db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):
+    return {'whatsapp_number':_setting(db,'whatsapp_number',DEFAULT_STORE_WHATSAPP)}
+
+@router.put('/admin/settings')
+def update_settings(payload:StoreSettingsIn,db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):
+    phone=_clean_phone(payload.whatsapp_number)
+    if len(phone)<10 or len(phone)>15: raise HTTPException(400,'Número de WhatsApp inválido')
+    row=db.query(StoreSetting).filter(StoreSetting.key=='whatsapp_number').first()
+    if row: row.value=phone
+    else: db.add(StoreSetting(key='whatsapp_number',value=phone))
+    db.commit();return {'ok':True,'whatsapp_number':phone}
 
 @router.get('/products')
 def products(db:Session=Depends(get_db)):
@@ -119,6 +154,10 @@ DEFAULTS=[
  ('gorra','Gorra','Accesorios','Accesorio con identidad del club.',['Único'])]
 
 def bootstrap_store(db:Session):
-    if db.query(StoreProduct).count(): return {'created':0,'skipped':True}
-    for i,(slug,name,cat,desc,sizes) in enumerate(DEFAULTS): db.add(StoreProduct(slug=slug,name=name,category=cat,description=desc,sizes_csv=','.join(sizes),sort_order=i))
-    db.commit();return {'created':len(DEFAULTS),'skipped':False}
+    created=0
+    if not db.query(StoreProduct).count():
+        for i,(slug,name,cat,desc,sizes) in enumerate(DEFAULTS):
+            db.add(StoreProduct(slug=slug,name=name,category=cat,description=desc,sizes_csv=','.join(sizes),sort_order=i));created+=1
+    if not db.query(StoreSetting).filter(StoreSetting.key=='whatsapp_number').first():
+        db.add(StoreSetting(key='whatsapp_number',value=DEFAULT_STORE_WHATSAPP))
+    db.commit();return {'created':created,'skipped':created==0}
