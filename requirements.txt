@@ -13,3 +13,4 @@ pandas==2.3.2
 lxml==6.0.1
 apscheduler==3.11.0
 bcrypt==4.0.1
+pywebpush>=2.0.0,<3
