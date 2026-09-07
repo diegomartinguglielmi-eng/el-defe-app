@@ -18,7 +18,7 @@ from .notifications_v5 import NotificationEvent, publish_event
 FEFI_URL = "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/"
 FEFI_CLUB = "DEF. DE SANTOS LUGARES"
 FEFI_DIVISION = "Zona H"
-USER_AGENT = "ElDefeApp/0.8 (+Defensores de Santos Lugares)"
+USER_AGENT = "ElDefeApp/0.9 (+Defensores de Santos Lugares)"
 CATEGORIES = ["2019", "2013", "2018", "2014", "2017", "2016", "2015"]
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 
@@ -46,13 +46,11 @@ class FefiCategoryResult(Base):
 
 
 def parse_fefi_results(html: str) -> list[dict]:
-    """Parse FEFI result tables.
+    """Parse official FEFI result tables and keep the last occurrence per round.
 
-    The FEFI page renders Apertura and Clausura tables in the same HTML and the
-    surrounding tab labels are not reliable DOM ancestors.  Tables are emitted
-    in tournament order, so we parse every results table and let the last row
-    for each round win (Clausura is rendered after Apertura).  This also avoids
-    depending on the visual tab state used by WordPress/wpDataTables.
+    The official page renders Apertura and Clausura in the same document. In
+    the current 2026 markup Clausura appears after Apertura, so the final
+    occurrence for each F-number is the Clausura row.
     """
     soup = BeautifulSoup(html, "html.parser")
     candidates = []
@@ -100,7 +98,6 @@ def parse_fefi_results(html: str) -> list[dict]:
                 continue
             i += 1
 
-    # Last occurrence is Clausura on the official 2026 page.
     dedup = {r["round"]: r for r in out}
     return [dedup[k] for k in sorted(dedup)]
 
@@ -126,13 +123,19 @@ def _result_body(result: dict, idx: int) -> str:
 
 def sync_verified_results(db: Session, html: str | None = None) -> dict:
     if html is None:
-        response = requests.get(FEFI_URL, timeout=30, headers={"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"})
+        response = requests.get(
+            FEFI_URL,
+            timeout=30,
+            headers={"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"},
+        )
         response.raise_for_status()
         html = response.text
+
     parsed = parse_fefi_results(html)
     verified = 0
     category_rows = 0
     notifications = 0
+
     for result in parsed:
         if _norm(result.get("status")) != "VERIFICADO":
             continue
@@ -144,6 +147,7 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
             Match.division == FEFI_DIVISION,
             Match.round_name == round_name,
         ).order_by(Match.id.desc()).first()
+
         if not match:
             match = Match(
                 external_key=f"FEFI|2026|H|CLAUSURA|{round_name}",
@@ -172,6 +176,7 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
             new_home = result["scores_home"][idx] if idx < len(result["scores_home"]) else None
             new_away = result["scores_away"][idx] if idx < len(result["scores_away"]) else None
             changed = row is None or row.home_value != new_home or row.away_value != new_away or _norm(row.status) != "VERIFICADO"
+
             if not row:
                 row = FefiCategoryResult(
                     external_key=key,
@@ -181,6 +186,7 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
                     away=result["away"],
                 )
                 db.add(row)
+
             row.home = result["home"]
             row.away = result["away"]
             row.home_value = new_home
@@ -209,18 +215,55 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
                     )
                     notifications += 1
 
-    db.add(SyncRun(source="FEFI_RESULTS", status="ok", detail=f"Clausura: {verified} resultados verificados; {category_rows} filas de categoría; {notifications} avisos"))
+    db.add(SyncRun(
+        source="FEFI_RESULTS",
+        status="ok",
+        detail=f"Clausura: {verified} resultados verificados; {category_rows} filas de categoría; {notifications} avisos",
+    ))
     db.commit()
-    return {"tournament": "CLAUSURA", "verified_results": verified, "category_rows": category_rows, "notifications": notifications}
+    return {
+        "tournament": "CLAUSURA",
+        "verified_results": verified,
+        "category_rows": category_rows,
+        "notifications": notifications,
+    }
 
 
 router = APIRouter(prefix="/api/fefi", tags=["FEFI"])
 
 
+def _round_rows(db: Session, round_number: int):
+    return db.query(FefiCategoryResult).filter(
+        FefiCategoryResult.round_number == round_number,
+        FefiCategoryResult.external_key.like("%|CLAUSURA|%"),
+    ).order_by(FefiCategoryResult.id).all()
+
+
 @router.get("/results/{round_number}")
 def category_results(round_number: int, db: Session = Depends(get_db)):
-    rows = db.query(FefiCategoryResult).filter(
-        FefiCategoryResult.round_number == round_number,
-        FefiCategoryResult.external_key.like("%|CLAUSURA|%")
-    ).order_by(FefiCategoryResult.id).all()
-    return [{"round": r.round_number, "category": r.category, "home": r.home, "away": r.away, "home_value": r.home_value, "away_value": r.away_value, "status": r.status} for r in rows]
+    rows = _round_rows(db, round_number)
+
+    # Self-healing cache: a category profile must not depend on the cron having
+    # already run. If the requested round is empty, refresh official FEFI data
+    # once and query the database again.
+    if not rows:
+        try:
+            sync_verified_results(db)
+        except Exception as exc:
+            db.rollback()
+            db.add(SyncRun(source="FEFI_RESULTS_LAZY", status="error", detail=str(exc)[:900]))
+            db.commit()
+        rows = _round_rows(db, round_number)
+
+    return [
+        {
+            "round": r.round_number,
+            "category": r.category,
+            "home": r.home,
+            "away": r.away,
+            "home_value": r.home_value,
+            "away_value": r.away_value,
+            "status": r.status,
+        }
+        for r in rows
+    ]
