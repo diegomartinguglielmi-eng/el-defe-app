@@ -55,21 +55,17 @@ def _bootstrap_argenliga():
         db.close()
 
 def _repair_fefi_baseline(db):
-    """Promote the already-approved first FEFI baseline to canonical Clausura keys."""
-    changes=db.query(FefiPendingChange).filter(FefiPendingChange.status=="approved").all()
-    repaired=0
+    changes=db.query(FefiPendingChange).filter(FefiPendingChange.status=="approved").all();repaired=0
     for change in changes:
         if "|CLAUSURA|" not in (change.external_key or ""):continue
         payload=__import__('json').loads(change.after_json)
         row=db.query(Match).filter(Match.competition=="FEFI",Match.division=="Zona H",Match.round_name==payload.get("round_name")).order_by(Match.id.desc()).first()
-        if row and "|CLAUSURA|" not in (row.external_key or ""):
-            _apply_change(db,change);repaired+=1
+        if row and "|CLAUSURA|" not in (row.external_key or ""):_apply_change(db,change);repaired+=1
     if repaired:db.commit()
     return repaired
 
 def _adopt_first_fefi_baseline(db):
-    pending=db.query(FefiPendingChange).filter(FefiPendingChange.status=="pending").all()
-    approved=db.query(FefiPendingChange).filter(FefiPendingChange.status=="approved").count()
+    pending=db.query(FefiPendingChange).filter(FefiPendingChange.status=="pending").all();approved=db.query(FefiPendingChange).filter(FefiPendingChange.status=="approved").count()
     if approved or len(pending)!=15:return 0
     now=datetime.now(timezone.utc)
     for change in pending:_apply_change(db,change);change.status="approved";change.resolved_at=now
@@ -80,13 +76,10 @@ def _bootstrap_fefi_freshness():
     try:
         locked=bool(db.execute(text("SELECT pg_try_advisory_lock(:k)"),{"k":FEFI_BOOTSTRAP_LOCK}).scalar())
         if not locked:print({"fefi_bootstrap":"skipped","reason":"another_service_is_loading"});return
-        repaired=_repair_fefi_baseline(db)
-        exists=db.query(SyncRun).filter(SyncRun.source=="FEFI_PENDING").first()
+        repaired=_repair_fefi_baseline(db);exists=db.query(SyncRun).filter(SyncRun.source=="FEFI_PENDING").first()
         if exists:
-            adopted=_adopt_first_fefi_baseline(db);repaired+=_repair_fefi_baseline(db)
-            print({"fefi_bootstrap":"ready","baseline_adopted":adopted,"baseline_repaired":repaired});return
-        result=run_fefi_pending_sync(db);adopted=_adopt_first_fefi_baseline(db) if result.get("ok") else 0;repaired+=_repair_fefi_baseline(db)
-        print({"fefi_bootstrap":"completed",**result,"baseline_adopted":adopted,"baseline_repaired":repaired})
+            adopted=_adopt_first_fefi_baseline(db);repaired+=_repair_fefi_baseline(db);print({"fefi_bootstrap":"ready","baseline_adopted":adopted,"baseline_repaired":repaired});return
+        result=run_fefi_pending_sync(db);adopted=_adopt_first_fefi_baseline(db) if result.get("ok") else 0;repaired+=_repair_fefi_baseline(db);print({"fefi_bootstrap":"completed",**result,"baseline_adopted":adopted,"baseline_repaired":repaired})
     except Exception as exc:db.rollback();print({"fefi_bootstrap":"error","detail":str(exc)})
     finally:
         if locked:
@@ -94,22 +87,34 @@ def _bootstrap_fefi_freshness():
             except Exception:db.rollback()
         db.close()
 
+def _cleanup_laamba_conflicts():
+    db=SessionLocal();removed=[]
+    try:
+        groups=(db.query(Match.division,Match.round_name,func.count(Match.id).label("n"))
+                .filter(Match.competition=="LAAMBA",Match.source_kind=="sync_clausura")
+                .group_by(Match.division,Match.round_name).having(func.count(Match.id)>1).all())
+        for g in groups:
+            rows=db.query(Match).filter(Match.competition=="LAAMBA",Match.division==g.division,Match.round_name==g.round_name,Match.source_kind=="sync_clausura").all()
+            finals=[r for r in rows if r.status=="final"]
+            scheduled=[r for r in rows if r.status!="final"]
+            if len(finals)==1 and scheduled:
+                for row in scheduled:
+                    removed.append({"id":row.id,"division":row.division,"round":row.round_name,"home":row.home,"away":row.away})
+                    db.delete(row)
+        db.commit();print({"laamba_conflict_cleanup":{"removed":len(removed),"rows":removed}})
+    except Exception as exc:db.rollback();print({"laamba_conflict_cleanup_error":str(exc)})
+    finally:db.close()
+
 def _log_duplicate_groups():
     db=SessionLocal()
     try:
-        groups=(db.query(Match.competition,Match.division,Match.round_name,Match.date,func.count(Match.id).label("n"))
-                .group_by(Match.competition,Match.division,Match.round_name,Match.date)
-                .having(func.count(Match.id)>1).all())
+        groups=(db.query(Match.competition,Match.division,Match.round_name,Match.date,func.count(Match.id).label("n")).group_by(Match.competition,Match.division,Match.round_name,Match.date).having(func.count(Match.id)>1).all())
         out=[]
         for g in groups:
-            rows=(db.query(Match)
-                  .filter(Match.competition==g.competition,Match.division==g.division,Match.round_name==g.round_name,Match.date==g.date)
-                  .order_by(Match.id).all())
-            out.append({"group":{"competition":g.competition,"division":g.division,"round_name":g.round_name,"date":g.date,"count":g.n},
-                        "rows":[{"id":r.id,"home":r.home,"away":r.away,"score":[r.home_score,r.away_score],"status":r.status,"source_kind":r.source_kind,"external_key":r.external_key} for r in rows]})
+            rows=db.query(Match).filter(Match.competition==g.competition,Match.division==g.division,Match.round_name==g.round_name,Match.date==g.date).order_by(Match.id).all()
+            out.append({"group":{"competition":g.competition,"division":g.division,"round_name":g.round_name,"date":g.date,"count":g.n},"rows":[{"id":r.id,"home":r.home,"away":r.away,"status":r.status,"source_kind":r.source_kind} for r in rows]})
         print({"duplicate_diagnostic":out})
-    except Exception as exc:
-        print({"duplicate_diagnostic_error":str(exc)})
+    except Exception as exc:print({"duplicate_diagnostic_error":str(exc)})
     finally:db.close()
 
 @app.on_event("startup")
@@ -124,4 +129,4 @@ def v5_startup_hardening():
         if legacy and legacy.email!=settings.admin_email:legacy.is_active=False;legacy.role="lector"
         db.commit()
     finally:db.close()
-    Thread(target=_bootstrap_laamba_clausura,daemon=True).start();Thread(target=_bootstrap_argenliga,daemon=True).start();Thread(target=_bootstrap_fefi_freshness,daemon=True).start();Thread(target=_log_duplicate_groups,daemon=True).start()
+    Thread(target=_bootstrap_laamba_clausura,daemon=True).start();Thread(target=_bootstrap_argenliga,daemon=True).start();Thread(target=_bootstrap_fefi_freshness,daemon=True).start();Thread(target=_cleanup_laamba_conflicts,daemon=True).start();Thread(target=_log_duplicate_groups,daemon=True).start()
