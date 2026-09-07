@@ -5,9 +5,10 @@ from .auth import require_roles
 from .db import get_db
 from .models import SyncRun
 from .pending import FefiRawSnapshot
+from .fefi_standings import router as standings_router
 
 router = APIRouter(prefix="/api/fefi", tags=["FEFI"])
-
+router.include_router(standings_router)
 
 @router.get("/freshness")
 def fefi_freshness(
