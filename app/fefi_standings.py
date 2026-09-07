@@ -22,9 +22,12 @@ def _to_int(v):
     except:return None
 
 def _parse_table(df):
-    if len(df.columns)<6:return None
-    cols=[_clean(c).upper() for c in df.columns]
-    if not any('EQUIP' in c for c in cols) or not any(c in ('PJ','P.J.') or 'PJ' in c for c in cols):return None
+    # Standings are the FEFI tables with exactly six columns:
+    # EQUIPOS | PJ | G | E | P | Pts. Results tables also contain
+    # EQUIPOS/P.J./Pts. but have 12 columns, so they must be excluded.
+    if len(df.columns)!=6:return None
+    cols=[_clean(c).upper().replace('.','') for c in df.columns]
+    if not any('EQUIP' in c for c in cols) or 'PJ' not in cols:return None
     sections={c:[] for c in CATEGORIES};section=None
     for _,row in df.iterrows():
         vals=[_clean(x) for x in row.tolist()[:6]]
@@ -44,9 +47,9 @@ def _load():
     for df in tables:
         parsed=_parse_table(df)
         if parsed:standings.append(parsed)
-    data={};names=['apertura','clausura','anual']
-    for i,block in enumerate(standings[:3]):data[names[i]]=block
-    payload={'source_url':URL,'fetched_at':datetime.now(timezone.utc).isoformat(),'tournaments':data}
+    names=['apertura','clausura','anual']
+    data={names[i]:block for i,block in enumerate(standings[:3])}
+    payload={'source_url':URL,'fetched_at':datetime.now(timezone.utc).isoformat(),'tournaments':data,'standings_tables_found':len(standings)}
     _CACHE.update(at=now,data=payload);return payload
 
 @router.get('/standings')
@@ -57,7 +60,7 @@ def standings(tournament:str=Query('clausura'),category:str=Query('GENERAL')):
     try:data=_load()
     except Exception as exc:raise HTTPException(502,f'No se pudo consultar FEFI: {exc}')
     block=data['tournaments'].get(t)
-    if not block:return {'tournament':t,'category':c,'rows':[],'available':False,'source_url':URL,'fetched_at':data['fetched_at']}
+    if not block:return {'tournament':t,'category':c,'rows':[],'available':False,'source_url':URL,'fetched_at':data['fetched_at'],'standings_tables_found':data['standings_tables_found']}
     rows=block.get(c,[])
     rows=sorted(rows,key=lambda x:((x.get('pts') if x.get('pts') is not None else -1),(x.get('won') if x.get('won') is not None else -1)),reverse=True)
-    return {'tournament':t,'category':c,'rows':rows,'available':bool(rows),'source_url':URL,'fetched_at':data['fetched_at']}
+    return {'tournament':t,'category':c,'rows':rows,'available':bool(rows),'source_url':URL,'fetched_at':data['fetched_at'],'standings_tables_found':data['standings_tables_found']}
