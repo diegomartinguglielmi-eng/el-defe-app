@@ -5,7 +5,7 @@ import requests
 import pandas as pd
 from fastapi import APIRouter, HTTPException, Query
 
-router=APIRouter(prefix='/api/fefi',tags=['FEFI'])
+router=APIRouter(tags=['FEFI'])
 URL='https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/'
 UA={'User-Agent':'ElDefe/2.0 (+contacto club Defensores de Santos Lugares)'}
 CATEGORIES=['GENERAL','2019','2013','2018','2014','2017','2016','2015']
@@ -22,7 +22,6 @@ def _to_int(v):
     except:return None
 
 def _parse_table(df):
-    # FEFI tables have: EQUIPOS | PJ | G | E | P | Pts.
     if len(df.columns)<6:return None
     cols=[_clean(c).upper() for c in df.columns]
     if not any('EQUIP' in c for c in cols) or not any(c in ('PJ','P.J.') or 'PJ' in c for c in cols):return None
@@ -30,8 +29,7 @@ def _parse_table(df):
     for _,row in df.iterrows():
         vals=[_clean(x) for x in row.tolist()[:6]]
         first=vals[0].upper()
-        if first in CATEGORIES and all(not x for x in vals[1:]):
-            section=first;continue
+        if first in CATEGORIES and all(not x for x in vals[1:]):section=first;continue
         if not section or not vals[0] or first in ('EQUIPOS','EQUIPO'):continue
         pj,g,e,p,pts=[_to_int(x) for x in vals[1:6]]
         if pj is None and pts is None:continue
@@ -42,15 +40,11 @@ def _load():
     now=time.time()
     if _CACHE['data'] is not None and now-_CACHE['at']<CACHE_SECONDS:return _CACHE['data']
     r=requests.get(URL,headers=UA,timeout=25);r.raise_for_status()
-    tables=pd.read_html(StringIO(r.text))
-    standings=[]
+    tables=pd.read_html(StringIO(r.text));standings=[]
     for df in tables:
         parsed=_parse_table(df)
         if parsed:standings.append(parsed)
-    # On the official Zona H page the standings blocks are published in tab order:
-    # TABLAS APERTURA, TABLAS CLAUSURA, TABLAS ANUALES. Annual may be absent.
-    data={}
-    names=['apertura','clausura','anual']
+    data={};names=['apertura','clausura','anual']
     for i,block in enumerate(standings[:3]):data[names[i]]=block
     payload={'source_url':URL,'fetched_at':datetime.now(timezone.utc).isoformat(),'tournaments':data}
     _CACHE.update(at=now,data=payload);return payload
