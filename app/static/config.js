@@ -165,6 +165,6 @@ window.EL_DEFE_API_URL = "";
     if(typeof oldAdmin==='function') window.refreshAdmin=function(){oldAdmin();loadFefiAdmin();ensureSourcesCard();};
     const oldProfile=window.refreshProfile;
     if(typeof oldProfile==='function') window.refreshProfile=async function(){const r=await oldProfile();ensureAdminAccess();return r;};
-    const explorer=document.createElement('script');explorer.src='/static/matches-explorer.js?v=51';explorer.defer=true;document.body.appendChild(explorer);
+    const explorer=document.createElement('script');explorer.src='/static/matches-explorer.js?v=60';explorer.defer=true;document.body.appendChild(explorer);
   });
 })();
