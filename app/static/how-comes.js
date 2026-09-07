@@ -1,0 +1,15 @@
+// El Defe · Cómo viene en Inicio
+(function(){
+ const API=()=>window.EL_DEFE_API_URL||'',KEY='defe_followed_v1',CLUB=/DEFENSORES|DEF\. DE SANTOS LUGARES|DEFENSORES DE SL|DEF\. DE STOS\. LUGARES/i;
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+ const prefs=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return []}};
+ async function get(p){const r=await fetch(API()+p,{cache:'no-store'});if(!r.ok)throw new Error('sin datos');return r.json()}
+ const mine=rows=>(rows||[]).find(r=>CLUB.test(r.team||''));
+ async function fefi(cat){try{const d=await get('/api/fefi/standings?tournament=clausura&category='+encodeURIComponent(cat)),i=(d.rows||[]).findIndex(r=>CLUB.test(r.team||''));if(i<0)return null;const r=d.rows[i];return {label:'FEFI '+cat,pos:i+1,pts:r.pts,pj:r.played};}catch{return null}}
+ async function laamba(div){try{const rows=await get('/api/standings?competition=LAAMBA&division='+encodeURIComponent(div)),i=rows.findIndex(r=>CLUB.test(r.team||''));if(i<0)return null;const r=rows[i];return {label:'LAAMBA '+div,pos:i+1,pts:r.pts,pj:r.played};}catch{return null}}
+ function row(r){return `<div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)"><div><b>${esc(r.label)}</b><div class="meta">Clausura · ${r.pj??'—'} PJ · ${r.pts??'—'} pts</div></div><div style="text-align:right"><b style="font-size:20px">${r.pos}°</b><div class="meta">posición</div></div></div>`}
+ async function render(){const host=document.getElementById('myDefeCards');if(!host)return;document.getElementById('howComesCard')?.remove();const p=prefs(),jobs=[];p.forEach(x=>{let [c,v]=x.split('|');if(c==='FEFI'&&/^\d{4}$/.test(v))jobs.push(fefi(v));if(c==='LAAMBA'&&v)jobs.push(laamba(v));});if(!jobs.length)return;const card=document.createElement('div');card.className='card';card.id='howComesCard';card.innerHTML='<div class="row"><b>Cómo viene</b><span class="badge">CLAUSURA</span></div><div class="meta">Posición actual de tus categorías</div><div id="howComesRows" style="margin-top:7px"><div class="meta">Actualizando…</div></div>';const first=host.firstElementChild;first?first.after(card):host.appendChild(card);const data=(await Promise.all(jobs)).filter(Boolean),box=document.getElementById('howComesRows');if(!box)return;if(!data.length){card.remove();return}box.innerHTML=data.map(row).join('');}
+ function schedule(){setTimeout(render,250);setTimeout(render,1200)}
+ document.addEventListener('defe:preferences-updated',schedule);const obs=new MutationObserver(()=>{if(document.getElementById('myDefeCards')&&!document.getElementById('howComesCard'))schedule()});obs.observe(document.documentElement,{childList:true,subtree:true});
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();window.defeLoadHowComes=render;
+})();
