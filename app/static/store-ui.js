@@ -2,112 +2,73 @@
   const BASE=()=>String(window.EL_DEFE_API_URL||'').replace(/\/$/,'');
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const money=n=>n==null?'Consultar':new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n);
-  let products=[], settings={whatsapp_number:''}, cart=[];
+  let products=[], settings={whatsapp_number:''}, cart=[], query='', category='Todos';
 
-  async function storeApi(path,opts={}){
-    opts.headers=opts.headers||{};
-    const token=localStorage.getItem('defe_token')||'';
-    if(token) opts.headers.Authorization='Bearer '+token;
-    const r=await fetch(BASE()+path,{...opts,cache:'no-store'});
-    const j=await r.json().catch(()=>({}));
-    if(!r.ok) throw new Error(j.detail||'No se pudo completar la operación');
-    return j;
-  }
+  async function storeApi(path,opts={}){opts.headers=opts.headers||{};const token=localStorage.getItem('defe_token')||'';if(token)opts.headers.Authorization='Bearer '+token;const r=await fetch(BASE()+path,{...opts,cache:'no-store'});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.detail||'No se pudo completar la operación');return j;}
 
   function addCss(){
     if(document.getElementById('defe-store-css'))return;
     const s=document.createElement('style');s.id='defe-store-css';s.textContent=`
-      .quick.store-enabled{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
-      .quick.store-enabled button{padding-left:2px;padding-right:2px}.quick.store-enabled small{font-size:7.7px}
-      .store-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-      .store-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:11px;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:220px}
-      .store-photo{height:105px;border-radius:14px;background:linear-gradient(145deg,#f0eefb,#fff);display:grid;place-items:center;overflow:hidden;font-size:34px;margin-bottom:9px}
-      .store-photo img{width:100%;height:100%;object-fit:cover}.store-card h3{font-size:12px;margin:0 0 4px}.store-price{font-size:14px;font-weight:950;color:var(--c);margin:6px 0}.store-card select{margin:5px 0 7px;padding:8px}
-      .store-cart{position:sticky;bottom:78px;z-index:8}.store-cart .card{border:2px solid #e7e3ff}.store-line{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}.store-line:last-child{border-bottom:0}.store-line b{font-size:10px}.store-line .grow{font-size:9px}.store-qty{display:flex;align-items:center;gap:6px}.store-qty button{width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:9px;font-weight:900}
+      .quick.store-enabled{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.quick.store-enabled button{padding-left:2px;padding-right:2px}.quick.store-enabled small{font-size:7.7px}
+      .store-hero{background:linear-gradient(145deg,var(--c2),var(--c));color:#fff;padding:18px 16px 20px;border-radius:0 0 28px 28px;margin-bottom:14px}.store-hero-row{display:flex;align-items:center;gap:12px}.store-hero .logo{width:56px;height:56px;border-radius:16px}.store-hero h1{margin:0;font-size:23px}.store-hero p{margin:3px 0 0;font-size:10px;opacity:.72}.store-tagline{margin-top:13px;font-size:8px;letter-spacing:1.5px;font-weight:900;opacity:.7}
+      .store-toolbar{padding:0 15px 4px}.store-search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:0 12px;box-shadow:0 4px 14px #00000008}.store-search span{font-size:16px;color:var(--mut)}.store-search input{margin:0;border:0;padding:12px 0;background:transparent;font-size:12px;outline:none}
+      .store-filters{display:flex;gap:7px;overflow:auto;padding:10px 0 2px;scrollbar-width:none}.store-chip{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font-size:9px;font-weight:900;color:var(--ink)}.store-chip.on{background:var(--c2);color:#fff;border-color:var(--c2)}
+      .store-section-title{display:flex;justify-content:space-between;align-items:center;margin:15px 0 10px}.store-section-title h2{font-size:18px}.store-count{font-size:9px;color:var(--mut)}
+      .store-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.store-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:10px;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:292px;position:relative}.store-photo{height:145px;border-radius:15px;background:linear-gradient(145deg,#ece9fb,#fff);display:grid;place-items:center;overflow:hidden;font-size:38px;margin-bottom:9px;position:relative}.store-photo img{width:100%;height:100%;object-fit:cover}.store-fav{position:absolute;right:8px;top:8px;width:30px;height:30px;border:0;border-radius:50%;background:#ffffffdd;display:grid;place-items:center;font-size:14px}.store-card .badge{align-self:flex-start;margin-bottom:5px}.store-card h3{font-size:12.5px;line-height:1.2;margin:0 0 4px}.store-card .meta{font-size:8.8px;min-height:38px}.store-price-row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:7px 0}.store-price{font-size:15px;font-weight:950;color:var(--c);margin:0}.store-stock{font-size:8px;display:flex;align-items:center;gap:4px;color:var(--mut)}.store-dot{width:7px;height:7px;border-radius:50%;background:#38ad62}.store-dot.low{background:#e3a51b}.store-card select{margin:4px 0 7px;padding:9px;font-size:10px}.store-card .btn{font-size:10px;padding:10px}.store-card .btn:before{content:'🛒 ';font-size:10px}
+      .store-cart-fab{position:fixed;right:max(18px,calc((100vw - 440px)/2 + 18px));bottom:82px;z-index:24;border:0;background:var(--c2);color:#fff;border-radius:17px;padding:11px 14px;box-shadow:0 10px 28px #28215f55;font-weight:900;font-size:10px;display:none}.store-cart-fab.on{display:block}.store-cart-badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#fff;color:var(--c2);margin-left:6px;font-size:9px}
+      .store-cart{position:relative;z-index:8;margin-top:14px}.store-cart .card{border:2px solid #e7e3ff}.store-line{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}.store-line:last-child{border-bottom:0}.store-line b{font-size:10px}.store-line .grow{font-size:9px}.store-qty{display:flex;align-items:center;gap:6px}.store-qty button{width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:9px;font-weight:900}
       .store-empty{text-align:center;padding:28px 12px}.store-empty span{font-size:38px;display:block;margin-bottom:8px}
-      @media(max-width:360px){.quick.store-enabled{grid-template-columns:repeat(3,1fr)}.store-grid{grid-template-columns:1fr}}
+      .nav .store-nav-button{display:block}
+      @media(max-width:360px){.quick.store-enabled{grid-template-columns:repeat(3,1fr)}.store-grid{grid-template-columns:1fr}.store-card{min-height:auto}.store-photo{height:190px}}
     `;document.head.appendChild(s);
   }
 
   function ensureStoreScreen(){
     if(document.getElementById('store'))return;
     const app=document.querySelector('.app'),nav=document.querySelector('.nav');if(!app||!nav)return;
-    const sec=document.createElement('section');sec.id='store';sec.className='screen';sec.innerHTML=`<div class="sub"><button class="back" onclick="show('home')">←</button><div><h1>Tienda</h1><p>Indumentaria y accesorios del Defe</p></div></div><main class="main"><div id="storeProducts"><div class="card">Cargando tienda…</div></div><div id="storeCart" class="store-cart"></div></main>`;
+    const sec=document.createElement('section');sec.id='store';sec.className='screen';sec.innerHTML=`
+      <header class="store-hero"><div class="store-hero-row"><img class="logo" src="/static/escudo.jpg" onerror="this.src='./escudo.jpg'"><div><h1>Tienda</h1><p>Indumentaria y accesorios del Defe</p><div class="store-tagline">LLEVÁ LOS COLORES SIEMPRE CON VOS</div></div></div></header>
+      <div class="store-toolbar"><div class="store-search"><span>⌕</span><input id="storeSearch" placeholder="Buscar productos..." oninput="defeStoreSearch(this.value)"></div><div id="storeFilters" class="store-filters"></div></div>
+      <main class="main" style="padding-top:8px"><div class="store-section-title"><h2>Productos</h2><span id="storeCount" class="store-count"></span></div><div id="storeProducts"><div class="card">Cargando tienda…</div></div><div id="storeCart" class="store-cart"></div></main>
+      <button id="storeCartFab" class="store-cart-fab" onclick="document.getElementById('storeCart')?.scrollIntoView({behavior:'smooth',block:'start'})">🛒 Pedido <span id="storeCartFabCount" class="store-cart-badge">0</span></button>`;
     app.insertBefore(sec,nav);
   }
 
   function ensureStoreAccess(){
-    const q=document.querySelector('#home .quick');if(!q)return;
-    q.classList.add('store-enabled');
-    if(!document.getElementById('storeQuickButton')){
-      const b=document.createElement('button');b.id='storeQuickButton';b.setAttribute('onclick',"show('store')");b.innerHTML='<span>🛒</span><small>Tienda</small>';
-      const profile=[...q.querySelectorAll('button')].find(x=>/Mi Defe/i.test(x.textContent));
-      if(profile)q.insertBefore(b,profile);else q.appendChild(b);
-    }
+    const q=document.querySelector('#home .quick');if(q){q.classList.add('store-enabled');if(!document.getElementById('storeQuickButton')){const b=document.createElement('button');b.id='storeQuickButton';b.setAttribute('onclick',"show('store')");b.innerHTML='<span>🛒</span><small>Tienda</small>';const profile=[...q.querySelectorAll('button')].find(x=>/Mi Defe/i.test(x.textContent));if(profile)q.insertBefore(b,profile);else q.appendChild(b);}}
   }
 
-  function availableSizes(p){
-    const sizes=p.sizes||[];if(!p.stock_managed)return sizes;
-    return sizes.filter(s=>(p.inventory?.[s]||0)>0);
+  function ensureStoreNav(){
+    const nav=document.querySelector('.nav');if(!nav||nav.querySelector('.store-nav-button'))return;
+    const community=[...nav.querySelectorAll('button')].find(x=>/Comunidad/i.test(x.textContent));
+    if(community){const b=document.createElement('button');b.className='store-nav-button';b.setAttribute('onclick',"nav('store',this)");b.innerHTML='<span>🛒</span>Tienda';nav.insertBefore(b,community);}
   }
+
+  function availableSizes(p){const sizes=p.sizes||[];if(!p.stock_managed)return sizes;return sizes.filter(s=>(p.inventory?.[s]||0)>0);}
+  function categories(){return ['Todos',...new Set(products.map(p=>p.category).filter(Boolean))];}
+  function renderFilters(){const box=document.getElementById('storeFilters');if(!box)return;box.innerHTML=categories().map(c=>`<button class="store-chip ${c===category?'on':''}" onclick="defeStoreCategory('${esc(c)}')">${esc(c)}</button>`).join('');}
+  function filtered(){return products.filter(p=>(category==='Todos'||p.category===category)&&(!query||(`${p.name} ${p.description||''} ${p.category||''}`).toLowerCase().includes(query.toLowerCase())));}
 
   function renderProducts(){
-    const box=document.getElementById('storeProducts');if(!box)return;
-    if(!products.length){box.innerHTML='<div class="card store-empty"><span>🛍️</span><b>Tienda en preparación</b><div class="meta">Todavía no hay productos publicados.</div></div>';return;}
-    box.innerHTML='<div class="store-grid">'+products.map(p=>{
-      const sizes=availableSizes(p),sold=p.stock_managed&&!sizes.length;
-      const img=p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.name)}">`:'🛍️';
-      const opts=sizes.map(s=>`<option value="${esc(s)}">${esc(s)}${p.stock_managed?' · '+(p.inventory?.[s]||0)+' disp.':''}</option>`).join('');
-      return `<div class="store-card"><div class="store-photo">${img}</div><span class="badge">${esc(p.category)}</span><h3>${esc(p.name)}</h3><div class="meta">${esc(p.description||'Producto oficial del club')}</div><div class="store-price">${money(p.price)}</div><div style="margin-top:auto"><select id="storeSize${p.id}" ${sold?'disabled':''}>${opts||'<option>Sin stock</option>'}</select><button class="btn" ${sold?'disabled style="opacity:.45"':''} onclick="defeStoreAdd(${p.id})">${sold?'Sin stock':'Agregar'}</button></div></div>`;
-    }).join('')+'</div>';
+    const box=document.getElementById('storeProducts');if(!box)return;const list=filtered();const count=document.getElementById('storeCount');if(count)count.textContent=`${list.length} producto${list.length===1?'':'s'}`;
+    if(!list.length){box.innerHTML='<div class="card store-empty"><span>🛍️</span><b>No encontramos productos</b><div class="meta">Probá con otra búsqueda o categoría.</div></div>';return;}
+    box.innerHTML='<div class="store-grid">'+list.map(p=>{const sizes=availableSizes(p),sold=p.stock_managed&&!sizes.length;const img=p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.name)}">`:'🛍️';const opts=sizes.map(s=>`<option value="${esc(s)}">${esc(s)}${p.stock_managed?' · '+(p.inventory?.[s]||0)+' disp.':''}</option>`).join('');const low=p.stock_managed&&sizes.some(s=>(p.inventory?.[s]||0)<=2);return `<div class="store-card"><div class="store-photo">${img}<button class="store-fav" type="button">♡</button></div><span class="badge">${esc(p.category)}</span><h3>${esc(p.name)}</h3><div class="meta">${esc(p.description||'Producto oficial del club')}</div><div class="store-price-row"><div class="store-price">${money(p.price)}</div>${sold?'<div class="store-stock"><span class="store-dot low"></span>Sin stock</div>':p.stock_managed?`<div class="store-stock"><span class="store-dot ${low?'low':''}"></span>${low?'Stock bajo':'En stock'}</div>`:''}</div><div style="margin-top:auto"><select id="storeSize${p.id}" ${sold?'disabled':''}>${opts||'<option>Sin stock</option>'}</select><button class="btn" ${sold?'disabled style="opacity:.45"':''} onclick="defeStoreAdd(${p.id})">${sold?'Sin stock':'Agregar al carrito'}</button></div></div>`;}).join('')+'</div>';
   }
 
   function renderCart(){
-    const box=document.getElementById('storeCart');if(!box)return;
-    if(!cart.length){box.innerHTML='';return;}
-    const total=cart.reduce((a,x)=>a+(x.product.price==null?0:x.product.price*x.qty),0),complete=cart.every(x=>x.product.price!=null);
-    box.innerHTML=`<div class="card"><div class="row"><b>Mi pedido</b><span class="badge">${cart.reduce((a,x)=>a+x.qty,0)} items</span></div>${cart.map((x,i)=>`<div class="store-line"><div class="grow"><b>${esc(x.product.name)}</b><div class="meta">Talle ${esc(x.size)} · ${money(x.product.price)}</div></div><div class="store-qty"><button onclick="defeStoreQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="defeStoreQty(${i},1)">+</button></div></div>`).join('')}<div class="row" style="margin:11px 0"><b>Total</b><b>${complete?money(total):'A confirmar'}</b></div><input id="storeBuyerName" placeholder="Nombre y apellido"><input id="storeBuyerPhone" placeholder="Teléfono / WhatsApp" inputmode="tel"><input id="storeBuyerCategory" placeholder="Categoría (opcional)"><textarea id="storeBuyerNote" placeholder="Comentario (opcional)"></textarea><button class="btn" onclick="defeStoreOrder()">Enviar pedido por WhatsApp</button><div id="storeOrderMsg" class="meta"></div></div>`;
+    const box=document.getElementById('storeCart'),fab=document.getElementById('storeCartFab'),fc=document.getElementById('storeCartFabCount');if(!box)return;const qty=cart.reduce((a,x)=>a+x.qty,0);if(fc)fc.textContent=qty;if(fab)fab.classList.toggle('on',qty>0);
+    if(!cart.length){box.innerHTML='';return;}const total=cart.reduce((a,x)=>a+(x.product.price==null?0:x.product.price*x.qty),0),complete=cart.every(x=>x.product.price!=null);
+    box.innerHTML=`<div class="card"><div class="row"><b>Mi pedido</b><span class="badge">${qty} items</span></div>${cart.map((x,i)=>`<div class="store-line"><div class="grow"><b>${esc(x.product.name)}</b><div class="meta">Talle ${esc(x.size)} · ${money(x.product.price)}</div></div><div class="store-qty"><button onclick="defeStoreQty(${i},-1)">−</button><b>${x.qty}</b><button onclick="defeStoreQty(${i},1)">+</button></div></div>`).join('')}<div class="row" style="margin:12px 0"><b>Total</b><b>${complete?money(total):'A confirmar'}</b></div><input id="storeBuyerName" placeholder="Nombre y apellido"><input id="storeBuyerPhone" placeholder="Teléfono / WhatsApp" inputmode="tel"><input id="storeBuyerCategory" placeholder="Categoría (opcional)"><textarea id="storeBuyerNote" placeholder="Comentario (opcional)"></textarea><button class="btn" onclick="defeStoreOrder()">Enviar pedido por WhatsApp</button><div id="storeOrderMsg" class="meta"></div></div>`;
   }
 
-  window.defeStoreAdd=id=>{
-    const p=products.find(x=>x.id===id);if(!p)return;
-    const sel=document.getElementById('storeSize'+id),size=sel?.value;if(!size||size==='Sin stock')return;
-    const found=cart.find(x=>x.product.id===id&&x.size===size);
-    const max=p.stock_managed?(p.inventory?.[size]||0):99;
-    if(found){if(found.qty<max)found.qty++;}else cart.push({product:p,size,qty:1});
-    renderCart();document.getElementById('storeCart')?.scrollIntoView({behavior:'smooth',block:'end'});
-  };
+  window.defeStoreSearch=v=>{query=v||'';renderProducts();};window.defeStoreCategory=c=>{category=c;renderFilters();renderProducts();};
+  window.defeStoreAdd=id=>{const p=products.find(x=>x.id===id);if(!p)return;const sel=document.getElementById('storeSize'+id),size=sel?.value;if(!size||size==='Sin stock')return;const found=cart.find(x=>x.product.id===id&&x.size===size),max=p.stock_managed?(p.inventory?.[size]||0):99;if(found){if(found.qty<max)found.qty++;}else cart.push({product:p,size,qty:1});renderCart();};
   window.defeStoreQty=(i,d)=>{const x=cart[i];if(!x)return;const max=x.product.stock_managed?(x.product.inventory?.[x.size]||0):99;x.qty=Math.max(0,Math.min(max,x.qty+d));if(!x.qty)cart.splice(i,1);renderCart();};
 
-  window.defeStoreOrder=async()=>{
-    const msg=document.getElementById('storeOrderMsg');
-    const name=document.getElementById('storeBuyerName')?.value.trim(),phone=document.getElementById('storeBuyerPhone')?.value.trim();
-    if(!name||!phone){if(msg)msg.textContent='Completá nombre y teléfono.';return;}
-    try{
-      if(msg)msg.textContent='Generando pedido…';
-      const order=await storeApi('/api/store/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({buyer_name:name,buyer_phone:phone,buyer_category:document.getElementById('storeBuyerCategory')?.value||null,buyer_note:document.getElementById('storeBuyerNote')?.value||null,items:cart.map(x=>({product_id:x.product.id,size:x.size,qty:x.qty}))})});
-      const lines=cart.map(x=>`• ${x.product.name} · ${x.size} x${x.qty}`).join('\n');
-      const text=`Hola, quiero hacer el pedido #${order.id} de la Tienda del Defe:\n${lines}\n${order.total!=null?'Total: '+money(order.total):'Importe a confirmar'}\nNombre: ${name}\nTel: ${phone}`;
-      cart=[];renderCart();
-      const wa=String(settings.whatsapp_number||'').replace(/\D/g,'');
-      if(wa)window.location.href=`https://wa.me/${wa}?text=${encodeURIComponent(text)}`;
-      else if(msg)msg.textContent='Pedido registrado. El WhatsApp de la tienda no está configurado.';
-    }catch(e){if(msg)msg.textContent=e.message;}
-  };
+  window.defeStoreOrder=async()=>{const msg=document.getElementById('storeOrderMsg'),name=document.getElementById('storeBuyerName')?.value.trim(),phone=document.getElementById('storeBuyerPhone')?.value.trim();if(!name||!phone){if(msg)msg.textContent='Completá nombre y teléfono.';return;}try{if(msg)msg.textContent='Generando pedido…';const order=await storeApi('/api/store/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({buyer_name:name,buyer_phone:phone,buyer_category:document.getElementById('storeBuyerCategory')?.value||null,buyer_note:document.getElementById('storeBuyerNote')?.value||null,items:cart.map(x=>({product_id:x.product.id,size:x.size,qty:x.qty}))})});const lines=cart.map(x=>`• ${x.product.name} · ${x.size} x${x.qty}`).join('\n');const text=`Hola, quiero hacer el pedido #${order.id} de la Tienda del Defe:\n${lines}\n${order.total!=null?'Total: '+money(order.total):'Importe a confirmar'}\nNombre: ${name}\nTel: ${phone}`;cart=[];renderCart();const wa=String(settings.whatsapp_number||'').replace(/\D/g,'');if(wa)window.location.href=`https://wa.me/${wa}?text=${encodeURIComponent(text)}`;else if(msg)msg.textContent='Pedido registrado. El WhatsApp de la tienda no está configurado.';}catch(e){if(msg)msg.textContent=e.message;}};
 
-  window.defeLoadStore=async()=>{
-    ensureStoreScreen();ensureStoreAccess();
-    const box=document.getElementById('storeProducts');if(box)box.innerHTML='<div class="card">Cargando tienda…</div>';
-    try{[products,settings]=await Promise.all([storeApi('/api/store/products'),storeApi('/api/store/settings')]);renderProducts();renderCart();}
-    catch(e){if(box)box.innerHTML=`<div class="card"><b>No se pudo abrir la Tienda</b><div class="meta">${esc(e.message)}</div></div>`;}
-  };
+  window.defeLoadStore=async()=>{ensureStoreScreen();ensureStoreAccess();ensureStoreNav();const box=document.getElementById('storeProducts');if(box)box.innerHTML='<div class="card">Cargando tienda…</div>';try{[products,settings]=await Promise.all([storeApi('/api/store/products'),storeApi('/api/store/settings')]);renderFilters();renderProducts();renderCart();}catch(e){if(box)box.innerHTML=`<div class="card"><b>No se pudo abrir la Tienda</b><div class="meta">${esc(e.message)}</div></div>`;}};
 
-  function install(){
-    addCss();ensureStoreScreen();ensureStoreAccess();
-    const oldShow=window.show;
-    if(typeof oldShow==='function'&&!oldShow.__storeWrapped){
-      const wrapped=function(id){const r=oldShow.apply(this,arguments);if(id==='store')window.defeLoadStore();return r;};wrapped.__storeWrapped=true;window.show=wrapped;
-    }
-  }
+  function install(){addCss();ensureStoreScreen();ensureStoreAccess();ensureStoreNav();const oldShow=window.show;if(typeof oldShow==='function'&&!oldShow.__storeWrapped){const wrapped=function(id){const r=oldShow.apply(this,arguments);if(id==='store')window.defeLoadStore();return r;};wrapped.__storeWrapped=true;window.show=wrapped;}}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(install,0));else setTimeout(install,0);
 })();
