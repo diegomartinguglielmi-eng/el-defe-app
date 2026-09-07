@@ -61,6 +61,13 @@ def col(cols, term):
     for c in cols:
         if term in str(c).lower(): return c
 
+def _prefer_laamba_candidate(current, candidate):
+    """One match per division/round. A final result supersedes a scheduled fixture; otherwise latest source candidate wins."""
+    if current is None: return candidate
+    if candidate.get("status")=="final" and current.get("status")!="final": return candidate
+    if current.get("status")=="final" and candidate.get("status")!="final": return current
+    return candidate
+
 def sync_laamba(db:Session):
     divisions=["1ra","3ra","4ta","5ta","6ta","7ma","8va"]
     ms=st=0; errors=[]
@@ -68,6 +75,7 @@ def sync_laamba(db:Session):
         url=f"https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/{div}/torneo/m-eliteiclausura/?db=2026"
         try:
             r=requests.get(url,headers=UA,timeout=25);r.raise_for_status(); tables=pd.read_html(StringIO(r.text)); ri=0
+            candidates={}
             for df in tables:
                 cols=list(df.columns); lc=col(cols,"local"); vc=col(cols,"visitante"); rc=col(cols,"resultado"); dc=col(cols,"dirección") or col(cols,"direccion")
                 if lc is not None and vc is not None:
@@ -82,7 +90,8 @@ def sync_laamba(db:Session):
                         venue=None
                         if dc is not None:
                             vv=clean(row[dc]); venue=None if not vv or vv.lower()=="nan" or vv=="Fecha Libre" else vv
-                        upsert_match(db,dict(external_key=f"LAAMBA|2026|CLAUSURA|{div}|F{ri}|{h}|{a}",competition="LAAMBA",division=div,round_name=f"Fecha {ri}",date=None,home=h,away=a,home_score=hs,away_score=aw,status=status,venue=venue,source_url=url,source_kind="sync_clausura")); ms+=1
+                        cand=dict(external_key=f"LAAMBA|2026|CLAUSURA|{div}|F{ri}|{h}|{a}",competition="LAAMBA",division=div,round_name=f"Fecha {ri}",date=None,home=h,away=a,home_score=hs,away_score=aw,status=status,venue=venue,source_url=url,source_kind="sync_clausura")
+                        candidates[ri]=_prefer_laamba_candidate(candidates.get(ri),cand)
                 teamc=col(cols,"equipo");ptsc=col(cols,"pts")
                 if teamc is not None and ptsc is not None:
                     jc=col(cols," j")
@@ -90,8 +99,14 @@ def sync_laamba(db:Session):
                         team=clean(row[teamc])
                         if not team or team=="nan": continue
                         upsert_standing(db,dict(unique_key=f"LAAMBA|2026|CLAUSURA|{div}|{team}",competition="LAAMBA",division=div,season=2026,team=team,pts=as_int(row[ptsc]),played=as_int(row[jc]) if jc else None,won=None,drawn=None,lost=None,gf=None,gc=None,gd=None,source_url=url)); st+=1
+            for ri,cand in candidates.items():
+                # Remove stale/conflicting source rows for the same division/round before storing the canonical one.
+                stale=db.query(Match).filter(Match.competition=="LAAMBA",Match.division==div,Match.round_name==f"Fecha {ri}",Match.external_key!=cand["external_key"],Match.source_kind=="sync_clausura").all()
+                for row in stale: db.delete(row)
+                if stale: db.commit()
+                upsert_match(db,cand); ms+=1
         except Exception as e:
-            errors.append(f"{div}: {e}")
+            db.rollback();errors.append(f"{div}: {e}")
     if ms>0:
         legacy_matches=db.query(Match).filter(Match.competition=="LAAMBA",Match.source_kind=="sync").delete(synchronize_session=False)
         legacy_standings=db.query(Standing).filter(Standing.competition=="LAAMBA",~Standing.unique_key.contains("|CLAUSURA|")).delete(synchronize_session=False)
