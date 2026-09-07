@@ -5,6 +5,7 @@ from .db import Base, engine, SessionLocal
 from .pending import run_fefi_pending_sync, FefiPendingChange
 from .fefi_results import sync_verified_results
 from .fefi_mayores import sync_fefi_mayores_b
+from .superliga_sync import sync_superliga
 from .notification_reminders import run as run_notification_reminders
 from .models import SyncRun
 
@@ -63,6 +64,7 @@ if __name__ == "__main__":
     db = SessionLocal()
     try:
         output["fefi_mayores_b"] = sync_fefi_mayores_b(db)
+        output["superliga"] = sync_superliga(db)
         if not result.get("ok"):
             output["source_alert_created"] = _create_source_alert_after_two_failures(db)
         else:
