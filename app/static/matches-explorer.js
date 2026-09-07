@@ -27,6 +27,7 @@
     addScript('fefi-freshness','/static/fefi-freshness.js?v=56');
     addScript('pwa','/static/pwa.js?v=56');
     addScript('notifications','/static/notifications.js?v=56');
+    addScript('data-quality','/static/data-quality.js?v=57');
   }
   window.defeLoadMatchExplorer=load;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
