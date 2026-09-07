@@ -86,12 +86,39 @@ def create_user(payload:UserCreate,db:Session=Depends(get_db),user=Depends(requi
     db.add(u);db.commit();db.refresh(u);audit(db,user,"create","user",u.id,payload.role)
     return {"ok":True,"id":u.id}
 
+
+def _match_priority(m:Match):
+    key=(m.external_key or "").upper()
+    kind=(m.source_kind or "").lower()
+    if "|CLAUSURA|" in key: return 100
+    if kind=="verified_auto": return 95
+    if kind=="approved_sync": return 90
+    if kind=="manual": return 70
+    if kind=="import": return 60
+    if kind=="sync": return 10
+    return 20
+
+
+def _canonicalize_matches(rows:list[Match]):
+    non_fefi=[m for m in rows if m.competition!="FEFI"]
+    fefi=[m for m in rows if m.competition=="FEFI"]
+    chosen={}
+    for m in fefi:
+        key=(m.division or "",m.round_name or "",m.date or "")
+        current=chosen.get(key)
+        if current is None or (_match_priority(m),m.id)>(_match_priority(current),current.id):
+            chosen[key]=m
+    out=non_fefi+list(chosen.values())
+    out.sort(key=lambda m:((m.date or ""),m.id),reverse=True)
+    return out
+
 @app.get("/api/matches")
 def get_matches(competition:str|None=None,division:str|None=None,db:Session=Depends(get_db)):
     q=db.query(Match)
     if competition: q=q.filter(Match.competition==competition)
     if division: q=q.filter(Match.division==division)
-    rows=q.order_by(Match.date.desc().nullslast(),Match.id.desc()).all()
+    rows=q.all()
+    rows=_canonicalize_matches(rows)
     return [{c.name:getattr(x,c.name) for c in x.__table__.columns} for x in rows]
 
 @app.post("/api/matches")
@@ -149,8 +176,6 @@ def audit_log(db:Session=Depends(get_db),user=Depends(require_roles("admin"))):
     rows=db.query(AuditLog).order_by(AuditLog.id.desc()).limit(100).all()
     return [{c.name:getattr(x,c.name) for c in x.__table__.columns} for x in rows]
 
-
-
 # ---- Módulo deportivo V5 ----
 
 @app.get("/api/teams")
@@ -173,8 +198,7 @@ def people(role:str|None=None,db:Session=Depends(get_db)):
 
 @app.post("/api/people")
 def create_person(payload:PersonIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado","dt"))):
-    p=Person(**payload.model_dump());db.add(p);db.commit();db.refresh(p)
-    audit(db,user,"create","person",p.id,f"{p.first_name} {p.last_name}")
+    p=Person(**payload.model_dump());db.add(p);db.commit();db.refresh(p);audit(db,user,"create","person",p.id,f"{p.first_name} {p.last_name}")
     return {"ok":True,"id":p.id}
 
 @app.get("/api/teams/{team_id}/members")
@@ -218,34 +242,15 @@ def update_attendance(row_id:int,payload:AttendanceIn,db:Session=Depends(get_db)
     return {"ok":True}
 
 @app.post("/api/player-stats")
-def save_player_stat(payload:PlayerStatIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado","dt"))):
-    s=db.query(PlayerMatchStat).filter(PlayerMatchStat.match_id==payload.match_id,PlayerMatchStat.person_id==payload.person_id).first()
-    if not s:
-        s=PlayerMatchStat(**payload.model_dump());db.add(s)
+def add_player_stats(payload:PlayerStatIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado","dt"))):
+    # update-or-create by match/person
+    obj=db.query(PlayerMatchStat).filter(PlayerMatchStat.match_id==payload.match_id,PlayerMatchStat.person_id==payload.person_id).first()
+    if not obj:
+        obj=PlayerMatchStat(**payload.model_dump());db.add(obj)
     else:
-        for k,v in payload.model_dump().items():setattr(s,k,v)
-    db.commit();db.refresh(s);audit(db,user,"upsert","player_stat",s.id,f"match={payload.match_id}")
-    return {"ok":True,"id":s.id}
-
-@app.get("/api/stats/players")
-def player_stats(competition:str|None=None,db:Session=Depends(get_db)):
-    q=db.query(Person,PlayerMatchStat,Match).join(PlayerMatchStat,Person.id==PlayerMatchStat.person_id).join(Match,Match.id==PlayerMatchStat.match_id)
-    if competition:q=q.filter(Match.competition==competition)
-    rows=q.all()
-    agg={}
-    for p,s,m in rows:
-        a=agg.setdefault(p.id,{"person_id":p.id,"name":f"{p.first_name} {p.last_name}","goals":0,"assists":0,"yellow_cards":0,"red_cards":0,"matches":set()})
-        a["goals"]+=s.goals or 0;a["assists"]+=s.assists or 0;a["yellow_cards"]+=s.yellow_cards or 0;a["red_cards"]+=s.red_cards or 0;a["matches"].add(m.id)
-    out=[]
-    for a in agg.values():
-        a["matches"]=len(a["matches"]);out.append(a)
-    return sorted(out,key=lambda x:(-x["goals"],-x["assists"],x["name"]))
-
-@app.post("/api/suspensions")
-def create_suspension(payload:SuspensionIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado"))):
-    s=Suspension(**payload.model_dump());db.add(s);db.commit();db.refresh(s)
-    audit(db,user,"create","suspension",s.id,payload.reason)
-    return {"ok":True,"id":s.id}
+        for k,v in payload.model_dump().items():setattr(obj,k,v)
+    db.commit();db.refresh(obj);audit(db,user,"upsert","player_stats",obj.id,f"match={payload.match_id}")
+    return {"ok":True,"id":obj.id}
 
 @app.get("/api/suspensions")
 def suspensions(active_only:bool=True,db:Session=Depends(get_db)):
@@ -254,8 +259,6 @@ def suspensions(active_only:bool=True,db:Session=Depends(get_db)):
     rows=q.all()
     return [{"id":s.id,"person_id":p.id,"name":f"{p.first_name} {p.last_name}",
              "competition":s.competition,"reason":s.reason,"start_date":s.start_date,"end_date":s.end_date,"status":s.status} for s,p in rows]
-
-
 
 # ---- Comunidad V6 ----
 
