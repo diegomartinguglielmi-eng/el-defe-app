@@ -5,6 +5,7 @@
   const role=()=>localStorage.getItem('defe_role')||'';
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const money=v=>v==null?'Precio a confirmar':new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(v);
+  let ensuring=false;
   async function api(path,opts={}){
     opts.headers={...(opts.headers||{})};if(token())opts.headers.Authorization='Bearer '+token();
     const r=await fetch(API()+path,{...opts,cache:'no-store'}),j=await r.json().catch(()=>({}));
@@ -32,22 +33,29 @@
     };
   }
   async function ensure(){
-    if(!['admin','delegado'].includes(role()))return;
+    if(ensuring||!['admin','delegado'].includes(role()))return;
     const tools=document.getElementById('adminTools');if(!tools)return;
-    let card=document.getElementById('storeAdminCard');
-    if(!card){
-      card=document.createElement('div');card.className='card';card.id='storeAdminCard';
-      card.innerHTML=`<div class="row"><div><b>Gestión de Tienda</b><div class="meta">Pedidos, catálogo y stock.</div></div><span class="badge">TIENDA</span></div><button id="storeNewProductBridge" class="btn" style="margin-top:10px">+ Nuevo producto</button><div id="storeAdminForm"></div><div id="storeAdminList" style="margin-top:10px"></div>`;
-      tools.insertBefore(card,tools.firstChild);
-      document.getElementById('storeNewProductBridge').onclick=()=>openForm();
-      await loadList();
-    }
-    if(typeof window.defeLoadStoreOrders==='function')window.defeLoadStoreOrders();
+    ensuring=true;
+    try{
+      let card=document.getElementById('storeAdminCard');
+      if(!card){
+        card=document.createElement('div');card.className='card';card.id='storeAdminCard';
+        card.innerHTML=`<div class="row"><div><b>Gestión de Tienda</b><div class="meta">Pedidos, catálogo y stock.</div></div><span class="badge">TIENDA</span></div><button id="storeNewProductBridge" class="btn" style="margin-top:10px">+ Nuevo producto</button><div id="storeAdminForm"></div><div id="storeAdminList" style="margin-top:10px"></div>`;
+        tools.insertBefore(card,tools.firstChild);
+        document.getElementById('storeNewProductBridge').onclick=()=>openForm();
+        await loadList();
+      }
+    }finally{ensuring=false;}
   }
   window.defeEnsureStoreAdmin=ensure;
   const oldShow=window.show;
   if(typeof oldShow==='function'&&!oldShow.__storeAdminBridge){const w=function(id){const r=oldShow.apply(this,arguments);if(id==='admin')setTimeout(ensure,50);return r};w.__storeAdminBridge=true;window.show=w;}
-  const mo=new MutationObserver(()=>{const admin=document.getElementById('admin');if(admin?.classList.contains('on'))ensure();});
-  mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(ensure,500));
+  function watchAdmin(){
+    const admin=document.getElementById('admin');if(!admin)return;
+    let wasOn=admin.classList.contains('on');
+    const mo=new MutationObserver(()=>{const on=admin.classList.contains('on');if(on&&!wasOn)setTimeout(ensure,0);wasOn=on;});
+    mo.observe(admin,{attributes:true,attributeFilter:['class']});
+  }
+  const init=()=>{watchAdmin();setTimeout(ensure,500);};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
