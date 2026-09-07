@@ -23,8 +23,7 @@ def _to_int(v):
 
 def _parse_table(df):
     # Standings are the FEFI tables with exactly six columns:
-    # EQUIPOS | PJ | G | E | P | Pts. Results tables also contain
-    # EQUIPOS/P.J./Pts. but have 12 columns, so they must be excluded.
+    # EQUIPOS | PJ | G | E | P | Pts. Results tables have 12 columns.
     if len(df.columns)!=6:return None
     cols=[_clean(c).upper().replace('.','') for c in df.columns]
     if not any('EQUIP' in c for c in cols) or 'PJ' not in cols:return None
@@ -32,7 +31,11 @@ def _parse_table(df):
     for _,row in df.iterrows():
         vals=[_clean(x) for x in row.tolist()[:6]]
         first=vals[0].upper()
-        if first in CATEGORIES and all(not x for x in vals[1:]):section=first;continue
+        # FEFI uses colspan for category labels. pandas.read_html can either
+        # leave the remaining cells empty or repeat the label across them.
+        if first in CATEGORIES and all((not x) or x.upper()==first for x in vals[1:]):
+            section=first
+            continue
         if not section or not vals[0] or first in ('EQUIPOS','EQUIPO'):continue
         pj,g,e,p,pts=[_to_int(x) for x in vals[1:6]]
         if pj is None and pts is None:continue
