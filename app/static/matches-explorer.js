@@ -26,8 +26,9 @@
     addScript('fefi-schedules','/static/fefi-schedules.js?v=56');
     addScript('fefi-freshness','/static/fefi-freshness.js?v=56');
     addScript('pwa','/static/pwa.js?v=56');
-    addScript('notifications','/static/notifications.js?v=56');
+    addScript('notifications','/static/notifications.js?v=58');
     addScript('data-quality','/static/data-quality.js?v=57');
+    addScript('argenliga-guard','/static/argenliga_guard.js?v=58');
   }
   window.defeLoadMatchExplorer=load;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
