@@ -1,0 +1,2557 @@
+{
+  "club": "DEF. DE SANTOS LUGARES",
+  "actualizado": "2026-09-08T22:24:14.977Z",
+  "ligas": [
+    {
+      "id": "fefi",
+      "nombre": "FEFI",
+      "torneo": "Clausura 2026 · Zona H",
+      "fuente": "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/",
+      "conectada": true,
+      "actualizado": "2026-09-08T22:24:05.852Z",
+      "categorias": [
+        "2013",
+        "2014",
+        "2015",
+        "2016",
+        "2017",
+        "2018",
+        "2019"
+      ],
+      "encuentros": [
+        {
+          "nro": 1,
+          "fecha": "2026-08-08",
+          "rival": "ATLETICO LUGANO",
+          "local": false,
+          "sede": "JOSé IGNACIO RUCCI 4170, CABA"
+        },
+        {
+          "nro": 2,
+          "fecha": "2026-08-15",
+          "rival": "ESTRADA 2",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES",
+          "marc": {
+            "2013": [
+              2,
+              0
+            ],
+            "2014": [
+              2,
+              1
+            ],
+            "2015": [
+              10,
+              7
+            ],
+            "2016": [
+              1,
+              5
+            ],
+            "2017": [
+              1,
+              3
+            ],
+            "2018": [
+              11,
+              1
+            ],
+            "2019": [
+              4,
+              0
+            ]
+          },
+          "pts": [
+            18,
+            null
+          ],
+          "estado": "verificado"
+        },
+        {
+          "nro": 3,
+          "fecha": "2026-08-22",
+          "rival": "C. S. D. ARGENTINO \"1\"",
+          "local": false,
+          "sede": "ALBARIñO 2253, CAPITAL FEDERAL"
+        },
+        {
+          "nro": 4,
+          "fecha": "2026-08-29",
+          "rival": "DEFENSORES DE HAEDO",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES",
+          "marc": {
+            "2013": [
+              0,
+              0
+            ],
+            "2014": [
+              2,
+              1
+            ],
+            "2015": [
+              4,
+              7
+            ],
+            "2016": [
+              2,
+              1
+            ],
+            "2017": [
+              6,
+              5
+            ],
+            "2018": [
+              2,
+              2
+            ],
+            "2019": [
+              2,
+              2
+            ]
+          },
+          "pts": [
+            16,
+            null
+          ],
+          "estado": "verificado"
+        },
+        {
+          "nro": 5,
+          "fecha": "2026-09-05",
+          "rival": "CNEL. BRANDSEN",
+          "local": false,
+          "sede": "ROQUE SIMONE 3951, LA TABLADA"
+        },
+        {
+          "nro": 6,
+          "fecha": "2026-09-12",
+          "rival": "C. A. CENTENARIO S. M.",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
+        },
+        {
+          "nro": 7,
+          "fecha": "2026-09-19",
+          "rival": "LAMADRID",
+          "local": false,
+          "sede": "DESAGUADERO 3180, C.A.B.A."
+        },
+        {
+          "nro": 8,
+          "fecha": "2026-09-26",
+          "rival": "BOYA - C. A. I.",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
+        },
+        {
+          "nro": 9,
+          "fecha": "2026-10-03",
+          "rival": "EL TREBOL",
+          "local": false,
+          "sede": "GANDARA 2840, CABA"
+        },
+        {
+          "nro": 10,
+          "fecha": "2026-10-10",
+          "rival": "GIMNASIA",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
+        },
+        {
+          "nro": 11,
+          "fecha": "2026-10-17",
+          "rival": "A DOS TOQUES F. C.",
+          "local": false,
+          "sede": "PASO 399, AVELLANEDA"
+        },
+        {
+          "nro": 12,
+          "fecha": "2026-10-24",
+          "rival": "FRANJA DE ORO 1",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
+        },
+        {
+          "nro": 13,
+          "fecha": "2026-10-31",
+          "rival": "ALVEAR",
+          "local": false,
+          "sede": "JOSé E. RODO 4190, CABA"
+        },
+        {
+          "nro": 14,
+          "fecha": "2026-11-07",
+          "rival": "NOLTING",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
+        },
+        {
+          "nro": 15,
+          "fecha": "2026-11-14",
+          "rival": "EL FORTIN DE BELGRANO",
+          "local": false,
+          "sede": "CRAMER 3249, CABA"
+        }
+      ],
+      "tablas": {
+        "2013": [
+          {
+            "equipo": "NOLTING",
+            "pj": 5,
+            "g": 3,
+            "e": 1,
+            "p": 1,
+            "pts": 12
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 5,
+            "g": 2,
+            "e": 2,
+            "p": 1,
+            "pts": 11
+          },
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "pts": 11
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "pts": 11
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 5,
+            "g": 2,
+            "e": 2,
+            "p": 1,
+            "pts": 11
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 4,
+            "g": 3,
+            "e": 1,
+            "p": 0,
+            "pts": 11
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "pts": 10
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 3,
+            "g": 3,
+            "e": 0,
+            "p": 0,
+            "pts": 9
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "pts": 9
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 4,
+            "g": 2,
+            "e": 0,
+            "p": 2,
+            "pts": 8
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "pts": 7
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 3,
+            "g": 1,
+            "e": 1,
+            "p": 1,
+            "pts": 6
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 4,
+            "g": 1,
+            "e": 0,
+            "p": 3,
+            "pts": 6
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 4,
+            "g": 0,
+            "e": 0,
+            "p": 4,
+            "pts": 4
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 4,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 0
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 4,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 0
+          }
+        ],
+        "2014": [
+          {
+            "equipo": "NOLTING",
+            "pj": 5,
+            "g": 4,
+            "e": 1,
+            "p": 0,
+            "pts": 14
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 5,
+            "g": 3,
+            "e": 1,
+            "p": 1,
+            "pts": 12
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 4,
+            "g": 3,
+            "e": 1,
+            "p": 0,
+            "pts": 11
+          },
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 5,
+            "g": 2,
+            "e": 2,
+            "p": 1,
+            "pts": 11
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "pts": 11
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 4,
+            "g": 3,
+            "e": 0,
+            "p": 1,
+            "pts": 10
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 3,
+            "g": 3,
+            "e": 0,
+            "p": 0,
+            "pts": 9
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "pts": 8
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "pts": 7
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "pts": 7
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 5,
+            "g": 1,
+            "e": 0,
+            "p": 4,
+            "pts": 7
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 4,
+            "g": 1,
+            "e": 0,
+            "p": 3,
+            "pts": 6
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 3,
+            "g": 0,
+            "e": 2,
+            "p": 1,
+            "pts": 5
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 4,
+            "g": 1,
+            "e": 0,
+            "p": 2,
+            "pts": 5
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 4,
+            "g": 0,
+            "e": 0,
+            "p": 4,
+            "pts": 4
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 4,
+            "g": 0,
+            "e": 0,
+            "p": 4,
+            "pts": 4
+          }
+        ],
+        "2015": [
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 5,
+            "g": 5,
+            "e": 0,
+            "p": 0,
+            "pts": 15
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 5,
+            "g": 4,
+            "e": 0,
+            "p": 1,
+            "pts": 13
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 4,
+            "g": 3,
+            "e": 0,
+            "p": 1,
+            "pts": 10
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "pts": 10
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 3,
+            "g": 3,
+            "e": 0,
+            "p": 0,
+            "pts": 9
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "pts": 9
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 3,
+            "g": 2,
+            "e": 1,
+            "p": 0,
+            "pts": 8
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "pts": 8
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 4,
+            "g": 2,
+            "e": 0,
+            "p": 2,
+            "pts": 8
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 4,
+            "g": 1,
+            "e": 1,
+            "p": 2,
+            "pts": 7
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "pts": 7
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 3,
+            "g": 1,
+            "e": 1,
+            "p": 1,
+            "pts": 6
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 4,
+            "g": 0,
+            "e": 0,
+            "p": 4,
+            "pts": 4
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 3,
+            "g": 0,
+            "e": 1,
+            "p": 2,
+            "pts": 4
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "pts": 3
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "pts": 3
+          }
+        ],
+        "2016": [
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 4,
+            "g": 4,
+            "e": 0,
+            "p": 0,
+            "pts": 12
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "pts": 11
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 4,
+            "g": 3,
+            "e": 1,
+            "p": 0,
+            "pts": 11
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 3,
+            "g": 3,
+            "e": 0,
+            "p": 0,
+            "pts": 9
+          },
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 5,
+            "g": 1,
+            "e": 2,
+            "p": 2,
+            "pts": 9
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "pts": 9
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "pts": 9
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 3,
+            "g": 3,
+            "e": 0,
+            "p": 0,
+            "pts": 9
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 4,
+            "g": 2,
+            "e": 0,
+            "p": 2,
+            "pts": 8
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "pts": 8
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 4,
+            "g": 1,
+            "e": 1,
+            "p": 2,
+            "pts": 7
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 3,
+            "g": 1,
+            "e": 1,
+            "p": 1,
+            "pts": 6
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 3,
+            "g": 1,
+            "e": 0,
+            "p": 2,
+            "pts": 5
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 3,
+            "g": 0,
+            "e": 1,
+            "p": 2,
+            "pts": 4
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 3,
+            "g": 0,
+            "e": 1,
+            "p": 2,
+            "pts": 4
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "pts": 3
+          }
+        ],
+        "2017": [
+          {
+            "equipo": "LAMADRID",
+            "pj": 4,
+            "g": 4,
+            "e": 0,
+            "p": 0,
+            "pts": 12
+          },
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "pts": 10
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "pts": 10
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "pts": 10
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 4,
+            "g": 2,
+            "e": 1,
+            "p": 1,
+            "pts": 9
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 3,
+            "g": 3,
+            "e": 0,
+            "p": 0,
+            "pts": 9
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 3,
+            "g": 3,
+            "e": 0,
+            "p": 0,
+            "pts": 9
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 4,
+            "g": 2,
+            "e": 0,
+            "p": 2,
+            "pts": 8
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "pts": 8
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "pts": 7
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "pts": 7
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 5,
+            "g": 1,
+            "e": 0,
+            "p": 4,
+            "pts": 7
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 4,
+            "g": 1,
+            "e": 1,
+            "p": 2,
+            "pts": 7
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 3,
+            "g": 1,
+            "e": 0,
+            "p": 2,
+            "pts": 5
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "pts": 3
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "pts": 3
+          }
+        ],
+        "2018": [
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 5,
+            "g": 4,
+            "e": 1,
+            "p": 0,
+            "pts": 14
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 5,
+            "g": 4,
+            "e": 1,
+            "p": 0,
+            "pts": 14
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 5,
+            "g": 3,
+            "e": 1,
+            "p": 1,
+            "pts": 12
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 4,
+            "g": 3,
+            "e": 1,
+            "p": 0,
+            "pts": 11
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "pts": 11
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 5,
+            "g": 2,
+            "e": 2,
+            "p": 1,
+            "pts": 11
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 4,
+            "g": 3,
+            "e": 1,
+            "p": 0,
+            "pts": 11
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 4,
+            "g": 2,
+            "e": 2,
+            "p": 0,
+            "pts": 10
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "pts": 8
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 4,
+            "g": 1,
+            "e": 1,
+            "p": 2,
+            "pts": 7
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 3,
+            "g": 0,
+            "e": 2,
+            "p": 1,
+            "pts": 5
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 5,
+            "pts": 5
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 4,
+            "g": 0,
+            "e": 1,
+            "p": 3,
+            "pts": 5
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 4,
+            "g": 0,
+            "e": 1,
+            "p": 3,
+            "pts": 5
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 3,
+            "g": 0,
+            "e": 1,
+            "p": 2,
+            "pts": 4
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "pts": 3
+          }
+        ],
+        "2019": [
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 5,
+            "g": 4,
+            "e": 1,
+            "p": 0,
+            "pts": 14
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 5,
+            "g": 4,
+            "e": 1,
+            "p": 0,
+            "pts": 14
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 5,
+            "g": 4,
+            "e": 0,
+            "p": 1,
+            "pts": 13
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 4,
+            "g": 4,
+            "e": 0,
+            "p": 0,
+            "pts": 12
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 4,
+            "g": 3,
+            "e": 0,
+            "p": 1,
+            "pts": 10
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 4,
+            "g": 3,
+            "e": 0,
+            "p": 1,
+            "pts": 10
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 5,
+            "g": 1,
+            "e": 2,
+            "p": 2,
+            "pts": 9
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 4,
+            "g": 2,
+            "e": 0,
+            "p": 2,
+            "pts": 8
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "pts": 8
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 2,
+            "pts": 7
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 4,
+            "g": 1,
+            "e": 0,
+            "p": 3,
+            "pts": 6
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 4,
+            "g": 1,
+            "e": 0,
+            "p": 3,
+            "pts": 6
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 3,
+            "g": 1,
+            "e": 0,
+            "p": 2,
+            "pts": 5
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 3,
+            "g": 1,
+            "e": 0,
+            "p": 2,
+            "pts": 5
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 5,
+            "pts": 5
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "pts": 3
+          }
+        ],
+        "general": [
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 35,
+            "g": 21,
+            "e": 7,
+            "p": 7,
+            "pts": 84
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 35,
+            "g": 21,
+            "e": 5,
+            "p": 9,
+            "pts": 82
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 35,
+            "g": 18,
+            "e": 4,
+            "p": 13,
+            "pts": 75
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 31,
+            "g": 16,
+            "e": 5,
+            "p": 10,
+            "pts": 68
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 32,
+            "g": 14,
+            "e": 4,
+            "p": 14,
+            "pts": 64
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 35,
+            "g": 11,
+            "e": 7,
+            "p": 16,
+            "pts": 63
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 28,
+            "g": 15,
+            "e": 4,
+            "p": 9,
+            "pts": 62
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 35,
+            "g": 10,
+            "e": 2,
+            "p": 23,
+            "pts": 57
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 28,
+            "g": 12,
+            "e": 3,
+            "p": 13,
+            "pts": 55
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 21,
+            "g": 13,
+            "e": 3,
+            "p": 5,
+            "pts": 50
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 24,
+            "g": 10,
+            "e": 3,
+            "p": 11,
+            "pts": 47
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 25,
+            "g": 11,
+            "e": 3,
+            "p": 6,
+            "pts": 45
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 21,
+            "g": 10,
+            "e": 1,
+            "p": 10,
+            "pts": 42
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 25,
+            "g": 6,
+            "e": 2,
+            "p": 17,
+            "pts": 39
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 25,
+            "g": 6,
+            "e": 2,
+            "p": 13,
+            "pts": 35
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 21,
+            "g": 4,
+            "e": 3,
+            "p": 14,
+            "pts": 32
+          }
+        ]
+      }
+    },
+    {
+      "id": "superliga",
+      "nombre": "Superliga",
+      "disciplina": "Futsal",
+      "torneo": "Junior A · Torneo 2026",
+      "fuente": "https://www.futsalargentina.com.ar/fixture.php?cat=1_1",
+      "conectada": true,
+      "actualizado": "2026-09-08T22:24:06.953Z",
+      "categorias": [
+        "Junior A"
+      ],
+      "partidos": [
+        {
+          "rival": "Pasaje Futsal",
+          "local": true,
+          "sede": "Bonorino Futbol",
+          "fecha": "2026-09-07",
+          "hora": "21:15",
+          "gf": 1,
+          "gc": 8
+        }
+      ],
+      "tablas": {
+        "general": [
+          {
+            "equipo": "1",
+            "pj": 13,
+            "g": 5,
+            "e": 4,
+            "p": 1,
+            "pts": null
+          },
+          {
+            "equipo": "2",
+            "pj": 12,
+            "g": 4,
+            "e": 4,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "3",
+            "pj": 10,
+            "g": 4,
+            "e": 3,
+            "p": 1,
+            "pts": null
+          },
+          {
+            "equipo": "4",
+            "pj": 10,
+            "g": 5,
+            "e": 3,
+            "p": 1,
+            "pts": null
+          },
+          {
+            "equipo": "5",
+            "pj": 9,
+            "g": 5,
+            "e": 3,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "6",
+            "pj": 9,
+            "g": 4,
+            "e": 3,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "7",
+            "pj": 7,
+            "g": 4,
+            "e": 2,
+            "p": 1,
+            "pts": null
+          },
+          {
+            "equipo": "8",
+            "pj": 6,
+            "g": 4,
+            "e": 2,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "9",
+            "pj": 3,
+            "g": 4,
+            "e": 1,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "10",
+            "pj": 3,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "11",
+            "pj": 3,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "12",
+            "pj": 0,
+            "g": 5,
+            "e": 0,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "13",
+            "pj": 0,
+            "g": 4,
+            "e": 0,
+            "p": 0,
+            "pts": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "argenliga",
+      "nombre": "Argenliga",
+      "torneo": "Torneo 2026",
+      "fuente": null,
+      "conectada": false,
+      "actualizado": null,
+      "categorias": [],
+      "encuentros": [],
+      "tablas": {},
+      "error": "403 en https://api.sofascore.com/api/v1/team/1214864/events/last/0"
+    },
+    {
+      "id": "lamba",
+      "nombre": "LAAMBA",
+      "disciplina": "Futsal",
+      "torneo": "M - Elite I · F - Ascenso I Zona B",
+      "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026",
+      "conectada": true,
+      "actualizado": "2026-09-08T22:24:14.977Z",
+      "categorias": [
+        "1RA",
+        "3RA",
+        "4TA",
+        "5TA",
+        "6TA",
+        "7MA",
+        "8VA",
+        "FEM 1RA"
+      ],
+      "partidos": [],
+      "tablas": {
+        "1RA": [
+          {
+            "equipo": "Defensores de SL",
+            "pts": 18,
+            "pj": 7,
+            "g": 6,
+            "e": 0,
+            "p": 1,
+            "dg": 11
+          },
+          {
+            "equipo": "Cantera Zona Norte",
+            "pts": 12,
+            "pj": 7,
+            "g": 4,
+            "e": 0,
+            "p": 3,
+            "dg": 15
+          },
+          {
+            "equipo": "Club Pampero",
+            "pts": 12,
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "dg": 6
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pts": 12,
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "dg": 4
+          },
+          {
+            "equipo": "CEDIMA",
+            "pts": 10,
+            "pj": 5,
+            "g": 3,
+            "e": 1,
+            "p": 1,
+            "dg": 11
+          },
+          {
+            "equipo": "California",
+            "pts": 10,
+            "pj": 6,
+            "g": 3,
+            "e": 1,
+            "p": 2,
+            "dg": 2
+          },
+          {
+            "equipo": "Amistad",
+            "pts": 10,
+            "pj": 6,
+            "g": 3,
+            "e": 1,
+            "p": 2,
+            "dg": -3
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pts": 9,
+            "pj": 4,
+            "g": 3,
+            "e": 0,
+            "p": 1,
+            "dg": 12
+          },
+          {
+            "equipo": "Parque Patricios",
+            "pts": 9,
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "dg": 4
+          },
+          {
+            "equipo": "Club Aliados",
+            "pts": 9,
+            "pj": 7,
+            "g": 3,
+            "e": 0,
+            "p": 4,
+            "dg": -6
+          },
+          {
+            "equipo": "La Marca",
+            "pts": 6,
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "dg": 0
+          },
+          {
+            "equipo": "Independiente",
+            "pts": 4,
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "dg": -3
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pts": 4,
+            "pj": 7,
+            "g": 1,
+            "e": 1,
+            "p": 5,
+            "dg": -7
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pts": 4,
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "dg": -13
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pts": 4,
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "dg": -14
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pts": 1,
+            "pj": 5,
+            "g": 0,
+            "e": 1,
+            "p": 4,
+            "dg": -19
+          }
+        ],
+        "3RA": [
+          {
+            "equipo": "Cantera Zona Norte",
+            "pts": 21,
+            "pj": 7,
+            "g": 7,
+            "e": 0,
+            "p": 0,
+            "dg": 34
+          },
+          {
+            "equipo": "Club Pampero",
+            "pts": 14,
+            "pj": 7,
+            "g": 4,
+            "e": 2,
+            "p": 1,
+            "dg": 15
+          },
+          {
+            "equipo": "California",
+            "pts": 12,
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "dg": 11
+          },
+          {
+            "equipo": "Parque Patricios",
+            "pts": 11,
+            "pj": 5,
+            "g": 3,
+            "e": 2,
+            "p": 0,
+            "dg": 13
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pts": 10,
+            "pj": 5,
+            "g": 3,
+            "e": 1,
+            "p": 1,
+            "dg": 12
+          },
+          {
+            "equipo": "Club Aliados",
+            "pts": 10,
+            "pj": 7,
+            "g": 3,
+            "e": 1,
+            "p": 3,
+            "dg": 2
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pts": 10,
+            "pj": 7,
+            "g": 3,
+            "e": 1,
+            "p": 3,
+            "dg": -8
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pts": 9,
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "dg": 12
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pts": 9,
+            "pj": 7,
+            "g": 3,
+            "e": 0,
+            "p": 4,
+            "dg": -4
+          },
+          {
+            "equipo": "La Marca",
+            "pts": 7,
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "dg": -1
+          },
+          {
+            "equipo": "CEDIMA",
+            "pts": 6,
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "dg": -4
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pts": 6,
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "dg": -10
+          },
+          {
+            "equipo": "Independiente",
+            "pts": 6,
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "dg": -10
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pts": 3,
+            "pj": 5,
+            "g": 1,
+            "e": 0,
+            "p": 4,
+            "dg": -17
+          },
+          {
+            "equipo": "Amistad",
+            "pts": 3,
+            "pj": 6,
+            "g": 1,
+            "e": 0,
+            "p": 5,
+            "dg": -24
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pts": 0,
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 5,
+            "dg": -21
+          }
+        ],
+        "4TA": [
+          {
+            "equipo": "Cantera Zona Norte",
+            "pts": 21,
+            "pj": 7,
+            "g": 7,
+            "e": 0,
+            "p": 0,
+            "dg": 59
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pts": 16,
+            "pj": 6,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "dg": 23
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pts": 13,
+            "pj": 7,
+            "g": 4,
+            "e": 1,
+            "p": 2,
+            "dg": 17
+          },
+          {
+            "equipo": "CEDIMA",
+            "pts": 12,
+            "pj": 5,
+            "g": 4,
+            "e": 0,
+            "p": 1,
+            "dg": 19
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pts": 12,
+            "pj": 5,
+            "g": 4,
+            "e": 0,
+            "p": 1,
+            "dg": 12
+          },
+          {
+            "equipo": "Club Pampero",
+            "pts": 12,
+            "pj": 7,
+            "g": 4,
+            "e": 0,
+            "p": 3,
+            "dg": 3
+          },
+          {
+            "equipo": "La Marca",
+            "pts": 9,
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "dg": 24
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pts": 9,
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "dg": 1
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pts": 9,
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "dg": -3
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pts": 7,
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "dg": 0
+          },
+          {
+            "equipo": "Parque Patricios",
+            "pts": 6,
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "dg": -2
+          },
+          {
+            "equipo": "Club Aliados",
+            "pts": 6,
+            "pj": 7,
+            "g": 2,
+            "e": 0,
+            "p": 5,
+            "dg": -17
+          },
+          {
+            "equipo": "Amistad",
+            "pts": 4,
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "dg": -24
+          },
+          {
+            "equipo": "California",
+            "pts": 1,
+            "pj": 6,
+            "g": 0,
+            "e": 1,
+            "p": 5,
+            "dg": -28
+          },
+          {
+            "equipo": "Independiente",
+            "pts": 1,
+            "pj": 5,
+            "g": 0,
+            "e": 1,
+            "p": 4,
+            "dg": -33
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pts": 0,
+            "pj": 7,
+            "g": 0,
+            "e": 0,
+            "p": 7,
+            "dg": -51
+          }
+        ],
+        "5TA": [
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pts": 15,
+            "pj": 6,
+            "g": 5,
+            "e": 0,
+            "p": 1,
+            "dg": 21
+          },
+          {
+            "equipo": "Club Aliados",
+            "pts": 15,
+            "pj": 7,
+            "g": 5,
+            "e": 0,
+            "p": 2,
+            "dg": 2
+          },
+          {
+            "equipo": "Club Pampero",
+            "pts": 14,
+            "pj": 7,
+            "g": 4,
+            "e": 2,
+            "p": 1,
+            "dg": 15
+          },
+          {
+            "equipo": "Cantera Zona Norte",
+            "pts": 14,
+            "pj": 7,
+            "g": 4,
+            "e": 2,
+            "p": 1,
+            "dg": 10
+          },
+          {
+            "equipo": "CEDIMA",
+            "pts": 10,
+            "pj": 5,
+            "g": 3,
+            "e": 1,
+            "p": 1,
+            "dg": 12
+          },
+          {
+            "equipo": "La Marca",
+            "pts": 9,
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "dg": 8
+          },
+          {
+            "equipo": "Independiente",
+            "pts": 8,
+            "pj": 5,
+            "g": 2,
+            "e": 2,
+            "p": 1,
+            "dg": 0
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pts": 8,
+            "pj": 5,
+            "g": 2,
+            "e": 2,
+            "p": 1,
+            "dg": -1
+          },
+          {
+            "equipo": "Parque Patricios",
+            "pts": 7,
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "dg": 7
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pts": 7,
+            "pj": 6,
+            "g": 2,
+            "e": 1,
+            "p": 3,
+            "dg": 3
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pts": 7,
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "dg": -6
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pts": 6,
+            "pj": 7,
+            "g": 2,
+            "e": 0,
+            "p": 5,
+            "dg": -1
+          },
+          {
+            "equipo": "California",
+            "pts": 5,
+            "pj": 6,
+            "g": 1,
+            "e": 2,
+            "p": 3,
+            "dg": -16
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pts": 4,
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "dg": -2
+          },
+          {
+            "equipo": "Amistad",
+            "pts": 4,
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "dg": -10
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pts": 0,
+            "pj": 7,
+            "g": 0,
+            "e": 0,
+            "p": 7,
+            "dg": -42
+          }
+        ],
+        "6TA": [
+          {
+            "equipo": "Parque Patricios",
+            "pts": 15,
+            "pj": 5,
+            "g": 5,
+            "e": 0,
+            "p": 0,
+            "dg": 20
+          },
+          {
+            "equipo": "Cantera Zona Norte",
+            "pts": 15,
+            "pj": 7,
+            "g": 5,
+            "e": 0,
+            "p": 2,
+            "dg": 18
+          },
+          {
+            "equipo": "Club Aliados",
+            "pts": 15,
+            "pj": 7,
+            "g": 5,
+            "e": 0,
+            "p": 2,
+            "dg": -7
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pts": 14,
+            "pj": 6,
+            "g": 4,
+            "e": 2,
+            "p": 0,
+            "dg": 11
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pts": 13,
+            "pj": 6,
+            "g": 4,
+            "e": 1,
+            "p": 1,
+            "dg": 17
+          },
+          {
+            "equipo": "Club Pampero",
+            "pts": 13,
+            "pj": 7,
+            "g": 4,
+            "e": 1,
+            "p": 2,
+            "dg": 5
+          },
+          {
+            "equipo": "California",
+            "pts": 11,
+            "pj": 6,
+            "g": 3,
+            "e": 2,
+            "p": 1,
+            "dg": 3
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pts": 10,
+            "pj": 5,
+            "g": 3,
+            "e": 1,
+            "p": 1,
+            "dg": 11
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pts": 7,
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "dg": 13
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pts": 7,
+            "pj": 7,
+            "g": 2,
+            "e": 1,
+            "p": 4,
+            "dg": -2
+          },
+          {
+            "equipo": "La Marca",
+            "pts": 6,
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "dg": -3
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pts": 6,
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "dg": -7
+          },
+          {
+            "equipo": "CEDIMA",
+            "pts": 4,
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "dg": -7
+          },
+          {
+            "equipo": "Independiente",
+            "pts": 0,
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 5,
+            "dg": -14
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pts": 0,
+            "pj": 7,
+            "g": 0,
+            "e": 0,
+            "p": 7,
+            "dg": -21
+          },
+          {
+            "equipo": "Amistad",
+            "pts": 0,
+            "pj": 6,
+            "g": 0,
+            "e": 0,
+            "p": 6,
+            "dg": -37
+          }
+        ],
+        "7MA": [
+          {
+            "equipo": "Cantera Zona Norte",
+            "pts": 21,
+            "pj": 7,
+            "g": 7,
+            "e": 0,
+            "p": 0,
+            "dg": 43
+          },
+          {
+            "equipo": "Club Pampero",
+            "pts": 18,
+            "pj": 7,
+            "g": 6,
+            "e": 0,
+            "p": 1,
+            "dg": 19
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pts": 15,
+            "pj": 7,
+            "g": 5,
+            "e": 0,
+            "p": 2,
+            "dg": 14
+          },
+          {
+            "equipo": "La Marca",
+            "pts": 12,
+            "pj": 5,
+            "g": 4,
+            "e": 0,
+            "p": 1,
+            "dg": 26
+          },
+          {
+            "equipo": "Parque Patricios",
+            "pts": 12,
+            "pj": 5,
+            "g": 4,
+            "e": 0,
+            "p": 1,
+            "dg": 12
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pts": 11,
+            "pj": 6,
+            "g": 3,
+            "e": 2,
+            "p": 1,
+            "dg": 18
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pts": 9,
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "dg": 0
+          },
+          {
+            "equipo": "California",
+            "pts": 9,
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "dg": -3
+          },
+          {
+            "equipo": "Club Aliados",
+            "pts": 7,
+            "pj": 7,
+            "g": 2,
+            "e": 1,
+            "p": 4,
+            "dg": -9
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pts": 6,
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "dg": -8
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pts": 5,
+            "pj": 6,
+            "g": 1,
+            "e": 2,
+            "p": 3,
+            "dg": -13
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pts": 5,
+            "pj": 7,
+            "g": 1,
+            "e": 2,
+            "p": 4,
+            "dg": -14
+          },
+          {
+            "equipo": "CEDIMA",
+            "pts": 3,
+            "pj": 5,
+            "g": 1,
+            "e": 0,
+            "p": 4,
+            "dg": -17
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pts": 3,
+            "pj": 5,
+            "g": 1,
+            "e": 0,
+            "p": 4,
+            "dg": -23
+          },
+          {
+            "equipo": "Independiente",
+            "pts": 1,
+            "pj": 5,
+            "g": 0,
+            "e": 1,
+            "p": 4,
+            "dg": -15
+          },
+          {
+            "equipo": "Amistad",
+            "pts": 0,
+            "pj": 6,
+            "g": 0,
+            "e": 0,
+            "p": 6,
+            "dg": -30
+          }
+        ],
+        "8VA": [
+          {
+            "equipo": "Club Pampero",
+            "pts": 18,
+            "pj": 7,
+            "g": 6,
+            "e": 0,
+            "p": 1,
+            "dg": 27
+          },
+          {
+            "equipo": "Club Aliados",
+            "pts": 18,
+            "pj": 7,
+            "g": 6,
+            "e": 0,
+            "p": 1,
+            "dg": 17
+          },
+          {
+            "equipo": "La Marca",
+            "pts": 15,
+            "pj": 5,
+            "g": 5,
+            "e": 0,
+            "p": 0,
+            "dg": 30
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pts": 14,
+            "pj": 6,
+            "g": 4,
+            "e": 2,
+            "p": 0,
+            "dg": 10
+          },
+          {
+            "equipo": "California",
+            "pts": 13,
+            "pj": 6,
+            "g": 4,
+            "e": 1,
+            "p": 1,
+            "dg": 12
+          },
+          {
+            "equipo": "Cantera Zona Norte",
+            "pts": 12,
+            "pj": 7,
+            "g": 4,
+            "e": 0,
+            "p": 3,
+            "dg": 6
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pts": 9,
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "dg": 3
+          },
+          {
+            "equipo": "CEDIMA",
+            "pts": 7,
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "dg": 2
+          },
+          {
+            "equipo": "Independiente",
+            "pts": 6,
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "dg": 2
+          },
+          {
+            "equipo": "Parque Patricios",
+            "pts": 6,
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "dg": -6
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pts": 6,
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "dg": -7
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pts": 6,
+            "pj": 7,
+            "g": 2,
+            "e": 0,
+            "p": 5,
+            "dg": -21
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pts": 4,
+            "pj": 7,
+            "g": 1,
+            "e": 1,
+            "p": 5,
+            "dg": -16
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pts": 4,
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "dg": -21
+          },
+          {
+            "equipo": "Amistad",
+            "pts": 0,
+            "pj": 6,
+            "g": 0,
+            "e": 0,
+            "p": 6,
+            "dg": -18
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pts": 0,
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 5,
+            "dg": -20
+          }
+        ],
+        "FEM 1RA": [
+          {
+            "equipo": "Pampa FC",
+            "pts": 9,
+            "pj": 3,
+            "g": 3,
+            "e": 0,
+            "p": 0,
+            "dg": 6
+          },
+          {
+            "equipo": "Ituzaingo",
+            "pts": 6,
+            "pj": 2,
+            "g": 2,
+            "e": 0,
+            "p": 0,
+            "dg": 9
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pts": 6,
+            "pj": 2,
+            "g": 2,
+            "e": 0,
+            "p": 0,
+            "dg": 6
+          },
+          {
+            "equipo": "Toque y Toque",
+            "pts": 5,
+            "pj": 3,
+            "g": 1,
+            "e": 2,
+            "p": 0,
+            "dg": 6
+          },
+          {
+            "equipo": "Deportivo La Boca",
+            "pts": 4,
+            "pj": 3,
+            "g": 1,
+            "e": 1,
+            "p": 1,
+            "dg": 2
+          },
+          {
+            "equipo": "San Andres Futsal",
+            "pts": 4,
+            "pj": 3,
+            "g": 1,
+            "e": 1,
+            "p": 1,
+            "dg": 0
+          },
+          {
+            "equipo": "Club Saenz Peña",
+            "pts": 3,
+            "pj": 1,
+            "g": 1,
+            "e": 0,
+            "p": 0,
+            "dg": 1
+          },
+          {
+            "equipo": "Union Italiana",
+            "pts": 3,
+            "pj": 2,
+            "g": 1,
+            "e": 0,
+            "p": 1,
+            "dg": 0
+          },
+          {
+            "equipo": "Deportivo Vedia",
+            "pts": 1,
+            "pj": 3,
+            "g": 0,
+            "e": 1,
+            "p": 2,
+            "dg": -4
+          },
+          {
+            "equipo": "Cervantes LP",
+            "pts": 1,
+            "pj": 3,
+            "g": 0,
+            "e": 1,
+            "p": 2,
+            "dg": -6
+          },
+          {
+            "equipo": "Estrada de Almagro",
+            "pts": 0,
+            "pj": 1,
+            "g": 0,
+            "e": 0,
+            "p": 1,
+            "dg": -1
+          },
+          {
+            "equipo": "Estudiantes del Norte",
+            "pts": 0,
+            "pj": 1,
+            "g": 0,
+            "e": 0,
+            "p": 1,
+            "dg": -4
+          },
+          {
+            "equipo": "Villa Mitre",
+            "pts": 0,
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "dg": -15
+          },
+          {
+            "equipo": "Fecha Libre",
+            "pts": 0,
+            "pj": 0,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "dg": 0
+          }
+        ]
+      }
+    }
+  ]
+}
