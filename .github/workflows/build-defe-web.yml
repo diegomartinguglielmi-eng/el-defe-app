@@ -1,0 +1,45 @@
+name: Compilar app web
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'defe-web-listo.zip'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Preparar proyecto
+        run: |
+          rm -rf defe-web-build
+          mkdir defe-web-build
+          unzip -q defe-web-listo.zip -d defe-web-build
+
+      - name: Instalar dependencias
+        working-directory: defe-web-build
+        run: npm install
+
+      - name: Compilar
+        working-directory: defe-web-build
+        run: npm run build
+
+      - name: Empaquetar dist
+        run: |
+          cd defe-web-build/dist
+          zip -qr ../../defe-web-dist.zip .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: defe-web-dist
+          path: defe-web-dist.zip
+          retention-days: 7
