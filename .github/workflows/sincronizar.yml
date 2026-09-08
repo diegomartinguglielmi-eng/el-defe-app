@@ -1,0 +1,84 @@
+name: Sincronizar ligas
+
+on:
+  schedule:
+    - cron: "0 23 * * 6"
+    - cron: "0 2 * * 2"
+    - cron: "0 11 * * 2"
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - "defe-datos/manual.json"
+      - "defe-datos/sync-ligas.mjs"
+      - "defe-datos/avisos.mjs"
+      - "defe-datos/package.json"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: datos
+  cancel-in-progress: false
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: defe-datos
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Guardar la sincronización anterior
+        run: cp datos.json datos-anterior.json || true
+
+      - name: Leer las ligas
+        run: npm run sync
+
+      - name: Avisar lo que cambió
+        env:
+          AVISOS_URL: ${{ secrets.AVISOS_URL }}
+          CLAVE_AVISOS: ${{ secrets.CLAVE_AVISOS }}
+        run: node avisos.mjs datos-anterior.json datos.json
+
+      - name: Preparar la carpeta pública
+        run: |
+          mkdir -p public
+          cp datos.json public/datos.json
+          echo '{"actualizado":"'"$(date -u +%FT%TZ)"'"}' > public/salud.json
+
+      - name: Guardar el resultado en el repo
+        run: |
+          if [[ -n "$(git status --porcelain datos.json)" ]]; then
+            git config user.name "sync-defe"
+            git config user.email "sync@defe.local"
+            git add datos.json
+            git commit -m "Datos al $(TZ=America/Argentina/Buenos_Aires date +'%d/%m %H:%M')"
+            git push
+          else
+            echo "Sin cambios."
+          fi
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: defe-datos/public
+
+  publicar:
+    needs: sincronizar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
