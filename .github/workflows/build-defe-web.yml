@@ -36,9 +36,9 @@ jobs:
         working-directory: defe-web-build
         run: npm install
 
-      - name: Compilar
+      - name: Compilar para GitHub Pages
         working-directory: defe-web-build
-        run: npm run build
+        run: npm run build -- --base=/el-defe-app/
 
       - name: Incorporar datos sincronizados
         run: |
