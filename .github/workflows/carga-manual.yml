@@ -1,0 +1,102 @@
+name: Cargar a mano
+
+on:
+  workflow_dispatch:
+    inputs:
+      que:
+        description: "Qué querés cargar"
+        required: true
+        type: choice
+        options: [horarios, partido, borrar]
+      liga:
+        description: "Liga"
+        required: true
+        type: choice
+        options: [fefi, superliga, lamba, argenliga]
+      referencia:
+        description: "Nro de fecha (horarios) o id del registro (borrar)"
+        required: false
+        type: string
+      detalle:
+        description: "Horarios, ej: 2019 14:30 · 2013 15:15 · 2018 16:10"
+        required: false
+        type: string
+      categoria:
+        description: "Categoría o división del partido"
+        required: false
+        type: string
+      rival:
+        description: "Rival"
+        required: false
+        type: string
+      fecha:
+        description: "Fecha del partido (AAAA-MM-DD)"
+        required: false
+        type: string
+      hora:
+        description: "Hora"
+        required: false
+        type: string
+      sede:
+        description: "Cancha"
+        required: false
+        type: string
+      condicion:
+        description: "Local o visitante"
+        required: false
+        type: choice
+        options: [local, visitante]
+
+permissions:
+  contents: write
+
+jobs:
+  cargar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Aplicar el cambio
+        env:
+          DATOS: ${{ toJSON(inputs) }}
+        run: |
+          cd defe-datos
+          node --input-type=module -e '
+            import { readFileSync, writeFileSync } from "node:fs";
+            const i = JSON.parse(process.env.DATOS);
+            let m = { partidos: [], horarios: {} };
+            try { m = JSON.parse(readFileSync("manual.json", "utf8")); } catch {}
+
+            if (i.que === "horarios") {
+              if (!i.referencia || !i.detalle) throw new Error("Faltan la fecha y el detalle");
+              m.horarios[`${i.liga}:${i.referencia}`] = i.detalle;
+            }
+
+            if (i.que === "partido") {
+              if (!i.rival || !i.fecha) throw new Error("Faltan el rival y la fecha");
+              m.partidos.push({
+                id: "m" + Date.now(), origen: "manual", liga: i.liga,
+                categoria: i.categoria || null, rival: i.rival, fecha: i.fecha,
+                hora: i.hora || null, sede: i.sede || null,
+                local: i.condicion !== "visitante",
+                cargado: new Date().toISOString(),
+              });
+            }
+
+            if (i.que === "borrar") {
+              if (!i.referencia) throw new Error("Falta el id a borrar");
+              m.partidos = m.partidos.filter((p) => p.id !== i.referencia);
+              delete m.horarios[i.referencia];
+            }
+
+            writeFileSync("manual.json", JSON.stringify(m, null, 2));
+            console.log("manual.json actualizado");
+          '
+
+      - name: Guardar
+        run: |
+          git config user.name "carga-defe"
+          git config user.email "carga@defe.local"
+          git add defe-datos/manual.json
+          git diff --cached --quiet || git commit -m "Carga manual: ${{ inputs.que }} (${{ inputs.liga }})"
+          git push
