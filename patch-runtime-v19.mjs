@@ -19,8 +19,7 @@ const oldToday='iu=new Date("2026-09-08T09:00:00")';
 if(!js.includes(oldToday)) throw new Error('No se encontró fecha fija iu');
 js=js.replace(oldToday,'iu=new Date');
 
-// 3) Próxima fecha y último resultado FEFI se determinan exclusivamente por fecha.
-//    Esto evita que fixtures futuros con marcadores placeholder sean tomados como jugados.
+// 3) Próxima fecha y último resultado FEFI se determinan por fecha real.
 const oldSelection='l=a.find(y=>!y.jugado&&xa(y.fecha)>=iu),c=[...a].reverse().find(y=>y.jugado),';
 const newSelection='l=[...a].filter(y=>xa(y.fecha)>=iu).sort((y,f)=>xa(y.fecha)-xa(f.fecha))[0],c=[...a].filter(y=>xa(y.fecha)<iu&&y.marc).sort((y,f)=>xa(f.fecha)-xa(y.fecha))[0],';
 if(!js.includes(oldSelection)) throw new Error('No se encontró lógica V12 de selección FEFI');
@@ -31,6 +30,6 @@ fs.writeFileSync(jsPath,js);
 
 const indexPath=path.join(dist,'index.html');
 let html=fs.readFileSync(indexPath,'utf8');
-html=html.replace(/<meta name="defe-brand" content="[^"]*"\s*\/>/,'<meta name="defe-brand" content="v20-date-based-fefi-20260909" />');
+html=html.replace(/<meta name="defe-brand" content="[^"]*"\s*\/>/,'<meta name="defe-brand" content="v19-runtime-20260909" />');
 fs.writeFileSync(indexPath,html);
-console.log('V20 aplicada: FEFI por fecha real + pts opcional');
+console.log('Runtime aplicado: FEFI por fecha real + pts opcional');
