@@ -88,7 +88,8 @@ jobs:
         run: |
           grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-*.js
           grep -R "Cuenta creada correctamente" defe-web-build/dist/assets/index-*.js
-          grep -R "#3A307E" defe-web-build/dist/assets/index-*.js
+          grep -R "#40368F" defe-web-build/dist/assets/index-*.js
+          grep -R "linear-gradient(135deg,#332A73" defe-web-build/dist/assets/index-*.js
           test -f defe-web-build/dist/escudo-dsl.svg
           grep -F "updateViaCache: 'none'" defe-web-build/dist/registerSW.js
           grep -F "SKIP_WAITING" defe-web-build/dist/sw.js
