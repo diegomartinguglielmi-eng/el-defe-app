@@ -15,7 +15,6 @@ on:
       - 'patch-ui-v8.mjs'
       - 'patch-ui-v9.mjs'
       - 'patch-ui-v11.mjs'
-      - 'patch-ui-v16.mjs'
       - 'defe-datos/datos.json'
       - '.github/workflows/build-defe-web.yml'
 
@@ -60,20 +59,20 @@ jobs:
         run: node patch-ui-v9.mjs
       - name: Aplicar V12 cierre real del selector
         run: node patch-ui-v11.mjs
-      - name: Verificar Home V12 estable
+      - name: Verificar V12 estable
         run: |
           grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-*.js
+          grep -R "EXPLICIT_CATEGORY_EDITOR_STATE" defe-web-build/dist/assets/index-*.js
           grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-*.js
           grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-*.js
           grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-*.js
-      - name: Aplicar V16 Mi Defe multiliga seguro
-        run: node patch-ui-v16.mjs
-      - name: Forzar bundle único V16
+      - name: Forzar bundle único V17 recuperación
         run: |
           JS=$(basename $(ls defe-web-build/dist/assets/index-*.js | head -1))
-          UNIQUE="index-v16-${GITHUB_SHA}.js"
+          UNIQUE="index-v17-recovery-${GITHUB_SHA}.js"
           cp "defe-web-build/dist/assets/${JS}" "defe-web-build/dist/assets/${UNIQUE}"
           sed -i "s#assets/${JS}#assets/${UNIQUE}#" defe-web-build/dist/index.html
+          sed -i 's#v12-20260909#v17-recovery-20260909#g' defe-web-build/dist/index.html
           echo "Bundle publicado: ${UNIQUE}"
       - name: Incorporar datos y gestión de usuarios
         run: |
@@ -88,48 +87,31 @@ jobs:
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
               try {
-                const reg = await navigator.serviceWorker.register('/el-defe-app/sw.js?v=${GITHUB_SHA}', { updateViaCache: 'none' });
-                await reg.update();
-                if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-                navigator.serviceWorker.addEventListener('controllerchange', () => {
-                  if (!sessionStorage.getItem('defe-sw-reloaded-${GITHUB_SHA}')) {
-                    sessionStorage.setItem('defe-sw-reloaded-${GITHUB_SHA}', '1');
-                    window.location.reload();
-                  }
-                });
-              } catch (e) { console.error('No se pudo actualizar la app', e); }
-            });
+                const regs = await navigator.serviceWorker.getRegistrations();
+                for (const r of regs) await r.unregister();
+                const keys = await caches.keys();
+                await Promise.all(keys.map(k => caches.delete(k)));
+                window.location.replace('/el-defe-app/?v=${GITHUB_SHA}');
+              } catch (e) { console.error('No se pudo limpiar caché PWA', e); }
+            }, { once: true });
           }
           EOF
-          cat >> defe-web-build/dist/sw.js <<EOF
-          // deploy-version: ${GITHUB_SHA}
-          self.addEventListener('message', event => {
-            if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
-          });
-          self.addEventListener('activate', event => {
-            event.waitUntil((async () => {
-              const keys = await caches.keys();
-              await Promise.all(keys.map(key => caches.delete(key)));
-              await self.clients.claim();
-            })());
-          });
+          cat > defe-web-build/dist/sw.js <<EOF
+          // V17 recovery service worker intentionally inert
+          self.addEventListener('install', () => self.skipWaiting());
+          self.addEventListener('activate', event => event.waitUntil(self.registration.unregister()));
           EOF
-      - name: Verificar autenticación, UI V16, datos y PWA
+      - name: Verificar recuperación V17 y datos FEFI
         run: |
-          grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-v16-${GITHUB_SHA}.js
-          grep -R "DEFE_UI_V16_20260909" defe-web-build/dist/assets/index-v16-${GITHUB_SHA}.js
-          grep -R "PROFILE_ONLY_SAFE" defe-web-build/dist/assets/index-v16-${GITHUB_SHA}.js
-          grep -R "Mis ligas y categorías" defe-web-build/dist/assets/index-v16-${GITHUB_SHA}.js
-          grep -R '"9NA","Primera"' defe-web-build/dist/assets/index-v16-${GITHUB_SHA}.js
-          grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-v16-${GITHUB_SHA}.js
-          grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-v16-${GITHUB_SHA}.js
-          grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-v16-${GITHUB_SHA}.js
-          grep -F "assets/index-v16-${GITHUB_SHA}.js" defe-web-build/dist/index.html
-          grep -F "v16-safe-20260909" defe-web-build/dist/index.html
+          grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-v17-recovery-${GITHUB_SHA}.js
+          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-v17-recovery-${GITHUB_SHA}.js
+          grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-v17-recovery-${GITHUB_SHA}.js
+          grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-v17-recovery-${GITHUB_SHA}.js
+          grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-v17-recovery-${GITHUB_SHA}.js
+          grep -F "assets/index-v17-recovery-${GITHUB_SHA}.js" defe-web-build/dist/index.html
+          grep -F "v17-recovery-20260909" defe-web-build/dist/index.html
           grep -R '"rival": "CNEL. BRANDSEN"' defe-web-build/dist/datos.json
           grep -A8 '"rival": "CNEL. BRANDSEN"' defe-web-build/dist/datos.json | grep -A3 '"2013"' | grep '4'
-          grep -F "updateViaCache: 'none'" defe-web-build/dist/registerSW.js
-          grep -F "deploy-version: ${GITHUB_SHA}" defe-web-build/dist/sw.js
       - name: Empaquetar dist
         run: |
           cd defe-web-build/dist
