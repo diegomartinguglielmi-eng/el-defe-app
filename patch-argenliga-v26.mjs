@@ -47,3 +47,6 @@ fs.writeFileSync(indexPath,html);
 console.log('V26 aplicada: Argenliga Primera conectada a Fixture, Resultados y Posiciones');
 
 await import('./patch-argenliga-v27.mjs');
+html=fs.readFileSync(indexPath,'utf8');
+html=html.replace(/<meta name="defe-brand" content="[^"]*"\s*\/>/,'<meta name="defe-brand" content="v26-argenliga-20260909" />');
+fs.writeFileSync(indexPath,html);
