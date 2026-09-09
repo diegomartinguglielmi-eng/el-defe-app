@@ -53,4 +53,4 @@ let html=fs.readFileSync(indexPath,'utf8');
 html=html.replace(/<meta name="defe-brand" content="[^"]*"\s*\/>/,'<meta name="defe-brand" content="v8-20260909" />');
 fs.writeFileSync(indexPath,html);
 
-console.log('UI V8 aplicada: selección múltiple real con guardado al final.');
+console.log('UI V8 aplicada y lista para publicar: selección múltiple real con guardado al final.');
