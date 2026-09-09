@@ -10,7 +10,25 @@ const asInt=v=>{const n=Number(clean(v));return Number.isFinite(n)?n:null};
 const months={ENERO:1,FEBRERO:2,MARZO:3,ABRIL:4,MAYO:5,JUNIO:6,JULIO:7,AGOSTO:8,SEPTIEMBRE:9,OCTUBRE:10,NOVIEMBRE:11,DICIEMBRE:12};
 function dateFromText(t){const m=clean(t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().match(/(\d{1,2})\s+DE\s+([A-Z]+)/);if(!m||!months[m[2]])return null;return `2026-${String(months[m[2]]).padStart(2,'0')}-${String(Number(m[1])).padStart(2,'0')}`}
 function tableRows($,table){return $(table).find('tr').toArray().map(tr=>$(tr).find('th,td').toArray().map(td=>clean($(td).text()))).filter(r=>r.length)}
-function parseFixture(html){const $=cheerio.load(html),lines=$.root().text().split(/\n+/).map(clean).filter(Boolean);let round=null,date=null;const out=[];for(let i=0;i<lines.length;i++){const m=lines[i].match(/^Fecha\s+(\d+)(?:\s*-\s*(.*))?$/i);if(m){round=`Fecha ${Number(m[1])}`;date=dateFromText(m[2]||'');continue}if(lines[i].toLowerCase()==='vs'&&round&&i>0&&i<lines.length-1){const home=lines[i-1],away=lines[i+1];if(isDefe(home)||isDefe(away))out.push({round_name:round,date,home,away})}}const dedup={};for(const r of out)dedup[r.round_name]=r;return Object.values(dedup)}
+function parseFixture(html){
+ const $=cheerio.load(html),out=[];
+ $('table').each((_,table)=>{
+   const rows=tableRows($,table); if(!rows.length)return;
+   const head=rows[0].map(compact);
+   if(!(head.includes('LOCAL')&&head.includes('VISITANTE')))return;
+   let round=null,date=null;
+   for(const row of rows.slice(1)){
+     const joined=clean(row.join(' '));
+     const fm=joined.match(/Fecha\s+(\d+)(?:\s*-\s*(.*))?/i);
+     if(fm){round=`Fecha ${Number(fm[1])}`;date=dateFromText(fm[2]||'');continue}
+     const vs=row.findIndex(c=>compact(c)==='VS');
+     if(vs<0||!round)continue;
+     const home=clean(row[vs-1]||row[0]),away=clean(row[vs+1]||row[row.length-1]);
+     if(home&&away&&(isDefe(home)||isDefe(away)))out.push({round_name:round,date,home,away});
+   }
+ });
+ const dedup={};for(const r of out)dedup[r.round_name]=r;return Object.values(dedup).sort((a,b)=>Number(a.round_name.replace(/\D/g,''))-Number(b.round_name.replace(/\D/g,'')));
+}
 function resultTables(html){const $=cheerio.load(html),tables=[];$('table').each((_,t)=>{const rows=tableRows($,t);if(!rows.length)return;const h=rows[0].map(compact);if(h.includes('EQUIPOS')&&h.includes('GL')&&h.some(x=>x==='FT'||x.startsWith('FT')))tables.push(rows)});return tables}
 function parseResults(html){const tables=resultTables(html);if(tables.length<2)return[];const rows=tables[1],h=rows[0].map(compact);const idx=t=>h.findIndex(x=>x===t||x.startsWith(t)),ft=idx('FT'),team=idx('EQUIPOS'),gl=idx('GL'),st=idx('ESTADO');if(ft<0||team<0||gl<0)return[];const out=[];for(let i=1;i<rows.length-1;){const a=rows[i],b=rows[i+1],f=compact(a[ft]||'');if(/^F\d+$/.test(f)){const home=a[team]||'',away=b[team]||'';if(isDefe(home)||isDefe(away)){const hr=a[gl]||'',ar=b[gl]||'';out.push({round_name:`Fecha ${Number(f.replace(/\D/g,''))}`,home,away,home_raw:hr,away_raw:ar,home_score:asInt(hr),away_score:asInt(ar),status:st>=0?(a[st]||''):''})}i+=2}else i++}return out}
 function standingTables(html){const $=cheerio.load(html),tables=[];$('table').each((_,t)=>{const rows=tableRows($,t);if(!rows.length)return;const h=rows[0].map(compact);if(h.length===6&&h.includes('EQUIPOS')&&h.includes('PJ')&&h.includes('PTS'))tables.push(rows)});return tables}
