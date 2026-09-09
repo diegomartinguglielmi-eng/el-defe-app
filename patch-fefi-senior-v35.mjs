@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
+const f=path.join('defe-web-build','dist','fefi-senior-v30.js');
+let s=fs.readFileSync(f,'utf8');
+const start=s.indexOf(' const team=x=>');
+const end=s.indexOf(';',start);
+if(start<0||end<0)throw new Error('No se encontró función team FEFI');
+const fixed=" const team=x=>{const n=String(x||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');return n.startsWith('DEF')&&n.includes('SANTOSLUGARES')};";
+s=s.slice(0,start)+fixed+s.slice(end+1);
+fs.writeFileSync(f,s);
+console.log('V35 FEFI +42: filtro de equipo corregido sin regex frágil');
