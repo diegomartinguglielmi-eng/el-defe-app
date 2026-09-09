@@ -60,10 +60,11 @@ jobs:
           node patch-league-logos-v29.mjs
           node patch-fefi-senior-v30.mjs
           node patch-fefi-senior-v31.mjs
+          node patch-fefi-senior-v32.mjs
       - name: Forzar bundle único
         run: |
           JS=$(basename $(ls defe-web-build/dist/assets/index-*.js | head -1))
-          UNIQUE="index-v31-${GITHUB_SHA}.js"
+          UNIQUE="index-v32-${GITHUB_SHA}.js"
           cp "defe-web-build/dist/assets/${JS}" "defe-web-build/dist/assets/${UNIQUE}"
           sed -i "s#assets/${JS}#assets/${UNIQUE}#" defe-web-build/dist/index.html
       - name: Incorporar datos y gestión de usuarios
@@ -77,12 +78,13 @@ jobs:
         run: |
           sed -i "s#<head>#<head><script>(function(){var v='${GITHUB_SHA}';if(!location.search.includes('v='+v)){location.replace('/el-defe-app/?v='+v);}})();</script>#" defe-web-build/dist/index.html
           echo "// inert" > defe-web-build/dist/sw.js
-      - name: Verificar V31
+      - name: Verificar V32
         run: |
-          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-v31-${GITHUB_SHA}.js
+          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-v32-${GITHUB_SHA}.js
           grep -F "league-logos-v29.js" defe-web-build/dist/index.html
           grep -F "fefi-senior-v30.js" defe-web-build/dist/index.html
-          grep -F "team(r.home)!==team(r.away)" defe-web-build/dist/fefi-senior-v30.js
+          grep -F "resultadosApertura" defe-web-build/dist/fefi-senior-v30.js
+          grep -F "posicionesClausura" defe-web-build/dist/fefi-senior-v30.js
       - name: Empaquetar dist
         run: |
           cd defe-web-build/dist
