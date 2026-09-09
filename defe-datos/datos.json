@@ -1,6 +1,6 @@
 {
   "club": "DEF. DE SANTOS LUGARES",
-  "actualizado": "2026-09-09T19:10:37.906Z",
+  "actualizado": "2026-09-09T22:10:48.943Z",
   "ligas": [
     {
       "id": "fefi",
@@ -8,7 +8,7 @@
       "torneo": "Clausura 2026 · Zona H",
       "fuente": "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/",
       "conectada": true,
-      "actualizado": "2026-09-09T19:10:12.706Z",
+      "actualizado": "2026-09-09T22:10:24.326Z",
       "categorias": [
         "2013",
         "2014",
@@ -1583,7 +1583,7 @@
       "torneo": "Junior A · Torneo 2026",
       "fuente": "https://www.futsalargentina.com.ar/fixture.php?cat=1_1",
       "conectada": true,
-      "actualizado": "2026-09-09T19:10:14.242Z",
+      "actualizado": "2026-09-09T22:10:27.202Z",
       "categorias": [
         "Junior A"
       ],
@@ -1713,7 +1713,7 @@
       "torneo": "Argenliga A · Zona 1 · 2026",
       "fuente": "https://www.sofascore.com/es-la/futsal/team/defensores-de-santos-lugares/1214864",
       "conectada": true,
-      "actualizado": "2026-09-09T19:10:37.906Z",
+      "actualizado": "2026-09-09T22:10:48.943Z",
       "categorias": [
         "Primera"
       ],
@@ -2012,7 +2012,7 @@
           }
         ]
       },
-      "error": "403 en https://api.sofascore.com/api/v1/unique-tournament/34170/seasons",
+      "error": "403 en https://api.sofascore.com/api/v1/team/1214864/events/last/0",
       "disciplina": "Futsal",
       "partidos": [
         {
@@ -2091,7 +2091,7 @@
       "torneo": "Masculino · Elite I | Femenino · Ascenso I · Zona B · Reserva",
       "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026",
       "conectada": true,
-      "actualizado": "2026-09-09T19:10:32.518Z",
+      "actualizado": "2026-09-09T22:10:43.933Z",
       "categorias": [
         "1RA",
         "3RA",
@@ -5372,6 +5372,80 @@
     "resultadosApertura": [
       {
         "round_name": "Fecha 1",
+        "home": "SOL DE AMERICA",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 2,
+        "away_score": 3,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 2",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "ESTUDIANTES",
+        "home_score": 7,
+        "away_score": 6,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 3",
+        "home": "BRISAS DE HAEDO",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 4,
+        "away_score": 8,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 4",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "CLUB PATRIA",
+        "home_score": 8,
+        "away_score": 5,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 5",
+        "home": "MIRIÑAQUE",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 5,
+        "away_score": 4,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 6",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "NOLTING",
+        "home_score": 4,
+        "away_score": 2,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 7",
+        "home": "CLUB DEF. DE BELGRANO",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 3,
+        "away_score": 7,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 8",
+        "home": "REAL CELINA",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 6,
+        "away_score": 3,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 9",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "AMISTAD \"B\"",
+        "home_score": 6,
+        "away_score": 4,
+        "status": ""
+      }
+    ],
+    "resultadosClausura": [
+      {
+        "round_name": "Fecha 1",
         "home": "DEF. DE SANTOS LUGARES",
         "away": "SOL DE AMERICA",
         "home_score": 5,
@@ -5393,9 +5467,16 @@
         "home_score": 6,
         "away_score": 3,
         "status": ""
+      },
+      {
+        "round_name": "Fecha 5",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "MIRIÑAQUE",
+        "home_score": 3,
+        "away_score": 2,
+        "status": ""
       }
     ],
-    "resultadosClausura": [],
     "posicionesApertura": [
       {
         "equipo": "MIRIÑAQUE",
@@ -5480,15 +5561,31 @@
     ],
     "posicionesClausura": [
       {
-        "equipo": "MIRIÑAQUE",
-        "pj": 4,
+        "equipo": "ESTUDIANTES",
+        "pj": 5,
         "g": 4,
         "e": 0,
-        "p": 0,
-        "pts": 12
+        "p": 1,
+        "pts": 13
       },
       {
-        "equipo": "ESTUDIANTES",
+        "equipo": "MIRIÑAQUE",
+        "pj": 5,
+        "g": 4,
+        "e": 0,
+        "p": 1,
+        "pts": 13
+      },
+      {
+        "equipo": "REAL CELINA",
+        "pj": 5,
+        "g": 3,
+        "e": 0,
+        "p": 2,
+        "pts": 11
+      },
+      {
+        "equipo": "CLUB PATRIA",
         "pj": 4,
         "g": 3,
         "e": 0,
@@ -5496,7 +5593,7 @@
         "pts": 10
       },
       {
-        "equipo": "REAL CELINA",
+        "equipo": "DEF. DE SANTOS LUGARES",
         "pj": 4,
         "g": 3,
         "e": 0,
@@ -5505,73 +5602,106 @@
       },
       {
         "equipo": "BRISAS DE HAEDO",
-        "pj": 3,
+        "pj": 4,
         "g": 2,
         "e": 0,
-        "p": 1,
-        "pts": 7
-      },
-      {
-        "equipo": "CLUB PATRIA",
-        "pj": 3,
-        "g": 2,
-        "e": 0,
-        "p": 1,
-        "pts": 7
-      },
-      {
-        "equipo": "DEF. DE SANTOS LUGARES",
-        "pj": 3,
-        "g": 2,
-        "e": 0,
-        "p": 1,
-        "pts": 7
+        "p": 2,
+        "pts": 8
       },
       {
         "equipo": "CLUB DEF. DE BELGRANO",
-        "pj": 3,
-        "g": 1,
+        "pj": 4,
+        "g": 2,
         "e": 0,
         "p": 2,
-        "pts": 5
+        "pts": 8
+      },
+      {
+        "equipo": "SOL DE AMERICA",
+        "pj": 4,
+        "g": 1,
+        "e": 0,
+        "p": 3,
+        "pts": 6
       },
       {
         "equipo": "NOLTING",
+        "pj": 5,
+        "g": 0,
+        "e": 0,
+        "p": 5,
+        "pts": 5
+      },
+      {
+        "equipo": "AMISTAD \"B\"",
         "pj": 4,
         "g": 0,
         "e": 0,
         "p": 4,
         "pts": 4
-      },
-      {
-        "equipo": "AMISTAD \"B\"",
-        "pj": 3,
-        "g": 0,
-        "e": 0,
-        "p": 3,
-        "pts": 3
-      },
-      {
-        "equipo": "SOL DE AMERICA",
-        "pj": 3,
-        "g": 0,
-        "e": 0,
-        "p": 3,
-        "pts": 3
       }
     ],
-    "resultados": [],
-    "posiciones": [
+    "resultados": [
       {
-        "equipo": "MIRIÑAQUE",
-        "pj": 4,
-        "g": 4,
-        "e": 0,
-        "p": 0,
-        "pts": 12
+        "round_name": "Fecha 1",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "SOL DE AMERICA",
+        "home_score": 5,
+        "away_score": 4,
+        "status": ""
       },
       {
+        "round_name": "Fecha 2",
+        "home": "ESTUDIANTES",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 4,
+        "away_score": 3,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 3",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "BRISAS DE HAEDO",
+        "home_score": 6,
+        "away_score": 3,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 5",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "MIRIÑAQUE",
+        "home_score": 3,
+        "away_score": 2,
+        "status": ""
+      }
+    ],
+    "posiciones": [
+      {
         "equipo": "ESTUDIANTES",
+        "pj": 5,
+        "g": 4,
+        "e": 0,
+        "p": 1,
+        "pts": 13
+      },
+      {
+        "equipo": "MIRIÑAQUE",
+        "pj": 5,
+        "g": 4,
+        "e": 0,
+        "p": 1,
+        "pts": 13
+      },
+      {
+        "equipo": "REAL CELINA",
+        "pj": 5,
+        "g": 3,
+        "e": 0,
+        "p": 2,
+        "pts": 11
+      },
+      {
+        "equipo": "CLUB PATRIA",
         "pj": 4,
         "g": 3,
         "e": 0,
@@ -5579,7 +5709,7 @@
         "pts": 10
       },
       {
-        "equipo": "REAL CELINA",
+        "equipo": "DEF. DE SANTOS LUGARES",
         "pj": 4,
         "g": 3,
         "e": 0,
@@ -5588,62 +5718,46 @@
       },
       {
         "equipo": "BRISAS DE HAEDO",
-        "pj": 3,
+        "pj": 4,
         "g": 2,
         "e": 0,
-        "p": 1,
-        "pts": 7
-      },
-      {
-        "equipo": "CLUB PATRIA",
-        "pj": 3,
-        "g": 2,
-        "e": 0,
-        "p": 1,
-        "pts": 7
-      },
-      {
-        "equipo": "DEF. DE SANTOS LUGARES",
-        "pj": 3,
-        "g": 2,
-        "e": 0,
-        "p": 1,
-        "pts": 7
+        "p": 2,
+        "pts": 8
       },
       {
         "equipo": "CLUB DEF. DE BELGRANO",
-        "pj": 3,
-        "g": 1,
+        "pj": 4,
+        "g": 2,
         "e": 0,
         "p": 2,
-        "pts": 5
+        "pts": 8
+      },
+      {
+        "equipo": "SOL DE AMERICA",
+        "pj": 4,
+        "g": 1,
+        "e": 0,
+        "p": 3,
+        "pts": 6
       },
       {
         "equipo": "NOLTING",
+        "pj": 5,
+        "g": 0,
+        "e": 0,
+        "p": 5,
+        "pts": 5
+      },
+      {
+        "equipo": "AMISTAD \"B\"",
         "pj": 4,
         "g": 0,
         "e": 0,
         "p": 4,
         "pts": 4
-      },
-      {
-        "equipo": "AMISTAD \"B\"",
-        "pj": 3,
-        "g": 0,
-        "e": 0,
-        "p": 3,
-        "pts": 3
-      },
-      {
-        "equipo": "SOL DE AMERICA",
-        "pj": 3,
-        "g": 0,
-        "e": 0,
-        "p": 3,
-        "pts": 3
       }
     ],
     "fuente": "https://fefi.com.ar/2026-futbol-sala-mayores-fefi/mayores-b/",
-    "actualizado": "2026-09-09T19:10:37.592Z"
+    "actualizado": "2026-09-09T22:10:48.776Z"
   }
 }
