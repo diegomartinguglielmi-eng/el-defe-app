@@ -1,6 +1,6 @@
 {
   "name": "defe-datos",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Fixture, resultados y posiciones del Club Defensores de Santos Lugares (baby fútbol y futsal)",
   "type": "module",
   "engines": { "node": ">=20" },
