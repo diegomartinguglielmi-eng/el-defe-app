@@ -2,6 +2,9 @@ name: Compilar y publicar app web
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Sincronizar ligas"]
+    types: [completed]
   push:
     paths:
       - 'defe-web-listo.zip'
@@ -26,6 +29,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
