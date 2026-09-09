@@ -27,6 +27,8 @@ jobs:
         working-directory: defe-datos
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -52,9 +54,13 @@ jobs:
           if [[ -n "$(git status --porcelain datos.json)" ]]; then
             git config user.name "sync-defe"
             git config user.email "sync@defe.local"
+            cp datos.json /tmp/datos-sync.json
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/datos-sync.json datos.json
             git add datos.json
-            git commit -m "Datos al $(TZ=America/Argentina/Buenos_Aires date +'%d/%m %H:%M')"
-            git push
+            git commit -m "Datos al $(TZ=America/Argentina/Buenos_Aires date +'%d/%m %H:%M')" || exit 0
+            git push origin HEAD:main
           else
             echo "Sin cambios."
           fi
