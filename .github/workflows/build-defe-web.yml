@@ -17,6 +17,7 @@ on:
       - 'patch-ui-v11.mjs'
       - 'patch-runtime-v19.mjs'
       - 'patch-home-v20.mjs'
+      - 'patch-results-v21.mjs'
       - 'defe-datos/datos.json'
       - '.github/workflows/build-defe-web.yml'
 
@@ -68,14 +69,16 @@ jobs:
           grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-*.js
           grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-*.js
           grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-*.js
-      - name: Corregir crash FEFI V19
+      - name: Corregir runtime FEFI
         run: node patch-runtime-v19.mjs
       - name: Enriquecer última fecha V20
         run: node patch-home-v20.mjs
-      - name: Forzar bundle único V20
+      - name: Agregar acumulados y resultados completos V21
+        run: node patch-results-v21.mjs
+      - name: Forzar bundle único V21
         run: |
           JS=$(basename $(ls defe-web-build/dist/assets/index-*.js | head -1))
-          UNIQUE="index-v20-${GITHUB_SHA}.js"
+          UNIQUE="index-v21-${GITHUB_SHA}.js"
           cp "defe-web-build/dist/assets/${JS}" "defe-web-build/dist/assets/${UNIQUE}"
           sed -i "s#assets/${JS}#assets/${UNIQUE}#" defe-web-build/dist/index.html
           echo "Bundle publicado: ${UNIQUE}"
@@ -105,27 +108,25 @@ jobs:
           }
           EOF
           cat > defe-web-build/dist/sw.js <<EOF
-          // V20 recovery service worker intentionally inert
+          // V21 recovery service worker intentionally inert
           self.addEventListener('install', () => self.skipWaiting());
           self.addEventListener('activate', event => event.waitUntil(self.registration.unregister()));
           EOF
-      - name: Verificar V20 y datos FEFI
+      - name: Verificar V21 y datos FEFI
         run: |
-          grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-v20-${GITHUB_SHA}.js
-          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-v20-${GITHUB_SHA}.js
-          grep -R "DEFE_RUNTIME_V19_OPTIONAL_FEFI_PTS" defe-web-build/dist/assets/index-v20-${GITHUB_SHA}.js
-          grep -R "DEFE_HOME_V20_RICH_LAST_MATCH" defe-web-build/dist/assets/index-v20-${GITHUB_SHA}.js
-          grep -R 'children:"Última fecha"' defe-web-build/dist/assets/index-v20-${GITHUB_SHA}.js
-          grep -R 'c.sede' defe-web-build/dist/assets/index-v20-${GITHUB_SHA}.js
-          grep -R 'ganados · ' defe-web-build/dist/assets/index-v20-${GITHUB_SHA}.js
-          grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-v20-${GITHUB_SHA}.js
-          grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-v20-${GITHUB_SHA}.js
-          grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-v20-${GITHUB_SHA}.js
-          grep -F "assets/index-v20-${GITHUB_SHA}.js" defe-web-build/dist/index.html
-          grep -F "v20-rich-last-match-20260909" defe-web-build/dist/index.html
+          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-v21-${GITHUB_SHA}.js
+          grep -R "DEFE_RUNTIME_V20_DATE_BASED_FEFI" defe-web-build/dist/assets/index-v21-${GITHUB_SHA}.js
+          grep -R "DEFE_HOME_V20_RICH_LAST_MATCH" defe-web-build/dist/assets/index-v21-${GITHUB_SHA}.js
+          grep -R "DEFE_RESULTS_V21_POINTS_GOALS_ALL_CATEGORIES" defe-web-build/dist/assets/index-v21-${GITHUB_SHA}.js
+          grep -R 'Puntos de la jornada' defe-web-build/dist/assets/index-v21-${GITHUB_SHA}.js
+          grep -R 'Goles acumulados' defe-web-build/dist/assets/index-v21-${GITHUB_SHA}.js
+          grep -R 'children:"Última fecha"' defe-web-build/dist/assets/index-v21-${GITHUB_SHA}.js
+          grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-v21-${GITHUB_SHA}.js
+          grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-v21-${GITHUB_SHA}.js
+          grep -F "assets/index-v21-${GITHUB_SHA}.js" defe-web-build/dist/index.html
+          grep -F "v21-points-goals-20260909" defe-web-build/dist/index.html
           grep -R '"rival": "CNEL. BRANDSEN"' defe-web-build/dist/datos.json
           grep -R '"sede": "ROQUE SIMONE 3951, LA TABLADA"' defe-web-build/dist/datos.json
-          grep -A8 '"rival": "CNEL. BRANDSEN"' defe-web-build/dist/datos.json | grep -A3 '"2013"' | grep '4'
       - name: Empaquetar dist
         run: |
           cd defe-web-build/dist
