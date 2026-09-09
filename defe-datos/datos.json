@@ -1,6 +1,6 @@
 {
   "club": "DEF. DE SANTOS LUGARES",
-  "actualizado": "2026-09-09T17:05:38.629Z",
+  "actualizado": "2026-09-09T17:10:44.862Z",
   "ligas": [
     {
       "id": "fefi",
@@ -8,7 +8,7 @@
       "torneo": "Clausura 2026 · Zona H",
       "fuente": "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/",
       "conectada": true,
-      "actualizado": "2026-09-09T17:05:21.232Z",
+      "actualizado": "2026-09-09T17:10:24.629Z",
       "categorias": [
         "2013",
         "2014",
@@ -1583,7 +1583,7 @@
       "torneo": "Junior A · Torneo 2026",
       "fuente": "https://www.futsalargentina.com.ar/fixture.php?cat=1_1",
       "conectada": true,
-      "actualizado": "2026-09-09T17:05:22.247Z",
+      "actualizado": "2026-09-09T17:10:27.110Z",
       "categorias": [
         "Junior A"
       ],
@@ -1713,7 +1713,7 @@
       "torneo": "Argenliga A · Zona 1 · 2026",
       "fuente": "https://www.sofascore.com/es-la/futsal/team/defensores-de-santos-lugares/1214864",
       "conectada": true,
-      "actualizado": "2026-09-09T17:05:38.629Z",
+      "actualizado": "2026-09-09T17:10:44.862Z",
       "categorias": [
         "Primera"
       ],
@@ -2012,7 +2012,7 @@
           }
         ]
       },
-      "error": "403 en https://api.sofascore.com/api/v1/team/1214864/events/last/0",
+      "error": "403 en https://api.sofascore.com/api/v1/team/1214864/events/next/0",
       "disciplina": "Futsal",
       "partidos": [
         {
@@ -2091,7 +2091,7 @@
       "torneo": "Masculino · Elite I | Femenino · Ascenso I · Zona B · Reserva",
       "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026",
       "conectada": true,
-      "actualizado": "2026-09-09T17:05:38.480Z",
+      "actualizado": "2026-09-09T17:10:44.682Z",
       "categorias": [
         "1RA",
         "3RA",
@@ -3968,1023 +3968,1023 @@
         "1RA": [
           {
             "equipo": "Defensores de SL",
-            "pts": 18,
             "pj": 7,
             "g": 6,
             "e": 0,
             "p": 1,
-            "dg": 11
+            "dg": 11,
+            "pts": 18
           },
           {
             "equipo": "Cantera Zona Norte",
-            "pts": 12,
             "pj": 7,
             "g": 4,
             "e": 0,
             "p": 3,
-            "dg": 15
+            "dg": 15,
+            "pts": 12
           },
           {
             "equipo": "Club Pampero",
-            "pts": 12,
             "pj": 6,
             "g": 4,
             "e": 0,
             "p": 2,
-            "dg": 6
+            "dg": 6,
+            "pts": 12
           },
           {
             "equipo": "El Lucero Futsal",
-            "pts": 12,
             "pj": 6,
             "g": 4,
             "e": 0,
             "p": 2,
-            "dg": 4
+            "dg": 4,
+            "pts": 12
           },
           {
             "equipo": "CEDIMA",
-            "pts": 10,
             "pj": 5,
             "g": 3,
             "e": 1,
             "p": 1,
-            "dg": 11
+            "dg": 11,
+            "pts": 10
           },
           {
             "equipo": "California",
-            "pts": 10,
             "pj": 6,
             "g": 3,
             "e": 1,
             "p": 2,
-            "dg": 2
+            "dg": 2,
+            "pts": 10
           },
           {
             "equipo": "Amistad",
-            "pts": 10,
             "pj": 6,
             "g": 3,
             "e": 1,
             "p": 2,
-            "dg": -3
+            "dg": -3,
+            "pts": 10
           },
           {
             "equipo": "Mariano Moreno",
-            "pts": 9,
             "pj": 4,
             "g": 3,
             "e": 0,
             "p": 1,
-            "dg": 12
+            "dg": 12,
+            "pts": 9
           },
           {
             "equipo": "Parque Patricios",
-            "pts": 9,
             "pj": 5,
             "g": 3,
             "e": 0,
             "p": 2,
-            "dg": 4
+            "dg": 4,
+            "pts": 9
           },
           {
             "equipo": "Club Aliados",
-            "pts": 9,
             "pj": 7,
             "g": 3,
             "e": 0,
             "p": 4,
-            "dg": -6
+            "dg": -6,
+            "pts": 9
           },
           {
             "equipo": "La Marca",
-            "pts": 6,
             "pj": 5,
             "g": 2,
             "e": 0,
             "p": 3,
-            "dg": 0
+            "dg": 0,
+            "pts": 6
           },
           {
             "equipo": "Independiente",
-            "pts": 4,
             "pj": 5,
             "g": 1,
             "e": 1,
             "p": 3,
-            "dg": -3
+            "dg": -3,
+            "pts": 4
           },
           {
             "equipo": "Nueva Pompeya",
-            "pts": 4,
             "pj": 7,
             "g": 1,
             "e": 1,
             "p": 5,
-            "dg": -7
+            "dg": -7,
+            "pts": 4
           },
           {
             "equipo": "Defensores de Barracas",
-            "pts": 4,
             "pj": 5,
             "g": 1,
             "e": 1,
             "p": 3,
-            "dg": -13
+            "dg": -13,
+            "pts": 4
           },
           {
             "equipo": "Almafuerte de Ciudad Evita",
-            "pts": 4,
             "pj": 6,
             "g": 1,
             "e": 1,
             "p": 4,
-            "dg": -14
+            "dg": -14,
+            "pts": 4
           },
           {
             "equipo": "Federacion Caballito",
-            "pts": 1,
             "pj": 5,
             "g": 0,
             "e": 1,
             "p": 4,
-            "dg": -19
+            "dg": -19,
+            "pts": 1
           }
         ],
         "3RA": [
           {
             "equipo": "Cantera Zona Norte",
-            "pts": 21,
             "pj": 7,
             "g": 7,
             "e": 0,
             "p": 0,
-            "dg": 34
+            "dg": 34,
+            "pts": 21
           },
           {
             "equipo": "Club Pampero",
-            "pts": 14,
             "pj": 7,
             "g": 4,
             "e": 2,
             "p": 1,
-            "dg": 15
+            "dg": 15,
+            "pts": 14
           },
           {
             "equipo": "California",
-            "pts": 12,
             "pj": 6,
             "g": 4,
             "e": 0,
             "p": 2,
-            "dg": 11
+            "dg": 11,
+            "pts": 12
           },
           {
             "equipo": "Parque Patricios",
-            "pts": 11,
             "pj": 5,
             "g": 3,
             "e": 2,
             "p": 0,
-            "dg": 13
+            "dg": 13,
+            "pts": 11
           },
           {
             "equipo": "Mariano Moreno",
-            "pts": 10,
             "pj": 5,
             "g": 3,
             "e": 1,
             "p": 1,
-            "dg": 12
+            "dg": 12,
+            "pts": 10
           },
           {
             "equipo": "Club Aliados",
-            "pts": 10,
             "pj": 7,
             "g": 3,
             "e": 1,
             "p": 3,
-            "dg": 2
+            "dg": 2,
+            "pts": 10
           },
           {
             "equipo": "Defensores de SL",
-            "pts": 10,
             "pj": 7,
             "g": 3,
             "e": 1,
             "p": 3,
-            "dg": -8
+            "dg": -8,
+            "pts": 10
           },
           {
             "equipo": "El Lucero Futsal",
-            "pts": 9,
             "pj": 6,
             "g": 3,
             "e": 0,
             "p": 3,
-            "dg": 12
+            "dg": 12,
+            "pts": 9
           },
           {
             "equipo": "Nueva Pompeya",
-            "pts": 9,
             "pj": 7,
             "g": 3,
             "e": 0,
             "p": 4,
-            "dg": -4
+            "dg": -4,
+            "pts": 9
           },
           {
             "equipo": "La Marca",
-            "pts": 7,
             "pj": 5,
             "g": 2,
             "e": 1,
             "p": 2,
-            "dg": -1
+            "dg": -1,
+            "pts": 7
           },
           {
             "equipo": "CEDIMA",
-            "pts": 6,
             "pj": 5,
             "g": 2,
             "e": 0,
             "p": 3,
-            "dg": -4
+            "dg": -4,
+            "pts": 6
           },
           {
             "equipo": "Almafuerte de Ciudad Evita",
-            "pts": 6,
             "pj": 6,
             "g": 2,
             "e": 0,
             "p": 4,
-            "dg": -10
+            "dg": -10,
+            "pts": 6
           },
           {
             "equipo": "Independiente",
-            "pts": 6,
             "pj": 5,
             "g": 2,
             "e": 0,
             "p": 3,
-            "dg": -10
+            "dg": -10,
+            "pts": 6
           },
           {
             "equipo": "Federacion Caballito",
-            "pts": 3,
             "pj": 5,
             "g": 1,
             "e": 0,
             "p": 4,
-            "dg": -17
+            "dg": -17,
+            "pts": 3
           },
           {
             "equipo": "Amistad",
-            "pts": 3,
             "pj": 6,
             "g": 1,
             "e": 0,
             "p": 5,
-            "dg": -24
+            "dg": -24,
+            "pts": 3
           },
           {
             "equipo": "Defensores de Barracas",
-            "pts": 0,
             "pj": 5,
             "g": 0,
             "e": 0,
             "p": 5,
-            "dg": -21
+            "dg": -21,
+            "pts": 0
           }
         ],
         "4TA": [
           {
             "equipo": "Cantera Zona Norte",
-            "pts": 21,
             "pj": 7,
             "g": 7,
             "e": 0,
             "p": 0,
-            "dg": 59
+            "dg": 59,
+            "pts": 21
           },
           {
             "equipo": "El Lucero Futsal",
-            "pts": 16,
             "pj": 6,
             "g": 5,
             "e": 1,
             "p": 0,
-            "dg": 23
+            "dg": 23,
+            "pts": 16
           },
           {
             "equipo": "Nueva Pompeya",
-            "pts": 13,
             "pj": 7,
             "g": 4,
             "e": 1,
             "p": 2,
-            "dg": 17
+            "dg": 17,
+            "pts": 13
           },
           {
             "equipo": "CEDIMA",
-            "pts": 12,
             "pj": 5,
             "g": 4,
             "e": 0,
             "p": 1,
-            "dg": 19
+            "dg": 19,
+            "pts": 12
           },
           {
             "equipo": "Federacion Caballito",
-            "pts": 12,
             "pj": 5,
             "g": 4,
             "e": 0,
             "p": 1,
-            "dg": 12
+            "dg": 12,
+            "pts": 12
           },
           {
             "equipo": "Club Pampero",
-            "pts": 12,
             "pj": 7,
             "g": 4,
             "e": 0,
             "p": 3,
-            "dg": 3
+            "dg": 3,
+            "pts": 12
           },
           {
             "equipo": "La Marca",
-            "pts": 9,
             "pj": 5,
             "g": 3,
             "e": 0,
             "p": 2,
-            "dg": 24
+            "dg": 24,
+            "pts": 9
           },
           {
             "equipo": "Almafuerte de Ciudad Evita",
-            "pts": 9,
             "pj": 6,
             "g": 3,
             "e": 0,
             "p": 3,
-            "dg": 1
+            "dg": 1,
+            "pts": 9
           },
           {
             "equipo": "Mariano Moreno",
-            "pts": 9,
             "pj": 5,
             "g": 3,
             "e": 0,
             "p": 2,
-            "dg": -3
+            "dg": -3,
+            "pts": 9
           },
           {
             "equipo": "Defensores de Barracas",
-            "pts": 7,
             "pj": 5,
             "g": 2,
             "e": 1,
             "p": 2,
-            "dg": 0
+            "dg": 0,
+            "pts": 7
           },
           {
             "equipo": "Parque Patricios",
-            "pts": 6,
             "pj": 5,
             "g": 2,
             "e": 0,
             "p": 3,
-            "dg": -2
+            "dg": -2,
+            "pts": 6
           },
           {
             "equipo": "Club Aliados",
-            "pts": 6,
             "pj": 7,
             "g": 2,
             "e": 0,
             "p": 5,
-            "dg": -17
+            "dg": -17,
+            "pts": 6
           },
           {
             "equipo": "Amistad",
-            "pts": 4,
             "pj": 6,
             "g": 1,
             "e": 1,
             "p": 4,
-            "dg": -24
+            "dg": -24,
+            "pts": 4
           },
           {
             "equipo": "California",
-            "pts": 1,
             "pj": 6,
             "g": 0,
             "e": 1,
             "p": 5,
-            "dg": -28
+            "dg": -28,
+            "pts": 1
           },
           {
             "equipo": "Independiente",
-            "pts": 1,
             "pj": 5,
             "g": 0,
             "e": 1,
             "p": 4,
-            "dg": -33
+            "dg": -33,
+            "pts": 1
           },
           {
             "equipo": "Defensores de SL",
-            "pts": 0,
             "pj": 7,
             "g": 0,
             "e": 0,
             "p": 7,
-            "dg": -51
+            "dg": -51,
+            "pts": 0
           }
         ],
         "5TA": [
           {
             "equipo": "Almafuerte de Ciudad Evita",
-            "pts": 15,
             "pj": 6,
             "g": 5,
             "e": 0,
             "p": 1,
-            "dg": 21
+            "dg": 21,
+            "pts": 15
           },
           {
             "equipo": "Club Aliados",
-            "pts": 15,
             "pj": 7,
             "g": 5,
             "e": 0,
             "p": 2,
-            "dg": 2
+            "dg": 2,
+            "pts": 15
           },
           {
             "equipo": "Club Pampero",
-            "pts": 14,
             "pj": 7,
             "g": 4,
             "e": 2,
             "p": 1,
-            "dg": 15
+            "dg": 15,
+            "pts": 14
           },
           {
             "equipo": "Cantera Zona Norte",
-            "pts": 14,
             "pj": 7,
             "g": 4,
             "e": 2,
             "p": 1,
-            "dg": 10
+            "dg": 10,
+            "pts": 14
           },
           {
             "equipo": "CEDIMA",
-            "pts": 10,
             "pj": 5,
             "g": 3,
             "e": 1,
             "p": 1,
-            "dg": 12
+            "dg": 12,
+            "pts": 10
           },
           {
             "equipo": "La Marca",
-            "pts": 9,
             "pj": 5,
             "g": 3,
             "e": 0,
             "p": 2,
-            "dg": 8
+            "dg": 8,
+            "pts": 9
           },
           {
             "equipo": "Independiente",
-            "pts": 8,
             "pj": 5,
             "g": 2,
             "e": 2,
             "p": 1,
-            "dg": 0
+            "dg": 0,
+            "pts": 8
           },
           {
             "equipo": "Mariano Moreno",
-            "pts": 8,
             "pj": 5,
             "g": 2,
             "e": 2,
             "p": 1,
-            "dg": -1
+            "dg": -1,
+            "pts": 8
           },
           {
             "equipo": "Parque Patricios",
-            "pts": 7,
             "pj": 5,
             "g": 2,
             "e": 1,
             "p": 2,
-            "dg": 7
+            "dg": 7,
+            "pts": 7
           },
           {
             "equipo": "El Lucero Futsal",
-            "pts": 7,
             "pj": 6,
             "g": 2,
             "e": 1,
             "p": 3,
-            "dg": 3
+            "dg": 3,
+            "pts": 7
           },
           {
             "equipo": "Defensores de Barracas",
-            "pts": 7,
             "pj": 5,
             "g": 2,
             "e": 1,
             "p": 2,
-            "dg": -6
+            "dg": -6,
+            "pts": 7
           },
           {
             "equipo": "Nueva Pompeya",
-            "pts": 6,
             "pj": 7,
             "g": 2,
             "e": 0,
             "p": 5,
-            "dg": -1
+            "dg": -1,
+            "pts": 6
           },
           {
             "equipo": "California",
-            "pts": 5,
             "pj": 6,
             "g": 1,
             "e": 2,
             "p": 3,
-            "dg": -16
+            "dg": -16,
+            "pts": 5
           },
           {
             "equipo": "Federacion Caballito",
-            "pts": 4,
             "pj": 5,
             "g": 1,
             "e": 1,
             "p": 3,
-            "dg": -2
+            "dg": -2,
+            "pts": 4
           },
           {
             "equipo": "Amistad",
-            "pts": 4,
             "pj": 6,
             "g": 1,
             "e": 1,
             "p": 4,
-            "dg": -10
+            "dg": -10,
+            "pts": 4
           },
           {
             "equipo": "Defensores de SL",
-            "pts": 0,
             "pj": 7,
             "g": 0,
             "e": 0,
             "p": 7,
-            "dg": -42
+            "dg": -42,
+            "pts": 0
           }
         ],
         "6TA": [
           {
             "equipo": "Parque Patricios",
-            "pts": 15,
             "pj": 5,
             "g": 5,
             "e": 0,
             "p": 0,
-            "dg": 20
+            "dg": 20,
+            "pts": 15
           },
           {
             "equipo": "Cantera Zona Norte",
-            "pts": 15,
             "pj": 7,
             "g": 5,
             "e": 0,
             "p": 2,
-            "dg": 18
+            "dg": 18,
+            "pts": 15
           },
           {
             "equipo": "Club Aliados",
-            "pts": 15,
             "pj": 7,
             "g": 5,
             "e": 0,
             "p": 2,
-            "dg": -7
+            "dg": -7,
+            "pts": 15
           },
           {
             "equipo": "El Lucero Futsal",
-            "pts": 14,
             "pj": 6,
             "g": 4,
             "e": 2,
             "p": 0,
-            "dg": 11
+            "dg": 11,
+            "pts": 14
           },
           {
             "equipo": "Almafuerte de Ciudad Evita",
-            "pts": 13,
             "pj": 6,
             "g": 4,
             "e": 1,
             "p": 1,
-            "dg": 17
+            "dg": 17,
+            "pts": 13
           },
           {
             "equipo": "Club Pampero",
-            "pts": 13,
             "pj": 7,
             "g": 4,
             "e": 1,
             "p": 2,
-            "dg": 5
+            "dg": 5,
+            "pts": 13
           },
           {
             "equipo": "California",
-            "pts": 11,
             "pj": 6,
             "g": 3,
             "e": 2,
             "p": 1,
-            "dg": 3
+            "dg": 3,
+            "pts": 11
           },
           {
             "equipo": "Federacion Caballito",
-            "pts": 10,
             "pj": 5,
             "g": 3,
             "e": 1,
             "p": 1,
-            "dg": 11
+            "dg": 11,
+            "pts": 10
           },
           {
             "equipo": "Mariano Moreno",
-            "pts": 7,
             "pj": 5,
             "g": 2,
             "e": 1,
             "p": 2,
-            "dg": 13
+            "dg": 13,
+            "pts": 7
           },
           {
             "equipo": "Nueva Pompeya",
-            "pts": 7,
             "pj": 7,
             "g": 2,
             "e": 1,
             "p": 4,
-            "dg": -2
+            "dg": -2,
+            "pts": 7
           },
           {
             "equipo": "La Marca",
-            "pts": 6,
             "pj": 5,
             "g": 2,
             "e": 0,
             "p": 3,
-            "dg": -3
+            "dg": -3,
+            "pts": 6
           },
           {
             "equipo": "Defensores de Barracas",
-            "pts": 6,
             "pj": 5,
             "g": 2,
             "e": 0,
             "p": 3,
-            "dg": -7
+            "dg": -7,
+            "pts": 6
           },
           {
             "equipo": "CEDIMA",
-            "pts": 4,
             "pj": 5,
             "g": 1,
             "e": 1,
             "p": 3,
-            "dg": -7
+            "dg": -7,
+            "pts": 4
           },
           {
             "equipo": "Independiente",
-            "pts": 0,
             "pj": 5,
             "g": 0,
             "e": 0,
             "p": 5,
-            "dg": -14
+            "dg": -14,
+            "pts": 0
           },
           {
             "equipo": "Defensores de SL",
-            "pts": 0,
             "pj": 7,
             "g": 0,
             "e": 0,
             "p": 7,
-            "dg": -21
+            "dg": -21,
+            "pts": 0
           },
           {
             "equipo": "Amistad",
-            "pts": 0,
             "pj": 6,
             "g": 0,
             "e": 0,
             "p": 6,
-            "dg": -37
+            "dg": -37,
+            "pts": 0
           }
         ],
         "7MA": [
           {
             "equipo": "Cantera Zona Norte",
-            "pts": 21,
             "pj": 7,
             "g": 7,
             "e": 0,
             "p": 0,
-            "dg": 43
+            "dg": 43,
+            "pts": 21
           },
           {
             "equipo": "Club Pampero",
-            "pts": 18,
             "pj": 7,
             "g": 6,
             "e": 0,
             "p": 1,
-            "dg": 19
+            "dg": 19,
+            "pts": 18
           },
           {
             "equipo": "Nueva Pompeya",
-            "pts": 15,
             "pj": 7,
             "g": 5,
             "e": 0,
             "p": 2,
-            "dg": 14
+            "dg": 14,
+            "pts": 15
           },
           {
             "equipo": "La Marca",
-            "pts": 12,
             "pj": 5,
             "g": 4,
             "e": 0,
             "p": 1,
-            "dg": 26
+            "dg": 26,
+            "pts": 12
           },
           {
             "equipo": "Parque Patricios",
-            "pts": 12,
             "pj": 5,
             "g": 4,
             "e": 0,
             "p": 1,
-            "dg": 12
+            "dg": 12,
+            "pts": 12
           },
           {
             "equipo": "Almafuerte de Ciudad Evita",
-            "pts": 11,
             "pj": 6,
             "g": 3,
             "e": 2,
             "p": 1,
-            "dg": 18
+            "dg": 18,
+            "pts": 11
           },
           {
             "equipo": "Mariano Moreno",
-            "pts": 9,
             "pj": 5,
             "g": 3,
             "e": 0,
             "p": 2,
-            "dg": 0
+            "dg": 0,
+            "pts": 9
           },
           {
             "equipo": "California",
-            "pts": 9,
             "pj": 6,
             "g": 3,
             "e": 0,
             "p": 3,
-            "dg": -3
+            "dg": -3,
+            "pts": 9
           },
           {
             "equipo": "Club Aliados",
-            "pts": 7,
             "pj": 7,
             "g": 2,
             "e": 1,
             "p": 4,
-            "dg": -9
+            "dg": -9,
+            "pts": 7
           },
           {
             "equipo": "Federacion Caballito",
-            "pts": 6,
             "pj": 5,
             "g": 2,
             "e": 0,
             "p": 3,
-            "dg": -8
+            "dg": -8,
+            "pts": 6
           },
           {
             "equipo": "El Lucero Futsal",
-            "pts": 5,
             "pj": 6,
             "g": 1,
             "e": 2,
             "p": 3,
-            "dg": -13
+            "dg": -13,
+            "pts": 5
           },
           {
             "equipo": "Defensores de SL",
-            "pts": 5,
             "pj": 7,
             "g": 1,
             "e": 2,
             "p": 4,
-            "dg": -14
+            "dg": -14,
+            "pts": 5
           },
           {
             "equipo": "CEDIMA",
-            "pts": 3,
             "pj": 5,
             "g": 1,
             "e": 0,
             "p": 4,
-            "dg": -17
+            "dg": -17,
+            "pts": 3
           },
           {
             "equipo": "Defensores de Barracas",
-            "pts": 3,
             "pj": 5,
             "g": 1,
             "e": 0,
             "p": 4,
-            "dg": -23
+            "dg": -23,
+            "pts": 3
           },
           {
             "equipo": "Independiente",
-            "pts": 1,
             "pj": 5,
             "g": 0,
             "e": 1,
             "p": 4,
-            "dg": -15
+            "dg": -15,
+            "pts": 1
           },
           {
             "equipo": "Amistad",
-            "pts": 0,
             "pj": 6,
             "g": 0,
             "e": 0,
             "p": 6,
-            "dg": -30
+            "dg": -30,
+            "pts": 0
           }
         ],
         "8VA": [
           {
             "equipo": "Club Pampero",
-            "pts": 18,
             "pj": 7,
             "g": 6,
             "e": 0,
             "p": 1,
-            "dg": 27
+            "dg": 27,
+            "pts": 18
           },
           {
             "equipo": "Club Aliados",
-            "pts": 18,
             "pj": 7,
             "g": 6,
             "e": 0,
             "p": 1,
-            "dg": 17
+            "dg": 17,
+            "pts": 18
           },
           {
             "equipo": "La Marca",
-            "pts": 15,
             "pj": 5,
             "g": 5,
             "e": 0,
             "p": 0,
-            "dg": 30
+            "dg": 30,
+            "pts": 15
           },
           {
             "equipo": "Almafuerte de Ciudad Evita",
-            "pts": 14,
             "pj": 6,
             "g": 4,
             "e": 2,
             "p": 0,
-            "dg": 10
+            "dg": 10,
+            "pts": 14
           },
           {
             "equipo": "California",
-            "pts": 13,
             "pj": 6,
             "g": 4,
             "e": 1,
             "p": 1,
-            "dg": 12
+            "dg": 12,
+            "pts": 13
           },
           {
             "equipo": "Cantera Zona Norte",
-            "pts": 12,
             "pj": 7,
             "g": 4,
             "e": 0,
             "p": 3,
-            "dg": 6
+            "dg": 6,
+            "pts": 12
           },
           {
             "equipo": "Federacion Caballito",
-            "pts": 9,
             "pj": 5,
             "g": 3,
             "e": 0,
             "p": 2,
-            "dg": 3
+            "dg": 3,
+            "pts": 9
           },
           {
             "equipo": "CEDIMA",
-            "pts": 7,
             "pj": 5,
             "g": 2,
             "e": 1,
             "p": 2,
-            "dg": 2
+            "dg": 2,
+            "pts": 7
           },
           {
             "equipo": "Independiente",
-            "pts": 6,
             "pj": 5,
             "g": 2,
             "e": 0,
             "p": 3,
-            "dg": 2
+            "dg": 2,
+            "pts": 6
           },
           {
             "equipo": "Parque Patricios",
-            "pts": 6,
             "pj": 5,
             "g": 2,
             "e": 0,
             "p": 3,
-            "dg": -6
+            "dg": -6,
+            "pts": 6
           },
           {
             "equipo": "Mariano Moreno",
-            "pts": 6,
             "pj": 5,
             "g": 2,
             "e": 0,
             "p": 3,
-            "dg": -7
+            "dg": -7,
+            "pts": 6
           },
           {
             "equipo": "Nueva Pompeya",
-            "pts": 6,
             "pj": 7,
             "g": 2,
             "e": 0,
             "p": 5,
-            "dg": -21
+            "dg": -21,
+            "pts": 6
           },
           {
             "equipo": "Defensores de SL",
-            "pts": 4,
             "pj": 7,
             "g": 1,
             "e": 1,
             "p": 5,
-            "dg": -16
+            "dg": -16,
+            "pts": 4
           },
           {
             "equipo": "El Lucero Futsal",
-            "pts": 4,
             "pj": 6,
             "g": 1,
             "e": 1,
             "p": 4,
-            "dg": -21
+            "dg": -21,
+            "pts": 4
           },
           {
             "equipo": "Amistad",
-            "pts": 0,
             "pj": 6,
             "g": 0,
             "e": 0,
             "p": 6,
-            "dg": -18
+            "dg": -18,
+            "pts": 0
           },
           {
             "equipo": "Defensores de Barracas",
-            "pts": 0,
             "pj": 5,
             "g": 0,
             "e": 0,
             "p": 5,
-            "dg": -20
+            "dg": -20,
+            "pts": 0
           }
         ],
         "FEM 1RA": [
@@ -5113,6 +5113,125 @@
             "e": 0,
             "p": 0,
             "dg": 0
+          }
+        ],
+        "FEM RVA": [
+          {
+            "equipo": "Deportivo Vedia",
+            "pj": 3,
+            "g": 3,
+            "e": 0,
+            "p": 0,
+            "dg": 16,
+            "pts": 9
+          },
+          {
+            "equipo": "Ituzaingo",
+            "pj": 2,
+            "g": 2,
+            "e": 0,
+            "p": 0,
+            "dg": 7,
+            "pts": 6
+          },
+          {
+            "equipo": "Deportivo La Boca",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "dg": 6,
+            "pts": 6
+          },
+          {
+            "equipo": "Pampa FC",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "dg": 3,
+            "pts": 6
+          },
+          {
+            "equipo": "San Andres Futsal",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "dg": 1,
+            "pts": 6
+          },
+          {
+            "equipo": "Club Saenz Peña",
+            "pj": 2,
+            "g": 1,
+            "e": 0,
+            "p": 1,
+            "dg": 2,
+            "pts": 3
+          },
+          {
+            "equipo": "Estudiantes del Norte",
+            "pj": 2,
+            "g": 1,
+            "e": 0,
+            "p": 1,
+            "dg": 0,
+            "pts": 3
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pj": 2,
+            "g": 1,
+            "e": 0,
+            "p": 1,
+            "dg": -1,
+            "pts": 3
+          },
+          {
+            "equipo": "Toque y Toque",
+            "pj": 3,
+            "g": 1,
+            "e": 0,
+            "p": 2,
+            "dg": -8,
+            "pts": 3
+          },
+          {
+            "equipo": "Union Italiana",
+            "pj": 2,
+            "g": 0,
+            "e": 1,
+            "p": 1,
+            "dg": -3,
+            "pts": 1
+          },
+          {
+            "equipo": "Cervantes LP",
+            "pj": 3,
+            "g": 0,
+            "e": 1,
+            "p": 2,
+            "dg": -9,
+            "pts": 1
+          },
+          {
+            "equipo": "Estrada de Almagro",
+            "pj": 1,
+            "g": 0,
+            "e": 0,
+            "p": 1,
+            "dg": -3,
+            "pts": 0
+          },
+          {
+            "equipo": "Villa Mitre",
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "dg": -11,
+            "pts": 0
           }
         ]
       },
