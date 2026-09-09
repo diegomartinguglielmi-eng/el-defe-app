@@ -9,6 +9,8 @@ on:
       - "defe-datos/manual.json"
       - "defe-datos/sync-ligas.mjs"
       - "defe-datos/run-sync.mjs"
+      - "defe-datos/enrich-fefi-mayores.mjs"
+      - "defe-datos/enrich-argenliga.mjs"
       - "defe-datos/avisos.mjs"
       - "defe-datos/package.json"
 
