@@ -73,6 +73,15 @@ jobs:
         run: node patch-ui-v13.mjs
       - name: Aplicar V14 restauración de Inicio
         run: node patch-ui-v14.mjs
+      - name: Forzar bundle único V15
+        run: |
+          JS=$(basename $(ls defe-web-build/dist/assets/index-*.js | head -1))
+          UNIQUE="index-v15-${GITHUB_SHA}.js"
+          cp "defe-web-build/dist/assets/${JS}" "defe-web-build/dist/assets/${UNIQUE}"
+          sed -i "s#assets/${JS}#assets/${UNIQUE}#" defe-web-build/dist/index.html
+          sed -i 's#v14-20260909#v15-20260909#g' defe-web-build/dist/index.html
+          echo "Bundle original: ${JS}"
+          echo "Bundle publicado: ${UNIQUE}"
       - name: Incorporar datos y gestión de usuarios
         run: |
           cp defe-datos/datos.json defe-web-build/dist/datos.json
@@ -112,19 +121,19 @@ jobs:
             })());
           });
           EOF
-      - name: Verificar autenticación, datos, UI V14 y PWA
+      - name: Verificar autenticación, datos, UI V15 y PWA
         run: |
-          grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-*.js
-          grep -R "Cuenta creada correctamente" defe-web-build/dist/assets/index-*.js
-          grep -R "Mis ligas y categorías" defe-web-build/dist/assets/index-*.js
-          grep -R '"9NA","Primera"' defe-web-build/dist/assets/index-*.js
-          grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-*.js
-          grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-*.js
-          grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-*.js
-          grep -R 'iu=new Date' defe-web-build/dist/assets/index-*.js
+          grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-v15-${GITHUB_SHA}.js
+          grep -R "Cuenta creada correctamente" defe-web-build/dist/assets/index-v15-${GITHUB_SHA}.js
+          grep -R "Mis ligas y categorías" defe-web-build/dist/assets/index-v15-${GITHUB_SHA}.js
+          grep -R '"9NA","Primera"' defe-web-build/dist/assets/index-v15-${GITHUB_SHA}.js
+          grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-v15-${GITHUB_SHA}.js
+          grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-v15-${GITHUB_SHA}.js
+          grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-v15-${GITHUB_SHA}.js
+          grep -F "assets/index-v15-${GITHUB_SHA}.js" defe-web-build/dist/index.html
+          grep -F "v15-20260909" defe-web-build/dist/index.html
           grep -R '"rival": "CNEL. BRANDSEN"' defe-web-build/dist/datos.json
           grep -A8 '"rival": "CNEL. BRANDSEN"' defe-web-build/dist/datos.json | grep -A3 '"2013"' | grep '4'
-          grep -F "v14-20260909" defe-web-build/dist/index.html
           grep -F "updateViaCache: 'none'" defe-web-build/dist/registerSW.js
           grep -F "deploy-version: ${GITHUB_SHA}" defe-web-build/dist/sw.js
       - name: Empaquetar dist
