@@ -5,7 +5,7 @@
   "type": "module",
   "engines": { "node": ">=20" },
   "scripts": {
-    "sync": "node sync-ligas.mjs",
+    "sync": "node run-sync.mjs",
     "buscar-laamba": "node sync-ligas.mjs --buscar-laamba"
   },
   "dependencies": {
