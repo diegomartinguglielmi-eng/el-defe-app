@@ -29,7 +29,11 @@ globalThis.fetch = (input, init = {}) => {
 };
 
 const limpiar = (s) => String(s ?? "").replace(/\s+/g, " ").trim();
-const normalizar = (s) => limpiar(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+const normalizar = (s) => limpiar(s)
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toUpperCase()
+  .replace(/[^A-Z0-9]/g, "");
 
 function filasDeTablas(html) {
   const $ = cheerio.load(html);
