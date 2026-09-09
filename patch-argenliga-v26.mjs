@@ -47,9 +47,9 @@ fs.writeFileSync(indexPath,html);
 console.log('V26 aplicada: Argenliga Primera conectada a Fixture, Resultados y Posiciones');
 
 await import('./patch-argenliga-v27.mjs');
+await import('./patch-ligas-v28.mjs');
 
-// Posiciones debe permanecer dentro del bloque Argenliga V27 para conservar
-// los filtros de rama y categoría, igual que LAAMBA.
+// Posiciones debe permanecer dentro del bloque Argenliga para conservar filtros de categoría.
 js=fs.readFileSync(jsPath,'utf8');
 const earlyOld='if(p==="posiciones"&&r!=="lamba")return u.jsx(Yf,{favs:e,liga:r,setLiga:n,irA:a,vista:p,setVista:g});';
 const earlyNew='if(p==="posiciones"&&r!=="lamba"&&r!=="argenliga")return u.jsx(Yf,{favs:e,liga:r,setLiga:n,irA:a,vista:p,setVista:g});';
