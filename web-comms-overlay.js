@@ -1,8 +1,9 @@
 (() => {
  const API='https://el-defe-v5-production.up.railway.app', READ='defe_comunicaciones_leidas_v2'; let cache=[];
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- function jwt(){for(const st of [localStorage,sessionStorage])for(let i=0;i<st.length;i++){const m=(st.getItem(st.key(i))||'').match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(m)return m[0]}return null}
- function role(){try{let p=jwt().split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(atob(p.padEnd(Math.ceil(p.length/4)*4,'='))).role}catch{return null}}
+ function jwtFromValue(value){if(!value||typeof value!=='string')return null;const direct=value.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(direct)return direct[0];try{const parsed=JSON.parse(value);if(typeof parsed==='string')return jwtFromValue(parsed);if(parsed&&typeof parsed==='object')for(const v of Object.values(parsed)){const found=jwtFromValue(typeof v==='string'?v:JSON.stringify(v));if(found)return found}}catch(_){}return null}
+ function jwt(){for(const st of [localStorage,sessionStorage])for(let i=0;i<st.length;i++){const t=jwtFromValue(st.getItem(st.key(i)));if(t)return t}return null}
+ function role(){try{const t=jwt();if(!t)return null;let p=t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(atob(p.padEnd(Math.ceil(p.length/4)*4,'='))).role||null}catch{return null}}
  const isAdmin=()=>role()==='admin'; const reads=()=>{try{return new Set(JSON.parse(localStorage.getItem(READ)||'[]'))}catch{return new Set}}; const saveReads=x=>localStorage.setItem(READ,JSON.stringify([...x]));
  const encode=(tipo,aud,msg)=>`[DEFE-COMMS-V2][TIPO:${tipo}][AUD:${aud}]\n${msg}`;
  function decode(n){const b=String(n.body||'');if(!b.startsWith('[DEFE-COMMS-V2]'))return null;const t=(b.match(/\[TIPO:([^\]]+)\]/)||[])[1]||'Información',a=(b.match(/\[AUD:([^\]]+)\]/)||[])[1]||'Todo el club';return{id:'srv-'+n.id,titulo:n.title,mensaje:b.replace(/^\[DEFE-COMMS-V2\]\[TIPO:[^\]]+\]\[AUD:[^\]]+\]\n?/,''),tipo:t,audiencia:a,fecha:n.published_at,remitente:'Administración Defe'}}
