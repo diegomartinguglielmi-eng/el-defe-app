@@ -7,6 +7,7 @@ on:
       - 'defe-web-listo.zip'
       - 'web-auth-overlay.js'
       - 'patch-web-auth.mjs'
+      - 'patch-brand.mjs'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
@@ -45,6 +46,9 @@ jobs:
       - name: Reemplazar autenticación nativa por API Railway
         run: node patch-web-auth.mjs
 
+      - name: Aplicar identidad visual del club
+        run: node patch-brand.mjs
+
       - name: Incorporar datos y gestión de usuarios
         run: |
           cp defe-datos/datos.json defe-web-build/dist/datos.json
@@ -80,10 +84,12 @@ jobs:
           });
           EOF
 
-      - name: Verificar autenticación y actualización PWA
+      - name: Verificar autenticación, marca y actualización PWA
         run: |
           grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-*.js
           grep -R "Cuenta creada correctamente" defe-web-build/dist/assets/index-*.js
+          grep -R "#3A307E" defe-web-build/dist/assets/index-*.js
+          test -f defe-web-build/dist/escudo-dsl.svg
           grep -F "updateViaCache: 'none'" defe-web-build/dist/registerSW.js
           grep -F "SKIP_WAITING" defe-web-build/dist/sw.js
 
