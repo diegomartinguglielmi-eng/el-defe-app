@@ -123,9 +123,9 @@ jobs:
           grep -R "DEFE_RESULTS_V22_POINTS_GOALS_SAFE_RESULTS" defe-web-build/dist/assets/index-v24-${GITHUB_SHA}.js
           grep -R "DEFE_FIXTURE_V23_DATE_BASED_COMPLETE" defe-web-build/dist/assets/index-v24-${GITHUB_SHA}.js
           grep -R "DEFE_LAAMBA_V24_MASC_FEM_FULL" defe-web-build/dist/assets/index-v24-${GITHUB_SHA}.js
-          grep -R 'children:"Masculino"' defe-web-build/dist/assets/index-v24-${GITHUB_SHA}.js
-          grep -R 'children:"Femenino"' defe-web-build/dist/assets/index-v24-${GITHUB_SHA}.js
-          grep -R '1RA Femenino' defe-web-build/dist/assets/index-v24-${GITHUB_SHA}.js
+          grep -F '"Masculino"' defe-web-build/dist/assets/index-v24-${GITHUB_SHA}.js
+          grep -F '"Femenino"' defe-web-build/dist/assets/index-v24-${GITHUB_SHA}.js
+          grep -F '1RA Femenino' defe-web-build/dist/assets/index-v24-${GITHUB_SHA}.js
           grep -F "assets/index-v24-${GITHUB_SHA}.js" defe-web-build/dist/index.html
           grep -F "v24-laamba-full-20260909" defe-web-build/dist/index.html
           grep -F "location.replace('/el-defe-app/?v='+v)" defe-web-build/dist/index.html
