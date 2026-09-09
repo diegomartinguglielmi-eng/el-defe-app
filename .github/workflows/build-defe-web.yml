@@ -66,13 +66,13 @@ jobs:
           grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-*.js
           grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-*.js
           grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-*.js
-      - name: Forzar bundle único V17 recuperación
+      - name: Forzar bundle único V18 recuperación
         run: |
           JS=$(basename $(ls defe-web-build/dist/assets/index-*.js | head -1))
-          UNIQUE="index-v17-recovery-${GITHUB_SHA}.js"
+          UNIQUE="index-v18-recovery-${GITHUB_SHA}.js"
           cp "defe-web-build/dist/assets/${JS}" "defe-web-build/dist/assets/${UNIQUE}"
           sed -i "s#assets/${JS}#assets/${UNIQUE}#" defe-web-build/dist/index.html
-          sed -i 's#v12-20260909#v17-recovery-20260909#g' defe-web-build/dist/index.html
+          sed -i 's#v12-20260909#v18-recovery-20260909#g' defe-web-build/dist/index.html
           echo "Bundle publicado: ${UNIQUE}"
       - name: Incorporar datos y gestión de usuarios
         run: |
@@ -81,11 +81,14 @@ jobs:
           OVERLAY="web-auth-overlay-${GITHUB_SHA}.js"
           cp web-auth-overlay.js "defe-web-build/dist/${OVERLAY}"
           sed -i "s#</body>#<script src=\"./${OVERLAY}\"></script></body>#" defe-web-build/dist/index.html
-      - name: Forzar renovación real de caché PWA
+      - name: Limpiar PWA una sola vez
         run: |
           cat > defe-web-build/dist/registerSW.js <<EOF
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
+              const key = 'defe-recovery-${GITHUB_SHA}';
+              if (sessionStorage.getItem(key)) return;
+              sessionStorage.setItem(key, '1');
               try {
                 const regs = await navigator.serviceWorker.getRegistrations();
                 for (const r of regs) await r.unregister();
@@ -97,19 +100,20 @@ jobs:
           }
           EOF
           cat > defe-web-build/dist/sw.js <<EOF
-          // V17 recovery service worker intentionally inert
+          // V18 recovery service worker intentionally inert
           self.addEventListener('install', () => self.skipWaiting());
           self.addEventListener('activate', event => event.waitUntil(self.registration.unregister()));
           EOF
-      - name: Verificar recuperación V17 y datos FEFI
+      - name: Verificar recuperación V18 y datos FEFI
         run: |
-          grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-v17-recovery-${GITHUB_SHA}.js
-          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-v17-recovery-${GITHUB_SHA}.js
-          grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-v17-recovery-${GITHUB_SHA}.js
-          grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-v17-recovery-${GITHUB_SHA}.js
-          grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-v17-recovery-${GITHUB_SHA}.js
-          grep -F "assets/index-v17-recovery-${GITHUB_SHA}.js" defe-web-build/dist/index.html
-          grep -F "v17-recovery-20260909" defe-web-build/dist/index.html
+          grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-v18-recovery-${GITHUB_SHA}.js
+          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-v18-recovery-${GITHUB_SHA}.js
+          grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-v18-recovery-${GITHUB_SHA}.js
+          grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-v18-recovery-${GITHUB_SHA}.js
+          grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-v18-recovery-${GITHUB_SHA}.js
+          grep -F "assets/index-v18-recovery-${GITHUB_SHA}.js" defe-web-build/dist/index.html
+          grep -F "v18-recovery-20260909" defe-web-build/dist/index.html
+          grep -F "sessionStorage.getItem(key)" defe-web-build/dist/registerSW.js
           grep -R '"rival": "CNEL. BRANDSEN"' defe-web-build/dist/datos.json
           grep -A8 '"rival": "CNEL. BRANDSEN"' defe-web-build/dist/datos.json | grep -A3 '"2013"' | grep '4'
       - name: Empaquetar dist
