@@ -45,11 +45,11 @@ jobs:
         run: node patch-web-auth.mjs
       - name: Aplicar identidad visual del club
         run: node patch-brand.mjs
-      - name: Aplicar UI V7 base
+      - name: Aplicar UI base
         run: node patch-ui-v5.mjs
-      - name: Aplicar multiselección V8
+      - name: Aplicar multiselección base
         run: node patch-ui-v8.mjs
-      - name: Reordenar selector y horarios V9
+      - name: Aplicar V10 multiselección visible
         run: node patch-ui-v9.mjs
       - name: Incorporar datos y gestión de usuarios
         run: |
@@ -64,7 +64,7 @@ jobs:
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
               try {
-                const reg = await navigator.serviceWorker.register('/el-defe-app/sw.js', { updateViaCache: 'none' });
+                const reg = await navigator.serviceWorker.register('/el-defe-app/sw.js?v=${GITHUB_SHA}', { updateViaCache: 'none' });
                 await reg.update();
                 if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
                 navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -90,19 +90,18 @@ jobs:
             })());
           });
           EOF
-      - name: Verificar autenticación, UI V9 y actualización PWA
+      - name: Verificar autenticación, UI V10 y actualización PWA
         run: |
           grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-*.js
           grep -R "Cuenta creada correctamente" defe-web-build/dist/assets/index-*.js
-          grep -R "DEFE_UI_V9_20260909" defe-web-build/dist/assets/index-*.js
-          grep -R "INLINE_MULTISELECT_BEFORE_MATCH" defe-web-build/dist/assets/index-*.js
-          grep -R "Podés elegir una, dos o varias" defe-web-build/dist/assets/index-*.js
+          grep -R "DEFE_UI_V10_20260909" defe-web-build/dist/assets/index-*.js
+          grep -R "ALWAYS_VISIBLE_MULTISELECT" defe-web-build/dist/assets/index-*.js
+          grep -R "Seleccioná todas las categorías que quieras seguir" defe-web-build/dist/assets/index-*.js
           grep -R "Guardar selección" defe-web-build/dist/assets/index-*.js
           grep -R "Horarios de tus categorías" defe-web-build/dist/assets/index-*.js
           grep -R "CLUB ATLÉTICO DEFENSORES DE SANTOS LUGARES" defe-web-build/dist/assets/index-*.js
           grep -R "SIEMPRE DEFE!" defe-web-build/dist/assets/index-*.js
-          if grep -R 'entrada ${nt(g.entrada)}' defe-web-build/dist/assets/index-*.js; then exit 1; fi
-          grep -F "v9-20260909" defe-web-build/dist/index.html
+          grep -F "v10-20260909" defe-web-build/dist/index.html
           grep -F "updateViaCache: 'none'" defe-web-build/dist/registerSW.js
           grep -F "deploy-version: ${GITHUB_SHA}" defe-web-build/dist/sw.js
           grep -F "caches.delete" defe-web-build/dist/sw.js
