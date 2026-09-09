@@ -29,6 +29,7 @@ globalThis.fetch = (input, init = {}) => {
 };
 
 const limpiar = (s) => String(s ?? "").replace(/\s+/g, " ").trim();
+const normalizar = (s) => limpiar(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
 
 function filasDeTablas(html) {
   const $ = cheerio.load(html);
@@ -69,6 +70,9 @@ async function completarResultadosFefi(salida) {
       if (!enc) continue;
 
       const clubEsPrimero = primera[1] === CLUB;
+      const rivalTabla = clubEsPrimero ? segunda[1] : primera[1];
+      if (normalizar(rivalTabla) !== normalizar(enc.rival)) continue;
+
       const golesPrimero = primera.slice(2, 9);
       const golesSegundo = segunda.slice(2, 9);
       if (golesPrimero.length < 7 || golesSegundo.length < 7) continue;
@@ -95,7 +99,7 @@ async function completarResultadosFefi(salida) {
     }
   }
 
-  console.error(`FEFI: ${completados} fecha(s) con marcadores detectadas en todas las tablas.`);
+  console.error(`FEFI: ${completados} fecha(s) con rival y marcadores validados.`);
 }
 
 const { sincronizar } = await import("./sync-ligas.mjs");
