@@ -15,6 +15,7 @@ on:
       - 'patch-ui-v8.mjs'
       - 'patch-ui-v9.mjs'
       - 'patch-ui-v11.mjs'
+      - 'patch-ui-v13.mjs'
       - 'defe-datos/datos.json'
       - '.github/workflows/build-defe-web.yml'
 
@@ -59,6 +60,14 @@ jobs:
         run: node patch-ui-v9.mjs
       - name: Aplicar V12 cierre real del selector
         run: node patch-ui-v11.mjs
+      - name: Verificar base V12
+        run: |
+          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-*.js
+          grep -R "EXPLICIT_CATEGORY_EDITOR_STATE" defe-web-build/dist/assets/index-*.js
+          grep -R 'onClick:()=>{Q(!1),F(A)}' defe-web-build/dist/assets/index-*.js
+          grep -F "v12-20260909" defe-web-build/dist/index.html
+      - name: Aplicar V13 selección por liga y categoría
+        run: node patch-ui-v13.mjs
       - name: Incorporar datos y gestión de usuarios
         run: |
           cp defe-datos/datos.json defe-web-build/dist/datos.json
@@ -98,18 +107,18 @@ jobs:
             })());
           });
           EOF
-      - name: Verificar autenticación, UI V12 y actualización PWA
+      - name: Verificar autenticación, datos, UI V13 y PWA
         run: |
           grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-*.js
           grep -R "Cuenta creada correctamente" defe-web-build/dist/assets/index-*.js
-          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-*.js
-          grep -R "EXPLICIT_CATEGORY_EDITOR_STATE" defe-web-build/dist/assets/index-*.js
-          grep -R 'useState(()=>e.length===0)' defe-web-build/dist/assets/index-*.js
-          grep -R 'q&&u.jsxs("div",{className:"defe-category-card defe-category-card-v10' defe-web-build/dist/assets/index-*.js
-          grep -R 'onClick:()=>{Q(!1),F(A)}' defe-web-build/dist/assets/index-*.js
-          grep -R "Cambiar categorías" defe-web-build/dist/assets/index-*.js
-          grep -R "Horarios de tus categorías" defe-web-build/dist/assets/index-*.js
-          grep -F "v12-20260909" defe-web-build/dist/index.html
+          grep -R "DEFE_UI_V13_20260909" defe-web-build/dist/assets/index-*.js
+          grep -R "PERSONAL_LEAGUES_CATEGORIES" defe-web-build/dist/assets/index-*.js
+          grep -R "Mis ligas y categorías" defe-web-build/dist/assets/index-*.js
+          grep -R "Próximos partidos" defe-web-build/dist/assets/index-*.js
+          grep -R "Últimos resultados" defe-web-build/dist/assets/index-*.js
+          grep -R '"rival": "CNEL. BRANDSEN"' defe-web-build/dist/datos.json
+          grep -A8 '"rival": "CNEL. BRANDSEN"' defe-web-build/dist/datos.json | grep -A3 '"2013"' | grep '4'
+          grep -F "v13-20260909" defe-web-build/dist/index.html
           grep -F "updateViaCache: 'none'" defe-web-build/dist/registerSW.js
           grep -F "deploy-version: ${GITHUB_SHA}" defe-web-build/dist/sw.js
       - name: Empaquetar dist
