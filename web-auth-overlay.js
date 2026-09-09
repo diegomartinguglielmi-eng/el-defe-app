@@ -1,6 +1,5 @@
 (() => {
   const API = 'https://el-defe-v5-production.up.railway.app';
-  let registering = false;
 
   async function apiFetch(path, options = {}, timeoutMs = 12000) {
     const controller = new AbortController();
@@ -12,114 +11,8 @@
     }
   }
 
-  function visible(el) { return !!(el && el.offsetParent !== null); }
-  function textOf(el) { return (el?.textContent || '').trim().toLowerCase(); }
-
-  function registerFields() {
-    const inputs = [...document.querySelectorAll('input')].filter(visible);
-    const email = inputs.find(i => i.type === 'email' || /email/i.test(i.placeholder || ''));
-    const passwords = inputs.filter(i => i.type === 'password');
-    const password = passwords.find(i => /contrase/i.test(i.placeholder || '')) || passwords[0];
-    const name = inputs.find(i => /nombre/i.test(i.placeholder || ''));
-    return {email, password, name};
-  }
-
-  function isRegisterButton(el) {
-    if (!el) return false;
-    const btn = el.closest?.('button');
-    if (!btn) return false;
-    const t = textOf(btn);
-    if (!(t === 'crear cuenta' || t === 'crear mi cuenta' || t === 'un momento…' || t === 'un momento...')) return false;
-    const {email, password} = registerFields();
-    return !!(email && password);
-  }
-
-  function messageNode(button) {
-    let msg = document.querySelector('[data-defe-register-msg]');
-    if (!msg) {
-      msg = document.createElement('div');
-      msg.dataset.defeRegisterMsg = '1';
-      msg.style.cssText = 'margin-top:12px;font-size:14px;line-height:1.4';
-      button.insertAdjacentElement('afterend', msg);
-    }
-    return msg;
-  }
-
-  function showMessage(button, text, ok = false) {
-    const msg = messageNode(button);
-    msg.style.color = ok ? '#067647' : '#b42318';
-    msg.textContent = text;
-  }
-
-  function setBusy(button, busy) {
-    if (!button.dataset.defeOriginalText) button.dataset.defeOriginalText = 'Crear cuenta';
-    button.disabled = busy;
-    button.textContent = busy ? 'Un momento…' : button.dataset.defeOriginalText;
-  }
-
-  async function register(button) {
-    if (registering) return;
-    const {email, password, name} = registerFields();
-    const emailValue = (email?.value || '').trim().toLowerCase();
-    const passwordValue = password?.value || '';
-
-    if (name && !name.value.trim()) return showMessage(button, 'Completá nombre y apellido.');
-    if (!emailValue || !emailValue.includes('@')) return showMessage(button, 'Ingresá un email válido.');
-    if (passwordValue.length < 8) return showMessage(button, 'La contraseña debe tener al menos 8 caracteres.');
-
-    registering = true;
-    setBusy(button, true);
-    showMessage(button, 'Creando tu cuenta…', true);
-    try {
-      const r = await apiFetch('/api/auth/register', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({email: emailValue, password: passwordValue})
-      });
-      const data = await r.json().catch(() => ({}));
-      if (!r.ok) {
-        let detail = data.detail;
-        if (Array.isArray(detail)) detail = detail.map(x => x.msg).filter(Boolean).join(' · ');
-        throw new Error(detail || `No se pudo crear la cuenta (${r.status})`);
-      }
-      if (data.access_token) {
-        localStorage.setItem('defe_access_token', data.access_token);
-        localStorage.setItem('defe_user', JSON.stringify(data.user || {email: emailValue, role: 'lector'}));
-      }
-      showMessage(button, 'Cuenta creada correctamente. Ya podés ingresar.', true);
-      setTimeout(() => {
-        const loginLink = [...document.querySelectorAll('button,a')].find(el => /ya tengo cuenta/i.test(el.textContent || ''));
-        loginLink?.click();
-      }, 900);
-    } catch (e) {
-      const msg = e?.name === 'AbortError' ? 'La conexión tardó demasiado. Probá nuevamente.' : (e?.message || 'No se pudo crear la cuenta.');
-      showMessage(button, msg, false);
-    } finally {
-      registering = false;
-      setBusy(button, false);
-    }
-  }
-
-  // Captura a nivel documento: corre antes que los handlers delegados de React.
-  document.addEventListener('click', e => {
-    if (!isRegisterButton(e.target)) return;
-    const button = e.target.closest('button');
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
-    register(button);
-  }, true);
-
-  document.addEventListener('submit', e => {
-    const form = e.target;
-    const button = [...form.querySelectorAll('button')].find(b => isRegisterButton(b));
-    if (!button) return;
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
-    register(button);
-  }, true);
-
+  // La autenticación de registro/login la maneja exclusivamente el bundle React.
+  // Este overlay queda limitado a la gestión administrativa de usuarios.
   function jwtFromValue(value) {
     if (!value || typeof value !== 'string') return null;
     const direct = value.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);
@@ -197,7 +90,7 @@
       btn = document.createElement('button');
       btn.dataset.defeUsersButton = '1';
       btn.textContent = 'Usuarios';
-      btn.style.cssText = 'position:fixed;right:14px;top:84px;z-index:9998;background:#3437a5;color:#fff;border:0;border-radius:999px;padding:10px 14px;font-weight:700';
+      btn.style.cssText = 'position:fixed;right:14px;top:84px;z-index:9998;background:#40368f;color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:999px;padding:10px 14px;font-weight:700';
       btn.onclick = manageUsers;
       document.body.appendChild(btn);
     }
