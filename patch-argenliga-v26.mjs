@@ -33,7 +33,6 @@ const posNew='const w=t==="superliga"?l:t==="argenliga"?q:c,x=a[t].categorias';
 if(!js.includes(posOld)) throw new Error('No se encontró selector de tabla simple');
 js=js.replace(posOld,posNew);
 
-// En Argenliga, los partidos sin resultado son Fixture; los terminados son Resultados.
 const revOld='u.jsx("div",{className:"space-y-3",children:[...f.partidos].reverse().map(v=>u.jsxs("div",';
 const revNew='u.jsx("div",{className:"space-y-3",children:[...f.partidos].filter(v=>r!=="argenliga"||p==="resultados"?v.jugado:!v.jugado).sort((v,A)=>p==="resultados"?String(A.fecha).localeCompare(String(v.fecha)):String(v.fecha).localeCompare(String(A.fecha))).map(v=>u.jsxs("div",';
 if(js.includes(revOld)) js=js.replace(revOld,revNew);
@@ -46,3 +45,5 @@ let html=fs.readFileSync(indexPath,'utf8');
 html=html.replace(/<meta name="defe-brand" content="[^"]*"\s*\/>/,'<meta name="defe-brand" content="v26-argenliga-20260909" />');
 fs.writeFileSync(indexPath,html);
 console.log('V26 aplicada: Argenliga Primera conectada a Fixture, Resultados y Posiciones');
+
+await import('./patch-argenliga-v27.mjs');
