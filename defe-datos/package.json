@@ -5,7 +5,7 @@
   "type": "module",
   "engines": { "node": ">=20" },
   "scripts": {
-    "sync": "node run-sync.mjs",
+    "sync": "node run-sync.mjs && node enrich-argenliga.mjs",
     "buscar-laamba": "node sync-ligas.mjs --buscar-laamba"
   },
   "dependencies": {
