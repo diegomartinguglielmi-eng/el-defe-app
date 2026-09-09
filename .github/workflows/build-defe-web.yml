@@ -12,6 +12,7 @@ on:
       - 'patch-ui-v8.mjs'
       - 'patch-ui-v9.mjs'
       - 'patch-ui-v11.mjs'
+      - 'defe-datos/datos.json'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
