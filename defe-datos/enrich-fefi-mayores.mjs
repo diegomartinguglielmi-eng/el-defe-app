@@ -27,23 +27,33 @@ function parseFixture(html){
      if(home&&away&&(isDefe(home)!==isDefe(away)))out.push({round_name:round,date,home,away});
    }
  });
- const dedup={};for(const r of out)dedup[r.round_name]=r;return Object.values(dedup).sort((a,b)=>Number(a.round_name.replace(/\D/g,''))-Number(b.round_name.replace(/\D/g,'')));
+ const dedup={};for(const r of out)dedup[`${r.round_name}|${compact(r.home)}|${compact(r.away)}`]=r;
+ return Object.values(dedup).sort((a,b)=>Number(a.round_name.replace(/\D/g,''))-Number(b.round_name.replace(/\D/g,'')));
 }
 function resultTables(html){const $=cheerio.load(html),tables=[];$('table').each((_,t)=>{const rows=tableRows($,t);if(!rows.length)return;const h=rows[0].map(compact);if(h.includes('EQUIPOS')&&h.includes('GL')&&h.some(x=>x==='FT'||x.startsWith('FT')))tables.push(rows)});return tables}
 function parseResultTable(rows){const h=rows[0].map(compact);const idx=t=>h.findIndex(x=>x===t||x.startsWith(t)),ft=idx('FT'),team=idx('EQUIPOS'),gl=idx('GL'),st=idx('ESTADO');if(ft<0||team<0||gl<0)return[];const out=[];for(let i=1;i<rows.length-1;){const a=rows[i],b=rows[i+1],f=compact(a[ft]||'');if(/^F\d+$/.test(f)){const home=clean(a[team]||''),away=clean(b[team]||'');const hr=asInt(a[gl]),ar=asInt(b[gl]);if(isDefe(home)!==isDefe(away)&&hr!==null&&ar!==null){out.push({round_name:`Fecha ${Number(f.replace(/\D/g,''))}`,home,away,home_score:hr,away_score:ar,status:st>=0?(a[st]||''):''})}i+=2}else i++}return out}
-function parseResults(html){const candidates=resultTables(html).map(parseResultTable).filter(r=>r.some(x=>isDefe(x.home)||isDefe(x.away)));if(!candidates.length)return[];candidates.sort((a,b)=>b.length-a.length);return candidates[0]}
-function standingTables(html){const $=cheerio.load(html),tables=[];$('table').each((_,t)=>{const rows=tableRows($,t);if(!rows.length)return;const h=rows[0].map(compact);if(h.length===6&&h.includes('EQUIPOS')&&h.includes('PJ')&&h.includes('PTS'))tables.push(rows)});return tables}
+function standingTables(html){const $=cheerio.load(html),tables=[];$('table').each((_,t)=>{const rows=tableRows($,t);if(!rows.length)return;const h=rows[0].map(compact);if(h.includes('EQUIPOS')&&h.includes('PJ')&&h.includes('PTS'))tables.push(rows)});return tables}
 function parseStandingTable(rows){return rows.slice(1).map(r=>({equipo:clean(r[0]),pj:asInt(r[1]),g:asInt(r[2]),e:asInt(r[3]),p:asInt(r[4]),pts:asInt(r[5])})).filter(r=>r.equipo&&r.pj!==null&&r.pts!==null)}
-function parseStandings(html){const candidates=standingTables(html).map(parseStandingTable).filter(r=>r.some(x=>isDefe(x.equipo)));if(!candidates.length)return[];candidates.sort((a,b)=>b.length-a.length);return candidates[0]}
 
 const datos=JSON.parse(fs.readFileSync(FILE,'utf8'));
-const sep=URL.includes('?')?'&':'?';
-const res=await fetch(`${URL}${sep}_defe=${Date.now()}`,{headers:{'user-agent':'Mozilla/5.0 ElDefe/2026','cache-control':'no-cache'}});
+const res=await fetch(`${URL}?_defe=${Date.now()}`,{headers:{'user-agent':'Mozilla/5.0 ElDefe/2026','cache-control':'no-cache'}});
 if(!res.ok)throw new Error(`FEFI Mayores B respondió ${res.status}`);
 const html=await res.text();
-const fixture=parseFixture(html),resultados=parseResults(html),posiciones=parseStandings(html);
+const fixture=parseFixture(html);
+const resultSets=resultTables(html).map(parseResultTable).filter(r=>r.some(x=>isDefe(x.home)||isDefe(x.away)));
+const standingSets=standingTables(html).map(parseStandingTable).filter(r=>r.some(x=>isDefe(x.equipo)));
+const resultadosApertura=resultSets[0]||[];
+const resultadosClausura=resultSets[1]||[];
+const posicionesApertura=standingSets[0]||[];
+const posicionesClausura=standingSets[1]||[];
 if(!fixture.length)throw new Error('No se encontró a Defensores en el fixture Mayores B');
-if(!posiciones.some(r=>isDefe(r.equipo)))console.error('FEFI Mayores B: tabla Clausura sin Defe; se conserva vacía para no mezclar datos.');
-datos.fefiMayoresB={id:'fefi-mayores-b',competencia:'FEFI',division:'Mayores B',equipo:'+42',temporada:2026,fixture,resultados,posiciones:posiciones.some(r=>isDefe(r.equipo))?posiciones:[],fuente:URL,actualizado:new Date().toISOString()};
+datos.fefiMayoresB={
+ id:'fefi-mayores-b',competencia:'FEFI',division:'Mayores B',equipo:'+42',temporada:2026,
+ fixture,fixtureClausura:fixture,
+ resultadosApertura,resultadosClausura,
+ posicionesApertura,posicionesClausura,
+ resultados:resultadosClausura,posiciones:posicionesClausura,
+ fuente:URL,actualizado:new Date().toISOString()
+};
 fs.writeFileSync(FILE,JSON.stringify(datos,null,2));
-console.error(`FEFI Mayores B +42: ${fixture.length} fechas, ${resultados.length} resultados válidos, ${datos.fefiMayoresB.posiciones.length} posiciones.`);
+console.error(`FEFI Mayores B +42: fixture ${fixture.length}; resultados A ${resultadosApertura.length}, C ${resultadosClausura.length}; tablas A ${posicionesApertura.length}, C ${posicionesClausura.length}.`);
