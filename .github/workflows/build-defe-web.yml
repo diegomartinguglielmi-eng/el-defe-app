@@ -52,7 +52,7 @@ jobs:
         run: node patch-ui-v8.mjs
       - name: Aplicar V10 multiselección visible
         run: node patch-ui-v9.mjs
-      - name: Aplicar V11 selector de primera carga
+      - name: Aplicar V12 cierre real del selector
         run: node patch-ui-v11.mjs
       - name: Incorporar datos y gestión de usuarios
         run: |
@@ -93,17 +93,18 @@ jobs:
             })());
           });
           EOF
-      - name: Verificar autenticación, UI V11 y actualización PWA
+      - name: Verificar autenticación, UI V12 y actualización PWA
         run: |
           grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-*.js
           grep -R "Cuenta creada correctamente" defe-web-build/dist/assets/index-*.js
-          grep -R "DEFE_UI_V11_20260909" defe-web-build/dist/assets/index-*.js
-          grep -R "FIRST_LOAD_CATEGORY_PICKER" defe-web-build/dist/assets/index-*.js
-          grep -R 'e.length===0||q' defe-web-build/dist/assets/index-*.js
-          grep -R 'Q(!1)' defe-web-build/dist/assets/index-*.js
+          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-*.js
+          grep -R "EXPLICIT_CATEGORY_EDITOR_STATE" defe-web-build/dist/assets/index-*.js
+          grep -R 'useState(()=>e.length===0)' defe-web-build/dist/assets/index-*.js
+          grep -R 'q&&u.jsxs("div",{className:"defe-category-card defe-category-card-v10' defe-web-build/dist/assets/index-*.js
+          grep -R 'onClick:()=>{Q(!1),F(A)}' defe-web-build/dist/assets/index-*.js
           grep -R "Cambiar categorías" defe-web-build/dist/assets/index-*.js
           grep -R "Horarios de tus categorías" defe-web-build/dist/assets/index-*.js
-          grep -F "v11-20260909" defe-web-build/dist/index.html
+          grep -F "v12-20260909" defe-web-build/dist/index.html
           grep -F "updateViaCache: 'none'" defe-web-build/dist/registerSW.js
           grep -F "deploy-version: ${GITHUB_SHA}" defe-web-build/dist/sw.js
       - name: Empaquetar dist
