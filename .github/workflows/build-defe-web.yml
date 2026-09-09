@@ -9,6 +9,7 @@ on:
       - 'patch-web-auth.mjs'
       - 'patch-brand.mjs'
       - 'patch-ui-v5.mjs'
+      - 'patch-ui-v8.mjs'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
@@ -43,8 +44,10 @@ jobs:
         run: node patch-web-auth.mjs
       - name: Aplicar identidad visual del club
         run: node patch-brand.mjs
-      - name: Aplicar UI V7 aprobada
+      - name: Aplicar UI V7 base
         run: node patch-ui-v5.mjs
+      - name: Aplicar multiselección V8
+        run: node patch-ui-v8.mjs
       - name: Incorporar datos y gestión de usuarios
         run: |
           cp defe-datos/datos.json defe-web-build/dist/datos.json
@@ -84,19 +87,20 @@ jobs:
             })());
           });
           EOF
-      - name: Verificar autenticación, UI V7 y actualización PWA
+      - name: Verificar autenticación, UI V8 y actualización PWA
         run: |
           grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-*.js
           grep -R "Cuenta creada correctamente" defe-web-build/dist/assets/index-*.js
-          grep -R "DEFE_UI_V7_20260909" defe-web-build/dist/assets/index-*.js
+          grep -R "DEFE_UI_V8_20260909" defe-web-build/dist/assets/index-*.js
+          grep -R "MULTISELECT_DRAFT_SAVE" defe-web-build/dist/assets/index-*.js
+          grep -R 'setFavs:V' defe-web-build/dist/assets/index-*.js
           grep -R "Podés elegir una, dos o varias" defe-web-build/dist/assets/index-*.js
-          grep -R "Categorías de tu familia" defe-web-build/dist/assets/index-*.js
           grep -R "Guardar selección" defe-web-build/dist/assets/index-*.js
           grep -R "Cambiar" defe-web-build/dist/assets/index-*.js
           grep -R "CLUB ATLÉTICO DEFENSORES DE SANTOS LUGARES" defe-web-build/dist/assets/index-*.js
           grep -R "SIEMPRE DEFE!" defe-web-build/dist/assets/index-*.js
           if grep -R 'entrada ${nt(g.entrada)}' defe-web-build/dist/assets/index-*.js; then exit 1; fi
-          grep -F "v7-20260909" defe-web-build/dist/index.html
+          grep -F "v8-20260909" defe-web-build/dist/index.html
           grep -F "updateViaCache: 'none'" defe-web-build/dist/registerSW.js
           grep -F "deploy-version: ${GITHUB_SHA}" defe-web-build/dist/sw.js
           grep -F "caches.delete" defe-web-build/dist/sw.js
