@@ -6,6 +6,7 @@ on:
     paths:
       - 'defe-web-listo.zip'
       - 'web-auth-overlay.js'
+      - 'patch-web-auth.mjs'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
@@ -41,6 +42,9 @@ jobs:
         working-directory: defe-web-build
         run: npm run build -- --base=/el-defe-app/
 
+      - name: Reemplazar autenticación nativa por API Railway
+        run: node patch-web-auth.mjs
+
       - name: Incorporar datos y gestión de usuarios
         run: |
           cp defe-datos/datos.json defe-web-build/dist/datos.json
@@ -48,6 +52,11 @@ jobs:
           OVERLAY="web-auth-overlay-${GITHUB_SHA}.js"
           cp web-auth-overlay.js "defe-web-build/dist/${OVERLAY}"
           sed -i "s#</body>#<script src=\"./${OVERLAY}\"></script></body>#" defe-web-build/dist/index.html
+
+      - name: Verificar autenticación parcheada
+        run: |
+          grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-*.js
+          grep -R "Cuenta creada correctamente" defe-web-build/dist/assets/index-*.js
 
       - name: Empaquetar dist
         run: |
