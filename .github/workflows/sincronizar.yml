@@ -2,10 +2,7 @@ name: Sincronizar ligas
 
 on:
   schedule:
-    - cron: "0 23 * * 6"
-    - cron: "0 2 * * 2"
-    - cron: "0 11 * * 2"
-    - cron: "0 10 * * *"
+    - cron: "0 10,13,16,19,22 * * *"
   workflow_dispatch:
   push:
     paths:
@@ -16,8 +13,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 concurrency:
   group: datos
@@ -51,12 +46,6 @@ jobs:
           CLAVE_AVISOS: ${{ secrets.CLAVE_AVISOS }}
         run: node avisos.mjs datos-anterior.json datos.json
 
-      - name: Preparar la carpeta pública
-        run: |
-          mkdir -p public
-          cp datos.json public/datos.json
-          echo '{"actualizado":"'"$(date -u +%FT%TZ)"'"}' > public/salud.json
-
       - name: Guardar el resultado en el repo
         run: |
           if [[ -n "$(git status --porcelain datos.json)" ]]; then
@@ -68,17 +57,3 @@ jobs:
           else
             echo "Sin cambios."
           fi
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: defe-datos/public
-
-  publicar:
-    needs: sincronizar
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    steps:
-      - id: deploy
-        uses: actions/deploy-pages@v4
