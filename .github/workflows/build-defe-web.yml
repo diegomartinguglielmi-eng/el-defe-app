@@ -8,6 +8,7 @@ on:
       - 'web-auth-overlay.js'
       - 'patch-web-auth.mjs'
       - 'patch-brand.mjs'
+      - 'patch-ui-v5.mjs'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
@@ -24,31 +25,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Preparar proyecto
         run: |
           rm -rf defe-web-build
           mkdir defe-web-build
           unzip -q defe-web-listo.zip -d defe-web-build
-
       - name: Instalar dependencias
         working-directory: defe-web-build
         run: npm install
-
       - name: Compilar para GitHub Pages
         working-directory: defe-web-build
         run: npm run build -- --base=/el-defe-app/
-
       - name: Reemplazar autenticación nativa por API Railway
         run: node patch-web-auth.mjs
-
       - name: Aplicar identidad visual del club
         run: node patch-brand.mjs
-
+      - name: Aplicar UI V5 aprobada
+        run: node patch-ui-v5.mjs
       - name: Incorporar datos y gestión de usuarios
         run: |
           cp defe-datos/datos.json defe-web-build/dist/datos.json
@@ -56,7 +52,6 @@ jobs:
           OVERLAY="web-auth-overlay-${GITHUB_SHA}.js"
           cp web-auth-overlay.js "defe-web-build/dist/${OVERLAY}"
           sed -i "s#</body>#<script src=\"./${OVERLAY}\"></script></body>#" defe-web-build/dist/index.html
-
       - name: Forzar renovación real de caché PWA
         run: |
           cat > defe-web-build/dist/registerSW.js <<EOF
@@ -72,9 +67,7 @@ jobs:
                     window.location.reload();
                   }
                 });
-              } catch (e) {
-                console.error('No se pudo actualizar la app', e);
-              }
+              } catch (e) { console.error('No se pudo actualizar la app', e); }
             });
           }
           EOF
@@ -91,39 +84,31 @@ jobs:
             })());
           });
           EOF
-
-      - name: Verificar autenticación, marca y actualización PWA
+      - name: Verificar autenticación, UI V5 y actualización PWA
         run: |
           grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-*.js
           grep -R "Cuenta creada correctamente" defe-web-build/dist/assets/index-*.js
-          grep -R "#082D68" defe-web-build/dist/assets/index-*.js
-          grep -R "DEFE_BRAND_V4_1_20260909" defe-web-build/dist/assets/index-*.js
-          grep -R 'includes(x)?"MI DEFE"' defe-web-build/dist/assets/index-*.js
-          grep -R "MI BARRIO" defe-web-build/dist/assets/index-*.js
-          grep -R "EL GIGANTE DE TRES DE FEBRERO" defe-web-build/dist/assets/index-*.js
-          test -f defe-web-build/dist/escudo-dsl.svg
-          grep -F "v4.1-20260909" defe-web-build/dist/index.html
-          grep -F "#082D68" defe-web-build/dist/manifest.webmanifest
+          grep -R "DEFE_UI_V5_20260909" defe-web-build/dist/assets/index-*.js
+          grep -R "CLUB ATLÉTICO DEFENSORES DE SANTOS LUGARES" defe-web-build/dist/assets/index-*.js
+          grep -R "SIEMPRE DEFE!" defe-web-build/dist/assets/index-*.js
+          if grep -R 'entrada ${nt(g.entrada)}' defe-web-build/dist/assets/index-*.js; then exit 1; fi
+          grep -F "v5-20260909" defe-web-build/dist/index.html
           grep -F "updateViaCache: 'none'" defe-web-build/dist/registerSW.js
           grep -F "deploy-version: ${GITHUB_SHA}" defe-web-build/dist/sw.js
           grep -F "caches.delete" defe-web-build/dist/sw.js
-
       - name: Empaquetar dist
         run: |
           cd defe-web-build/dist
           zip -qr ../../defe-web-dist.zip .
-
       - uses: actions/upload-artifact@v4
         with:
           name: defe-web-dist
           path: defe-web-dist.zip
           retention-days: 7
-
       - name: Preparar Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: defe-web-build/dist
-
   deploy:
     environment:
       name: github-pages
