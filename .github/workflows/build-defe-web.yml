@@ -57,9 +57,9 @@ jobs:
           cp web-auth-overlay.js "defe-web-build/dist/${OVERLAY}"
           sed -i "s#</body>#<script src=\"./${OVERLAY}\"></script></body>#" defe-web-build/dist/index.html
 
-      - name: Forzar actualización inmediata de PWA
+      - name: Forzar renovación real de caché PWA
         run: |
-          cat > defe-web-build/dist/registerSW.js <<'EOF'
+          cat > defe-web-build/dist/registerSW.js <<EOF
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
               try {
@@ -67,8 +67,8 @@ jobs:
                 await reg.update();
                 if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
                 navigator.serviceWorker.addEventListener('controllerchange', () => {
-                  if (!sessionStorage.getItem('defe-sw-reloaded')) {
-                    sessionStorage.setItem('defe-sw-reloaded', '1');
+                  if (!sessionStorage.getItem('defe-sw-reloaded-${GITHUB_SHA}')) {
+                    sessionStorage.setItem('defe-sw-reloaded-${GITHUB_SHA}', '1');
                     window.location.reload();
                   }
                 });
@@ -78,9 +78,17 @@ jobs:
             });
           }
           EOF
-          cat >> defe-web-build/dist/sw.js <<'EOF'
+          cat >> defe-web-build/dist/sw.js <<EOF
+          // deploy-version: ${GITHUB_SHA}
           self.addEventListener('message', event => {
             if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+          });
+          self.addEventListener('activate', event => {
+            event.waitUntil((async () => {
+              const keys = await caches.keys();
+              await Promise.all(keys.map(key => caches.delete(key)));
+              await self.clients.claim();
+            })());
           });
           EOF
 
@@ -92,7 +100,8 @@ jobs:
           grep -R "linear-gradient(135deg,#332A73" defe-web-build/dist/assets/index-*.js
           test -f defe-web-build/dist/escudo-dsl.svg
           grep -F "updateViaCache: 'none'" defe-web-build/dist/registerSW.js
-          grep -F "SKIP_WAITING" defe-web-build/dist/sw.js
+          grep -F "deploy-version: ${GITHUB_SHA}" defe-web-build/dist/sw.js
+          grep -F "caches.delete" defe-web-build/dist/sw.js
 
       - name: Empaquetar dist
         run: |
