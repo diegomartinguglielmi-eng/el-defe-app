@@ -47,6 +47,16 @@ fs.writeFileSync(indexPath,html);
 console.log('V26 aplicada: Argenliga Primera conectada a Fixture, Resultados y Posiciones');
 
 await import('./patch-argenliga-v27.mjs');
+
+// Posiciones debe permanecer dentro del bloque Argenliga V27 para conservar
+// los filtros de rama y categoría, igual que LAAMBA.
+js=fs.readFileSync(jsPath,'utf8');
+const earlyOld='if(p==="posiciones"&&r!=="lamba")return u.jsx(Yf,{favs:e,liga:r,setLiga:n,irA:a,vista:p,setVista:g});';
+const earlyNew='if(p==="posiciones"&&r!=="lamba"&&r!=="argenliga")return u.jsx(Yf,{favs:e,liga:r,setLiga:n,irA:a,vista:p,setVista:g});';
+if(js.includes(earlyOld)) js=js.replace(earlyOld,earlyNew);
+else if(!js.includes(earlyNew)) throw new Error('No se encontró retorno temprano de Posiciones');
+fs.writeFileSync(jsPath,js);
+
 html=fs.readFileSync(indexPath,'utf8');
 html=html.replace(/<meta name="defe-brand" content="[^"]*"\s*\/>/,'<meta name="defe-brand" content="v26-argenliga-20260909" />');
 fs.writeFileSync(indexPath,html);
