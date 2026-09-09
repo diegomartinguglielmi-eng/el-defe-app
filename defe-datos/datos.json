@@ -1,6 +1,6 @@
 {
   "club": "DEF. DE SANTOS LUGARES",
-  "actualizado": "2026-09-09T13:48:31.299Z",
+  "actualizado": "2026-09-09T13:49:49.310Z",
   "ligas": [
     {
       "id": "fefi",
@@ -8,7 +8,7 @@
       "torneo": "Clausura 2026 · Zona H",
       "fuente": "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/",
       "conectada": true,
-      "actualizado": "2026-09-09T13:48:21.486Z",
+      "actualizado": "2026-09-09T13:49:39.885Z",
       "categorias": [
         "2013",
         "2014",
@@ -24,35 +24,7 @@
           "fecha": "2026-08-08",
           "rival": "ATLETICO LUGANO",
           "local": false,
-          "sede": "JOSé IGNACIO RUCCI 4170, CABA",
-          "marc": {
-            "2013": "GP",
-            "2014": [
-              2,
-              3
-            ],
-            "2015": [
-              3,
-              7
-            ],
-            "2016": [
-              2,
-              2
-            ],
-            "2017": [
-              2,
-              7
-            ],
-            "2018": [
-              6,
-              0
-            ],
-            "2019": [
-              2,
-              "NP"
-            ]
-          },
-          "estado": "verificado"
+          "sede": "JOSé IGNACIO RUCCI 4170, CABA"
         },
         {
           "nro": 2,
@@ -101,38 +73,7 @@
           "fecha": "2026-08-22",
           "rival": "C. S. D. ARGENTINO \"1\"",
           "local": false,
-          "sede": "ALBARIñO 2253, CAPITAL FEDERAL",
-          "marc": {
-            "2013": [
-              2,
-              2
-            ],
-            "2014": [
-              6,
-              2
-            ],
-            "2015": [
-              3,
-              7
-            ],
-            "2016": [
-              1,
-              6
-            ],
-            "2017": [
-              3,
-              0
-            ],
-            "2018": [
-              2,
-              4
-            ],
-            "2019": [
-              2,
-              2
-            ]
-          },
-          "estado": "verificado"
+          "sede": "ALBARIñO 2253, CAPITAL FEDERAL"
         },
         {
           "nro": 4,
@@ -181,38 +122,7 @@
           "fecha": "2026-09-05",
           "rival": "CNEL. BRANDSEN",
           "local": false,
-          "sede": "ROQUE SIMONE 3951, LA TABLADA",
-          "marc": {
-            "2013": [
-              3,
-              1
-            ],
-            "2014": [
-              2,
-              1
-            ],
-            "2015": [
-              3,
-              7
-            ],
-            "2016": [
-              5,
-              1
-            ],
-            "2017": [
-              5,
-              3
-            ],
-            "2018": [
-              5,
-              2
-            ],
-            "2019": [
-              6,
-              6
-            ]
-          },
-          "estado": "verificado"
+          "sede": "ROQUE SIMONE 3951, LA TABLADA"
         },
         {
           "nro": 6,
@@ -226,38 +136,7 @@
           "fecha": "2026-09-19",
           "rival": "LAMADRID",
           "local": false,
-          "sede": "DESAGUADERO 3180, C.A.B.A.",
-          "marc": {
-            "2013": [
-              2,
-              1
-            ],
-            "2014": [
-              3,
-              4
-            ],
-            "2015": [
-              11,
-              7
-            ],
-            "2016": [
-              2,
-              0
-            ],
-            "2017": [
-              2,
-              5
-            ],
-            "2018": [
-              0,
-              1
-            ],
-            "2019": [
-              6,
-              5
-            ]
-          },
-          "estado": "verificado"
+          "sede": "DESAGUADERO 3180, C.A.B.A."
         },
         {
           "nro": 8,
@@ -271,38 +150,7 @@
           "fecha": "2026-10-03",
           "rival": "EL TREBOL",
           "local": false,
-          "sede": "GANDARA 2840, CABA",
-          "marc": {
-            "2013": [
-              7,
-              2
-            ],
-            "2014": [
-              2,
-              3
-            ],
-            "2015": [
-              9,
-              7
-            ],
-            "2016": [
-              4,
-              2
-            ],
-            "2017": [
-              11,
-              3
-            ],
-            "2018": [
-              5,
-              3
-            ],
-            "2019": [
-              3,
-              8
-            ]
-          },
-          "estado": "verificado"
+          "sede": "GANDARA 2840, CABA"
         },
         {
           "nro": 10,
@@ -316,38 +164,7 @@
           "fecha": "2026-10-17",
           "rival": "A DOS TOQUES F. C.",
           "local": false,
-          "sede": "PASO 399, AVELLANEDA",
-          "marc": {
-            "2013": [
-              8,
-              0
-            ],
-            "2014": [
-              0,
-              2
-            ],
-            "2015": [
-              6,
-              7
-            ],
-            "2016": [
-              1,
-              1
-            ],
-            "2017": [
-              6,
-              0
-            ],
-            "2018": [
-              6,
-              6
-            ],
-            "2019": [
-              2,
-              1
-            ]
-          },
-          "estado": "verificado"
+          "sede": "PASO 399, AVELLANEDA"
         },
         {
           "nro": 12,
@@ -361,38 +178,7 @@
           "fecha": "2026-10-31",
           "rival": "ALVEAR",
           "local": false,
-          "sede": "JOSé E. RODO 4190, CABA",
-          "marc": {
-            "2013": [
-              1,
-              1
-            ],
-            "2014": [
-              4,
-              0
-            ],
-            "2015": [
-              5,
-              7
-            ],
-            "2016": [
-              1,
-              2
-            ],
-            "2017": [
-              4,
-              6
-            ],
-            "2018": [
-              0,
-              3
-            ],
-            "2019": [
-              3,
-              4
-            ]
-          },
-          "estado": "verificado"
+          "sede": "JOSé E. RODO 4190, CABA"
         },
         {
           "nro": 14,
@@ -406,17 +192,7 @@
           "fecha": "2026-11-14",
           "rival": "EL FORTIN DE BELGRANO",
           "local": false,
-          "sede": "CRAMER 3249, CABA",
-          "marc": {
-            "2013": "GP",
-            "2014": "GP",
-            "2015": "GP",
-            "2016": "GP",
-            "2017": "GP",
-            "2018": "GP",
-            "2019": "GP"
-          },
-          "estado": "verificado"
+          "sede": "CRAMER 3249, CABA"
         }
       ],
       "tablas": {
@@ -1469,7 +1245,7 @@
       "torneo": "Junior A · Torneo 2026",
       "fuente": "https://www.futsalargentina.com.ar/fixture.php?cat=1_1",
       "conectada": true,
-      "actualizado": "2026-09-09T13:48:22.884Z",
+      "actualizado": "2026-09-09T13:49:40.947Z",
       "categorias": [
         "Junior A"
       ],
@@ -1603,7 +1379,7 @@
       "categorias": [],
       "encuentros": [],
       "tablas": {},
-      "error": "403 en https://api.sofascore.com/api/v1/team/1214864/events/last/0"
+      "error": "403 en https://api.sofascore.com/api/v1/unique-tournament/34170/seasons"
     },
     {
       "id": "lamba",
@@ -1612,7 +1388,7 @@
       "torneo": "M - Elite I · F - Ascenso I Zona B",
       "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026",
       "conectada": true,
-      "actualizado": "2026-09-09T13:48:31.298Z",
+      "actualizado": "2026-09-09T13:49:49.310Z",
       "categorias": [
         "1RA",
         "3RA",
