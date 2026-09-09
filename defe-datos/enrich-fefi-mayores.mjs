@@ -5,7 +5,7 @@ const URL='https://fefi.com.ar/2026-futbol-sala-mayores-fefi/mayores-b/';
 const FILE='datos.json';
 const clean=v=>String(v??'').replace(/\s+/g,' ').trim();
 const compact=v=>clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
-const isDefe=v=>/DEF(ENSORES)?DES(ANTOS|TOS)LUGARES/.test(compact(v));
+const isDefe=v=>{const n=compact(v);return /^DEF.*SANTOSLUGARES$/.test(n)||/^DEF.*STOSLUGARES$/.test(n)};
 const asInt=v=>{const s=clean(v);if(!s||!/^-?\d+(?:[.,]\d+)?$/.test(s))return null;const n=Number(s.replace(',','.'));return Number.isFinite(n)?n:null};
 const months={ENERO:1,FEBRERO:2,MARZO:3,ABRIL:4,MAYO:5,JUNIO:6,JULIO:7,AGOSTO:8,SEPTIEMBRE:9,OCTUBRE:10,NOVIEMBRE:11,DICIEMBRE:12};
 function dateFromText(t){const m=clean(t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().match(/(\d{1,2})\s+DE\s+([A-Z]+)/);if(!m||!months[m[2]])return null;return `2026-${String(months[m[2]]).padStart(2,'0')}-${String(Number(m[1])).padStart(2,'0')}`}
