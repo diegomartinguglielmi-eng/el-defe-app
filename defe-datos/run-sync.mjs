@@ -5,6 +5,18 @@ const FEFI_URL = "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/";
 const CLUB = "DEF. DE SANTOS LUGARES";
 const CATEGORIAS_FEFI = ["2019", "2013", "2018", "2014", "2017", "2016", "2015"];
 
+const LAAMBA_BASE = "https://www.laamba.ar/torneoslaamba";
+const LAAMBA_FRENTES = [
+  { etiqueta: "1RA", rama: "masculino", torneo: "m-elite-i", division: "1ra", slug: "m-eliteiclausura" },
+  { etiqueta: "3RA", rama: "masculino", torneo: "m-elite-i", division: "3ra", slug: "m-eliteiclausura" },
+  { etiqueta: "4TA", rama: "masculino", torneo: "m-elite-i", division: "4ta", slug: "m-eliteiclausura" },
+  { etiqueta: "5TA", rama: "masculino", torneo: "m-elite-i", division: "5ta", slug: "m-eliteiclausura" },
+  { etiqueta: "6TA", rama: "masculino", torneo: "m-elite-i", division: "6ta", slug: "m-eliteiclausura" },
+  { etiqueta: "7MA", rama: "masculino", torneo: "m-elite-i", division: "7ma", slug: "m-eliteiclausura" },
+  { etiqueta: "8VA", rama: "masculino", torneo: "m-elite-i", division: "8va", slug: "m-eliteiclausura" },
+  { etiqueta: "FEM 1RA", rama: "femenino", torneo: "f-ascenso-i-zona-b", division: "1ra", slug: "f-ascensoi-zonab" },
+];
+
 const fetchOriginal = globalThis.fetch;
 const fetchSinCache = (url, init = {}) => {
   const separador = url.includes("?") ? "&" : "?";
@@ -32,6 +44,8 @@ const normalizar = (s) => limpiar(s)
   .replace(/[\u0300-\u036f]/g, "")
   .toUpperCase()
   .replace(/[^A-Z0-9]/g, "");
+
+const esDefeLaamba = (s) => /DEFENSORES\s+DE\s+SL|SANTOS\s*LUGARES/i.test(limpiar(s));
 
 function filasDeTablas(html) {
   const $ = cheerio.load(html);
@@ -66,9 +80,6 @@ async function completarResultadosFefi(salida) {
       const segunda = tabla[i + 1] || [];
       if (!/^F\d+$/i.test(primera[0] || "")) continue;
 
-      // FEFI omite la celda F# en la segunda fila del partido:
-      // primera = [F5, equipo1, 19,13,18,14,17,16,15,PJ,Pts,Estado]
-      // segunda = [equipo2, 19,13,18,14,17,16,15,PJ,Pts]
       const equipoPrimero = primera[1];
       const equipoSegundo = segunda[0];
       if (![equipoPrimero, equipoSegundo].includes(CLUB)) continue;
@@ -110,12 +121,130 @@ async function completarResultadosFefi(salida) {
   console.error(`FEFI: ${completados} fecha(s) con rival y marcadores validados.`);
 }
 
+function urlLaamba(frente, anio = 2026) {
+  return `${LAAMBA_BASE}/${frente.rama}/${frente.torneo}/${frente.division}/torneo/${frente.slug}/?db=${anio}`;
+}
+
+function numeroFechaParaTabla($, tabla) {
+  const item = $(tabla).closest(".accordion-item,.card,.tab-pane,section");
+  const textoItem = limpiar(item.find("button,.accordion-button,h1,h2,h3,h4,h5,h6").first().text());
+  const mItem = textoItem.match(/Fecha\s*(\d+)/i);
+  if (mItem) return Number(mItem[1]);
+
+  let nodo = $(tabla);
+  for (let i = 0; i < 8; i++) {
+    nodo = nodo.prev();
+    if (!nodo.length) break;
+    const m = limpiar(nodo.text()).match(/Fecha\s*(\d+)/i);
+    if (m) return Number(m[1]);
+  }
+  return null;
+}
+
+function partidosLaamba(html, frente) {
+  const $ = cheerio.load(html);
+  const partidos = [];
+
+  $("table").each((_, tabla) => {
+    const filas = $(tabla).find("tr").toArray().map((tr) =>
+      $(tr).find("th,td").toArray().map((td) => limpiar($(td).text()))
+    );
+    if (!filas.length) return;
+
+    const cab = filas[0].map((c) => c.toUpperCase());
+    const iLocal = cab.findIndex((c) => c === "LOCAL");
+    const iVisita = cab.findIndex((c) => c === "VISITANTE");
+    const iRes = cab.findIndex((c) => /RESULT/.test(c));
+    const iDir = cab.findIndex((c) => /DIRECCI/.test(c));
+    const iFecha = cab.findIndex((c) => /FECHA|D[IÍ]A/.test(c));
+    const iHora = cab.findIndex((c) => /HORA/.test(c));
+    if (iLocal < 0 || iVisita < 0) return;
+
+    const ronda = numeroFechaParaTabla($, tabla);
+    for (const fila of filas.slice(1)) {
+      const local = limpiar(fila[iLocal]);
+      const visitante = limpiar(fila[iVisita]);
+      if (!local || !visitante || (!esDefeLaamba(local) && !esDefeLaamba(visitante))) continue;
+
+      const somosLocal = esDefeLaamba(local);
+      const resultado = iRes >= 0 ? limpiar(fila[iRes]) : "";
+      const marcador = resultado.match(/(\d+)\s*[-–]\s*(\d+)/);
+      const gl = marcador ? Number(marcador[1]) : null;
+      const gv = marcador ? Number(marcador[2]) : null;
+
+      partidos.push({
+        liga: "LAAMBA",
+        rama: frente.rama,
+        categoria: frente.etiqueta,
+        ronda,
+        rival: somosLocal ? visitante : local,
+        local: somosLocal,
+        sede: iDir >= 0 ? limpiar(fila[iDir]) || null : null,
+        fechaTexto: iFecha >= 0 ? limpiar(fila[iFecha]) || null : null,
+        hora: iHora >= 0 ? limpiar(fila[iHora]) || null : null,
+        gf: marcador ? (somosLocal ? gl : gv) : null,
+        gc: marcador ? (somosLocal ? gv : gl) : null,
+        jugado: Boolean(marcador),
+        fuente: urlLaamba(frente),
+      });
+    }
+  });
+
+  const vistos = new Set();
+  return partidos.filter((p) => {
+    const k = `${p.rama}|${p.categoria}|${p.ronda}|${normalizar(p.rival)}|${p.local}|${p.gf}|${p.gc}`;
+    if (vistos.has(k)) return false;
+    vistos.add(k);
+    return true;
+  });
+}
+
+async function completarLaamba(salida) {
+  const liga = salida.ligas.find((l) => l.id === "lamba");
+  if (!liga) return;
+
+  const partidos = [];
+  const errores = [];
+  for (const frente of LAAMBA_FRENTES) {
+    const url = urlLaamba(frente);
+    try {
+      const html = await fetchSinCache(url).then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.text();
+      });
+      const extraidos = partidosLaamba(html, frente);
+      partidos.push(...extraidos);
+      console.error(`LAAMBA ${frente.etiqueta}: ${extraidos.length} partido(s) extraídos.`);
+    } catch (err) {
+      errores.push(`${frente.etiqueta}: ${err.message}`);
+      console.error(`LAAMBA ${frente.etiqueta}: ${err.message}`);
+    }
+    await new Promise((r) => setTimeout(r, 250));
+  }
+
+  liga.partidos = partidos;
+  liga.ramas = {
+    masculino: LAAMBA_FRENTES.filter((f) => f.rama === "masculino").map((f) => f.etiqueta),
+    femenino: LAAMBA_FRENTES.filter((f) => f.rama === "femenino").map((f) => f.etiqueta),
+  };
+  liga.categorias = [...liga.ramas.masculino, ...liga.ramas.femenino];
+  liga.torneo = "Masculino · Elite I | Femenino · Ascenso I Zona B";
+  liga.errorPartidos = errores.length ? errores : undefined;
+  liga.conectada = liga.conectada || partidos.length > 0;
+  liga.actualizado = new Date().toISOString();
+}
+
 const { sincronizar } = await import("./sync-ligas.mjs");
 const salida = await sincronizar();
 try {
   await completarResultadosFefi(salida);
 } catch (err) {
   console.error("No se pudo completar FEFI con el parser reforzado:", err.message);
+}
+try {
+  await completarLaamba(salida);
+} catch (err) {
+  console.error("No se pudo completar LAAMBA:", err.message);
 }
 writeFileSync("datos.json", JSON.stringify(salida, null, 2));
 console.error(`Listo: ${salida.ligas.filter((l) => l.conectada).length} liga(s) al día.`);
