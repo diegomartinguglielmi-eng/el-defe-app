@@ -22,9 +22,7 @@ const fetchSinCache = (url, init = {}) => {
 
 globalThis.fetch = (input, init = {}) => {
   const url = typeof input === "string" ? input : input?.url;
-  if (url && url.includes("fefi.com.ar/2026-torneo-anual-baby-futbol/h/")) {
-    return fetchSinCache(url, init);
-  }
+  if (url && url.includes("fefi.com.ar/2026-torneo-anual-baby-futbol/h/")) return fetchSinCache(url, init);
   return fetchOriginal(input, init);
 };
 
@@ -67,18 +65,24 @@ async function completarResultadosFefi(salida) {
       const primera = tabla[i] || [];
       const segunda = tabla[i + 1] || [];
       if (!/^F\d+$/i.test(primera[0] || "")) continue;
-      if (![primera[1], segunda[1]].includes(CLUB)) continue;
+
+      // FEFI omite la celda F# en la segunda fila del partido:
+      // primera = [F5, equipo1, 19,13,18,14,17,16,15,PJ,Pts,Estado]
+      // segunda = [equipo2, 19,13,18,14,17,16,15,PJ,Pts]
+      const equipoPrimero = primera[1];
+      const equipoSegundo = segunda[0];
+      if (![equipoPrimero, equipoSegundo].includes(CLUB)) continue;
 
       const nro = Number((primera[0] || "").replace(/\D/g, ""));
       const enc = liga.encuentros?.find((e) => e.nro === nro);
       if (!enc) continue;
 
-      const clubEsPrimero = primera[1] === CLUB;
-      const rivalTabla = clubEsPrimero ? segunda[1] : primera[1];
+      const clubEsPrimero = equipoPrimero === CLUB;
+      const rivalTabla = clubEsPrimero ? equipoSegundo : equipoPrimero;
       if (normalizar(rivalTabla) !== normalizar(enc.rival)) continue;
 
       const golesPrimero = primera.slice(2, 9);
-      const golesSegundo = segunda.slice(2, 9);
+      const golesSegundo = segunda.slice(1, 8);
       if (golesPrimero.length < 7 || golesSegundo.length < 7) continue;
       if ([...golesPrimero, ...golesSegundo].every((g) => limpiar(g) === "")) continue;
 
@@ -98,7 +102,7 @@ async function completarResultadosFefi(salida) {
 
       if (!validos) continue;
       enc.marc = marc;
-      enc.estado = limpiar(primera[11] || segunda[11] || "verificado").toLowerCase() || "verificado";
+      enc.estado = limpiar(primera[11] || "verificado").toLowerCase() || "verificado";
       completados++;
     }
   }
