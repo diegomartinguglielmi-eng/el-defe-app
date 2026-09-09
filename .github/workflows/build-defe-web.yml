@@ -15,6 +15,7 @@ on:
       - 'patch-ui-v8.mjs'
       - 'patch-ui-v9.mjs'
       - 'patch-ui-v11.mjs'
+      - 'patch-runtime-v19.mjs'
       - 'defe-datos/datos.json'
       - '.github/workflows/build-defe-web.yml'
 
@@ -66,13 +67,14 @@ jobs:
           grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-*.js
           grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-*.js
           grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-*.js
-      - name: Forzar bundle único V18 recuperación
+      - name: Corregir crash FEFI V19
+        run: node patch-runtime-v19.mjs
+      - name: Forzar bundle único V19
         run: |
           JS=$(basename $(ls defe-web-build/dist/assets/index-*.js | head -1))
-          UNIQUE="index-v18-recovery-${GITHUB_SHA}.js"
+          UNIQUE="index-v19-${GITHUB_SHA}.js"
           cp "defe-web-build/dist/assets/${JS}" "defe-web-build/dist/assets/${UNIQUE}"
           sed -i "s#assets/${JS}#assets/${UNIQUE}#" defe-web-build/dist/index.html
-          sed -i 's#v12-20260909#v18-recovery-20260909#g' defe-web-build/dist/index.html
           echo "Bundle publicado: ${UNIQUE}"
       - name: Incorporar datos y gestión de usuarios
         run: |
@@ -100,20 +102,22 @@ jobs:
           }
           EOF
           cat > defe-web-build/dist/sw.js <<EOF
-          // V18 recovery service worker intentionally inert
+          // V19 recovery service worker intentionally inert
           self.addEventListener('install', () => self.skipWaiting());
           self.addEventListener('activate', event => event.waitUntil(self.registration.unregister()));
           EOF
-      - name: Verificar recuperación V18 y datos FEFI
+      - name: Verificar V19 y datos FEFI
         run: |
-          grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-v18-recovery-${GITHUB_SHA}.js
-          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-v18-recovery-${GITHUB_SHA}.js
-          grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-v18-recovery-${GITHUB_SHA}.js
-          grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-v18-recovery-${GITHUB_SHA}.js
-          grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-v18-recovery-${GITHUB_SHA}.js
-          grep -F "assets/index-v18-recovery-${GITHUB_SHA}.js" defe-web-build/dist/index.html
-          grep -F "v18-recovery-20260909" defe-web-build/dist/index.html
-          grep -F "sessionStorage.getItem(key)" defe-web-build/dist/registerSW.js
+          grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-v19-${GITHUB_SHA}.js
+          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-v19-${GITHUB_SHA}.js
+          grep -R "DEFE_RUNTIME_V19_OPTIONAL_FEFI_PTS" defe-web-build/dist/assets/index-v19-${GITHUB_SHA}.js
+          grep -R 'Array.isArray(c.pts)' defe-web-build/dist/assets/index-v19-${GITHUB_SHA}.js
+          ! grep -R 'c.pts\[0\]' defe-web-build/dist/assets/index-v19-${GITHUB_SHA}.js | grep -v 'Array.isArray(c.pts)'
+          grep -R 'children:"Próxima fecha"' defe-web-build/dist/assets/index-v19-${GITHUB_SHA}.js
+          grep -R 'children:"Futsal"' defe-web-build/dist/assets/index-v19-${GITHUB_SHA}.js
+          grep -R 'children:"Novedades"' defe-web-build/dist/assets/index-v19-${GITHUB_SHA}.js
+          grep -F "assets/index-v19-${GITHUB_SHA}.js" defe-web-build/dist/index.html
+          grep -F "v19-runtime-20260909" defe-web-build/dist/index.html
           grep -R '"rival": "CNEL. BRANDSEN"' defe-web-build/dist/datos.json
           grep -A8 '"rival": "CNEL. BRANDSEN"' defe-web-build/dist/datos.json | grep -A3 '"2013"' | grep '4'
       - name: Empaquetar dist
