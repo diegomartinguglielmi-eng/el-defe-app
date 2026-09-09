@@ -45,8 +45,9 @@ jobs:
         run: |
           cp defe-datos/datos.json defe-web-build/dist/datos.json
           if [ -f defe-datos/salud.json ]; then cp defe-datos/salud.json defe-web-build/dist/salud.json; fi
-          cp web-auth-overlay.js defe-web-build/dist/web-auth-overlay.js
-          sed -i 's#</body>#<script src="./web-auth-overlay.js"></script></body>#' defe-web-build/dist/index.html
+          OVERLAY="web-auth-overlay-${GITHUB_SHA}.js"
+          cp web-auth-overlay.js "defe-web-build/dist/${OVERLAY}"
+          sed -i "s#</body>#<script src=\"./${OVERLAY}\"></script></body>#" defe-web-build/dist/index.html
 
       - name: Empaquetar dist
         run: |
