@@ -53,10 +53,39 @@ jobs:
           cp web-auth-overlay.js "defe-web-build/dist/${OVERLAY}"
           sed -i "s#</body>#<script src=\"./${OVERLAY}\"></script></body>#" defe-web-build/dist/index.html
 
-      - name: Verificar autenticación parcheada
+      - name: Forzar actualización inmediata de PWA
+        run: |
+          cat > defe-web-build/dist/registerSW.js <<'EOF'
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+              try {
+                const reg = await navigator.serviceWorker.register('/el-defe-app/sw.js', { updateViaCache: 'none' });
+                await reg.update();
+                if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                  if (!sessionStorage.getItem('defe-sw-reloaded')) {
+                    sessionStorage.setItem('defe-sw-reloaded', '1');
+                    window.location.reload();
+                  }
+                });
+              } catch (e) {
+                console.error('No se pudo actualizar la app', e);
+              }
+            });
+          }
+          EOF
+          cat >> defe-web-build/dist/sw.js <<'EOF'
+          self.addEventListener('message', event => {
+            if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+          });
+          EOF
+
+      - name: Verificar autenticación y actualización PWA
         run: |
           grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-*.js
           grep -R "Cuenta creada correctamente" defe-web-build/dist/assets/index-*.js
+          grep -F "updateViaCache: 'none'" defe-web-build/dist/registerSW.js
+          grep -F "SKIP_WAITING" defe-web-build/dist/sw.js
 
       - name: Empaquetar dist
         run: |
