@@ -14,7 +14,7 @@ const LAAMBA_FRENTES = [
   { etiqueta: "6TA", rama: "masculino", torneo: "m-elite-i", division: "6ta", slug: "m-eliteiclausura" },
   { etiqueta: "7MA", rama: "masculino", torneo: "m-elite-i", division: "7ma", slug: "m-eliteiclausura" },
   { etiqueta: "8VA", rama: "masculino", torneo: "m-elite-i", division: "8va", slug: "m-eliteiclausura" },
-  { etiqueta: "FEM 1RA", rama: "femenino", torneo: "f-ascenso-i-zona-b", division: "1ra", slug: "f-ascensoi-zonab" },
+  { etiqueta: "FEM RVA", rama: "femenino", torneo: "f-ascenso-i", division: "reserva", slug: "f-ascensoi" },
 ];
 
 const fetchOriginal = globalThis.fetch;
@@ -228,7 +228,7 @@ async function completarLaamba(salida) {
     femenino: LAAMBA_FRENTES.filter((f) => f.rama === "femenino").map((f) => f.etiqueta),
   };
   liga.categorias = [...liga.ramas.masculino, ...liga.ramas.femenino];
-  liga.torneo = "Masculino · Elite I | Femenino · Ascenso I Zona B";
+  liga.torneo = "Masculino · Elite I | Femenino · Ascenso I";
   liga.errorPartidos = errores.length ? errores : undefined;
   liga.conectada = liga.conectada || partidos.length > 0;
   liga.actualizado = new Date().toISOString();
