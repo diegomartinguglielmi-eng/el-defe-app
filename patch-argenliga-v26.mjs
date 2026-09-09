@@ -60,3 +60,9 @@ fs.writeFileSync(jsPath,js);
 html=fs.readFileSync(indexPath,'utf8');
 html=html.replace(/<meta name="defe-brand" content="[^"]*"\s*\/>/,'<meta name="defe-brand" content="v26-argenliga-20260909" />');
 fs.writeFileSync(indexPath,html);
+
+// V29: reemplazar nombres de ligas por los logos provistos por el usuario.
+await import('./patch-league-logos-v29.mjs');
+html=fs.readFileSync(indexPath,'utf8');
+html=html.replace(/<meta name="defe-brand" content="[^"]*"\s*\/>/,'<meta name="defe-brand" content="v26-argenliga-20260909" />');
+fs.writeFileSync(indexPath,html);
