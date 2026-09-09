@@ -97,11 +97,12 @@ jobs:
           grep -R "el-defe-v5-production.up.railway.app" defe-web-build/dist/assets/index-*.js
           grep -R "Cuenta creada correctamente" defe-web-build/dist/assets/index-*.js
           grep -R "#082D68" defe-web-build/dist/assets/index-*.js
-          grep -R "DEFE_BRAND_V4_20260909" defe-web-build/dist/assets/index-*.js
+          grep -R "DEFE_BRAND_V4_1_20260909" defe-web-build/dist/assets/index-*.js
+          grep -R 'includes(x)?"MI DEFE"' defe-web-build/dist/assets/index-*.js
           grep -R "MI BARRIO" defe-web-build/dist/assets/index-*.js
           grep -R "EL GIGANTE DE TRES DE FEBRERO" defe-web-build/dist/assets/index-*.js
           test -f defe-web-build/dist/escudo-dsl.svg
-          grep -F "v4-20260909" defe-web-build/dist/index.html
+          grep -F "v4.1-20260909" defe-web-build/dist/index.html
           grep -F "#082D68" defe-web-build/dist/manifest.webmanifest
           grep -F "updateViaCache: 'none'" defe-web-build/dist/registerSW.js
           grep -F "deploy-version: ${GITHUB_SHA}" defe-web-build/dist/sw.js
