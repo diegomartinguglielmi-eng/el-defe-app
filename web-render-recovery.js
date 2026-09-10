@@ -1,64 +1,107 @@
 (() => {
-  const ROOT_SELECTOR = '#root';
-  const RELOAD_KEY = 'defe-render-recovery-v1';
-  let timer = null;
+  const ROOT = '#root';
+  const BASE = '/el-defe-app/';
+  let blankTimer = null;
+  let lastRecovery = 0;
+
+  function jwtFromValue(value) {
+    if (!value || typeof value !== 'string') return null;
+    const direct = value.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);
+    if (direct) return direct[0];
+    try {
+      const parsed = JSON.parse(value);
+      if (typeof parsed === 'string') return jwtFromValue(parsed);
+      if (parsed && typeof parsed === 'object') {
+        for (const v of Object.values(parsed)) {
+          const found = jwtFromValue(typeof v === 'string' ? v : JSON.stringify(v));
+          if (found) return found;
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  function clearAuthOnly() {
+    for (const store of [localStorage, sessionStorage]) {
+      const remove = [];
+      for (let i = 0; i < store.length; i++) {
+        const key = store.key(i);
+        const value = store.getItem(key);
+        const k = (key || '').toLowerCase();
+        if (jwtFromValue(value) || /(^|[_-])(token|jwt|auth|session)([_-]|$)/.test(k)) {
+          // No borrar preferencias del usuario, categorías seguidas ni estado de push.
+          if (!k.includes('followed') && !k.includes('push') && !k.includes('notif')) remove.push(key);
+        }
+      }
+      remove.forEach(k => store.removeItem(k));
+    }
+  }
+
+  function hardHome(reason) {
+    const now = Date.now();
+    if (now - lastRecovery < 2500) return;
+    lastRecovery = now;
+    const u = `${BASE}?recover=${now}&reason=${encodeURIComponent(reason || 'blank')}`;
+    location.replace(u);
+  }
 
   function rootLooksBlank() {
-    const root = document.querySelector(ROOT_SELECTOR);
+    const root = document.querySelector(ROOT);
     if (!root) return true;
     const text = (root.innerText || '').replace(/\s+/g, ' ').trim();
-    const rect = root.getBoundingClientRect();
-    return text.length < 40 || rect.height < 220;
+    const visibleNodes = [...root.querySelectorAll('*')].filter(el => {
+      const r = el.getBoundingClientRect();
+      const s = getComputedStyle(el);
+      return r.width > 20 && r.height > 20 && s.display !== 'none' && s.visibility !== 'hidden';
+    }).length;
+    return text.length < 25 && visibleNodes < 3;
   }
 
-  function canReload() {
-    const now = Date.now();
-    let state = { ts: 0, count: 0 };
-    try { state = JSON.parse(sessionStorage.getItem(RELOAD_KEY) || '{}'); } catch (_) {}
-    if (!state.ts || now - state.ts > 12000) state = { ts: now, count: 0 };
-    if ((state.count || 0) >= 2) return false;
-    state.count = (state.count || 0) + 1;
-    state.ts = now;
-    sessionStorage.setItem(RELOAD_KEY, JSON.stringify(state));
-    return true;
+  function scheduleBlankCheck(reason = 'blank') {
+    clearTimeout(blankTimer);
+    blankTimer = setTimeout(() => {
+      if (document.visibilityState === 'visible' && rootLooksBlank()) hardHome(reason);
+    }, 1200);
   }
 
-  function recoverIfNeeded() {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      if (document.visibilityState !== 'visible' || !rootLooksBlank()) return;
-      if (!canReload()) return;
-      location.reload();
-    }, 900);
-  }
+  // El logout del bundle deja el árbol React vacío en algunos Android/PWA.
+  // Lo resolvemos de forma determinista: limpiamos SOLO autenticación y arrancamos la app de cero.
+  document.addEventListener('click', (event) => {
+    const el = event.target?.closest?.('button,a,[role="button"]');
+    if (!el) return;
+    const label = (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
 
-  function arm() {
-    const root = document.querySelector(ROOT_SELECTOR);
-    if (!root) {
-      recoverIfNeeded();
+    if (label.includes('cerrar sesión') || label.includes('cerrar sesion')) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      clearAuthOnly();
+      setTimeout(() => hardHome('logout'), 50);
       return;
     }
-    new MutationObserver(recoverIfNeeded).observe(root, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      characterData: true
-    });
-    recoverIfNeeded();
-  }
 
-  // Los cambios de sesión/ruta pueden vaciar temporalmente el árbol React.
-  // Si queda vacío de forma sostenida, una recarga reconstruye el estado desde storage.
-  document.addEventListener('click', (event) => {
-    const el = event.target && event.target.closest ? event.target.closest('button,a') : null;
-    const label = (el?.innerText || '').toLowerCase();
-    if (label.includes('cerrar sesión') || label.includes('ingresar') || label.includes('guardar selección')) {
-      setTimeout(recoverIfNeeded, 250);
+    if (label.includes('ingresar') || label.includes('guardar selección') || label.includes('guardar seleccion')) {
+      setTimeout(() => scheduleBlankCheck('session-change'), 300);
     }
   }, true);
-  window.addEventListener('pageshow', recoverIfNeeded);
-  window.addEventListener('focus', recoverIfNeeded);
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arm, { once: true });
-  else arm();
+  function armObserver() {
+    const root = document.querySelector(ROOT);
+    if (!root) {
+      scheduleBlankCheck('missing-root');
+      return;
+    }
+    const observer = new MutationObserver(() => scheduleBlankCheck('empty-root'));
+    observer.observe(root, { childList: true, subtree: true });
+    scheduleBlankCheck('startup');
+  }
+
+  window.addEventListener('pageshow', () => scheduleBlankCheck('pageshow'));
+  window.addEventListener('focus', () => scheduleBlankCheck('focus'));
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', armObserver, { once: true });
+  } else {
+    armObserver();
+  }
 })();
