@@ -49,7 +49,8 @@ def get_current_user(token:str|None=Depends(oauth2), db:Session=Depends(get_db))
         except (TypeError,ValueError):
             user=None
 
-    if not user or not user.is_active:
+    # Bases legacy pueden tener is_active=NULL. Sólo False explícito bloquea.
+    if user is None or user.is_active is False:
         raise HTTPException(status_code=401,detail="Usuario inválido")
     return user
 
