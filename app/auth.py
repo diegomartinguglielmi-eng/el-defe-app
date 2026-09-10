@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from jose import jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -53,9 +53,6 @@ def get_current_user(token:str|None=Depends(oauth2), db:Session=Depends(get_db))
         except (TypeError,ValueError):
             user=None
 
-    # admin@elde.fe es la identidad administrativa oficial de la app.
-    # Si existe en una base legacy como lector, la normalizamos al validar
-    # una sesión correctamente firmada de esa misma identidad.
     if user is not None and _email(user)==CANONICAL_ADMIN_EMAIL:
         changed=False
         if user.role!="admin":
@@ -66,8 +63,6 @@ def get_current_user(token:str|None=Depends(oauth2), db:Session=Depends(get_db))
             db.commit(); db.refresh(user)
         return user
 
-    # Compatibilidad con tokens admin anteriores: resolver primero contra
-    # la identidad oficial y no contra un administrador legacy configurado.
     if user is None and role=="admin":
         user=db.query(User).filter(func.lower(func.trim(User.email))==CANONICAL_ADMIN_EMAIL).first()
         if user is not None:
@@ -80,7 +75,11 @@ def get_current_user(token:str|None=Depends(oauth2), db:Session=Depends(get_db))
     return user
 
 def require_roles(*roles):
-    def dep(user:User=Depends(get_current_user)):
+    def dep(request:Request, user:User=Depends(get_current_user)):
+        # El rol Tienda sólo hereda permisos operativos equivalentes a delegado
+        # dentro de /api/store/admin. Nunca obtiene permisos administrativos globales.
+        if user.role=="tienda" and request.url.path.startswith("/api/store/admin") and "delegado" in roles:
+            return user
         if user.role not in roles:
             raise HTTPException(status_code=403,detail="Sin permiso")
         return user
