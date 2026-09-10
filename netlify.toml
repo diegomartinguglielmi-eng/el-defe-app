@@ -1,0 +1,10 @@
+[build]
+  command = "bash netlify-build.sh"
+  publish = "netlify-publish"
+
+[build.environment]
+  PYTHON_VERSION = "3.13"
+  NETLIFY_SKIP_PYTHON = "true"
+
+[functions]
+  directory = "netlify-functions-disabled"
