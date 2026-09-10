@@ -1,0 +1,15 @@
+// El Defe · Alertas operativas de stock
+(function(){
+  if(window.__defeStoreStockAlertsLoaded)return;
+  window.__defeStoreStockAlertsLoaded=true;
+  const API=()=>String(window.EL_DEFE_API_URL||'').replace(/\/$/,'');
+  const token=()=>localStorage.getItem('defe_token')||'';
+  const role=()=>localStorage.getItem('defe_role')||'';
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  let loading=false;
+  async function api(path){const r=await fetch(API()+path,{cache:'no-store',headers:{Authorization:'Bearer '+token()}}),j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.detail||'Error');return j;}
+  function critical(rows){const out=[];rows.filter(p=>p.active&&p.stock_managed).forEach(p=>(p.sizes||[]).forEach(size=>{const q=Number(p.inventory?.[size]||0);if(q<=2)out.push({name:p.name,size,q});}));return out.sort((a,b)=>a.q-b.q||a.name.localeCompare(b.name));}
+  async function render(){if(loading||!['admin','delegado'].includes(role()))return;const card=document.getElementById('storeAdminCard');if(!card)return;loading=true;try{const rows=await api('/api/store/admin/products'),items=critical(rows);let box=document.getElementById('storeStockAlerts');if(!box){box=document.createElement('div');box.id='storeStockAlerts';box.style.marginTop='14px';const anchor=document.getElementById('storeReceivingCard')||document.getElementById('storeOrdersCard')||document.getElementById('storeAdminList');if(anchor)card.insertBefore(box,anchor);else card.appendChild(box);}box.innerHTML=`<div style="padding-top:12px;border-top:1px solid var(--line)"><div class="row"><div><b>Stock crítico</b><div class="meta">Talles con 2 unidades o menos.</div></div><span class="badge">${items.length}</span></div>${items.length?`<div style="margin-top:8px">${items.slice(0,12).map(x=>`<div class="row" style="padding:7px 0;border-top:1px solid var(--line)"><div><b>${esc(x.name)}</b><div class="meta">Talle ${esc(x.size)}</div></div><span class="badge">${x.q===0?'AGOTADO':x.q+' disp.'}</span></div>`).join('')}${items.length>12?`<div class="meta" style="margin-top:7px">+ ${items.length-12} alertas adicionales.</div>`:''}</div>`:'<div class="meta" style="margin-top:8px">Sin faltantes ni stock bajo.</div>'}</div>`;}catch(e){}finally{loading=false;}}
+  function init(){const mo=new MutationObserver(()=>{if(document.getElementById('storeAdminCard'))render();});mo.observe(document.body,{childList:true,subtree:true});window.addEventListener('defe-store-admin-list-ready',()=>setTimeout(render,0));window.addEventListener('focus',render);setInterval(render,30000);setTimeout(render,1000);window.defeRefreshStoreStockAlerts=render;}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
