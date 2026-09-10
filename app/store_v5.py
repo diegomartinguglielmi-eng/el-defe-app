@@ -152,16 +152,24 @@ def update_order_status(order_id:int,payload:OrderStatusIn,db:Session=Depends(ge
     if payload.status not in allowed:raise HTTPException(400,'Estado inválido')
     row=db.query(StoreOrder).filter(StoreOrder.id==order_id).first()
     if not row:raise HTTPException(404,'Pedido no encontrado')
+    items=json.loads(row.items_json)
+    # Confirmar reserva/descuenta stock una sola vez. Si un pedido ya descontado se cancela,
+    # se devuelve exactamente la misma cantidad antes de marcarlo cancelado.
     if payload.status=='confirmed' and not row.stock_applied:
-        for item in json.loads(row.items_json):
+        for item in items:
             managed=db.query(StoreInventory).filter(StoreInventory.product_id==item['product_id']).first() is not None
             if not managed:continue
             inv=db.query(StoreInventory).filter(StoreInventory.product_id==item['product_id'],StoreInventory.size==item['size']).first()
             if not inv or inv.quantity<item['qty']:raise HTTPException(409,f"Stock insuficiente: {item['name']} talle {item['size']}")
-        for item in json.loads(row.items_json):
+        for item in items:
             inv=db.query(StoreInventory).filter(StoreInventory.product_id==item['product_id'],StoreInventory.size==item['size']).first()
             if inv:inv.quantity-=item['qty']
         row.stock_applied=True
+    elif payload.status=='cancelled' and row.stock_applied:
+        for item in items:
+            inv=db.query(StoreInventory).filter(StoreInventory.product_id==item['product_id'],StoreInventory.size==item['size']).first()
+            if inv:inv.quantity+=item['qty']
+        row.stock_applied=False
     row.status=payload.status;row.updated_at=datetime.now(timezone.utc);db.commit();db.refresh(row);return _order_out(row)
 
 DEFAULTS=[('camiseta-partido','Camiseta de partido','Partido','Camiseta oficial para llevar los colores del Defe dentro y fuera de la cancha.',['XS','S','M','L','XL','XXL']),('short-partido','Short de partido','Partido','Short oficial del club.',['XS','S','M','L','XL','XXL']),('medias','Medias oficiales','Partido','Medias para completar el conjunto de partido.',['Único']),('remera-entrenamiento','Remera de entrenamiento','Entrenamiento','Indumentaria para entrenamiento y uso diario.',['XS','S','M','L','XL','XXL']),('buzo','Buzo deportivo','Abrigo','Buzo del Defe para entrenar y acompañar al club.',['S','M','L','XL','XXL']),('campera','Campera del club','Abrigo','Campera institucional del Defe.',['S','M','L','XL','XXL']),('gorra','Gorra','Accesorios','Accesorio con identidad del club.',['Único'])]
