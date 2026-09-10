@@ -24,8 +24,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages-push-v1
-  cancel-in-progress: false
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   build:
