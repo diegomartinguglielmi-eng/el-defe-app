@@ -61,12 +61,18 @@ sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.
 echo "// inert" > defe-web-build/dist/sw.js
 echo "// inert" > defe-web-build/dist/registerSW.js
 
-PWA_HEAD='<link rel="manifest" href="/el-defe-app/manifest.webmanifest"><link rel="icon" type="image/png" href="/el-defe-app/icon.png"><meta name="theme-color" content="#0b3a7a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="El Defe">'
-sed -i "s#<head>#<head>${PWA_HEAD}#" defe-web-build/dist/index.html
-
-CLEAN="<script>(async function(){var k='defe-clean-${SHA}';if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{if('serviceWorker' in navigator){var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){return r.unregister()}));}if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(x){return caches.delete(x)}));}}catch(e){}location.replace('/el-defe-app/?v=${SHA}&clean=1');})();</script>"
-sed -i "s#<head>#<head>${CLEAN}#" defe-web-build/dist/index.html
-sed -i "s#<head>#<head><script>(function(){var v='${SHA}';if(!location.search.includes('v='+v)){location.replace('/el-defe-app/?v='+v);}})();</script>#" defe-web-build/dist/index.html
+python3 - "$SHA" <<'PY'
+from pathlib import Path
+import sys
+sha = sys.argv[1]
+p = Path('defe-web-build/dist/index.html')
+s = p.read_text()
+pwa = '<link rel="manifest" href="/el-defe-app/manifest.webmanifest"><link rel="icon" type="image/png" href="/el-defe-app/icon.png"><meta name="theme-color" content="#0b3a7a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="El Defe">'
+clean = f'''<script>(async function(){{var k='defe-clean-{sha}';if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{{if('serviceWorker' in navigator){{var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){{return r.unregister()}}));}}if('caches' in window){{var ks=await caches.keys();await Promise.all(ks.map(function(x){{return caches.delete(x)}}));}}}}catch(e){{}}location.replace('/el-defe-app/?v={sha}&clean=1');}})();</script>'''
+version = f'''<script>(function(){{var v='{sha}';if(!location.search.includes('v='+v)){{location.replace('/el-defe-app/?v='+v);}}}})();</script>'''
+s = s.replace('<head>', '<head>' + version + clean + pwa, 1)
+p.write_text(s)
+PY
 
 cp -R defe-web-build/dist/. netlify-publish/el-defe-app/
 printf '/ /el-defe-app/ 302\n/el-defe-app/* /el-defe-app/index.html 200\n' > netlify-publish/_redirects
