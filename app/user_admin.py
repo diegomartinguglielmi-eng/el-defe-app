@@ -36,7 +36,7 @@ class RoleIn(BaseModel):
     @classmethod
     def validate_role(cls, value: str):
         value = value.strip().lower()
-        if value not in {"lector", "admin"}:
+        if value not in {"lector", "tienda", "admin"}:
             raise ValueError("Rol inválido")
         return value
 
@@ -58,7 +58,7 @@ def register(payload: RegisterIn, db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == email).first():
         raise HTTPException(status_code=409, detail="Ese email ya está registrado")
 
-    # El alta pública nunca puede crear administradores.
+    # El alta pública nunca puede crear administradores ni operadores de Tienda.
     user = User(
         email=email,
         password_hash=hash_password(payload.password),
