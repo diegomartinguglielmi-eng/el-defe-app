@@ -149,12 +149,13 @@ def admin_orders(db:Session=Depends(get_db),user=Depends(require_roles('admin','
 def update_order_status(order_id:int,payload:OrderStatusIn,db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):
     import json
     allowed={'pending','confirmed','ready','delivered','cancelled'}
+    transitions={'pending':{'confirmed','cancelled'},'confirmed':{'ready','cancelled'},'ready':{'delivered','cancelled'},'delivered':set(),'cancelled':set()}
     if payload.status not in allowed:raise HTTPException(400,'Estado inválido')
     row=db.query(StoreOrder).filter(StoreOrder.id==order_id).first()
     if not row:raise HTTPException(404,'Pedido no encontrado')
+    if payload.status==row.status:return _order_out(row)
+    if payload.status not in transitions.get(row.status,set()):raise HTTPException(409,f'Transición inválida: {row.status} → {payload.status}')
     items=json.loads(row.items_json)
-    # Confirmar reserva/descuenta stock una sola vez. Si un pedido ya descontado se cancela,
-    # se devuelve exactamente la misma cantidad antes de marcarlo cancelado.
     if payload.status=='confirmed' and not row.stock_applied:
         for item in items:
             managed=db.query(StoreInventory).filter(StoreInventory.product_id==item['product_id']).first() is not None
