@@ -1,4 +1,6 @@
 (() => {
+  if(window.__defeSponsorsLoaded)return;
+  window.__defeSponsorsLoaded=true;
   const sponsors=[
     {name:'JM Distribuidora',rubro:'Distribución',logo:'JM'},
     {name:'Wimer',rubro:'Servicios',logo:'W'},
@@ -9,24 +11,20 @@
     {name:'Ascensores Pastorino',rubro:'Ascensores',logo:'AP'},
     {name:'Lo de Abru',rubro:'Beauty Bar',logo:'LA'}
   ];
-
   const css=document.createElement('style');
-  css.textContent=`#defe-acompanan-modal{position:fixed;inset:0;background:#f5f7fb;z-index:2147482500;overflow:auto;color:#112f55}.da-top{position:sticky;top:0;background:#0b3b78;color:#fff;padding:18px;display:flex;align-items:center;gap:14px}.da-back{border:0;background:#ffffff18;color:#fff;border-radius:50%;width:40px;height:40px;font-size:22px}.da-title{font-size:23px;font-weight:900}.da-sub{padding:18px 20px 4px;color:#65758b}.da-list{padding:12px 18px 100px;display:grid;gap:12px}.da-card{background:#fff;border:1px solid #dbe4ef;border-radius:16px;padding:13px;display:flex;align-items:center;gap:13px}.da-mark{width:64px;height:64px;border-radius:13px;border:1px solid #dbe4ef;display:flex;align-items:center;justify-content:center;font-weight:900;color:#0b3b78;background:#f9fbfe}.da-info{flex:1;text-align:left}.da-name{font-weight:900;font-size:17px}.da-rubro{font-size:13px;color:#718096;margin-top:4px}.da-arrow{font-size:24px;color:#0b3b78}.da-detail{padding:26px 20px}.da-detail .da-mark{width:110px;height:110px;margin:20px auto;font-size:27px}.da-detail h2,.da-detail p{text-align:center}.da-detail p{color:#64748b}.da-note{text-align:center;padding:22px;color:#0b3b78;font-weight:800}`;
+  css.textContent=`#defe-acompanan-launch{background:#fff;border:1px solid #dbe4ef;border-radius:18px;padding:14px 14px 12px;margin:14px 0}.da-launch-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.da-launch-title{font-size:18px;font-weight:900;color:#0b3b78}.da-launch-all{border:0;background:transparent;color:#0b3b78;font-weight:900;font-size:13px}.da-launch-sub{font-size:12px;color:#64748b;margin-top:4px}.da-strip{display:flex;gap:9px;overflow:auto;padding:12px 0 3px;scrollbar-width:none}.da-strip button{min-width:92px;height:70px;border:1px solid #dbe4ef;border-radius:14px;background:#f9fbfe;color:#0b3b78;font-weight:900;padding:8px}.da-strip small{display:block;color:#64748b;font-size:9px;font-weight:700;margin-top:4px}.da-launch-note{font-size:10px;color:#64748b;margin-top:7px}#defe-acompanan-modal{position:fixed;inset:0;background:#f5f7fb;z-index:2147482500;overflow:auto;color:#112f55}.da-top{position:sticky;top:0;background:#0b3b78;color:#fff;padding:18px;display:flex;align-items:center;gap:14px}.da-back{border:0;background:#ffffff18;color:#fff;border-radius:50%;width:40px;height:40px;font-size:22px}.da-title{font-size:23px;font-weight:900}.da-sub{padding:18px 20px 4px;color:#65758b}.da-list{padding:12px 18px 100px;display:grid;gap:12px}.da-card{background:#fff;border:1px solid #dbe4ef;border-radius:16px;padding:13px;display:flex;align-items:center;gap:13px}.da-mark{width:64px;height:64px;border-radius:13px;border:1px solid #dbe4ef;display:flex;align-items:center;justify-content:center;font-weight:900;color:#0b3b78;background:#f9fbfe}.da-info{flex:1;text-align:left}.da-name{font-weight:900;font-size:17px}.da-rubro{font-size:13px;color:#718096;margin-top:4px}.da-arrow{font-size:24px;color:#0b3b78}.da-detail{padding:26px 20px}.da-detail .da-mark{width:110px;height:110px;margin:20px auto;font-size:27px}.da-detail h2,.da-detail p{text-align:center}.da-detail p{color:#64748b}.da-note{text-align:center;padding:22px;color:#0b3b78;font-weight:800}`;
   document.head.appendChild(css);
 
-  function detail(s){
-    const m=document.getElementById('defe-acompanan-modal');
-    m.innerHTML=`<div class="da-top"><button class="da-back" id="da-detail-back">‹</button><div class="da-title">Nos acompañan</div></div><div class="da-detail"><div class="da-mark">${s.logo}</div><h2>${s.name}</h2><p>${s.rubro}</p><p>Acompaña al Defe y ayuda a sostener las actividades del club.</p><div class="da-note">Gracias por acompañar al Defe</div></div>`;
-    document.getElementById('da-detail-back').onclick=show;
-  }
-
-  function show(){
-    let m=document.getElementById('defe-acompanan-modal');
-    if(!m){m=document.createElement('div');m.id='defe-acompanan-modal';document.body.appendChild(m)}
-    m.innerHTML=`<div class="da-top"><button class="da-back" id="da-close">‹</button><div class="da-title">Nos acompañan</div></div><div class="da-sub">Empresas y comercios que acompañan al Defe.</div><div class="da-list">${sponsors.map((s,i)=>`<button class="da-card" data-i="${i}"><div class="da-mark">${s.logo}</div><div class="da-info"><div class="da-name">${s.name}</div><div class="da-rubro">${s.rubro}</div></div><div class="da-arrow">›</div></button>`).join('')}</div>`;
-    document.getElementById('da-close').onclick=()=>m.remove();
-    m.querySelectorAll('.da-card').forEach(b=>b.onclick=()=>detail(sponsors[+b.dataset.i]));
-  }
-
-  window.defeAcompanantes={show,detail,sponsors};
+  function detail(s){const m=document.getElementById('defe-acompanan-modal');if(!m)return;m.innerHTML=`<div class="da-top"><button class="da-back" id="da-detail-back">‹</button><div class="da-title">Nos acompañan</div></div><div class="da-detail"><div class="da-mark">${s.logo}</div><h2>${s.name}</h2><p>${s.rubro}</p><p>Acompaña al Defe y ayuda a sostener las actividades del club.</p><div class="da-note">Gracias por acompañar al Defe</div></div>`;document.getElementById('da-detail-back').onclick=show;}
+  function show(){let m=document.getElementById('defe-acompanan-modal');if(!m){m=document.createElement('div');m.id='defe-acompanan-modal';document.body.appendChild(m)}m.innerHTML=`<div class="da-top"><button class="da-back" id="da-close">‹</button><div class="da-title">Nos acompañan</div></div><div class="da-sub">Empresas y comercios que acompañan al Defe.</div><div class="da-list">${sponsors.map((s,i)=>`<button class="da-card" data-i="${i}"><div class="da-mark">${s.logo}</div><div class="da-info"><div class="da-name">${s.name}</div><div class="da-rubro">${s.rubro}</div></div><div class="da-arrow">›</div></button>`).join('')}</div>`;document.getElementById('da-close').onclick=()=>m.remove();m.querySelectorAll('.da-card').forEach(b=>b.onclick=()=>detail(sponsors[+b.dataset.i]));}
+  function launchHtml(){return `<div class="da-launch-head"><div><div class="da-launch-title">Nos acompañan</div><div class="da-launch-sub">Sponsors del fútbol del Defe</div></div><button class="da-launch-all" type="button">Ver todos →</button></div><div class="da-strip">${sponsors.slice(0,6).map((s,i)=>`<button type="button" data-sponsor="${i}">${s.logo}<small>${s.name}</small></button>`).join('')}</div><div class="da-launch-note">Gracias a quienes acompañan y hacen crecer al Defe.</div>`;}
+  function locateFutsal(){const all=[...document.querySelectorAll('h1,h2,h3,h4,div,span,p')];return all.find(el=>el.childElementCount===0&&el.textContent.trim()==='Futsal'&&el.offsetParent!==null)||null;}
+  function sectionFor(el){let n=el;for(let i=0;i<5&&n?.parentElement;i++,n=n.parentElement){const r=n.getBoundingClientRect();if(r.width>250&&r.height<700)return n;}return el?.parentElement||null;}
+  function mount(){if(document.getElementById('defe-acompanan-launch'))return true;const title=locateFutsal();if(!title)return false;const futsalSection=sectionFor(title);if(!futsalSection?.parentElement)return false;const parent=futsalSection.parentElement;let prev=futsalSection.previousElementSibling;const launch=document.createElement('section');launch.id='defe-acompanan-launch';launch.innerHTML=launchHtml();launch.querySelector('.da-launch-all').onclick=show;launch.querySelectorAll('[data-sponsor]').forEach(b=>b.onclick=()=>detailWithOpen(sponsors[+b.dataset.sponsor]));
+    const looksBroken=prev&&prev.querySelectorAll('img').length===1&&prev.textContent.trim().length<8&&prev.getBoundingClientRect().height>90;
+    if(looksBroken){prev.replaceWith(launch);}else{parent.insertBefore(launch,futsalSection);}return true;}
+  function detailWithOpen(s){show();detail(s);}
+  window.defeAcompanantes={show,detail,sponsors,mount};
+  let attempts=0;const timer=setInterval(()=>{attempts++;if(mount()||attempts>40)clearInterval(timer)},250);
+  new MutationObserver(()=>{if(!document.getElementById('defe-acompanan-launch'))mount();}).observe(document.body,{childList:true,subtree:true});
 })();
