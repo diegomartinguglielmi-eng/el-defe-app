@@ -1,5 +1,7 @@
 // El Defe · Gestión operativa de pedidos
 (function(){
+ if(window.__defeStoreOrdersModuleLoaded)return;
+ window.__defeStoreOrdersModuleLoaded=true;
  const API=()=>window.EL_DEFE_API_URL||'',token=()=>localStorage.getItem('defe_token')||'',role=()=>localStorage.getItem('defe_role')||'';
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
  const money=v=>v==null?'A confirmar':new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(v);
