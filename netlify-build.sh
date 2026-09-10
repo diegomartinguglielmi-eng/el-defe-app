@@ -53,6 +53,7 @@ CHECKOUTMARKER="store-checkout-marker-${SHA}.js"
 PICKUPHARDENING="store-pickup-hardening-${SHA}.js"
 ORDERSAFETY="store-order-safety-${SHA}.js"
 STORERECEIVING="store-receiving-${SHA}.js"
+STORESTOCKALERTS="store-stock-alerts-${SHA}.js"
 cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
 cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
 cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
@@ -64,10 +65,11 @@ cp app/static/store-checkout-marker.js "defe-web-build/dist/${CHECKOUTMARKER}"
 cp app/static/store-pickup-hardening.js "defe-web-build/dist/${PICKUPHARDENING}"
 cp app/static/store-order-safety.js "defe-web-build/dist/${ORDERSAFETY}"
 cp app/static/store-receiving.js "defe-web-build/dist/${STORERECEIVING}"
+cp app/static/store-stock-alerts.js "defe-web-build/dist/${STORESTOCKALERTS}"
 cp push-sw.js defe-web-build/dist/push-sw.js
 cp manifest.webmanifest defe-web-build/dist/manifest.webmanifest
 cp mobile/assets/icon.png defe-web-build/dist/icon.png
-sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${RECOVERY}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${STORECHECKOUT}\"></script><script src=\"./${CHECKOUTMARKER}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script></body>#" defe-web-build/dist/index.html
+sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${RECOVERY}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${STORECHECKOUT}\"></script><script src=\"./${CHECKOUTMARKER}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script></body>#" defe-web-build/dist/index.html
 
 sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
 echo "// inert" > defe-web-build/dist/sw.js
