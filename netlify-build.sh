@@ -49,6 +49,7 @@ PUSH="web-push-overlay-${SHA}.js"
 RECOVERY="web-render-recovery-${SHA}.js"
 ACOMP="web-acompanan-overlay-${SHA}.js"
 STORECHECKOUT="store-checkout-${SHA}.js"
+ORDERSAFETY="store-order-safety-${SHA}.js"
 cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
 cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
 cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
@@ -56,10 +57,11 @@ cp web-push-overlay.js "defe-web-build/dist/${PUSH}"
 cp web-render-recovery.js "defe-web-build/dist/${RECOVERY}"
 cp web-acompanan-overlay.js "defe-web-build/dist/${ACOMP}"
 cp app/static/store-checkout.js "defe-web-build/dist/${STORECHECKOUT}"
+cp app/static/store-order-safety.js "defe-web-build/dist/${ORDERSAFETY}"
 cp push-sw.js defe-web-build/dist/push-sw.js
 cp manifest.webmanifest defe-web-build/dist/manifest.webmanifest
 cp mobile/assets/icon.png defe-web-build/dist/icon.png
-sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${RECOVERY}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${STORECHECKOUT}\"></script></body>#" defe-web-build/dist/index.html
+sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${RECOVERY}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${STORECHECKOUT}\"></script><script src=\"./${ORDERSAFETY}\"></script></body>#" defe-web-build/dist/index.html
 
 sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
 echo "// inert" > defe-web-build/dist/sw.js
