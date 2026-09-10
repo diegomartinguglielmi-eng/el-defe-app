@@ -10,6 +10,7 @@ on:
       - 'defe-web-listo.zip'
       - 'web-auth-overlay.js'
       - 'web-comms-overlay.js'
+      - 'web-comms-push-bridge.js'
       - 'web-push-overlay.js'
       - 'push-sw.js'
       - 'patch-*.mjs'
@@ -82,21 +83,20 @@ jobs:
           cp defe-datos/datos.json defe-web-build/dist/datos.json
           if [ -f defe-datos/salud.json ]; then cp defe-datos/salud.json defe-web-build/dist/salud.json; fi
           AUTH="web-auth-overlay-${GITHUB_SHA}.js"
+          BRIDGE="web-comms-push-bridge-${GITHUB_SHA}.js"
           COMMS="web-comms-overlay-${GITHUB_SHA}.js"
           PUSH="web-push-overlay-${GITHUB_SHA}.js"
           cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
+          cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
           cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
           cp web-push-overlay.js "defe-web-build/dist/${PUSH}"
           cp push-sw.js defe-web-build/dist/push-sw.js
-          sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script></body>#" defe-web-build/dist/index.html
+          sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script></body>#" defe-web-build/dist/index.html
       - name: Limpiar PWA y service workers antiguos
         run: |
-          # No volver a registrar el service worker generado por la PWA.
           sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
           echo "// inert" > defe-web-build/dist/sw.js
           echo "// inert" > defe-web-build/dist/registerSW.js
-          # La primera carga de esta versión elimina SW/cache viejos y recarga una sola vez.
-          # Recién después el overlay registra push-sw.js, que NO implementa cache/fetch.
           CLEAN="<script>(async function(){var k='defe-clean-${GITHUB_SHA}';if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{if('serviceWorker' in navigator){var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){return r.unregister()}));}if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(x){return caches.delete(x)}));}}catch(e){}location.replace('/el-defe-app/?v=${GITHUB_SHA}&clean=1');})();</script>"
           sed -i "s#<head>#<head>${CLEAN}#" defe-web-build/dist/index.html
           sed -i "s#<head>#<head><script>(function(){var v='${GITHUB_SHA}';if(!location.search.includes('v='+v)){location.replace('/el-defe-app/?v='+v);}})();</script>#" defe-web-build/dist/index.html
@@ -111,6 +111,8 @@ jobs:
           grep -F ">Pts<" defe-web-build/dist/fefi-senior-v35-${GITHUB_SHA}.js
           grep -F "web-comms-overlay-${GITHUB_SHA}.js" defe-web-build/dist/index.html
           grep -F "Nueva comunicación" defe-web-build/dist/web-comms-overlay-${GITHUB_SHA}.js
+          grep -F "web-comms-push-bridge-${GITHUB_SHA}.js" defe-web-build/dist/index.html
+          grep -F "/api/notifications/communication" defe-web-build/dist/web-comms-push-bridge-${GITHUB_SHA}.js
           grep -F "web-push-overlay-${GITHUB_SHA}.js" defe-web-build/dist/index.html
           grep -F "push-sw.js" defe-web-build/dist/web-push-overlay-${GITHUB_SHA}.js
           grep -F "addEventListener('push'" defe-web-build/dist/push-sw.js
