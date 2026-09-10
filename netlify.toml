@@ -3,6 +3,7 @@
   publish = "netlify-publish"
 
 [build.environment]
+  NODE_VERSION = "20"
   PYTHON_VERSION = "3.13"
   NETLIFY_SKIP_PYTHON = "true"
 
