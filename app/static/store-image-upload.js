@@ -1,5 +1,7 @@
 // El Defe · carga directa de fotos para Gestión de Tienda
 (function(){
+  if(window.__defeStoreImageUploadLoaded)return;
+  window.__defeStoreImageUploadLoaded=true;
   const MAX_SOURCE=8*1024*1024, MAX_DIM=1400, QUALITY=.84;
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 
@@ -17,7 +19,8 @@
   }
 
   function enhanceForm(){
-    const box=document.getElementById('storeAdminForm'),url=document.getElementById('spImage');
+    const box=document.getElementById('storeAdminForm');
+    const url=document.getElementById('sapImage')||document.getElementById('spImage');
     if(!box||!url||document.getElementById('spImageUploadWrap'))return;
     const wrap=document.createElement('div');wrap.id='spImageUploadWrap';wrap.style.margin='6px 0 12px';
     wrap.innerHTML=`<div style="font-size:11px;font-weight:900;margin-bottom:6px">Foto del producto</div>
@@ -29,8 +32,8 @@
     url.placeholder='O pegá una URL de foto';
     const file=document.getElementById('spImageFile'),preview=document.getElementById('spImagePreview'),remove=document.getElementById('spImageRemove'),msg=document.getElementById('spImageUploadMsg');
     function paint(){const v=url.value.trim();preview.innerHTML=v?`<img src="${esc(v)}" alt="Vista previa" style="width:100%;max-height:240px;object-fit:contain;border-radius:14px;border:1px solid var(--line);background:#f6f4ff">`:'';remove.style.display=v?'block':'none';url.style.display=v.startsWith('data:image/')?'none':'';}
-    file.onchange=async()=>{const f=file.files?.[0];if(!f)return;msg.textContent='Procesando foto…';try{url.value=await optimize(f);paint();msg.textContent='Foto lista. Tocá “Guardar producto” para publicarla.';}catch(e){msg.textContent=e.message||'No se pudo procesar la foto.';file.value='';}};
-    remove.onclick=()=>{url.value='';file.value='';paint();msg.textContent='Foto eliminada del formulario. Guardá el producto para aplicar el cambio.';};
+    file.onchange=async()=>{const f=file.files?.[0];if(!f)return;msg.textContent='Procesando foto…';try{url.value=await optimize(f);url.dispatchEvent(new Event('input',{bubbles:true}));paint();msg.textContent='Foto lista. Tocá “Guardar producto” para publicarla.';}catch(e){msg.textContent=e.message||'No se pudo procesar la foto.';file.value='';}};
+    remove.onclick=()=>{url.value='';file.value='';url.dispatchEvent(new Event('input',{bubbles:true}));paint();msg.textContent='Foto eliminada del formulario. Guardá el producto para aplicar el cambio.';};
     url.addEventListener('input',paint);paint();
   }
 
