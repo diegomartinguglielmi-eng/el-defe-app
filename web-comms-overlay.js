@@ -1,3 +1,4 @@
+// Stable V35 + Comunicaciones V3 baseline; no functional change. Force Pages rebuild.
 (() => {
  const API='https://el-defe-v5-production.up.railway.app', READ='defe_comunicaciones_leidas_v3'; let cache=[], adminState=false;
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
