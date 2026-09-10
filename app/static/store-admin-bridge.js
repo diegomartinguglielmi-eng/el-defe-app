@@ -3,13 +3,23 @@
   const API=()=>String(window.EL_DEFE_API_URL||'').replace(/\/$/,'');
   const token=()=>localStorage.getItem('defe_token')||'';
   const role=()=>localStorage.getItem('defe_role')||'';
-  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const money=v=>v==null?'Precio a confirmar':new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(v);
   let ensuring=false;
   async function api(path,opts={}){
     opts.headers={...(opts.headers||{})};if(token())opts.headers.Authorization='Bearer '+token();
     const r=await fetch(API()+path,{...opts,cache:'no-store'}),j=await r.json().catch(()=>({}));
     if(!r.ok)throw new Error(j.detail||'Error');return j;
+  }
+  function loadModule(name,key,version='cierre-1609'){
+    if(document.querySelector(`script[data-${key}]`))return;
+    const s=document.createElement('script');s.src=API()+`/static/${name}?v=${version}`;s.dataset[key]='1';document.body.appendChild(s);
+  }
+  function ensureSupportingModules(){
+    loadModule('store-stock.js','storeStock');
+    loadModule('store-orders.js','storeOrders');
+    loadModule('store-settings.js','storeSettings');
+    loadModule('store-image-upload.js','storeImageUpload');
   }
   function ensureRosterModule(){
     if(document.getElementById('rosterAdminCard'))return;
@@ -49,11 +59,13 @@
       let card=document.getElementById('storeAdminCard');
       if(!card){
         card=document.createElement('div');card.className='card';card.id='storeAdminCard';
-        card.innerHTML=`<div class="row"><div><b>Gestión de Tienda</b><div class="meta">Pedidos, catálogo y stock.</div></div><span class="badge">TIENDA</span></div><button id="storeNewProductBridge" class="btn" style="margin-top:10px">+ Nuevo producto</button><div id="storeAdminForm"></div><div id="storeAdminList" style="margin-top:10px"></div>`;
+        card.innerHTML=`<div class="row"><div><b>Gestión de Tienda</b><div class="meta">Pedidos, catálogo, stock, fotos y configuración.</div></div><span class="badge">TIENDA</span></div><button id="storeNewProductBridge" class="btn" style="margin-top:10px">+ Nuevo producto</button><div id="storeAdminForm"></div><div id="storeAdminList" style="margin-top:10px"></div>`;
         tools.insertBefore(card,tools.firstChild);
         document.getElementById('storeNewProductBridge').onclick=()=>openForm();
         await loadList();
       }
+      ensureSupportingModules();
+      setTimeout(()=>{window.defeLoadStoreOrders?.();},250);
     }finally{ensuring=false;}
   }
   window.defeEnsureStoreAdmin=ensure;
