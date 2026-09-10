@@ -23,7 +23,9 @@
 
   function wrapCartQty(){const original=window.defeStoreQty;if(typeof original!=='function'||original.__stockGuard)return;const wrapped=async function(key,delta){if(delta<=0)return original.apply(this,arguments);try{await refreshProducts(false);}catch{return original.apply(this,arguments);}const cart=readCart(),line=cart.find(x=>x.key===key),p=line&&byId(line.id);if(!line||!p)return original.apply(this,arguments);const q=stockFor(p,line.size);if(q!=null&&line.qty>=q)return;return original.apply(this,arguments);};wrapped.__stockGuard=true;window.defeStoreQty=wrapped;}
 
-  function loadCheckout(){if(typeof window.defeStoreCheckout==='function')return;const existing=[...document.scripts].some(s=>/store-checkout(?:-|\.js)/.test(s.src||''));if(existing)return;const s=document.createElement('script');const base=String(API()||'').replace(/\/$/,'');s.src=`${base}/static/store-checkout.js?v=fallback-1609`;s.dataset.storeCheckout='1';document.body.appendChild(s);}
+  // El checkout oficial se inyecta desde netlify-build.sh. No cargar una segunda copia desde Railway:
+  // mezclar versiones fue una fuente de inconsistencias en carrito, retiro y WhatsApp.
+  function loadCheckout(){return;}
   function scheduleDetailEnhance(){if(!document.getElementById('storeDetailBody'))return;clearTimeout(detailTimer);detailTimer=setTimeout(enhanceProductDetail,100);}
   function observe(){const mo=new MutationObserver(()=>{scheduleDetailEnhance();wrapCartQty();});mo.observe(document.body,{childList:true,subtree:true});}
   function init(){observe();loadCheckout();window.addEventListener('defe-store-admin-list-ready',()=>{adminProductsLoaded=false;renderAdminButtons(true)});setTimeout(()=>{renderAdminButtons();scheduleDetailEnhance();wrapCartQty();},500);}
