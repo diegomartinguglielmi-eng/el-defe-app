@@ -43,9 +43,18 @@ class UrgentNoticeIn(BaseModel):
     body: str
     competition: Optional[str] = None
     category: Optional[str] = None
+
+class CommunicationNoticeIn(BaseModel):
+    title: str
+    body: str
+    competition: Optional[str] = None
+    category: Optional[str] = None
+    priority: Optional[str] = None
+
 class PushKeysIn(BaseModel):
     p256dh: str
     auth: str
+
 class PushSubscriptionIn(BaseModel):
     endpoint: str
     keys: PushKeysIn
@@ -67,7 +76,7 @@ def _wants(sub, event):
     return True
 
 def _push_payload(event):
-    return json.dumps({"id":event.id,"title":event.title,"body":event.body,"urgent":event.urgent,"competition":event.competition,"category":event.category,"url":"/"},ensure_ascii=False)
+    return json.dumps({"id":event.id,"title":event.title,"body":event.body,"urgent":event.urgent,"competition":event.competition,"category":event.category,"url":"/el-defe-app/"},ensure_ascii=False)
 
 def deliver_pushes(db, event):
     private_key=_vapid_private_key(); public_key=_vapid_public_key()
@@ -97,11 +106,13 @@ def publish_event(db,*,event_type,title,body,competition=None,category=None,matc
     db.add(event); db.flush(); setattr(event,"push_result",deliver_pushes(db,event)); return event
 
 router=APIRouter(prefix="/api/notifications",tags=["Notifications"])
+
 @router.get("/push/public-key")
 def push_public_key():
     key=_vapid_public_key()
     if not key: raise HTTPException(status_code=503,detail="Web Push todavía no está configurado")
     return {"public_key":key}
+
 @router.post("/push/subscribe")
 def push_subscribe(payload:PushSubscriptionIn,db:Session=Depends(get_db)):
     endpoint=payload.endpoint.strip()
@@ -110,15 +121,28 @@ def push_subscribe(payload:PushSubscriptionIn,db:Session=Depends(get_db)):
     if not row: row=PushSubscription(endpoint_hash=endpoint_hash,endpoint=endpoint,p256dh=payload.keys.p256dh,auth=payload.keys.auth); db.add(row)
     row.endpoint=endpoint; row.p256dh=payload.keys.p256dh; row.auth=payload.keys.auth; row.followed_json=json.dumps(payload.followed,ensure_ascii=False); row.enabled=True; db.commit()
     return {"ok":True,"background_push":True}
+
 @router.post("/push/unsubscribe")
 def push_unsubscribe(payload:PushSubscriptionIn,db:Session=Depends(get_db)):
     h=hashlib.sha256(payload.endpoint.strip().encode()).hexdigest(); row=db.query(PushSubscription).filter(PushSubscription.endpoint_hash==h).first()
     if row: row.enabled=False; db.commit()
     return {"ok":True}
+
 @router.get("/feed")
 def notification_feed(since_id:int=0,limit:int=50,db:Session=Depends(get_db)):
     limit=max(1,min(limit,100)); rows=db.query(NotificationEvent).filter(NotificationEvent.id>since_id).order_by(NotificationEvent.id.asc()).limit(limit).all()
     return [{"id":x.id,"event_type":x.event_type,"title":x.title,"body":x.body,"competition":x.competition,"category":x.category,"match_id":x.match_id,"urgent":x.urgent,"created_at":x.created_at} for x in rows]
+
+@router.post("/communication")
+def create_communication_notice(payload:CommunicationNoticeIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado"))):
+    priority=(payload.priority or "Información").strip()
+    title=payload.title.strip() or "Nueva comunicación"
+    body=payload.body.strip()
+    if not body: raise HTTPException(status_code=400,detail="El mensaje no puede estar vacío")
+    event=publish_event(db,event_type="communication",title=title,body=body,competition=payload.competition,category=payload.category,urgent=False)
+    db.commit(); db.refresh(event)
+    return {"ok":True,"id":event.id,"priority":priority,"push":getattr(event,"push_result",None)}
+
 @router.post("/urgent")
 def create_urgent_notice(payload:UrgentNoticeIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado"))):
     event=publish_event(db,event_type="urgent",title=payload.title.strip() or "Aviso urgente",body=payload.body.strip(),competition=payload.competition,category=payload.category,urgent=True); db.commit(); db.refresh(event)
