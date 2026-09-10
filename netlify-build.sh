@@ -51,11 +51,17 @@ cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
 cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
 cp web-push-overlay.js "defe-web-build/dist/${PUSH}"
 cp push-sw.js defe-web-build/dist/push-sw.js
+cp manifest.webmanifest defe-web-build/dist/manifest.webmanifest
+cp mobile/assets/icon.png defe-web-build/dist/icon.png
 sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script></body>#" defe-web-build/dist/index.html
 
 sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
 echo "// inert" > defe-web-build/dist/sw.js
 echo "// inert" > defe-web-build/dist/registerSW.js
+
+PWA_HEAD='<link rel="manifest" href="/el-defe-app/manifest.webmanifest"><link rel="icon" type="image/png" href="/el-defe-app/icon.png"><meta name="theme-color" content="#0b3a7a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="El Defe">'
+sed -i "s#<head>#<head>${PWA_HEAD}#" defe-web-build/dist/index.html
+
 CLEAN="<script>(async function(){var k='defe-clean-${SHA}';if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{if('serviceWorker' in navigator){var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){return r.unregister()}));}if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(x){return caches.delete(x)}));}}catch(e){}location.replace('/el-defe-app/?v=${SHA}&clean=1');})();</script>"
 sed -i "s#<head>#<head>${CLEAN}#" defe-web-build/dist/index.html
 sed -i "s#<head>#<head><script>(function(){var v='${SHA}';if(!location.search.includes('v='+v)){location.replace('/el-defe-app/?v='+v);}})();</script>#" defe-web-build/dist/index.html
