@@ -12,16 +12,22 @@ from .models import User
 pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2 = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 ALGO="HS256"
+CANONICAL_ADMIN_EMAIL="admin@elde.fe"
 
 def hash_password(p): return pwd.hash(p)
 def verify_password(p,h): return pwd.verify(p,h)
 
+def _email(user):
+    return str(getattr(user,"email","") or "").strip().lower()
+
 def create_token(user:User):
     exp=datetime.now(timezone.utc)+timedelta(minutes=settings.access_token_minutes)
+    email=_email(user)
+    role="admin" if email==CANONICAL_ADMIN_EMAIL else user.role
     return jwt.encode({
         "sub":str(user.id),
-        "email":user.email.strip().lower(),
-        "role":user.role,
+        "email":email,
+        "role":role,
         "exp":exp,
     },settings.secret_key,algorithm=ALGO)
 
@@ -38,40 +44,36 @@ def get_current_user(token:str|None=Depends(oauth2), db:Session=Depends(get_db))
     uid=data.get("sub")
     user=None
 
-    # 1) Identidad estable por email firmado.
     if email:
         user=db.query(User).filter(func.lower(func.trim(User.email))==email).first()
 
-    # 2) Compatibilidad por ID para tokens antiguos.
     if user is None and uid is not None:
         try:
             user=db.get(User,int(uid))
         except (TypeError,ValueError):
             user=None
 
-    # 3) Un token firmado con rol admin se resuelve contra el administrador
-    # configurado del servicio. Esto cubre tokens anteriores sin claim email o
-    # con un sub obsoleto después de recreaciones/migraciones de la base.
-    admin_email=str(settings.admin_email or "").strip().lower()
-    if user is None and role=="admin" and admin_email:
-        user=db.query(User).filter(func.lower(func.trim(User.email))==admin_email).first()
+    # admin@elde.fe es la identidad administrativa oficial de la app.
+    # Si existe en una base legacy como lector, la normalizamos al validar
+    # una sesión correctamente firmada de esa misma identidad.
+    if user is not None and _email(user)==CANONICAL_ADMIN_EMAIL:
+        changed=False
+        if user.role!="admin":
+            user.role="admin"; changed=True
+        if user.is_active is not True:
+            user.is_active=True; changed=True
+        if changed:
+            db.commit(); db.refresh(user)
+        return user
 
-    # 4) Si el token firmado representa al admin configurado y la fila no
-    # existe, recreamos únicamente esa identidad administrativa.
-    if user is None and role=="admin" and admin_email and (not email or email==admin_email):
-        user=User(
-            email=settings.admin_email,
-            password_hash=hash_password(settings.admin_password),
-            role="admin",
-            is_active=True,
-        )
-        db.add(user)
-        try:
-            db.commit()
-            db.refresh(user)
-        except Exception:
-            db.rollback()
-            user=db.query(User).filter(func.lower(func.trim(User.email))==admin_email).first()
+    # Compatibilidad con tokens admin anteriores: resolver primero contra
+    # la identidad oficial y no contra un administrador legacy configurado.
+    if user is None and role=="admin":
+        user=db.query(User).filter(func.lower(func.trim(User.email))==CANONICAL_ADMIN_EMAIL).first()
+        if user is not None:
+            if user.role!="admin" or user.is_active is not True:
+                user.role="admin"; user.is_active=True; db.commit(); db.refresh(user)
+            return user
 
     if user is None or user.is_active is False:
         raise HTTPException(status_code=401,detail="Usuario inválido")
