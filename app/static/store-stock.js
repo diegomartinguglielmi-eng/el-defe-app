@@ -1,5 +1,7 @@
 // El Defe · Stock por talle y control de carrito
 (function(){
+  if(window.__defeStoreStockModuleLoaded)return;
+  window.__defeStoreStockModuleLoaded=true;
   const API=()=>window.EL_DEFE_API_URL||'';
   const CART_KEY='defe_store_cart_v1';
   let products=[], adminProductsLoaded=false, detailTimer=null;
