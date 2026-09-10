@@ -10,6 +10,12 @@
   const b64ToBytes=s=>{const p='='.repeat((4-s.length%4)%4),b=(s+p).replace(/-/g,'+').replace(/_/g,'/'),raw=atob(b),out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out};
   const followed=()=>{try{return JSON.parse(localStorage.getItem('defe_followed_v1')||'[]')}catch{return []}};
 
+  function removeLegacyButton(){
+    document.getElementById('defe-push-btn')?.remove();
+    document.querySelectorAll('.defe-push-btn').forEach(el=>el.remove());
+    [...document.querySelectorAll('button')].forEach(b=>{const t=(b.textContent||'').trim();if((/avisos activos/i.test(t)||/activar avisos/i.test(t))&&b.closest('body')){const r=b.getBoundingClientRect();const s=getComputedStyle(b);if(s.position==='fixed'||r.bottom>window.innerHeight-180)b.remove();}});
+  }
+
   async function registerPushSW(){const reg=await navigator.serviceWorker.register(SW,{scope:BASE,updateViaCache:'none'});await reg.update().catch(()=>{});return reg}
   async function retire(reg,sub){try{const j=sub?.toJSON?.();if(j?.endpoint&&j?.keys?.p256dh&&j?.keys?.auth){await fetch(API+'/api/notifications/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:j.endpoint,keys:j.keys,followed:followed()})})}}catch(_){}try{await sub?.unsubscribe?.()}catch(_){}}
 
@@ -24,9 +30,10 @@
     finally{busy=false;paintPanel()}
   }
 
-  function findPanelButton(){return [...document.querySelectorAll('button')].find(b=>/activar notificaciones del dispositivo/i.test(b.textContent||'')||/avisos activos/i.test(b.textContent||''))}
+  function findPanelButton(){return [...document.querySelectorAll('button')].find(b=>/activar notificaciones del dispositivo/i.test(b.textContent||'')||/notificaciones activas/i.test(b.textContent||''))}
   function findStatus(){return [...document.querySelectorAll('p,div,span')].find(el=>/los avisos todavía no están configurados/i.test(el.textContent||'')&&el.children.length===0)}
   function paintPanel(state){
+    removeLegacyButton();
     const b=findPanelButton();if(!b)return false;
     b.onclick=e=>{e.preventDefault();e.stopPropagation();enable()};
     if(!supported()){b.textContent='Notificaciones no disponibles';b.disabled=true;return true}
@@ -39,11 +46,11 @@
   }
 
   function observePanel(){
-    const mo=new MutationObserver(()=>paintPanel());mo.observe(document.body,{childList:true,subtree:true});paintPanel()
+    const mo=new MutationObserver(()=>{removeLegacyButton();paintPanel()});mo.observe(document.body,{childList:true,subtree:true});removeLegacyButton();paintPanel()
   }
 
   async function init(){
-    // Push queda integrado al panel nativo de Notificaciones: ya no se crea botón flotante.
+    removeLegacyButton();
     observePanel();
     if(Notification.permission==='granted'&&localStorage.getItem(ENABLED)==='1')await sync();
     document.addEventListener('defe:preferences-updated',()=>sync());
