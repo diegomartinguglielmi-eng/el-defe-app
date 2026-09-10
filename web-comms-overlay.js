@@ -2,7 +2,14 @@
  const API='https://el-defe-v5-production.up.railway.app', READ='defe_comunicaciones_leidas_v2'; let cache=[], adminState=false;
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function jwtFromValue(value){if(!value||typeof value!=='string')return null;const direct=value.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(direct)return direct[0];try{const parsed=JSON.parse(value);if(typeof parsed==='string')return jwtFromValue(parsed);if(parsed&&typeof parsed==='object')for(const v of Object.values(parsed)){const found=jwtFromValue(typeof v==='string'?v:JSON.stringify(v));if(found)return found}}catch(_){}return null}
- function jwt(){const direct=jwtFromValue(localStorage.getItem('defe_access_token'));if(direct)return direct;try{const s=JSON.parse(localStorage.getItem('defe:railway:session')||'null');const t=jwtFromValue(s?.token);if(t)return t}catch(_){}for(const st of [localStorage,sessionStorage])for(let i=0;i<st.length;i++){const k=st.key(i);if(k==='defe_access_token'||k==='defe:railway:session')continue;const t=jwtFromValue(st.getItem(k));if(t)return t}return null}
+ function jwt(){
+  try{
+   const s=JSON.parse(localStorage.getItem('defe:railway:session')||'null');
+   const t=jwtFromValue(s?.token);
+   if(t)return t;
+  }catch(_){}
+  return jwtFromValue(localStorage.getItem('defe_access_token'));
+ }
  function tokenRole(){try{const t=jwt();if(!t)return null;let p=t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(atob(p.padEnd(Math.ceil(p.length/4)*4,'='))).role||null}catch{return null}}
  function visibleAdmin(){return (document.body?.innerText||'').toLowerCase().includes('admin@elde.fe')}
  async function refreshAdmin(){const t=jwt();adminState=visibleAdmin()||tokenRole()==='admin'||!!document.querySelector('[data-defe-users-button]');if(!t)return adminState;try{const r=await fetch(API+'/api/me',{headers:{Authorization:`Bearer ${t}`},cache:'no-store'});if(r.ok){const me=await r.json();adminState=adminState||me.role==='admin'||String(me.email||'').toLowerCase()==='admin@elde.fe'}}catch(_){}return adminState}
