@@ -9,7 +9,7 @@
   async function api(path,opts={}){opts.headers=opts.headers||{};if(token())opts.headers.Authorization='Bearer '+token();const r=await fetch(API()+path,{...opts,cache:'no-store'}),j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.detail||'Error');return j;}
   function removeDuplicates(){const nodes=[...document.querySelectorAll('#storeWhatsappSetting')];nodes.slice(1).forEach(n=>n.remove());}
   async function ensureAdminSetting(){
-    if(ensuring||!['admin','delegado'].includes(role()))return;
+    if(ensuring||!['admin','delegado','tienda'].includes(role()))return;
     const card=document.getElementById('storeAdminCard');if(!card)return;
     removeDuplicates();
     if(document.getElementById('storeWhatsappSetting'))return;
