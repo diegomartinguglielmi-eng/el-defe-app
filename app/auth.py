@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta, timezone
-from jose import jwt, JWTError
+from jose import jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from .config import settings
 from .db import get_db
 from .models import User
@@ -19,7 +20,7 @@ def create_token(user:User):
     exp=datetime.now(timezone.utc)+timedelta(minutes=settings.access_token_minutes)
     return jwt.encode({
         "sub":str(user.id),
-        "email":user.email,
+        "email":user.email.strip().lower(),
         "role":user.role,
         "exp":exp,
     },settings.secret_key,algorithm=ALGO)
@@ -29,18 +30,24 @@ def get_current_user(token:str|None=Depends(oauth2), db:Session=Depends(get_db))
         raise HTTPException(status_code=401,detail="No autenticado")
     try:
         data=jwt.decode(token,settings.secret_key,algorithms=[ALGO])
-        uid=int(data["sub"])
-        email=(data.get("email") or "").strip().lower()
     except Exception:
         raise HTTPException(status_code=401,detail="Token inválido")
 
-    user=db.get(User,uid)
+    email=str(data.get("email") or "").strip().lower()
+    uid=data.get("sub")
+    user=None
 
-    # Si la base fue recreada o cambió el ID interno, recuperamos la sesión
-    # por el email firmado dentro del JWT. Esto evita invalidar sesiones
-    # válidas por cambios de infraestructura.
-    if (not user or not user.is_active) and email:
-        user=db.query(User).filter(User.email==email).first()
+    # La identidad firmada por email es la referencia estable. Los IDs de la
+    # base pueden cambiar si Railway recrea/migra la base.
+    if email:
+        user=db.query(User).filter(func.lower(User.email)==email).first()
+
+    # Compatibilidad con tokens anteriores que sólo tenían sub.
+    if user is None and uid is not None:
+        try:
+            user=db.get(User,int(uid))
+        except (TypeError,ValueError):
+            user=None
 
     if not user or not user.is_active:
         raise HTTPException(status_code=401,detail="Usuario inválido")
