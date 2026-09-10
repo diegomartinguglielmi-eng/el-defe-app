@@ -84,11 +84,18 @@ jobs:
           cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
           cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
           sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${COMMS}\"></script></body>#" defe-web-build/dist/index.html
-      - name: Limpiar PWA
+      - name: Limpiar PWA y service workers antiguos
         run: |
-          sed -i "s#<head>#<head><script>(function(){var v='${GITHUB_SHA}';if(!location.search.includes('v='+v)){location.replace('/el-defe-app/?v='+v);}})();</script>#" defe-web-build/dist/index.html
+          # No volver a registrar el service worker generado por la PWA.
+          sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
           echo "// inert" > defe-web-build/dist/sw.js
-      - name: Verificar V35 + Comunicaciones V1
+          echo "// inert" > defe-web-build/dist/registerSW.js
+          # La primera carga de esta versión elimina cualquier SW/cache viejo (incluido push-sw)
+          # y recarga una sola vez antes de iniciar React.
+          CLEAN="<script>(async function(){var k='defe-clean-${GITHUB_SHA}';if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{if('serviceWorker' in navigator){var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){return r.unregister()}));}if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(x){return caches.delete(x)}));}}catch(e){}location.replace('/el-defe-app/?v=${GITHUB_SHA}&clean=1');})();</script>"
+          sed -i "s#<head>#<head>${CLEAN}#" defe-web-build/dist/index.html
+          sed -i "s#<head>#<head><script>(function(){var v='${GITHUB_SHA}';if(!location.search.includes('v='+v)){location.replace('/el-defe-app/?v='+v);}})();</script>#" defe-web-build/dist/index.html
+      - name: Verificar V35 + Comunicaciones V3 + limpieza SW
         run: |
           grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-v35-${GITHUB_SHA}.js
           grep -F "fefi-senior-v35-${GITHUB_SHA}.js" defe-web-build/dist/index.html
@@ -99,6 +106,8 @@ jobs:
           grep -F ">Pts<" defe-web-build/dist/fefi-senior-v35-${GITHUB_SHA}.js
           grep -F "web-comms-overlay-${GITHUB_SHA}.js" defe-web-build/dist/index.html
           grep -F "Nueva comunicación" defe-web-build/dist/web-comms-overlay-${GITHUB_SHA}.js
+          grep -F "getRegistrations" defe-web-build/dist/index.html
+          ! grep -F "vite-plugin-pwa:register-sw" defe-web-build/dist/index.html
       - name: Empaquetar dist
         run: |
           cd defe-web-build/dist
