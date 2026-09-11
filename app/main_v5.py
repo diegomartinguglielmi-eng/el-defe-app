@@ -14,6 +14,7 @@ from .fefi_standings import router as fefi_standings_router
 from .notifications_v5 import router as notifications_router
 from .data_quality import router as data_quality_router
 from .home_v5 import router as home_router
+from .following_v5 import router as following_router
 from .store_v5 import router as store_router, bootstrap_store
 from .user_admin import router as user_admin_router
 from .sponsors_v5 import router as sponsors_router, bootstrap_sponsors
@@ -29,7 +30,7 @@ from .argenliga_sync import sync_argenliga
 from .fefi_mayores import sync_fefi_mayores_b
 from .superliga_sync import sync_superliga
 
-app.include_router(router);app.include_router(fefi_results_router);app.include_router(fefi_schedules_router);app.include_router(fefi_freshness_router);app.include_router(fefi_standings_router);app.include_router(notifications_router);app.include_router(data_quality_router);app.include_router(home_router);app.include_router(store_router);app.include_router(user_admin_router);app.include_router(sponsors_router);app.include_router(league_tournaments_router);app.include_router(league_stats_router)
+app.include_router(router);app.include_router(fefi_results_router);app.include_router(fefi_schedules_router);app.include_router(fefi_freshness_router);app.include_router(fefi_standings_router);app.include_router(notifications_router);app.include_router(data_quality_router);app.include_router(home_router);app.include_router(following_router);app.include_router(store_router);app.include_router(user_admin_router);app.include_router(sponsors_router);app.include_router(league_tournaments_router);app.include_router(league_stats_router)
 BASE=Path(__file__).resolve().parent
 LAAMBA_BOOTSTRAP_LOCK=2026090701;ARGENLIGA_BOOTSTRAP_LOCK=2026090702;FEFI_BOOTSTRAP_LOCK=2026090703;FEFI_MAYORES_BOOTSTRAP_LOCK=2026090704;SUPERLIGA_BOOTSTRAP_LOCK=2026090705
 
