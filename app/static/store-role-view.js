@@ -23,7 +23,7 @@
       if(!title){
         title=document.createElement('div');title.id='tiendaProfileHeader';title.className='card';
         title.style.marginBottom='12px';
-        title.innerHTML='<div class="row"><div><b>Operación de Tienda</b><div class="meta">Pedidos, stock, productos y recepción de mercadería.</div></div><span class="badge">TIENDA</span></div>';
+        title.innerHTML='<div class="row"><div><b>Operación de Tienda</b><div class="meta">Pedidos de familias y jugadores, productos, stock y WhatsApp.</div></div><span class="badge">TIENDA</span></div>';
         tools.insertBefore(title,store);
       }
     }
