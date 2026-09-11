@@ -1,0 +1,1 @@
+Trigger dry build after workflow registration.
