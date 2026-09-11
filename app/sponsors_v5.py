@@ -58,7 +58,11 @@ router=APIRouter(prefix='/api/sponsors',tags=['Sponsors'])
 
 @router.get('')
 def public_sponsors(db:Session=Depends(get_db)):
-    return [_out(x) for x in db.query(Sponsor).filter(Sponsor.active==True).order_by(Sponsor.featured.desc(),Sponsor.sort_order,Sponsor.id).all()]
+    return [_out(x) for x in db.query(Sponsor).filter(Sponsor.active==True).order_by(Sponsor.sort_order,Sponsor.id).all()]
+
+@router.get('/featured')
+def featured_sponsors(db:Session=Depends(get_db)):
+    return [_out(x) for x in db.query(Sponsor).filter(Sponsor.active==True,Sponsor.featured==True).order_by(Sponsor.sort_order,Sponsor.id).all()]
 
 @router.get('/admin')
 def admin_sponsors(db:Session=Depends(get_db),user=Depends(require_roles('admin'))):
@@ -75,10 +79,10 @@ def update_sponsor(sponsor_id:int,payload:SponsorIn,db:Session=Depends(get_db),u
     _apply(row,payload);db.commit();db.refresh(row);return _out(row)
 
 @router.delete('/admin/{sponsor_id}')
-def deactivate_sponsor(sponsor_id:int,db:Session=Depends(get_db),user=Depends(require_roles('admin'))):
+def delete_sponsor(sponsor_id:int,db:Session=Depends(get_db),user=Depends(require_roles('admin'))):
     row=db.query(Sponsor).filter(Sponsor.id==sponsor_id).first()
     if not row:raise HTTPException(404,'Sponsor no encontrado')
-    row.active=False;db.commit();return {'ok':True}
+    db.delete(row);db.commit();return {'ok':True,'deleted':sponsor_id}
 
 DEFAULT_SPONSORS=[('JM Distribuidora','Distribución','JM'),('Wimer','Servicios','W'),('La Milagrosa Papelería','Papelería','LM'),('Matafuegos CADECI','Seguridad','MC'),('VA','Servicios','VA'),('Shop Ferretero','Ferretería','SF'),('Ascensores Pastorino','Ascensores','AP'),('Lo de Abru','Beauty Bar','LA')]
 
