@@ -69,13 +69,14 @@ def _order_out(x):
     import json
     return {'id':x.id,'buyer_name':x.buyer_name,'buyer_phone':x.buyer_phone,'buyer_category':x.buyer_category,'buyer_note':x.buyer_note,'items':json.loads(x.items_json),'total':x.total,'status':x.status,'stock_applied':x.stock_applied,'created_at':x.created_at.isoformat() if x.created_at else None,'updated_at':x.updated_at.isoformat() if x.updated_at else None}
 
+STORE_ROLES=('admin','delegado','tienda')
 router=APIRouter(prefix='/api/store',tags=['Store'])
 @router.get('/settings')
 def public_settings(db:Session=Depends(get_db)):return {'whatsapp_number':_setting(db,'whatsapp_number',DEFAULT_STORE_WHATSAPP)}
 @router.get('/admin/settings')
-def admin_settings(db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):return {'whatsapp_number':_setting(db,'whatsapp_number',DEFAULT_STORE_WHATSAPP)}
+def admin_settings(db:Session=Depends(get_db),user=Depends(require_roles(*STORE_ROLES))):return {'whatsapp_number':_setting(db,'whatsapp_number',DEFAULT_STORE_WHATSAPP)}
 @router.put('/admin/settings')
-def update_settings(payload:StoreSettingsIn,db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):
+def update_settings(payload:StoreSettingsIn,db:Session=Depends(get_db),user=Depends(require_roles(*STORE_ROLES))):
     phone=_clean_phone(payload.whatsapp_number)
     if len(phone)<10 or len(phone)>15:raise HTTPException(400,'Número de WhatsApp inválido')
     row=db.query(StoreSetting).filter(StoreSetting.key=='whatsapp_number').first()
@@ -86,19 +87,19 @@ def update_settings(payload:StoreSettingsIn,db:Session=Depends(get_db),user=Depe
 def products(db:Session=Depends(get_db)):
     return [_out(x) for x in db.query(StoreProduct).filter(StoreProduct.active==True).order_by(StoreProduct.featured.desc(),StoreProduct.sort_order,StoreProduct.id).all()]
 @router.get('/admin/products')
-def admin_products(db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):return [_out(x) for x in db.query(StoreProduct).order_by(StoreProduct.sort_order,StoreProduct.id).all()]
+def admin_products(db:Session=Depends(get_db),user=Depends(require_roles(*STORE_ROLES))):return [_out(x) for x in db.query(StoreProduct).order_by(StoreProduct.sort_order,StoreProduct.id).all()]
 @router.post('/admin/products')
-def create_product(payload:ProductIn,db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):
+def create_product(payload:ProductIn,db:Session=Depends(get_db),user=Depends(require_roles(*STORE_ROLES))):
     if db.query(StoreProduct).filter(StoreProduct.slug==payload.slug.strip()).first():raise HTTPException(409,'Ya existe un producto con ese identificador')
     row=StoreProduct(slug=payload.slug.strip(),name=payload.name.strip(),category=payload.category.strip(),description=payload.description,image_url=payload.image_url,price=payload.price,sizes_csv=','.join([s.strip() for s in payload.sizes if s.strip()]),active=payload.active,featured=payload.featured,sort_order=payload.sort_order);db.add(row);db.commit();db.refresh(row);return _out(row)
 @router.put('/admin/products/{product_id}')
-def update_product(product_id:int,payload:ProductIn,db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):
+def update_product(product_id:int,payload:ProductIn,db:Session=Depends(get_db),user=Depends(require_roles(*STORE_ROLES))):
     row=db.query(StoreProduct).filter(StoreProduct.id==product_id).first()
     if not row:raise HTTPException(404,'Producto no encontrado')
     if db.query(StoreProduct).filter(StoreProduct.slug==payload.slug.strip(),StoreProduct.id!=product_id).first():raise HTTPException(409,'Ya existe un producto con ese identificador')
     row.slug=payload.slug.strip();row.name=payload.name.strip();row.category=payload.category.strip();row.description=payload.description;row.image_url=payload.image_url;row.price=payload.price;row.sizes_csv=','.join([s.strip() for s in payload.sizes if s.strip()]);row.active=payload.active;row.featured=payload.featured;row.sort_order=payload.sort_order;db.commit();db.refresh(row);return _out(row)
 @router.put('/admin/products/{product_id}/inventory')
-def update_inventory(product_id:int,payload:InventoryIn,db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):
+def update_inventory(product_id:int,payload:InventoryIn,db:Session=Depends(get_db),user=Depends(require_roles(*STORE_ROLES))):
     row=db.query(StoreProduct).filter(StoreProduct.id==product_id).first()
     if not row:raise HTTPException(404,'Producto no encontrado')
     allowed=[s for s in (row.sizes_csv or '').split(',') if s];clean={str(k).strip():max(0,int(v)) for k,v in payload.inventory.items() if str(k).strip()};invalid=[k for k in clean if k not in allowed]
@@ -114,7 +115,7 @@ def update_inventory(product_id:int,payload:InventoryIn,db:Session=Depends(get_d
         if size not in allowed:db.delete(item)
     db.commit();db.refresh(row);return _out(row)
 @router.delete('/admin/products/{product_id}/inventory')
-def clear_inventory(product_id:int,db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):
+def clear_inventory(product_id:int,db:Session=Depends(get_db),user=Depends(require_roles(*STORE_ROLES))):
     row=db.query(StoreProduct).filter(StoreProduct.id==product_id).first()
     if not row:raise HTTPException(404,'Producto no encontrado')
     db.query(StoreInventory).filter(StoreInventory.product_id==product_id).delete(synchronize_session=False);db.commit();return {'ok':True,'stock_managed':False}
@@ -144,9 +145,9 @@ def create_order(payload:OrderIn,db:Session=Depends(get_db)):
         items.append({'product_id':p.id,'name':p.name,'size':item.size,'qty':item.qty,'unit_price':p.price,'subtotal':subtotal})
     row=StoreOrder(buyer_name=payload.buyer_name.strip(),buyer_phone=payload.buyer_phone.strip(),buyer_category=(payload.buyer_category or '').strip() or None,buyer_note=(payload.buyer_note or '').strip() or None,items_json=json.dumps(items,ensure_ascii=False),total=total if complete else None,status='pending');db.add(row);db.commit();db.refresh(row);return _order_out(row)
 @router.get('/admin/orders')
-def admin_orders(db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):return [_order_out(x) for x in db.query(StoreOrder).order_by(StoreOrder.created_at.desc()).limit(200).all()]
+def admin_orders(db:Session=Depends(get_db),user=Depends(require_roles(*STORE_ROLES))):return [_order_out(x) for x in db.query(StoreOrder).order_by(StoreOrder.created_at.desc()).limit(200).all()]
 @router.put('/admin/orders/{order_id}/status')
-def update_order_status(order_id:int,payload:OrderStatusIn,db:Session=Depends(get_db),user=Depends(require_roles('admin','delegado'))):
+def update_order_status(order_id:int,payload:OrderStatusIn,db:Session=Depends(get_db),user=Depends(require_roles(*STORE_ROLES))):
     import json
     allowed={'pending','confirmed','ready','delivered','cancelled'}
     transitions={'pending':{'confirmed','cancelled'},'confirmed':{'ready','cancelled'},'ready':{'delivered','cancelled'},'delivered':set(),'cancelled':set()}
