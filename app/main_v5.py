@@ -10,12 +10,14 @@ from .pending import router, run_fefi_pending_sync, FefiPendingChange, _apply_ch
 from .fefi_results import router as fefi_results_router
 from .fefi_schedules import router as fefi_schedules_router
 from .fefi_freshness import router as fefi_freshness_router
+from .fefi_standings import router as fefi_standings_router
 from .notifications_v5 import router as notifications_router
 from .data_quality import router as data_quality_router
 from .home_v5 import router as home_router
 from .store_v5 import router as store_router, bootstrap_store
 from .user_admin import router as user_admin_router
 from .sponsors_v5 import router as sponsors_router, bootstrap_sponsors
+from .league_tournaments import router as league_tournaments_router
 from .db import SessionLocal
 from .models import User, Match, SyncRun
 from .auth import hash_password
@@ -26,7 +28,7 @@ from .argenliga_sync import sync_argenliga
 from .fefi_mayores import sync_fefi_mayores_b
 from .superliga_sync import sync_superliga
 
-app.include_router(router);app.include_router(fefi_results_router);app.include_router(fefi_schedules_router);app.include_router(fefi_freshness_router);app.include_router(notifications_router);app.include_router(data_quality_router);app.include_router(home_router);app.include_router(store_router);app.include_router(user_admin_router);app.include_router(sponsors_router)
+app.include_router(router);app.include_router(fefi_results_router);app.include_router(fefi_schedules_router);app.include_router(fefi_freshness_router);app.include_router(fefi_standings_router);app.include_router(notifications_router);app.include_router(data_quality_router);app.include_router(home_router);app.include_router(store_router);app.include_router(user_admin_router);app.include_router(sponsors_router);app.include_router(league_tournaments_router)
 BASE=Path(__file__).resolve().parent
 LAAMBA_BOOTSTRAP_LOCK=2026090701;ARGENLIGA_BOOTSTRAP_LOCK=2026090702;FEFI_BOOTSTRAP_LOCK=2026090703;FEFI_MAYORES_BOOTSTRAP_LOCK=2026090704;SUPERLIGA_BOOTSTRAP_LOCK=2026090705
 
@@ -77,8 +79,14 @@ def _bootstrap_fefi_freshness():
         locked=bool(db.execute(text('SELECT pg_try_advisory_lock(:k)'),{'k':FEFI_BOOTSTRAP_LOCK}).scalar())
         if not locked:return
         repaired=_repair_fefi_baseline(db);exists=db.query(SyncRun).filter(SyncRun.source=='FEFI_PENDING').first()
-        if exists:print({'fefi_bootstrap':'ready','baseline_adopted':_adopt_first_fefi_baseline(db),'baseline_repaired':repaired});return
-        result=run_fefi_pending_sync(db);print({'fefi_bootstrap':'completed',**result,'baseline_adopted':_adopt_first_fefi_baseline(db) if result.get('ok') else 0})
+        if exists:
+            adopted=_adopt_first_fefi_baseline(db)
+            repaired+=_repair_fefi_baseline(db)
+            print({'fefi_bootstrap':'ready','baseline_adopted':adopted,'baseline_repaired':repaired});return
+        result=run_fefi_pending_sync(db)
+        adopted=_adopt_first_fefi_baseline(db) if result.get('ok') else 0
+        if adopted:repaired+=_repair_fefi_baseline(db)
+        print({'fefi_bootstrap':'completed',**result,'baseline_adopted':adopted,'baseline_repaired':repaired})
     except Exception as exc:db.rollback();print({'fefi_bootstrap':'error','detail':str(exc)})
     finally:
         if locked:
@@ -100,7 +108,9 @@ def _cleanup_laamba_conflicts():
 
 def _bootstrap_content():
     db=SessionLocal()
-    try:print({'store_bootstrap':bootstrap_store(db),'sponsors_bootstrap':bootstrap_sponsors(db)})
+    try:
+        print({'store_bootstrap':bootstrap_store(db)})
+        print({'sponsors_bootstrap':bootstrap_sponsors(db)})
     except Exception as exc:db.rollback();print({'content_bootstrap':'error','detail':str(exc)})
     finally:db.close()
 
