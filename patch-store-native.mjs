@@ -9,14 +9,18 @@ let js=fs.readFileSync(jsPath,'utf8');
 
 const oldStart='x=async()=>{c(!0);const{pedido:_,error:y}=await r({...s,retiro:p[s.retiro],total:e.total,items:e.items});if(c(!1),y||!_)return d("No pudimos registrar el pedido. Probá de nuevo.");const f=w(_.nro);o({nro:_.nro,texto:f}),window.open(`https://wa.me/${(n==null?void 0:n.whatsapp)||""}?text=${encodeURIComponent(f)}`,"_blank","noopener")};';
 
-const newStart='x=()=>{c(!0),d(null);try{const _=e.items.map(y=>({product_id:Number(y.productoId),size:y.talle,qty:y.cant})),Y=document.createElement("form");Y.method="POST",Y.action="https://el-defe-v5-production.up.railway.app/api/store/orders/submit",Y.style.display="none";const R={buyer_name:s.nombre.trim(),buyer_phone:s.telefono.trim(),buyer_category:s.categoria||"",buyer_note:s.nota||"",items:JSON.stringify(_)};Object.entries(R).forEach(([N,f])=>{const W=document.createElement("input");W.type="hidden",W.name=N,W.value=f,Y.appendChild(W)}),document.body.appendChild(Y),Y.submit()}catch(_){c(!1),d(((_==null?void 0:_.message)||"No pudimos registrar el pedido. Probá de nuevo."))}};';
+const newStart='x=()=>{c(!0),d(null);try{const _=e.items.map(y=>({product_id:Number(y.productoId),size:y.talle,qty:y.cant})),Y=document.createElement("form");Y.method="POST",Y.action="https://el-defe-v5-production.up.railway.app/api/store/orders/submit",Y.style.display="none";const R={buyer_name:s.nombre.trim(),buyer_phone:s.telefono.trim(),buyer_category:s.categoria||"",buyer_note:s.nota||"",items:JSON.stringify(_)};Object.entries(R).forEach(([N,f])=>{const W=document.createElement("input");W.type="hidden",W.name=N,W.value=f,Y.appendChild(W)}),document.body.appendChild(Y);try{const Z=document.querySelector("[role=dialog]")||document.querySelector(".modal");if(Z){const M=[...Z.querySelectorAll("button")].filter(B=>/^[−-]$/.test((B.textContent||"").trim()));e.items.forEach((y,i)=>{for(let j=0;j<Number(y.cant||1);j++)M[i]?.click()})}t()}catch(B){}Y.submit()}catch(_){c(!1),d(((_==null?void 0:_.message)||"No pudimos registrar el pedido. Probá de nuevo."))}};';
 
+if(js.includes('DEFE_STORE_NATIVE_EXACT_V3')){
+  console.log('Checkout nativo exacto ya aplicado.');
+  process.exit(0);
+}
 if(!js.includes(oldStart)) throw new Error('No se encontró el checkout nativo esperado');
 js=js.replace(oldStart,newStart);
 
 const patchedClick='onClick:(...Q)=>typeof window.defeStoreCheckout==="function"?window.defeStoreCheckout():x(...Q)';
 if(js.includes(patchedClick)) js=js.replace(patchedClick,'onClick:x');
 
-js+='\n/* DEFE_STORE_NATIVE_FORM_V2 */\n/* DEFE_STORE_NATIVE_RAILWAY_V1 */\n';
+js+='\n/* DEFE_STORE_NATIVE_EXACT_V3 */\n/* DEFE_STORE_NATIVE_RAILWAY_V1 */\n';
 fs.writeFileSync(jsPath,js);
-console.log('Checkout nativo de Tienda cambiado a POST HTML + redirect a WhatsApp.');
+console.log('Checkout nativo: IDs exactos + limpieza visual + redirect a WhatsApp.');
