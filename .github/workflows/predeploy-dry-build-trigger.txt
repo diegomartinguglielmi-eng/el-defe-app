@@ -1,0 +1,1 @@
+Trigger file for isolated predeploy validation. Safe to remove before merge.
