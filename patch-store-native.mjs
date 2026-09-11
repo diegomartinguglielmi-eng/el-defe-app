@@ -17,6 +17,6 @@ js=js.replace(oldStart,newStart);
 const patchedClick='onClick:(...Q)=>typeof window.defeStoreCheckout==="function"?window.defeStoreCheckout():x(...Q)';
 if(js.includes(patchedClick)) js=js.replace(patchedClick,'onClick:x');
 
-js+='\n/* DEFE_STORE_NATIVE_FORM_V2 */\n';
+js+='\n/* DEFE_STORE_NATIVE_FORM_V2 */\n/* DEFE_STORE_NATIVE_RAILWAY_V1 */\n';
 fs.writeFileSync(jsPath,js);
 console.log('Checkout nativo de Tienda cambiado a POST HTML + redirect a WhatsApp.');
