@@ -113,12 +113,23 @@ jobs:
 
           sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${CHECKOUT}\"></script><script src=\"./${SPONSORS}\"></script></body>#" defe-web-build/dist/index.html
 
-      - name: Limpiar service workers antiguos sin recargar la app
+      - name: Tomar control de service workers antiguos y liberar caches
         run: |
           sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
-          echo "// inert" > defe-web-build/dist/sw.js
-          echo "// inert" > defe-web-build/dist/registerSW.js
-          CLEAN="<script>(async function(){var k='defe-clean-${GITHUB_SHA}';try{if(localStorage.getItem(k))return;localStorage.setItem(k,'1');if('serviceWorker' in navigator){var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){return r.unregister()}));}if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(x){return caches.delete(x)}));}}catch(e){}})();</script>"
+          cat > defe-web-build/dist/sw.js <<'EOF'
+          self.addEventListener('install', event => { self.skipWaiting(); });
+          self.addEventListener('activate', event => {
+            event.waitUntil((async()=>{
+              try {
+                const keys = await caches.keys();
+                await Promise.all(keys.map(k => caches.delete(k)));
+              } catch (_) {}
+              await self.clients.claim();
+            })());
+          });
+          EOF
+          echo "// retired" > defe-web-build/dist/registerSW.js
+          CLEAN="<script>(async function(){var k='defe-clean-${GITHUB_SHA}';try{if(localStorage.getItem(k))return;localStorage.setItem(k,'1');if('serviceWorker' in navigator){var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){return r.update().catch(function(){});}));setTimeout(async function(){try{var rs2=await navigator.serviceWorker.getRegistrations();await Promise.all(rs2.map(function(r){return r.unregister()}));}catch(e){}},1200);}if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(x){return caches.delete(x)}));}}catch(e){}})();</script>"
           sed -i "s#<head>#<head>${CLEAN}#" defe-web-build/dist/index.html
 
       - name: Verificar build de producción
@@ -139,6 +150,8 @@ jobs:
           grep -F "Retiro por la Tienda del Club" defe-web-build/dist/store-checkout-${GITHUB_SHA}.js
           grep -F "push-sw.js" defe-web-build/dist/web-push-overlay-${GITHUB_SHA}.js
           grep -F "addEventListener('push'" defe-web-build/dist/push-sw.js
+          grep -F "skipWaiting" defe-web-build/dist/sw.js
+          grep -F "clients.claim" defe-web-build/dist/sw.js
           grep -F "getRegistrations" defe-web-build/dist/index.html
           ! grep -F "location.replace" defe-web-build/dist/index.html
           ! grep -F "vite-plugin-pwa:register-sw" defe-web-build/dist/index.html
