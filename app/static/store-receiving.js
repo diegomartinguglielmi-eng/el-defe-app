@@ -110,11 +110,21 @@
     }finally{loadingOrders=false;}
   }
 
-  function ensure(){ensureStock();renderOrders();}
   function init(){
-    const mo=new MutationObserver(()=>ensure());mo.observe(document.body,{childList:true,subtree:true});
-    setTimeout(ensure,600);window.addEventListener('defe-store-admin-list-ready',()=>setTimeout(ensure,0));window.addEventListener('focus',renderOrders);
-    setInterval(renderOrders,30000);window.defeReloadStoreOrders=renderOrders;
+    let booted=false;
+    const boot=()=>{
+      if(!allowedRole())return;
+      const card=document.getElementById('storeAdminCard');if(!card)return;
+      ensureStock();
+      if(!booted){booted=true;renderOrders();}
+    };
+    const mo=new MutationObserver(()=>{if(!document.getElementById('storeReceivingCard'))boot();});
+    mo.observe(document.body,{childList:true,subtree:true});
+    setTimeout(boot,600);
+    window.addEventListener('defe-store-admin-list-ready',()=>{ensureStock();renderOrders();});
+    window.addEventListener('focus',renderOrders);
+    setInterval(renderOrders,30000);
+    window.defeReloadStoreOrders=renderOrders;
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
