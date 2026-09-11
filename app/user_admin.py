@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from .auth import hash_password, create_token, require_roles
 from .db import get_db
 from .models import User, AuditLog
+from . import sponsors_v5  # registra API y bootstrap de sponsors
 
 router = APIRouter()
 
@@ -58,7 +59,6 @@ def register(payload: RegisterIn, db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == email).first():
         raise HTTPException(status_code=409, detail="Ese email ya está registrado")
 
-    # El alta pública nunca puede crear administradores ni operadores de Tienda.
     user = User(
         email=email,
         password_hash=hash_password(payload.password),
