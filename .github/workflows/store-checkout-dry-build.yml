@@ -28,3 +28,32 @@ jobs:
           grep -R -q 'quantity' netlify-publish/el-defe-app
           grep -R -q 'DEFE_STORE_NATIVE_RAILWAY_V1' netlify-publish/el-defe-app
           echo 'STORE_CHECKOUT_DRY_BUILD_OK'
+      - name: Live Railway smoke test without creating orders
+        shell: bash
+        run: |
+          set -euo pipefail
+          API='https://el-defe-v5-production.up.railway.app'
+          curl -fsS "$API/api/health" | grep -q 'ok\|status'
+          curl -fsS "$API/api/store/products" > /tmp/products.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/products.json'))
+          assert isinstance(d,list) and len(d)>0
+          assert all('id' in x and 'name' in x and 'sizes' in x for x in d)
+          print('STORE_PRODUCTS_OK', len(d))
+          PY
+          code=$(curl -sS -o /tmp/badqty.json -w '%{http_code}' -X POST "$API/api/store/orders/submit" \
+            -H 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode 'buyer_name=Smoke Test' \
+            --data-urlencode 'buyer_phone=1140811194' \
+            --data-urlencode 'items=[{"product_id":"x","size":"XL","qty":"abc"}]')
+          test "$code" = '400'
+          grep -q 'Cantidad inválida en ítem 1' /tmp/badqty.json
+          code=$(curl -sS -o /tmp/badproduct.json -w '%{http_code}' -X POST "$API/api/store/orders/submit" \
+            -H 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode 'buyer_name=Smoke Test' \
+            --data-urlencode 'buyer_phone=1140811194' \
+            --data-urlencode 'items=[{"product_id":"producto-inexistente","product_name":"Producto inexistente","size":"XL","qty":1}]')
+          test "$code" = '400'
+          grep -q 'Producto no disponible en ítem 1' /tmp/badproduct.json
+          echo 'RAILWAY_STORE_SMOKE_OK'
