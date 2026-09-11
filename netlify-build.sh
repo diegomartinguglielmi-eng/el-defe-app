@@ -30,13 +30,14 @@ node patch-fefi-senior-v31.mjs
 node patch-fefi-senior-v32.mjs
 node patch-fefi-senior-v33.mjs
 node patch-fefi-senior-v35.mjs
+node patch-final-ui-v36.mjs
 
 FEFI="fefi-senior-v35-${SHA}.js"
 mv defe-web-build/dist/fefi-senior-v30.js "defe-web-build/dist/${FEFI}"
 sed -i "s#fefi-senior-v30.js#${FEFI}#g" defe-web-build/dist/index.html
 
 JS=$(basename "$(ls defe-web-build/dist/assets/index-*.js | head -1)")
-UNIQUE="index-v35-${SHA}.js"
+UNIQUE="index-v36-${SHA}.js"
 cp "defe-web-build/dist/assets/${JS}" "defe-web-build/dist/assets/${UNIQUE}"
 sed -i "s#assets/${JS}#assets/${UNIQUE}#" defe-web-build/dist/index.html
 
@@ -121,6 +122,7 @@ grep -F "/api/following/next" "defe-web-build/dist/${FOLLOWING}"
 grep -F "Cómo llegar" "defe-web-build/dist/${FOLLOWING}"
 grep -F "Apertura" "defe-web-build/dist/${MATCHES}"
 grep -F "Clausura" "defe-web-build/dist/${MATCHES}"
+grep -F "DEFE_FINAL_UI_V36_PROMOS_ARGEN_9NA" "defe-web-build/dist/assets/${JS}"
 ! grep -F "web-sponsors-profile-bridge" defe-web-build/dist/index.html
 ! grep -F "web-push-overlay" defe-web-build/dist/index.html
 ! grep -F "location.replace" defe-web-build/dist/index.html
