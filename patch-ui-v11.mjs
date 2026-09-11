@@ -46,6 +46,24 @@ if(cssFile){
 const indexPath=path.join(dist,'index.html');
 let html=fs.readFileSync(indexPath,'utf8');
 html=html.replace(/<meta name="defe-brand" content="[^"]*"\s*\/>/,'<meta name="defe-brand" content="v12-20260909" />');
+
+const sponsorLogoHelper=`<script>(function(){
+  if(window.__defeSponsorLogoHelper)return;window.__defeSponsorLogoHelper=true;
+  const API='https://el-defe-v5-production.up.railway.app';
+  let rowsCache=null,rowsAt=0;
+  function jwtFromValue(value){if(!value||typeof value!=='string')return null;const m=value.match(/eyJ[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+/);if(m)return m[0];try{const p=JSON.parse(value);if(typeof p==='string')return jwtFromValue(p);if(p&&typeof p==='object')for(const v of Object.values(p)){const f=jwtFromValue(typeof v==='string'?v:JSON.stringify(v));if(f)return f}}catch(_){}return null}
+  function token(){for(const st of [localStorage,sessionStorage])for(let i=0;i<st.length;i++){const t=jwtFromValue(st.getItem(st.key(i)));if(t)return t}return null}
+  async function rows(){if(rowsCache&&Date.now()-rowsAt<3000)return rowsCache;try{const r=await fetch(API+'/api/sponsors/admin',{headers:{Authorization:'Bearer '+token()},cache:'no-store'});if(!r.ok)return [];rowsCache=await r.json();rowsAt=Date.now();return rowsCache}catch(_){return []}}
+  function previewBox(input){let box=input.parentElement.querySelector('.sp-logo-preview');if(!box){box=document.createElement('div');box.className='sp-logo-preview';box.style.cssText='margin-top:8px;display:flex;align-items:center;gap:10px;font-size:12px;color:#64748b';input.parentElement.appendChild(box)}return box}
+  function showPreview(input,url,label){const box=previewBox(input);box.innerHTML='';if(url){const img=document.createElement('img');img.src=url;img.alt='Logo';img.style.cssText='width:72px;height:52px;object-fit:contain;border:1px solid #dbe4ef;border-radius:10px;background:#fff;padding:4px';box.appendChild(img)}const span=document.createElement('span');span.textContent=label;box.appendChild(span)}
+  async function compress(file){return await new Promise((resolve,reject)=>{const fr=new FileReader();fr.onerror=reject;fr.onload=()=>{const img=new Image();img.onerror=reject;img.onload=()=>{const max=512,scale=Math.min(1,max/Math.max(img.width,img.height)),w=Math.max(1,Math.round(img.width*scale)),h=Math.max(1,Math.round(img.height*scale));const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.clearRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);c.toBlob(blob=>{if(!blob)return reject(new Error('No se pudo procesar el logo'));resolve(new File([blob],'logo.webp',{type:'image/webp'}))},'image/webp',0.86)};img.src=fr.result};fr.readAsDataURL(file)})}
+  async function bindInput(input,row){if(input.dataset.logoHelperBound)return;input.dataset.logoHelperBound='1';if(row&&row.logo_url)showPreview(input,row.logo_url,'Logo guardado');else showPreview(input,null,'Sin logo guardado');input.addEventListener('change',async()=>{const file=input.files&&input.files[0];if(!file)return;input.dataset.processing='1';showPreview(input,URL.createObjectURL(file),'Preparando logo…');try{const compact=await compress(file);const dt=new DataTransfer();dt.items.add(compact);input.files=dt.files;showPreview(input,URL.createObjectURL(compact),'Logo listo para guardar')}catch(e){showPreview(input,null,e.message||'No se pudo procesar el logo')}finally{delete input.dataset.processing}})}
+  async function enhance(){const panel=document.getElementById('defe-sponsors-admin');if(!panel)return;const data=await rows();panel.querySelectorAll('.sp-admin-card').forEach(card=>{const input=card.querySelector('input[data-f="logo_file"]');if(!input)return;const id=Number(card.dataset.id||0),row=data.find(x=>x.id===id);bindInput(input,row)});}
+  document.addEventListener('click',e=>{const save=e.target.closest('#defe-sponsors-admin [data-save]');if(!save)return;const card=save.closest('.sp-admin-card'),input=card&&card.querySelector('input[data-f="logo_file"]');if(input&&input.dataset.processing==='1'){e.preventDefault();e.stopImmediatePropagation();alert('Esperá un segundo mientras preparamos el logo.');}},true);
+  new MutationObserver(()=>{clearTimeout(window.__defeSponsorLogoTimer);window.__defeSponsorLogoTimer=setTimeout(enhance,80)}).observe(document.body,{childList:true,subtree:true});
+  window.addEventListener('focus',enhance);setTimeout(enhance,300);
+})();</script>`;
+html=html.replace('</body>',sponsorLogoHelper+'</body>');
 fs.writeFileSync(indexPath,html);
 
-console.log('UI V12 aplicada: Guardar cierra el selector y el check permite reabrirlo.');
+console.log('UI V12 aplicada: Guardar cierra el selector, el check permite reabrirlo y Sponsors mejora logos.');
