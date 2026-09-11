@@ -9,11 +9,12 @@ from sqlalchemy.orm import Session
 
 from .models import Match, Standing, SyncRun
 
-URL = "https://www.futsalargentina.com.ar/fixture.php?cat=1_1&fixture=1294"
+BASE_URL = "https://www.futsalargentina.com.ar/fixture.php?cat=1_1"
+TOURNAMENTS = {"APERTURA": 1273, "CLAUSURA": 1294}
 COMPETITION = "SUPERLIGA"
 DIVISION = "Junior A"
 TEAM = "Defensores Santos Lugares"
-UA = {"User-Agent": "ElDefe/2.1 (+contacto club Defensores de Santos Lugares)"}
+UA = {"User-Agent": "ElDefe/2.2 (+contacto club Defensores de Santos Lugares)"}
 
 
 def _clean(value):
@@ -74,20 +75,18 @@ def _upsert_standing(db: Session, payload: dict):
     db.commit()
 
 
-def _fixture_urls(html: str):
-    """Return every published Junior A fixture page linked by the source."""
+def _fixture_urls(html: str, seed_url: str):
     soup = BeautifulSoup(html, "html.parser")
-    urls = {URL}
+    urls = {seed_url}
     for anchor in soup.find_all("a", href=True):
         href = anchor.get("href", "")
         if "fixture.php" not in href or "cat=1_1" not in href or "fixture=" not in href:
             continue
-        urls.add(urljoin(URL, href))
+        urls.add(urljoin(BASE_URL, href))
     return sorted(urls)
 
 
-def _parse_fixture_table(html: str, source_url: str):
-    """Parse the actual fixture grid, which includes score, venue, date and time."""
+def _parse_fixture_table(html: str, source_url: str, tournament: str):
     soup = BeautifulSoup(html, "html.parser")
     round_number = _round_from_html(html)
     rows = []
@@ -111,15 +110,14 @@ def _parse_fixture_table(html: str, source_url: str):
             home_score = _int(home_raw)
             away_score = _int(away_raw)
             is_final = home_score is not None and away_score is not None
-            round_name = f"Fecha {round_number}" if round_number else "Fecha"
+            base_round = f"Fecha {round_number}" if round_number else "Fecha"
+            round_name = base_round
             if time_raw and time_raw.casefold() not in {"nan", "horario"}:
                 round_name += f" · {time_raw}"
 
-            # Keep the historic external-key family so rows created by the first
-            # Super Liga parser are upgraded in place instead of duplicated.
-            key_round = f"Fecha {round_number}" if round_number else date or "SIN_FECHA"
+            key_round = base_round if round_number else date or "SIN_FECHA"
             rows.append({
-                "external_key": f"SUPERLIGA|1294|{key_round}|{home}|{away}",
+                "external_key": f"SUPERLIGA|2026|{tournament}|{key_round}|{home}|{away}",
                 "competition": COMPETITION,
                 "division": DIVISION,
                 "round_name": round_name,
@@ -131,7 +129,7 @@ def _parse_fixture_table(html: str, source_url: str):
                 "status": "final" if is_final else "scheduled",
                 "venue": venue or None,
                 "source_url": source_url,
-                "source_kind": "sync_superliga",
+                "source_kind": f"sync_superliga_{tournament.lower()}",
             })
     return rows
 
@@ -145,9 +143,13 @@ def _find_col(columns, *names):
     return None
 
 
-def _parse_standings(html: str):
+def _parse_standings(html: str, source_url: str, tournament: str):
     rows = []
-    for df in pd.read_html(StringIO(html)):
+    try:
+        tables = pd.read_html(StringIO(html))
+    except Exception:
+        return rows
+    for df in tables:
         cols = list(df.columns)
         pts = _find_col(cols, "PTS")
         pj = _find_col(cols, "PJ")
@@ -176,7 +178,7 @@ def _parse_standings(html: str):
             if points is None and played is None:
                 continue
             rows.append({
-                "unique_key": f"SUPERLIGA|1294|JUNIOR_A|{team}",
+                "unique_key": f"SUPERLIGA|2026|{tournament}|JUNIOR_A|{team}",
                 "competition": COMPETITION,
                 "division": DIVISION,
                 "season": 2026,
@@ -189,66 +191,59 @@ def _parse_standings(html: str):
                 "gf": None,
                 "gc": None,
                 "gd": None,
-                "source_url": URL,
+                "source_url": source_url,
             })
         if rows:
             break
     return rows
 
 
+def _sync_tournament(db: Session, tournament: str, fixture_id: int):
+    seed_url = f"{BASE_URL}&fixture={fixture_id}"
+    response = requests.get(seed_url, headers=UA, timeout=25)
+    response.raise_for_status()
+    html = response.text
+
+    matches_by_key = {}
+    fixture_urls = _fixture_urls(html, seed_url)
+    for fixture_url in fixture_urls:
+        try:
+            page = requests.get(fixture_url, headers=UA, timeout=25)
+            page.raise_for_status()
+            for payload in _parse_fixture_table(page.text, fixture_url, tournament):
+                matches_by_key[payload["external_key"]] = payload
+        except Exception:
+            continue
+
+    matches = list(matches_by_key.values())
+    standings = _parse_standings(html, seed_url, tournament)
+    for payload in matches:
+        _upsert_match(db, payload)
+    for payload in standings:
+        _upsert_standing(db, payload)
+
+    finals = sum(1 for m in matches if m["status"] == "final")
+    scheduled = sum(1 for m in matches if m["status"] == "scheduled")
+    return {"matches":len(matches),"results":finals,"upcoming":scheduled,"standings":len(standings),"fixture_pages":len(fixture_urls),"source_url":seed_url}
+
+
 def sync_superliga(db: Session):
-    try:
-        response = requests.get(URL, headers=UA, timeout=25)
-        response.raise_for_status()
-        html = response.text
+    results={}; errors=[]
+    for tournament, fixture_id in TOURNAMENTS.items():
+        try:
+            results[tournament.lower()]=_sync_tournament(db,tournament,fixture_id)
+        except Exception as exc:
+            db.rollback();errors.append(f"{tournament}: {exc}")
 
-        # The landing page only exposes part of the fixture in its headings.
-        # Each published round is linked through its own fixture id and contains
-        # the authoritative grid with score, venue, date and time.
-        matches_by_key = {}
-        fixture_urls = _fixture_urls(html)
-        for fixture_url in fixture_urls:
-            try:
-                page = requests.get(fixture_url, headers=UA, timeout=25)
-                page.raise_for_status()
-                for payload in _parse_fixture_table(page.text, fixture_url):
-                    matches_by_key[payload["external_key"]] = payload
-            except Exception:
-                # One bad round must not erase the last good data from the others.
-                continue
-
-        matches = list(matches_by_key.values())
-        standings = _parse_standings(html)
-        for payload in matches:
-            _upsert_match(db, payload)
-        for payload in standings:
-            _upsert_standing(db, payload)
-
-        finals = sum(1 for m in matches if m["status"] == "final")
-        scheduled = sum(1 for m in matches if m["status"] == "scheduled")
-        db.add(SyncRun(
-            source="SUPERLIGA",
-            status="ok",
-            detail=(
-                f"Junior A: {len(matches)} partidos de Defe "
-                f"({finals} resultados / {scheduled} próximos) · "
-                f"{len(standings)} filas de tabla · {len(fixture_urls)} fechas consultadas"
-            ),
-        ))
+    if results:
+        legacy_matches=db.query(Match).filter(Match.competition==COMPETITION, Match.source_kind=="sync_superliga").delete(synchronize_session=False)
+        legacy_standings=db.query(Standing).filter(Standing.competition==COMPETITION, Standing.unique_key.contains("|1294|")).delete(synchronize_session=False)
         db.commit()
-        return {
-            "ok": True,
-            "competition": COMPETITION,
-            "division": DIVISION,
-            "matches": len(matches),
-            "results": finals,
-            "upcoming": scheduled,
-            "standings": len(standings),
-            "fixture_pages": len(fixture_urls),
-            "source_url": URL,
-        }
-    except Exception as exc:
-        db.rollback()
-        db.add(SyncRun(source="SUPERLIGA", status="error", detail=str(exc)))
-        db.commit()
-        return {"ok": False, "error": str(exc), "source_url": URL}
+    else:
+        legacy_matches=legacy_standings=0
+
+    status="ok" if not errors else ("partial" if results else "error")
+    detail="; ".join(f"{k}: {v['matches']} partidos / {v['standings']} tabla" for k,v in results.items())
+    if errors:detail+=("; " if detail else "")+" | ".join(errors[:3])
+    db.add(SyncRun(source="SUPERLIGA",status=status,detail=detail or "Sin datos"));db.commit()
+    return {"ok":bool(results),"status":status,"competition":COMPETITION,"division":DIVISION,"tournaments":results,"legacy_removed":{"matches":legacy_matches,"standings":legacy_standings},"errors":errors[:5]}
