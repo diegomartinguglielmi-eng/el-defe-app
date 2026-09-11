@@ -1,0 +1,22 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const dir='defe-web-build/dist/assets';
+const file=fs.readdirSync(dir).find(f=>/^index-.*\.js$/.test(f));
+if(!file) throw new Error('No se encontró el bundle principal');
+const p=path.join(dir,file);
+let s=fs.readFileSync(p,'utf8');
+const marker='Registrar y enviar por WhatsApp';
+const mi=s.indexOf(marker);
+if(mi<0) throw new Error('No se encontró el checkout nativo de Tienda');
+const from=Math.max(0,mi-1400);
+const before=s.slice(from,mi);
+const oi=before.lastIndexOf('onClick:x,disabled:g||l');
+if(oi<0) throw new Error('No se encontró el onClick nativo del checkout');
+const abs=from+oi;
+const old='onClick:x,disabled:g||l';
+const neu='onClick:(...Q)=>typeof window.defeStoreCheckout==="function"?window.defeStoreCheckout():x(...Q),disabled:g||l';
+s=s.slice(0,abs)+s.slice(abs).replace(old,neu);
+if(!s.includes('typeof window.defeStoreCheckout==="function"?window.defeStoreCheckout()')) throw new Error('No se aplicó el parche de checkout');
+fs.writeFileSync(p,s);
+console.log('Checkout nativo redirigido a defeStoreCheckout');
