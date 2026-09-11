@@ -1,0 +1,30 @@
+name: Store checkout dry build
+
+on:
+  push:
+    branches:
+      - store-checkout-hardening
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Python syntax check
+        run: python3 -m py_compile app/store_submit.py
+      - name: Build production frontend without deploy
+        run: bash netlify-build.sh
+      - name: Validate checkout V5 in built bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -R -q 'DEFE_STORE_NATIVE_EXACT_V5' netlify-publish/el-defe-app
+          grep -R -q '/api/store/orders/submit' netlify-publish/el-defe-app
+          grep -R -q 'cantidad' netlify-publish/el-defe-app
+          grep -R -q 'quantity' netlify-publish/el-defe-app
+          grep -R -q 'DEFE_STORE_NATIVE_RAILWAY_V1' netlify-publish/el-defe-app
+          echo 'STORE_CHECKOUT_DRY_BUILD_OK'
