@@ -1,0 +1,54 @@
+name: Validar backend DEFE
+
+on:
+  push:
+    paths:
+      - '.github/workflows/validate-backend.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validar health y endpoints públicos
+        shell: bash
+        run: |
+          set -euo pipefail
+          API='https://el-defe-v5-production.up.railway.app'
+          for i in {1..12}; do
+            if curl -fsS "$API/api/health" >/tmp/health.json; then break; fi
+            sleep 5
+          done
+          cat /tmp/health.json
+          curl -fsS "$API/api/store/products" >/tmp/products.json
+          curl -fsS "$API/api/sponsors" >/tmp/sponsors.json
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/products.json'))
+          s=json.load(open('/tmp/sponsors.json'))
+          assert isinstance(p,list) and len(p)>0, 'store products vacíos'
+          assert isinstance(s,list), 'sponsors no es lista'
+          print('products',len(p),'sponsors',len(s))
+          PY
+
+      - name: Validar CORS preflight de autenticación y tienda
+        shell: bash
+        run: |
+          set -euo pipefail
+          API='https://el-defe-v5-production.up.railway.app'
+          ORIGIN='https://diegomartinguglielmi-eng.github.io'
+          check_preflight(){
+            local path="$1" method="$2" headers="$3"
+            code=$(curl -sS -o /tmp/body -D /tmp/headers -w '%{http_code}' -X OPTIONS "$API$path" \
+              -H "Origin: $ORIGIN" \
+              -H "Access-Control-Request-Method: $method" \
+              -H "Access-Control-Request-Headers: $headers")
+            echo "$path -> $code"
+            cat /tmp/headers
+            test "$code" = '200'
+            grep -qi '^access-control-allow-origin:' /tmp/headers
+          }
+          check_preflight '/api/me' GET 'authorization'
+          check_preflight '/api/following/options' GET 'authorization'
+          check_preflight '/api/following/me' GET 'authorization'
+          check_preflight '/api/store/orders' POST 'content-type'
