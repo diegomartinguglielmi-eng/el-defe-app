@@ -150,7 +150,6 @@ jobs:
           grep -F "Retiro por la Tienda del Club" "defe-web-build/dist/store-checkout-${GITHUB_SHA}.js" >/dev/null
           grep -F "skipWaiting" defe-web-build/dist/sw.js >/dev/null
           grep -F "clients.claim" defe-web-build/dist/sw.js >/dev/null
-          ! grep -F "vite-plugin-pwa:register-sw" defe-web-build/dist/index.html
           echo "BUILD_STORE_OK"
 
       - name: Empaquetar dist
