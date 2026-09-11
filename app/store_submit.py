@@ -3,6 +3,7 @@ from urllib.parse import parse_qs, quote
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from .db import get_db
@@ -22,6 +23,14 @@ def _money(value):
     if value is None:
         return 'a confirmar'
     return '$' + f'{int(value):,}'.replace(',', '.')
+
+
+def _first(item, *keys, default=None):
+    for key in keys:
+        value = item.get(key)
+        if value not in (None, ''):
+            return value
+    return default
 
 
 @router.post('/orders/submit')
@@ -47,17 +56,22 @@ async def submit_order(request: Request, db: Session = Depends(get_db)):
     items = []
     total = 0
     complete = True
-    for item in incoming:
+    for pos, item in enumerate(incoming, start=1):
+        if not isinstance(item, dict):
+            raise HTTPException(400, f'Ítem {pos} inválido')
+
+        raw_size = _first(item, 'size', 'talle', 'medida', 'variant', default='')
+        raw_qty = _first(item, 'qty', 'cant', 'cantidad', 'quantity', default=None)
+        size = str(raw_size or '').strip()
         try:
-            size = str(item.get('size') or '').strip()
-            qty = int(item.get('qty') or 0)
+            qty = int(raw_qty)
         except Exception:
-            raise HTTPException(400, 'Ítem inválido')
+            raise HTTPException(400, f'Cantidad inválida en ítem {pos}')
         if qty < 1:
-            raise HTTPException(400, 'Cantidad inválida')
+            raise HTTPException(400, f'Cantidad inválida en ítem {pos}')
 
         product = None
-        raw_id = item.get('product_id')
+        raw_id = _first(item, 'product_id', 'productoId', 'id', 'slug', default=None)
         if raw_id not in (None, '', 'null'):
             try:
                 product_id = int(raw_id)
@@ -68,20 +82,28 @@ async def submit_order(request: Request, db: Session = Depends(get_db)):
             except Exception:
                 product = None
 
+            if not product:
+                slug = str(raw_id).strip()
+                if slug:
+                    product = db.query(StoreProduct).filter(
+                        StoreProduct.slug == slug,
+                        StoreProduct.active == True,
+                    ).first()
+
         if not product:
-            product_name = str(item.get('product_name') or item.get('name') or '').strip()
+            product_name = str(_first(item, 'product_name', 'name', 'nombre', default='') or '').strip()
             if product_name:
                 product = db.query(StoreProduct).filter(
-                    StoreProduct.name == product_name,
+                    func.lower(StoreProduct.name) == product_name.lower(),
                     StoreProduct.active == True,
                 ).first()
 
         if not product:
-            raise HTTPException(400, 'Producto no disponible')
+            raise HTTPException(400, f'Producto no disponible en ítem {pos}')
 
         allowed_sizes = [s.strip() for s in (product.sizes_csv or '').split(',') if s.strip()]
         if size not in allowed_sizes:
-            raise HTTPException(400, f'Talle inválido para {product.name}')
+            raise HTTPException(400, f'Talle inválido para {product.name}: {size or "sin talle"}')
 
         managed = db.query(StoreInventory).filter(StoreInventory.product_id == product.id).first() is not None
         inv = db.query(StoreInventory).filter(
@@ -113,17 +135,9 @@ async def submit_order(request: Request, db: Session = Depends(get_db)):
         items_json=json.dumps(items, ensure_ascii=False),
         total=total if complete else None,
         status='pending',
+        stock_applied=False,
     )
     db.add(order)
-
-    for item in items:
-        inv = db.query(StoreInventory).filter(
-            StoreInventory.product_id == item['product_id'],
-            StoreInventory.size == item['size'],
-        ).first()
-        if inv:
-            inv.quantity -= item['qty']
-
     db.commit()
     db.refresh(order)
 
