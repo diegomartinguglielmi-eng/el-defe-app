@@ -1,7 +1,6 @@
 (() => {
   if (window.__defeSponsorsLoaded) return;
   window.__defeSponsorsLoaded = true;
-
   const API = 'https://el-defe-v5-production.up.railway.app';
   let sponsors = [];
   const fallback = [
@@ -14,7 +13,6 @@
     {name:'Ascensores Pastorino',category:'Ascensores',short_mark:'AP'},
     {name:'Lo de Abru',category:'Beauty Bar',short_mark:'LA'}
   ];
-
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   function jwtFromValue(value){if(!value||typeof value!=='string')return null;const m=value.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(m)return m[0];try{const p=JSON.parse(value);if(typeof p==='string')return jwtFromValue(p);if(p&&typeof p==='object')for(const v of Object.values(p)){const f=jwtFromValue(typeof v==='string'?v:JSON.stringify(v));if(f)return f}}catch(_){}return null}
   function token(){for(const st of [localStorage,sessionStorage])for(let i=0;i<st.length;i++){const t=jwtFromValue(st.getItem(st.key(i)));if(t)return t}return null}
@@ -25,11 +23,10 @@
 
   const css=document.createElement('style');
   css.textContent=`
-  .da-fab{position:fixed;right:12px;bottom:82px;z-index:9997;border:0;border-radius:999px;padding:11px 14px;background:#0b3b78;color:#fff;font-weight:900;box-shadow:0 6px 18px #0003}
-  .da-fab.admin{background:#40368f}.da-fab[hidden]{display:none!important}
+  .da-fab{position:fixed;right:12px;bottom:82px;z-index:9997;border:0;border-radius:999px;padding:11px 14px;background:#0b3b78;color:#fff;font-weight:900;box-shadow:0 6px 18px #0003}.da-fab[hidden]{display:none!important}
+  #defe-sponsors-mi-defe{margin:16px 28px;background:#fff;border:1px solid #dbe4ef;border-radius:16px;padding:16px;box-shadow:0 2px 8px #0000000d;color:#112f55}#defe-sponsors-mi-defe h3{margin:0 0 4px;color:#0b3b78;font-size:18px}#defe-sponsors-mi-defe p{margin:0 0 12px;color:#64748b;font-size:12px}#defe-sponsors-mi-defe button{width:100%;border:0;border-radius:12px;padding:12px;background:#40368f;color:#fff;font-weight:900}
   #defe-acompanan-modal,#defe-sponsors-admin{position:fixed;inset:0;background:#f5f7fb;z-index:2147482500;overflow:auto;color:#112f55}
-  .da-top{position:sticky;top:0;background:#0b3b78;color:#fff;padding:18px;display:flex;align-items:center;gap:14px;z-index:2}.da-back{border:0;background:#ffffff18;color:#fff;border-radius:50%;width:40px;height:40px;font-size:22px}.da-title{font-size:23px;font-weight:900}.da-sub{padding:18px 20px 4px;color:#65758b}.da-list{padding:12px 18px 100px;display:grid;gap:12px}.da-card{background:#fff;border:1px solid #dbe4ef;border-radius:16px;padding:13px;display:flex;align-items:center;gap:13px;text-align:left}.da-info{flex:1}.da-name{font-weight:900;font-size:17px}.da-rubro{font-size:13px;color:#718096;margin-top:4px}.da-arrow{font-size:24px;color:#0b3b78}.da-detail{padding:26px 20px;text-align:center}.da-mark,.da-mark-lg{border-radius:13px;border:1px solid #dbe4ef;display:flex;align-items:center;justify-content:center;font-weight:900;color:#0b3b78;background:#fff;overflow:hidden}.da-mark{width:64px;height:48px}.da-mark-lg{width:110px;height:110px;margin:20px auto;font-size:27px}.da-mark img,.da-mark-lg img{width:100%;height:100%;object-fit:contain}.da-socials{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:18px}.da-socials button{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:9px 12px;font-weight:800}.sp-admin-wrap{padding:16px;max-width:760px;margin:auto}.sp-admin-card{background:#fff;border:1px solid #dbe4ef;border-radius:16px;padding:14px;margin:10px 0}.sp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sp-grid label{font-size:12px;font-weight:700;color:#475569}.sp-grid input,.sp-grid select{width:100%;box-sizing:border-box;margin-top:4px;padding:10px;border:1px solid #cbd5e1;border-radius:10px}.sp-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.sp-actions button,.sp-primary{border:0;border-radius:10px;padding:10px 12px;font-weight:800}.sp-primary{background:#0b3b78;color:#fff}.sp-danger{background:#fee2e2;color:#991b1b}.sp-status{font-size:12px;color:#64748b;margin-top:8px}@media(max-width:640px){.sp-grid{grid-template-columns:1fr}}
-  `;
+  .da-top{position:sticky;top:0;background:#0b3b78;color:#fff;padding:18px;display:flex;align-items:center;gap:14px;z-index:2}.da-back{border:0;background:#ffffff18;color:#fff;border-radius:50%;width:40px;height:40px;font-size:22px}.da-title{font-size:23px;font-weight:900}.da-sub{padding:18px 20px 4px;color:#65758b}.da-list{padding:12px 18px 100px;display:grid;gap:12px}.da-card{background:#fff;border:1px solid #dbe4ef;border-radius:16px;padding:13px;display:flex;align-items:center;gap:13px;text-align:left}.da-info{flex:1}.da-name{font-weight:900;font-size:17px}.da-rubro{font-size:13px;color:#718096;margin-top:4px}.da-arrow{font-size:24px;color:#0b3b78}.da-detail{padding:26px 20px;text-align:center}.da-mark,.da-mark-lg{border-radius:13px;border:1px solid #dbe4ef;display:flex;align-items:center;justify-content:center;font-weight:900;color:#0b3b78;background:#fff;overflow:hidden}.da-mark{width:64px;height:48px}.da-mark-lg{width:110px;height:110px;margin:20px auto;font-size:27px}.da-mark img,.da-mark-lg img{width:100%;height:100%;object-fit:contain}.da-socials{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:18px}.da-socials button{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:9px 12px;font-weight:800}.sp-admin-wrap{padding:16px;max-width:760px;margin:auto}.sp-admin-card{background:#fff;border:1px solid #dbe4ef;border-radius:16px;padding:14px;margin:10px 0}.sp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sp-grid label{font-size:12px;font-weight:700;color:#475569}.sp-grid input,.sp-grid select{width:100%;box-sizing:border-box;margin-top:4px;padding:10px;border:1px solid #cbd5e1;border-radius:10px}.sp-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.sp-actions button,.sp-primary{border:0;border-radius:10px;padding:10px 12px;font-weight:800}.sp-primary{background:#0b3b78;color:#fff}.sp-danger{background:#fee2e2;color:#991b1b}.sp-status{font-size:12px;color:#64748b;margin-top:8px}@media(max-width:640px){.sp-grid{grid-template-columns:1fr}#defe-sponsors-mi-defe{margin:14px 28px}}`;
   document.head.appendChild(css);
 
   async function loadPublic(){try{const r=await fetch(API+'/api/sponsors',{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();sponsors=Array.isArray(d)&&d.length?d:fallback}catch(_){sponsors=fallback}}
@@ -46,24 +43,20 @@
   async function renderAdmin(){const p=document.getElementById('defe-sponsors-admin');if(!p)return;const body=p.querySelector('[data-body]');try{const rows=await adminData();body.innerHTML=`<button class="sp-primary" data-new>+ Nuevo sponsor</button>`+rows.map(s=>`<div class="sp-admin-card" data-id="${s.id}"><strong>${esc(s.name)}</strong>${formHtml(s)}<div class="sp-actions"><button class="sp-primary" data-save>Guardar</button><button class="sp-danger" data-off>Desactivar</button></div><div class="sp-status"></div></div>`).join('');body.querySelector('[data-new]').onclick=()=>{const c=document.createElement('div');c.className='sp-admin-card';c.innerHTML='<strong>Nuevo sponsor</strong>'+formHtml({active:true,featured:false,sort_order:rows.length})+'<div class="sp-actions"><button class="sp-primary" data-save>Guardar</button></div><div class="sp-status"></div>';body.insertBefore(c,body.children[1]);c.querySelector('[data-save]').onclick=()=>saveSponsor(c,{})};body.querySelectorAll('[data-id]').forEach(c=>{const s=rows.find(x=>x.id===Number(c.dataset.id));c.querySelector('[data-save]').onclick=()=>saveSponsor(c,s);c.querySelector('[data-off]').onclick=()=>deactivate(s.id)})}catch(e){body.textContent=e.message}}
   function openAdmin(){if(role()!=='admin')return;let p=document.getElementById('defe-sponsors-admin');if(!p){p=document.createElement('div');p.id='defe-sponsors-admin';p.innerHTML='<div class="da-top"><button class="da-back" data-close>‹</button><div class="da-title">Gestión de Sponsors</div></div><div class="sp-admin-wrap"><div class="da-sub" style="padding:0 0 12px">Alta, edición, logo, orden y enlaces.</div><div data-body>Cargando…</div></div>';document.body.appendChild(p);p.querySelector('[data-close]').onclick=()=>p.remove()}renderAdmin()}
 
-  function pageState(){
-    const profile=!!document.querySelector('.defe-profile-page');
-    const home=!profile && !![...document.querySelectorAll('div,span,h1,h2,h3')].find(el=>el.childElementCount===0&&String(el.textContent||'').trim()==='Competiciones'&&el.offsetParent!==null);
-    return {profile,home};
-  }
-  function syncFab(){
-    const st=pageState();
+  function isProfile(){return !!document.querySelector('.defe-profile-page') || !![...document.querySelectorAll('div,span,p')].find(el=>el.childElementCount===0&&/categoría\(s\) seguidas/i.test(el.textContent||''));}
+  function isHome(){return !isProfile() && !![...document.querySelectorAll('div,span,h1,h2,h3')].find(el=>el.childElementCount===0&&String(el.textContent||'').trim()==='Competiciones'&&el.offsetParent!==null);}
+  function profileAnchor(){const email=[...document.querySelectorAll('div,span,p,strong')].find(el=>el.childElementCount===0&&/@/.test(el.textContent||'')&&el.offsetParent!==null);if(!email)return null;let n=email;for(let i=0;i<5&&n?.parentElement;i++,n=n.parentElement){const r=n.getBoundingClientRect();if(r.width>250&&r.height>100&&r.height<500)return n}return email.parentElement}
+  function syncUi(){
     let publicBtn=document.getElementById('defe-sponsors-public-fab');
     if(!publicBtn){publicBtn=document.createElement('button');publicBtn.id='defe-sponsors-public-fab';publicBtn.className='da-fab';publicBtn.textContent='🤝 Nos acompañan';publicBtn.onclick=show;document.body.appendChild(publicBtn)}
-    publicBtn.hidden=!st.home;
-    let adminBtn=document.getElementById('defe-sponsors-admin-fab');
-    if(!adminBtn){adminBtn=document.createElement('button');adminBtn.id='defe-sponsors-admin-fab';adminBtn.className='da-fab admin';adminBtn.textContent='🤝 Gestionar Sponsors';adminBtn.onclick=openAdmin;document.body.appendChild(adminBtn)}
-    adminBtn.hidden=!(st.profile&&role()==='admin');
+    publicBtn.hidden=!isHome();
+    document.getElementById('defe-sponsors-admin-fab')?.remove();
+    const existing=document.getElementById('defe-sponsors-mi-defe');
+    if(!(isProfile()&&role()==='admin')){existing?.remove();return}
+    if(existing)return;
+    const anchor=profileAnchor();if(!anchor?.parentElement)return;
+    const box=document.createElement('section');box.id='defe-sponsors-mi-defe';box.innerHTML='<h3>Gestión</h3><p>Herramientas disponibles para administradores.</p><button type="button">🤝 Gestionar Sponsors</button>';box.querySelector('button').onclick=openAdmin;anchor.insertAdjacentElement('afterend',box);
   }
-
   window.defeAcompanantes={show,openAdmin,get sponsors(){return sponsors}};
-  loadPublic();
-  syncFab();
-  setInterval(syncFab,700);
-  window.addEventListener('focus',syncFab);
+  loadPublic();syncUi();setInterval(syncUi,800);window.addEventListener('focus',syncUi);
 })();
