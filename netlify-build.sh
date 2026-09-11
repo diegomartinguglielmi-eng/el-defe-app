@@ -112,16 +112,17 @@ grep -F "web-sponsors-home-sync-${SHA}.js" defe-web-build/dist/index.html
 grep -F "web-following-overlay-${SHA}.js" defe-web-build/dist/index.html
 grep -F "matches-explorer-${SHA}.js" defe-web-build/dist/index.html
 grep -F "Gestionar Sponsors" "defe-web-build/dist/${ACOMP}"
-grep -F "/api/sponsors" "defe-web-build/dist/${SPONSORSHOME}"
+grep -F "/api/sponsors/featured" "defe-web-build/dist/${SPONSORSHOME}"
 grep -F "/api/following/next" "defe-web-build/dist/${FOLLOWING}"
 grep -F "Cómo llegar" "defe-web-build/dist/${FOLLOWING}"
 grep -F "Apertura" "defe-web-build/dist/${MATCHES}"
 grep -F "Clausura" "defe-web-build/dist/${MATCHES}"
 grep -F "DEFE_FINAL_UI_V36_PROMOS_ARGEN_9NA" "defe-web-build/dist/assets/${JS}"
-grep -F "DEFE_STORE_NATIVE_EXACT_V3" "defe-web-build/dist/assets/${JS}"
+grep -F "DEFE_STORE_NATIVE_EXACT_V4" "defe-web-build/dist/assets/${JS}"
+grep -F "DEFE_STORE_NATIVE_RAILWAY_V1" "defe-web-build/dist/assets/${JS}"
 ! grep -F "store-checkout-${SHA}.js" defe-web-build/dist/index.html
 ! grep -F "web-sponsors-profile-bridge" defe-web-build/dist/index.html
 ! grep -F "web-push-overlay" defe-web-build/dist/index.html
 ! grep -F "location.replace" defe-web-build/dist/index.html
 
-echo "Netlify build listo: checkout nativo exacto + Tienda"
+echo "Netlify build listo: checkout nativo exacto V4 + Tienda + Sponsors"
