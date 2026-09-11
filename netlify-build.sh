@@ -42,11 +42,14 @@ sed -i "s#assets/${JS}#assets/${UNIQUE}#" defe-web-build/dist/index.html
 
 cp defe-datos/datos.json defe-web-build/dist/datos.json
 if [ -f defe-datos/salud.json ]; then cp defe-datos/salud.json defe-web-build/dist/salud.json; fi
+
 AUTH="web-auth-overlay-${SHA}.js"
 BRIDGE="web-comms-push-bridge-${SHA}.js"
 COMMS="web-comms-overlay-${SHA}.js"
 PUSH="web-push-overlay-${SHA}.js"
 ACOMP="web-acompanan-overlay-${SHA}.js"
+SPONSORPROFILE="web-sponsors-profile-bridge-${SHA}.js"
+MATCHES="matches-explorer-${SHA}.js"
 STORECHECKOUT="store-checkout-${SHA}.js"
 CHECKOUTMARKER="store-checkout-marker-${SHA}.js"
 PICKUPHARDENING="store-pickup-hardening-${SHA}.js"
@@ -55,11 +58,14 @@ STORERECEIVING="store-receiving-${SHA}.js"
 STORESTOCKALERTS="store-stock-alerts-${SHA}.js"
 STOREROLEVIEW="store-role-view-${SHA}.js"
 STOREUISHIELD="store-ui-shield-${SHA}.js"
+
 cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
 cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
 cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
 cp web-push-overlay.js "defe-web-build/dist/${PUSH}"
 cp web-acompanan-overlay.js "defe-web-build/dist/${ACOMP}"
+cp web-sponsors-profile-bridge.js "defe-web-build/dist/${SPONSORPROFILE}"
+cp app/static/matches-explorer.js "defe-web-build/dist/${MATCHES}"
 cp app/static/store-checkout.js "defe-web-build/dist/${STORECHECKOUT}"
 cp app/static/store-checkout-marker.js "defe-web-build/dist/${CHECKOUTMARKER}"
 cp app/static/store-pickup-hardening.js "defe-web-build/dist/${PICKUPHARDENING}"
@@ -71,7 +77,8 @@ cp app/static/store-ui-shield.js "defe-web-build/dist/${STOREUISHIELD}"
 cp push-sw.js defe-web-build/dist/push-sw.js
 cp manifest.webmanifest defe-web-build/dist/manifest.webmanifest
 cp mobile/assets/icon.png defe-web-build/dist/icon.png
-sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${STOREUISHIELD}\"></script><script src=\"./${STORECHECKOUT}\"></script><script src=\"./${CHECKOUTMARKER}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
+
+sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORPROFILE}\"></script><script src=\"./${STOREUISHIELD}\"></script><script src=\"./${STORECHECKOUT}\"></script><script src=\"./${CHECKOUTMARKER}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
 
 sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
 echo "// inert" > defe-web-build/dist/sw.js
@@ -84,12 +91,33 @@ sha = sys.argv[1]
 p = Path('defe-web-build/dist/index.html')
 s = p.read_text()
 pwa = '<link rel="manifest" href="/el-defe-app/manifest.webmanifest"><link rel="icon" type="image/png" href="/el-defe-app/icon.png"><meta name="theme-color" content="#0b3a7a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="El Defe">'
-clean = f'''<script>(async function(){{var k='defe-clean-{sha}';if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{{if('serviceWorker' in navigator){{var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){{return r.unregister()}}));}}if('caches' in window){{var ks=await caches.keys();await Promise.all(ks.map(function(x){{return caches.delete(x)}}));}}}}catch(e){{}}}})();</script>'''
+clean = f'''<script>(async function(){{var k='defe-clean-{sha}';try{{if(localStorage.getItem(k))return;localStorage.setItem(k,'1');if('serviceWorker' in navigator){{var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){{return r.unregister()}}));}}if('caches' in window){{var ks=await caches.keys();await Promise.all(ks.map(function(x){{return caches.delete(x)}}));}}}}catch(e){{}}}})();</script>'''
 s = s.replace('<head>', '<head>' + clean + pwa, 1)
 p.write_text(s)
 PY
 
+# La app debe cargar la versión nueva desde red, sin forzar location.replace ni recargas.
+mkdir -p netlify-publish/el-defe-app
 cp -R defe-web-build/dist/. netlify-publish/el-defe-app/
 printf '/ /el-defe-app/ 302\n/el-defe-app/* /el-defe-app/index.html 200\n' > netlify-publish/_redirects
+cat > netlify-publish/_headers <<'HDR'
+/el-defe-app/
+  Cache-Control: no-cache, no-store, must-revalidate
+/el-defe-app/index.html
+  Cache-Control: no-cache, no-store, must-revalidate
+/el-defe-app/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+/el-defe-app/registerSW.js
+  Cache-Control: no-cache, no-store, must-revalidate
+HDR
+
+# Checks de cierre: si alguno falla, Netlify no publica un build incompleto.
+grep -F "web-acompanan-overlay-${SHA}.js" defe-web-build/dist/index.html
+grep -F "web-sponsors-profile-bridge-${SHA}.js" defe-web-build/dist/index.html
+grep -F "matches-explorer-${SHA}.js" defe-web-build/dist/index.html
+grep -F "Gestionar Sponsors" "defe-web-build/dist/${SPONSORPROFILE}"
+grep -F "Apertura" "defe-web-build/dist/${MATCHES}"
+grep -F "Clausura" "defe-web-build/dist/${MATCHES}"
+! grep -F "location.replace" defe-web-build/dist/index.html
 
 echo "Netlify build listo: netlify-publish/el-defe-app"
