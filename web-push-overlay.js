@@ -11,18 +11,8 @@
   const followed=()=>{try{return JSON.parse(localStorage.getItem('defe_followed_v1')||'[]')}catch{return []}};
   const pushOn=()=>supported()&&Notification.permission==='granted'&&localStorage.getItem(ENABLED)==='1';
 
-  function isLegacy(el){
-    const t=(el.textContent||'').replace(/\s+/g,' ').trim();
-    if(!/^(🔔\s*)?(avisos activos|activar avisos)$/i.test(t))return false;
-    if(el.closest('[data-defe-notifications-panel]'))return false;
-    const s=getComputedStyle(el),r=el.getBoundingClientRect();
-    return s.position==='fixed'||r.bottom>window.innerHeight-220;
-  }
-  function removeLegacyButton(){
-    document.getElementById('defe-push-btn')?.remove();
-    document.querySelectorAll('.defe-push-btn').forEach(el=>el.remove());
-    [...document.querySelectorAll('button,a,div,span')].filter(isLegacy).forEach(el=>{const target=el.closest('button,a')||el;target.style.setProperty('display','none','important');target.setAttribute('aria-hidden','true')});
-  }
+  function isLegacy(el){const t=(el.textContent||'').replace(/\s+/g,' ').trim();if(!/^(🔔\s*)?(avisos activos|activar avisos)$/i.test(t))return false;if(el.closest('[data-defe-notifications-panel]'))return false;const s=getComputedStyle(el),r=el.getBoundingClientRect();return s.position==='fixed'||r.bottom>window.innerHeight-220}
+  function removeLegacyButton(){document.getElementById('defe-push-btn')?.remove();document.querySelectorAll('.defe-push-btn').forEach(el=>el.remove());[...document.querySelectorAll('button,a,div,span')].filter(isLegacy).forEach(el=>{const target=el.closest('button,a')||el;if(target.style.display!=='none'){target.style.setProperty('display','none','important');target.setAttribute('aria-hidden','true')}})}
 
   async function registerPushSW(){const reg=await navigator.serviceWorker.register(SW,{scope:BASE,updateViaCache:'none'});await reg.update().catch(()=>{});return reg}
   async function retire(reg,sub){try{const j=sub?.toJSON?.();if(j?.endpoint&&j?.keys?.p256dh&&j?.keys?.auth){await fetch(API+'/api/notifications/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:j.endpoint,keys:j.keys,followed:followed()})})}}catch(_){}try{await sub?.unsubscribe?.()}catch(_){}}
@@ -31,13 +21,11 @@
 
   function findPanelButton(){return [...document.querySelectorAll('button')].find(b=>{const t=(b.textContent||'').replace(/\s+/g,' ').trim();return /^(activar notificaciones del dispositivo|activando notificaciones…?|✓?\s*notificaciones activas)$/i.test(t)})}
   function findStatus(){return [...document.querySelectorAll('p,div,span')].find(el=>/los avisos todavía no están configurados|las notificaciones del dispositivo están activas|notificaciones están bloqueadas/i.test(el.textContent||'')&&el.children.length===0)}
-  function paintPanel(state){
-    if(painting)return;painting=true;
-    try{removeLegacyButton();const b=findPanelButton();if(!b)return false;b.setAttribute('data-defe-notifications-panel','1');b.onclick=e=>{e.preventDefault();e.stopPropagation();enable()};if(!supported()){b.textContent='Notificaciones no disponibles';b.disabled=true;return true}if(state==='busy'&&!pushOn()){b.textContent='Activando notificaciones…';b.disabled=true;return true}b.disabled=false;const on=pushOn();b.textContent=on?'✓ Notificaciones activas':'Activar notificaciones del dispositivo';const st=findStatus();if(st)st.textContent=on?'Las notificaciones del dispositivo están activas. Recibirás los avisos según tus categorías y preferencias.':Notification.permission==='denied'?'Las notificaciones están bloqueadas en el dispositivo.':'Los avisos todavía no están configurados.';return true}finally{painting=false}
-  }
-  function refreshState(){paintPanel();setTimeout(()=>paintPanel(),120);setTimeout(()=>paintPanel(),500)}
-  function observePanel(){let queued=false;const refresh=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;removeLegacyButton();paintPanel()})};new MutationObserver(refresh).observe(document.body,{childList:true,subtree:true});refresh()}
-  async function init(){removeLegacyButton();observePanel();refreshState();if(pushOn())await sync();document.addEventListener('defe:preferences-updated',()=>{sync();refreshState()});document.addEventListener('click',e=>{const t=(e.target?.textContent||'').toLowerCase();if(t.includes('mi defe')||t.includes('mi df'))setTimeout(refreshState,150)},true);window.addEventListener('focus',refreshState);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshState()})}
+  function setText(el,text){if(el&&el.textContent!==text)el.textContent=text}
+  function paintPanel(state){if(painting)return;painting=true;try{removeLegacyButton();const b=findPanelButton();if(!b)return false;b.setAttribute('data-defe-notifications-panel','1');if(!b.dataset.defePushBound){b.dataset.defePushBound='1';b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();enable()})}if(!supported()){setText(b,'Notificaciones no disponibles');b.disabled=true;return true}if(state==='busy'&&!pushOn()){setText(b,'Activando notificaciones…');b.disabled=true;return true}b.disabled=false;const on=pushOn();setText(b,on?'✓ Notificaciones activas':'Activar notificaciones del dispositivo');const st=findStatus();if(st)setText(st,on?'Las notificaciones del dispositivo están activas. Recibirás los avisos según tus categorías y preferencias.':Notification.permission==='denied'?'Las notificaciones están bloqueadas en el dispositivo.':'Los avisos todavía no están configurados.');return true}finally{painting=false}}
+  function refreshState(){paintPanel();setTimeout(()=>paintPanel(),150)}
+  function observePanel(){let timer=0;new MutationObserver(muts=>{if(!muts.some(m=>m.addedNodes&&m.addedNodes.length))return;clearTimeout(timer);timer=setTimeout(()=>{removeLegacyButton();paintPanel()},80)}).observe(document.body,{childList:true,subtree:true});refreshState()}
+  async function init(){removeLegacyButton();observePanel();if(pushOn())await sync();document.addEventListener('defe:preferences-updated',()=>{sync();refreshState()});window.addEventListener('focus',refreshState);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshState()})}
   window.defeEnablePush=enable;window.defeSyncPush=()=>sync();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
