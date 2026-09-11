@@ -1,0 +1,50 @@
+name: Probar Tienda end-to-end
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verificar interceptor
+        run: |
+          grep -F "DEFE_STORE_CAPTURE_V2" store-checkout-interceptor.js
+          grep -F "/api/store/orders/submit" store-checkout-interceptor.js
+      - name: Probar backend y crear pedido de prueba
+        shell: bash
+        run: |
+          set -euo pipefail
+          API="https://el-defe-v5-production.up.railway.app"
+          curl -fsS "$API/api/store/products" -o /tmp/products.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/products.json'))
+          a=d if isinstance(d,list) else d.get('products',d.get('items',[]))
+          assert a, 'Catálogo vacío'
+          p=a[0]
+          sizes=p.get('sizes') or p.get('stock_by_size') or {}
+          if isinstance(sizes,dict) and sizes:
+              size=next(iter(sizes))
+          elif isinstance(sizes,list) and sizes:
+              x=sizes[0]; size=x if isinstance(x,str) else x.get('size',x.get('name','Único'))
+          else: size='Único'
+          open('/tmp/id','w').write(str(p['id']))
+          open('/tmp/size','w').write(str(size))
+          print('Producto:',p.get('name',p.get('nombre')), 'id=',p['id'],'talle=',size)
+          PY
+          ID=$(cat /tmp/id); SIZE=$(cat /tmp/size)
+          curl -sS -D /tmp/headers -o /tmp/body -X POST "$API/api/store/orders/submit" \
+            --data-urlencode "buyer_name=PRUEBA AUTOMATICA DEFE" \
+            --data-urlencode "buyer_phone=1100000000" \
+            --data-urlencode "buyer_category=TEST" \
+            --data-urlencode "buyer_note=Smoke test automático GitHub Actions" \
+            --data-urlencode "items=[{\"product_id\":$ID,\"size\":\"$SIZE\",\"qty\":1}]"
+          cat /tmp/headers
+          STATUS=$(head -1 /tmp/headers | awk '{print $2}')
+          test "$STATUS" = "302" -o "$STATUS" = "303" -o "$STATUS" = "307" -o "$STATUS" = "200"
+          grep -i '^location:.*wa.me\|^location:.*whatsapp' /tmp/headers || { echo 'Falta redirección a WhatsApp'; cat /tmp/body; exit 1; }
+          echo "STORE_E2E_OK"
