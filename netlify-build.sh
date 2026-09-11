@@ -88,9 +88,11 @@ sha = sys.argv[1]
 p = Path('defe-web-build/dist/index.html')
 s = p.read_text()
 pwa = '<link rel="manifest" href="/el-defe-app/manifest.webmanifest"><link rel="icon" type="image/png" href="/el-defe-app/icon.png"><meta name="theme-color" content="#0b3a7a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="El Defe">'
-clean = f'''<script>(async function(){{var k='defe-clean-{sha}';if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{{if('serviceWorker' in navigator){{var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){{return r.unregister()}}));}}if('caches' in window){{var ks=await caches.keys();await Promise.all(ks.map(function(x){{return caches.delete(x)}}));}}}}catch(e){{}}location.replace('/el-defe-app/?v={sha}&clean=1');}})();</script>'''
-version = f'''<script>(function(){{var v='{sha}';if(!location.search.includes('v='+v)){{location.replace('/el-defe-app/?v='+v);}}}})();</script>'''
-s = s.replace('<head>', '<head>' + version + clean + pwa, 1)
+# No forzar location.replace en cada build. Los assets ya llevan el SHA en el nombre,
+# por lo que el navegador obtiene la versión nueva sin provocar un bucle visual en la PWA.
+# Sólo limpiamos service workers/cachés antiguos una vez por versión, sin recargar la página.
+clean = f'''<script>(async function(){{var k='defe-clean-{sha}';if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{{if('serviceWorker' in navigator){{var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){{return r.unregister()}}));}}if('caches' in window){{var ks=await caches.keys();await Promise.all(ks.map(function(x){{return caches.delete(x)}}));}}}}catch(e){{}}}})();</script>'''
+s = s.replace('<head>', '<head>' + clean + pwa, 1)
 p.write_text(s)
 PY
 
