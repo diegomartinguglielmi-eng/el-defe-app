@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 from .auth import hash_password, create_token, require_roles
 from .db import get_db
 from .models import User, AuditLog
-from . import sponsors_v5  # registra API y bootstrap de sponsors
 
 router = APIRouter()
 
