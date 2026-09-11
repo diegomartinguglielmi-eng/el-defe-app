@@ -1,0 +1,27 @@
+name: Validar pedido Tienda
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/validate-store-order.yml'
+
+jobs:
+  validate-order:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener producto y crear pedido de prueba
+        shell: bash
+        run: |
+          set -euo pipefail
+          API='https://el-defe-v5-production.up.railway.app'
+          PRODUCTS=$(curl -fsS "$API/api/store/products")
+          echo "$PRODUCTS" | jq 'length > 0' | grep true
+          PID=$(echo "$PRODUCTS" | jq -r '.[0].id')
+          SIZE=$(echo "$PRODUCTS" | jq -r '.[0].sizes[0]')
+          test -n "$PID"
+          test -n "$SIZE"
+          BODY=$(jq -nc --argjson pid "$PID" --arg size "$SIZE" '{buyer_name:"VALIDACION CHATGPT",buyer_phone:"1100000000",buyer_category:"TEST",buyer_note:"Pedido técnico de validación",items:[{product_id:$pid,size:$size,qty:1}]}')
+          RESP=$(curl -fsS -X POST "$API/api/store/orders" -H 'Content-Type: application/json' -d "$BODY")
+          echo "$RESP" | jq -e '.id and .status=="pending" and (.items|length)==1'
+          echo "Pedido de prueba creado: $(echo "$RESP" | jq -r '.id')"
