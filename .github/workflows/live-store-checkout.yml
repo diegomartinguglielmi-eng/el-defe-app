@@ -13,13 +13,32 @@ jobs:
           curl -fsS "$API/api/store/products" -o /tmp/products.json
           python3 - <<'PY' > /tmp/form.txt
           import json, urllib.parse
-          p=json.load(open('/tmp/products.json'))[0]
-          size=(p.get('sizes') or ['Único'])[0]
+          products=json.load(open('/tmp/products.json'))
+          pick=None
+          for p in products:
+              sizes=p.get('sizes') or []
+              if not sizes:
+                  continue
+              if not p.get('stock_managed'):
+                  pick=(p,sizes[0]); break
+              inv=p.get('inventory') or {}
+              for size in sizes:
+                  if int(inv.get(size,0) or 0)>0:
+                      pick=(p,size); break
+              if pick:
+                  break
+          if not pick:
+              raise SystemExit('No hay producto/talle disponible para prueba')
+          p,size=pick
           item=json.dumps([{'product_id':p['id'],'product_name':p['name'],'size':size,'qty':1}],ensure_ascii=False)
           print(urllib.parse.urlencode({'buyer_name':'TEST AUTOMATICO','buyer_phone':'1','buyer_category':'TEST','buyer_note':'NO PREPARAR - prueba automatica','items':item}))
+          print(f"TEST_PRODUCT={p['id']}|{p['name']}|{size}", file=open('/tmp/pick.txt','w'))
           PY
+          cat /tmp/pick.txt
           CODE=$(curl -sS -o /tmp/body -D /tmp/headers -w '%{http_code}' --max-redirs 0 -X POST -H 'Content-Type: application/x-www-form-urlencoded' --data-binary @/tmp/form.txt "$API/api/store/orders/submit")
           cat /tmp/headers
+          cat /tmp/body
           test "$CODE" = 303
           grep -qi '^location: https://wa.me/' /tmp/headers
+          grep -qi 'Pedido' /tmp/headers
           echo LIVE_STORE_CHECKOUT_OK
