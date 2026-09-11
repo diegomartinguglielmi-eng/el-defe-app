@@ -47,6 +47,7 @@ AUTH="web-auth-overlay-${SHA}.js"
 BRIDGE="web-comms-push-bridge-${SHA}.js"
 COMMS="web-comms-overlay-${SHA}.js"
 ACOMP="web-acompanan-overlay-${SHA}.js"
+SPONSORSHOME="web-sponsors-home-sync-${SHA}.js"
 MATCHES="matches-explorer-${SHA}.js"
 STORECHECKOUT="store-checkout-${SHA}.js"
 CHECKOUTMARKER="store-checkout-marker-${SHA}.js"
@@ -61,6 +62,7 @@ cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
 cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
 cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
 cp web-acompanan-overlay.js "defe-web-build/dist/${ACOMP}"
+cp web-sponsors-home-sync.js "defe-web-build/dist/${SPONSORSHOME}"
 cp app/static/matches-explorer.js "defe-web-build/dist/${MATCHES}"
 cp app/static/store-checkout.js "defe-web-build/dist/${STORECHECKOUT}"
 cp app/static/store-checkout-marker.js "defe-web-build/dist/${CHECKOUTMARKER}"
@@ -74,9 +76,8 @@ cp push-sw.js defe-web-build/dist/push-sw.js
 cp manifest.webmanifest defe-web-build/dist/manifest.webmanifest
 cp mobile/assets/icon.png defe-web-build/dist/icon.png
 
-# Importante: no inyectar overlays que muten el DOM interno de React en Mi Defe.
-# La app base ya resuelve su panel de notificaciones. Sponsors usa un portal seguro en document.body.
-sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${STOREUISHIELD}\"></script><script src=\"./${STORECHECKOUT}\"></script><script src=\"./${CHECKOUTMARKER}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
+# No inyectar overlays de push/recovery que muten Mi Defe.
+sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${STOREUISHIELD}\"></script><script src=\"./${STORECHECKOUT}\"></script><script src=\"./${CHECKOUTMARKER}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
 
 sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
 echo "// inert" > defe-web-build/dist/sw.js
@@ -108,10 +109,11 @@ cat > netlify-publish/_headers <<'HDR'
   Cache-Control: no-cache, no-store, must-revalidate
 HDR
 
-# Validaciones de estabilidad y contenido antes de publicar.
 grep -F "web-acompanan-overlay-${SHA}.js" defe-web-build/dist/index.html
+grep -F "web-sponsors-home-sync-${SHA}.js" defe-web-build/dist/index.html
 grep -F "matches-explorer-${SHA}.js" defe-web-build/dist/index.html
 grep -F "Gestionar Sponsors" "defe-web-build/dist/${ACOMP}"
+grep -F "/api/sponsors" "defe-web-build/dist/${SPONSORSHOME}"
 grep -F "Apertura" "defe-web-build/dist/${MATCHES}"
 grep -F "Clausura" "defe-web-build/dist/${MATCHES}"
 ! grep -F "web-sponsors-profile-bridge" defe-web-build/dist/index.html
