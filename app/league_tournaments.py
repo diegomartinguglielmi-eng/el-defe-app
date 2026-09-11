@@ -1,10 +1,16 @@
+from threading import Thread
+
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from .db import get_db
+from .db import get_db, SessionLocal
+from .main import app
 from .models import Match, Standing
+from .laamba_period_sync import sync_laamba_periods
 
 router = APIRouter(prefix='/api/leagues', tags=['Leagues'])
+LAAMBA_PERIOD_LOCK=2026090711
 
 
 def _period_from_key(key: str | None) -> str | None:
@@ -79,3 +85,23 @@ def league_tournaments(competition: str, division: str | None = None, db: Sessio
         if p:values.add(p)
     order=['apertura','clausura','anual']
     return {'competition':competition,'division':division,'tournaments':[x for x in order if x in values]}
+
+
+def _sync_laamba_periods_startup():
+    db=SessionLocal();locked=False
+    try:
+        locked=bool(db.execute(text('SELECT pg_try_advisory_lock(:k)'),{'k':LAAMBA_PERIOD_LOCK}).scalar())
+        if not locked:return
+        print({'laamba_periods':sync_laamba_periods(db)})
+    except Exception as exc:
+        db.rollback();print({'laamba_periods':'error','detail':str(exc)})
+    finally:
+        if locked:
+            try:db.execute(text('SELECT pg_advisory_unlock(:k)'),{'k':LAAMBA_PERIOD_LOCK});db.commit()
+            except Exception:db.rollback()
+        db.close()
+
+
+@app.on_event('startup')
+def league_period_startup():
+    Thread(target=_sync_laamba_periods_startup,daemon=True).start()
