@@ -69,14 +69,16 @@ def _wants(sub, event):
     try: followed=set(json.loads(sub.followed_json or "[]"))
     except Exception: followed=set()
     if not followed: return True
-    if event.competition=="FEFI" and event.category: return f"FEFI|{event.category}" in followed
-    if event.competition=="FEFI": return any(x.startswith("FEFI|") for x in followed)
-    if event.competition=="LAAMBA" and event.category: return f"LAAMBA|{event.category}" in followed
-    if event.competition=="ARGENLIGA": return "ARGENLIGA|ALL" in followed
+    competition=(event.competition or "").upper().strip()
+    category=(event.category or "").strip()
+    if competition and category:
+        return f"{competition}|{category}" in followed or f"{competition}|ALL" in followed
+    if competition:
+        return any(x.startswith(f"{competition}|") for x in followed)
     return True
 
 def _push_payload(event):
-    return json.dumps({"id":event.id,"title":event.title,"body":event.body,"urgent":event.urgent,"competition":event.competition,"category":event.category,"url":"/el-defe-app/"},ensure_ascii=False)
+    return json.dumps({"id":event.id,"title":event.title,"body":event.body,"urgent":event.urgent,"competition":event.competition,"category":event.category,"match_id":event.match_id,"url":"/el-defe-app/"},ensure_ascii=False)
 
 def deliver_pushes(db, event):
     private_key=_vapid_private_key(); public_key=_vapid_public_key()
