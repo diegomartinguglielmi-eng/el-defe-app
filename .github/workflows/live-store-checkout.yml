@@ -1,0 +1,25 @@
+name: Live store checkout synthetic
+on:
+  push:
+    branches: [synthetic-store-checkout]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify live checkout
+        run: |
+          set -e
+          API=https://el-defe-v5-production.up.railway.app
+          curl -fsS "$API/api/store/products" -o /tmp/products.json
+          python3 - <<'PY' > /tmp/form.txt
+          import json, urllib.parse
+          p=json.load(open('/tmp/products.json'))[0]
+          size=(p.get('sizes') or ['Único'])[0]
+          item=json.dumps([{'product_id':p['id'],'product_name':p['name'],'size':size,'qty':1}],ensure_ascii=False)
+          print(urllib.parse.urlencode({'buyer_name':'TEST AUTOMATICO','buyer_phone':'1','buyer_category':'TEST','buyer_note':'NO PREPARAR - prueba automatica','items':item}))
+          PY
+          CODE=$(curl -sS -o /tmp/body -D /tmp/headers -w '%{http_code}' --max-redirs 0 -X POST -H 'Content-Type: application/x-www-form-urlencoded' --data-binary @/tmp/form.txt "$API/api/store/orders/submit")
+          cat /tmp/headers
+          test "$CODE" = 303
+          grep -qi '^location: https://wa.me/' /tmp/headers
+          echo LIVE_STORE_CHECKOUT_OK
