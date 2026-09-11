@@ -31,6 +31,7 @@ node patch-fefi-senior-v32.mjs
 node patch-fefi-senior-v33.mjs
 node patch-fefi-senior-v35.mjs
 node patch-final-ui-v36.mjs
+node patch-store-native.mjs
 
 FEFI="fefi-senior-v35-${SHA}.js"
 mv defe-web-build/dist/fefi-senior-v30.js "defe-web-build/dist/${FEFI}"
@@ -51,14 +52,11 @@ ACOMP="web-acompanan-overlay-${SHA}.js"
 SPONSORSHOME="web-sponsors-home-sync-${SHA}.js"
 FOLLOWING="web-following-overlay-${SHA}.js"
 MATCHES="matches-explorer-${SHA}.js"
-STORECHECKOUT="store-checkout-${SHA}.js"
-CHECKOUTMARKER="store-checkout-marker-${SHA}.js"
 PICKUPHARDENING="store-pickup-hardening-${SHA}.js"
 ORDERSAFETY="store-order-safety-${SHA}.js"
 STORERECEIVING="store-receiving-${SHA}.js"
 STORESTOCKALERTS="store-stock-alerts-${SHA}.js"
 STOREROLEVIEW="store-role-view-${SHA}.js"
-STOREUISHIELD="store-ui-shield-${SHA}.js"
 
 cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
 cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
@@ -67,20 +65,17 @@ cp web-acompanan-overlay.js "defe-web-build/dist/${ACOMP}"
 cp web-sponsors-home-sync.js "defe-web-build/dist/${SPONSORSHOME}"
 cp web-following-overlay.js "defe-web-build/dist/${FOLLOWING}"
 cp app/static/matches-explorer.js "defe-web-build/dist/${MATCHES}"
-cp app/static/store-checkout.js "defe-web-build/dist/${STORECHECKOUT}"
-cp app/static/store-checkout-marker.js "defe-web-build/dist/${CHECKOUTMARKER}"
 cp app/static/store-pickup-hardening.js "defe-web-build/dist/${PICKUPHARDENING}"
 cp app/static/store-order-safety.js "defe-web-build/dist/${ORDERSAFETY}"
 cp app/static/store-receiving.js "defe-web-build/dist/${STORERECEIVING}"
 cp app/static/store-stock-alerts.js "defe-web-build/dist/${STORESTOCKALERTS}"
 cp app/static/store-role-view.js "defe-web-build/dist/${STOREROLEVIEW}"
-cp app/static/store-ui-shield.js "defe-web-build/dist/${STOREUISHIELD}"
 cp push-sw.js defe-web-build/dist/push-sw.js
 cp manifest.webmanifest defe-web-build/dist/manifest.webmanifest
 cp mobile/assets/icon.png defe-web-build/dist/icon.png
 
-# No inyectar overlays de push/recovery que muten Mi Defe.
-sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${FOLLOWING}\"></script><script src=\"./${STOREUISHIELD}\"></script><script src=\"./${STORECHECKOUT}\"></script><script src=\"./${CHECKOUTMARKER}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
+# Checkout oficial queda dentro del bundle nativo; no inyectar el interceptor DOM legacy.
+sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${FOLLOWING}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
 
 sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
 echo "// inert" > defe-web-build/dist/sw.js
@@ -123,8 +118,10 @@ grep -F "Cómo llegar" "defe-web-build/dist/${FOLLOWING}"
 grep -F "Apertura" "defe-web-build/dist/${MATCHES}"
 grep -F "Clausura" "defe-web-build/dist/${MATCHES}"
 grep -F "DEFE_FINAL_UI_V36_PROMOS_ARGEN_9NA" "defe-web-build/dist/assets/${JS}"
+grep -F "DEFE_STORE_NATIVE_EXACT_V3" "defe-web-build/dist/assets/${JS}"
+! grep -F "store-checkout-${SHA}.js" defe-web-build/dist/index.html
 ! grep -F "web-sponsors-profile-bridge" defe-web-build/dist/index.html
 ! grep -F "web-push-overlay" defe-web-build/dist/index.html
 ! grep -F "location.replace" defe-web-build/dist/index.html
 
-echo "Netlify build listo: netlify-publish/el-defe-app"
+echo "Netlify build listo: checkout nativo exacto + Tienda"
