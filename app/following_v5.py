@@ -72,6 +72,9 @@ def _current(db: Session, user_id: int) -> list[str]:
 def _options(db: Session) -> dict[str, list[str]]:
     result: dict[str, set[str]] = {c: set() for c in COMPETITIONS}
     result["FEFI"].update(FEFI_BABY_DEFAULT)
+    # La 6ta de Argenliga es una categoría familiar válida aunque la fuente pública
+    # todavía no publique su fixture con el mismo nivel de detalle que la tabla general.
+    result["ARGENLIGA"].add("6ta")
 
     for (category,) in db.query(FefiCategorySchedule.category).distinct().all():
         if category:
@@ -230,7 +233,6 @@ def next_followed(limit: int = 10, db: Session = Depends(get_db), user=Depends(g
     events = []
     for selection in selections:
         events.extend(_events_for_selection(db, selection, today))
-    # Una próxima cita por selección en el resumen; la agenda completa puede crecer después.
     first_by_selection = {}
     for event in events:
         first_by_selection.setdefault(event["selection"], event)
