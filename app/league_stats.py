@@ -111,8 +111,8 @@ def parse_laamba(division,tournament):
         name=find_col(cols,'jugador','apellido y nombre','nombre')
         team=find_col(cols,'equipo','club')
         goals=find_col(cols,'goles','gol')
-        yellow=find_col(cols,'amarillas','amarilla','ta')
-        red=find_col(cols,'rojas','roja','tr')
+        yellow=find_col(cols,'amarillas','amarilla','tarjetas amarillas')
+        red=find_col(cols,'rojas','roja','tarjetas rojas')
         if name is None:continue
         if goals is not None:
             rows=[]
@@ -148,8 +148,6 @@ def league_stats(
             sections=parse_laamba(division,tournament)
             return {'available':bool(sections),'sections':sections,'scope':tournament}
         if comp=='SUPERLIGA':
-            # La fuente pública expone estas estadísticas para el torneo vigente.
-            # No se atribuyen a Apertura si la propia web no permite seleccionar ese período.
             if tournament=='apertura':return {'available':False,'sections':[],'scope':'current'}
             sections=parse_superliga()
             return {'available':bool(sections),'sections':sections,'scope':'current'}
