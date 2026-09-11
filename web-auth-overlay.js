@@ -1,51 +1,19 @@
 (() => {
   const API = 'https://el-defe-v5-production.up.railway.app';
-
-  async function apiFetch(path, options = {}, timeoutMs = 12000) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try { return await fetch(`${API}${path}`, {...options, signal: controller.signal}); }
-    finally { clearTimeout(timer); }
-  }
-
-  function jwtFromValue(value) {
-    if (!value || typeof value !== 'string') return null;
-    const direct = value.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);
-    if (direct) return direct[0];
-    try {
-      const parsed = JSON.parse(value);
-      if (typeof parsed === 'string') return jwtFromValue(parsed);
-      if (parsed && typeof parsed === 'object') for (const v of Object.values(parsed)) { const found=jwtFromValue(typeof v==='string'?v:JSON.stringify(v)); if(found)return found; }
-    } catch (_) {}
-    return null;
-  }
+  async function apiFetch(path, options = {}, timeoutMs = 12000) { const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeoutMs);try{return await fetch(`${API}${path}`,{...options,signal:controller.signal})}finally{clearTimeout(timer)} }
+  function jwtFromValue(value){if(!value||typeof value!=='string')return null;const direct=value.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(direct)return direct[0];try{const parsed=JSON.parse(value);if(typeof parsed==='string')return jwtFromValue(parsed);if(parsed&&typeof parsed==='object')for(const v of Object.values(parsed)){const found=jwtFromValue(typeof v==='string'?v:JSON.stringify(v));if(found)return found}}catch(_){}return null}
   function getToken(){for(const store of [localStorage,sessionStorage])for(let i=0;i<store.length;i++){const t=jwtFromValue(store.getItem(store.key(i)));if(t)return t}return null}
   function tokenRole(token){try{const payload=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(atob(payload.padEnd(Math.ceil(payload.length/4)*4,'='))).role||null}catch(_){return null}}
-  const roleLabel=r=>r==='admin'?'Administrador':r==='tienda'?'Tienda':'Usuario';
-
+  const roleLabel=r=>r==='admin'?'Administrador':r==='tienda'?'Tienda':'Socio';
   async function manageUsers(){
-    const token=getToken();if(!token)return;
-    document.querySelector('[data-defe-users-panel]')?.remove();
+    const token=getToken();if(!token)return;document.querySelector('[data-defe-users-panel]')?.remove();
     const panel=document.createElement('div');panel.dataset.defeUsersPanel='1';panel.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(17,24,39,.5);padding:20px;display:flex;align-items:center;justify-content:center';
     panel.innerHTML='<div style="background:#fff;width:min(480px,100%);max-height:85vh;overflow:auto;border-radius:20px;padding:20px"><h2 style="margin-top:0">Usuarios</h2><div style="font-size:12px;color:#64748b;margin-bottom:8px">Asigná a cada persona sólo el nivel de acceso que necesita.</div><div data-users-body>Cargando…</div><button data-close style="width:100%;margin-top:12px;padding:12px;border:0;border-radius:12px">Cerrar</button></div>';
     document.body.appendChild(panel);panel.querySelector('[data-close]').onclick=()=>panel.remove();const body=panel.querySelector('[data-users-body]');
-    try{
-      const r=await apiFetch('/api/admin/users',{headers:{Authorization:`Bearer ${token}`}}),users=await r.json();if(!r.ok)throw new Error(users.detail||'No se pudieron cargar los usuarios');body.innerHTML='';
-      for(const u of users){
-        const row=document.createElement('div');row.style.cssText='border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin:10px 0';
-        row.innerHTML=`<strong></strong><div style="font-size:13px;margin:5px 0">Perfil actual: <b>${roleLabel(u.role)}</b></div><select data-role style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:10px;margin:5px 0"><option value="lector" ${u.role==='lector'?'selected':''}>Usuario</option><option value="tienda" ${u.role==='tienda'?'selected':''}>Tienda</option><option value="admin" ${u.role==='admin'?'selected':''}>Administrador</option></select><button data-save style="width:100%;padding:9px 10px;border:0;border-radius:9px;margin-top:6px;background:#40368f;color:#fff;font-weight:700">Guardar perfil</button><div data-msg style="font-size:12px;margin-top:6px;color:#64748b"></div>`;
-        row.querySelector('strong').textContent=u.email;
-        row.querySelector('[data-save]').onclick=async()=>{const role=row.querySelector('[data-role]').value,msg=row.querySelector('[data-msg]');if(role===u.role){msg.textContent='Sin cambios.';return;}msg.textContent='Guardando…';const rr=await apiFetch(`/api/admin/users/${u.id}/role`,{method:'PATCH',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({role})}),dd=await rr.json().catch(()=>({}));if(!rr.ok){msg.textContent=dd.detail||'No se pudo cambiar el perfil';return;}panel.remove();manageUsers();};
-        body.appendChild(row);
-      }
-    }catch(e){body.textContent=e.message}
+    try{const r=await apiFetch('/api/admin/users',{headers:{Authorization:`Bearer ${token}`}}),users=await r.json();if(!r.ok)throw new Error(users.detail||'No se pudieron cargar los usuarios');body.innerHTML='';for(const u of users){const row=document.createElement('div');row.style.cssText='border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin:10px 0';row.innerHTML=`<strong></strong><div style="font-size:13px;margin:5px 0">Perfil actual: <b>${roleLabel(u.role)}</b></div><select data-role style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:10px;margin:5px 0"><option value="lector" ${u.role==='lector'?'selected':''}>Usuario</option><option value="tienda" ${u.role==='tienda'?'selected':''}>Tienda</option><option value="admin" ${u.role==='admin'?'selected':''}>Administrador</option></select><button data-save style="width:100%;padding:9px 10px;border:0;border-radius:9px;margin-top:6px;background:#40368f;color:#fff;font-weight:700">Guardar perfil</button><div data-msg style="font-size:12px;margin-top:6px;color:#64748b"></div>`;row.querySelector('strong').textContent=u.email;row.querySelector('[data-save]').onclick=async()=>{const role=row.querySelector('[data-role]').value,msg=row.querySelector('[data-msg]');if(role===u.role){msg.textContent='Sin cambios.';return}msg.textContent='Guardando…';const rr=await apiFetch(`/api/admin/users/${u.id}/role`,{method:'PATCH',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({role})}),dd=await rr.json().catch(()=>({}));if(!rr.ok){msg.textContent=dd.detail||'No se pudo cambiar el perfil';return}panel.remove();manageUsers()};body.appendChild(row)}}catch(e){body.textContent=e.message}
   }
-
-  function syncAdminButton(){
-    const token=getToken(),isAdmin=token&&tokenRole(token)==='admin';let btn=document.querySelector('[data-defe-users-button]');if(!isAdmin){btn?.remove();return}
-    if(!btn){btn=document.createElement('button');btn.dataset.defeUsersButton='1';btn.setAttribute('aria-label','Gestionar usuarios');btn.title='Usuarios';btn.innerHTML='👥<span class="defe-users-label"> Usuarios</span>';btn.onclick=manageUsers;document.body.appendChild(btn)}
-    const compact=window.innerWidth<760;btn.style.cssText=`position:fixed;right:12px;top:76px;z-index:9998;background:#40368f;color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:999px;height:44px;min-width:44px;padding:${compact?'0':'0 14px'};font-weight:700;box-shadow:0 4px 14px #0002`;
-    const label=btn.querySelector('.defe-users-label');if(label)label.style.display=compact?'none':'inline';
-  }
-  syncAdminButton();window.addEventListener('resize',syncAdminButton);setInterval(syncAdminButton,1200);
+  function syncProfileRole(){const t=getToken(),r=t?tokenRole(t):null;if(!r)return;const label=roleLabel(r);const email=[...document.querySelectorAll('div,span,p,strong')].find(el=>el.childElementCount===0&&/@/.test(el.textContent||'')&&el.offsetParent!==null);if(!email)return;const root=email.parentElement?.parentElement||email.parentElement;if(!root)return;const cand=[...root.querySelectorAll('div,span,p')].find(el=>el.childElementCount===0&&/^(Socio|Administrador|Tienda)\s*·/i.test((el.textContent||'').trim()));if(cand){const txt=(cand.textContent||'').trim();cand.textContent=txt.replace(/^(Socio|Administrador|Tienda)/i,label)}}
+  function syncAdminButton(){const token=getToken(),isAdmin=token&&tokenRole(token)==='admin';let btn=document.querySelector('[data-defe-users-button]');if(!isAdmin){btn?.remove();return}if(!btn){btn=document.createElement('button');btn.dataset.defeUsersButton='1';btn.setAttribute('aria-label','Gestionar usuarios');btn.title='Usuarios';btn.innerHTML='👥<span class="defe-users-label"> Usuarios</span>';btn.onclick=manageUsers;document.body.appendChild(btn)}const compact=window.innerWidth<760;btn.style.cssText=`position:fixed;right:12px;top:76px;z-index:9998;background:#40368f;color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:999px;height:44px;min-width:44px;padding:${compact?'0':'0 14px'};font-weight:700;box-shadow:0 4px 14px #0002`;const label=btn.querySelector('.defe-users-label');if(label)label.style.display=compact?'none':'inline'}
+  function sync(){syncAdminButton();syncProfileRole()}
+  sync();window.addEventListener('resize',sync);window.addEventListener('focus',sync);setInterval(sync,1000);
 })();
