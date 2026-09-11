@@ -3,7 +3,7 @@
  const CART_KEY='defe_store_cart_v1',BUYER_KEY='defe_store_buyer_v1',LAST_KEY='defe_store_last_order_v1';const API=()=>window.EL_DEFE_API_URL||'';let submitting=false;
  const money=v=>v==null?'Precio a confirmar':new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(v);
  const readCart=()=>{try{return JSON.parse(localStorage.getItem(CART_KEY)||'[]')}catch{return []}},readBuyer=()=>{try{return JSON.parse(localStorage.getItem(BUYER_KEY)||'{}')}catch{return {}}};
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
  async function products(){const r=await fetch(API()+'/api/store/products',{cache:'no-store'});return r.ok?r.json():[]}
  async function settings(){const r=await fetch(API()+'/api/store/settings',{cache:'no-store'});return r.ok?r.json():{whatsapp_number:''}}
  function cleanPhone(v){return String(v||'').replace(/\D/g,'')}
