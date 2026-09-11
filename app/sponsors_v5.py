@@ -3,9 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import Boolean, Integer, String, Text
 from sqlalchemy.orm import Mapped, Session, mapped_column
-from .db import Base, get_db, SessionLocal
+from .db import Base, get_db
 from .auth import require_roles
-from .main import app
 
 class Sponsor(Base):
     __tablename__='sponsors'
@@ -87,11 +86,3 @@ def bootstrap_sponsors(db:Session):
     if db.query(Sponsor).count():return {'created':0,'skipped':True}
     for i,(name,category,mark) in enumerate(DEFAULT_SPONSORS):db.add(Sponsor(name=name,category=category,short_mark=mark,active=True,featured=i<6,sort_order=i))
     db.commit();return {'created':len(DEFAULT_SPONSORS),'skipped':False}
-
-app.include_router(router)
-
-@app.on_event('startup')
-def sponsors_startup():
-    db=SessionLocal()
-    try:bootstrap_sponsors(db)
-    finally:db.close()
