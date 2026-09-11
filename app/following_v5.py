@@ -16,6 +16,7 @@ router = APIRouter(prefix="/api/following", tags=["Following"])
 FOLLOW_TYPE = "team_category"
 LEGACY_TYPES = {"category", "fefi_category"}
 FEFI_BABY_DEFAULT = ["2013", "2014", "2015", "2016", "2017", "2018", "2019"]
+LAAMBA_PROMO_DEFAULT = ["Promocional 2016", "Promocional 2017", "Promocional 2018", "Promocional 2019/20"]
 ARGENLIGA_INFERIORES = ["3ra", "4ta", "5ta", "6ta", "7ma", "8va", "9na"]
 COMPETITIONS = ["FEFI", "LAAMBA", "ARGENLIGA", "SUPERLIGA"]
 
@@ -47,7 +48,10 @@ def _current(db:Session,user_id:int)->list[str]:
     return out
 
 def _options(db:Session)->dict[str,list[str]]:
-    result={c:set() for c in COMPETITIONS};result["FEFI"].update(FEFI_BABY_DEFAULT);result["ARGENLIGA"].update(ARGENLIGA_INFERIORES)
+    result={c:set() for c in COMPETITIONS}
+    result["FEFI"].update(FEFI_BABY_DEFAULT)
+    result["LAAMBA"].update(LAAMBA_PROMO_DEFAULT)
+    result["ARGENLIGA"].update(ARGENLIGA_INFERIORES)
     for (category,) in db.query(FefiCategorySchedule.category).distinct().all():
         if category:result["FEFI"].add(str(category).strip())
     for team in db.query(Team).filter(Team.is_active==True).all():
@@ -58,8 +62,14 @@ def _options(db:Session)->dict[str,list[str]]:
         if comp in result and div and not(comp=="FEFI" and div.lower()=="zona h"):result[comp].add(div)
     def sort_key(v:str):
         if v.isdigit():return (0,int(v))
-        low=v.lower();order={"3ra":3,"4ta":4,"5ta":5,"6ta":6,"7ma":7,"8va":8,"9na":9,"1ra":1,"2da":2}
-        return (1,order.get(low,999),low)
+        low=v.lower();order={"1ra":1,"2da":2,"3ra":3,"4ta":4,"5ta":5,"6ta":6,"7ma":7,"8va":8,"9na":9}
+        if low in order:return (1,order[low],low)
+        if low.startswith("promocional "):
+            nums="".join(ch for ch in low if ch.isdigit())
+            try:n=int(nums[:4])
+            except:n=9999
+            return (2,n,low)
+        return (3,999,low)
     return {k:sorted(v,key=sort_key) for k,v in result.items() if v}
 
 def _date_parts(value:str|None)->tuple[str|None,str|None]:
