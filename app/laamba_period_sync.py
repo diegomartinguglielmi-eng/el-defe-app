@@ -8,10 +8,24 @@ from .sync import (
     parse_laamba_date, _laamba_table_frames, _is_cross_division_context,
 )
 
+# Divisiones Elite I en las que participa el Defe.
 DIVISIONS=['1ra','3ra','4ta','5ta','6ta','7ma','8va']
 TOURNAMENTS={
     'APERTURA':'m-elitei',
     'CLAUSURA':'m-eliteiclausura',
+}
+
+# Promocionales LAAMBA 2026: el Defe compite en Promocionales zII.
+# La web oficial publica cuatro categorías: 2016, 2017, 2018 y 2019/20.
+PROMO_DIVISIONS={
+    'Promocional 2016':'2016',
+    'Promocional 2017':'2017',
+    'Promocional 2018':'2018',
+    'Promocional 2019/20':'2019-20',
+}
+PROMO_TOURNAMENTS={
+    'APERTURA':'promocionaleszii',
+    'CLAUSURA':'promocionalesziiclausura',
 }
 
 
@@ -40,8 +54,7 @@ def _upsert_standing(db:Session,payload:dict):
     db.commit()
 
 
-def _sync_one(db:Session,tournament:str,slug:str,division:str):
-    url=f'https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/{division}/torneo/{slug}/?db=2026'
+def _sync_url(db:Session,tournament:str,division:str,url:str):
     r=requests.get(url,headers=UA,timeout=25);r.raise_for_status()
     frames=_laamba_table_frames(r.text)
     round_index=0;matches=0;standings=0
@@ -90,6 +103,16 @@ def _sync_one(db:Session,tournament:str,slug:str,division:str):
     return {'matches':matches,'standings':standings,'source_url':url}
 
 
+def _sync_one(db:Session,tournament:str,slug:str,division:str):
+    url=f'https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/{division}/torneo/{slug}/?db=2026'
+    return _sync_url(db,tournament,division,url)
+
+
+def _sync_promo(db:Session,tournament:str,slug:str,division_label:str,category_slug:str):
+    url=f'https://www.laamba.ar/torneoslaamba/promocionales/promocionales-zii/{category_slug}/torneo/{slug}/?db=2026'
+    return _sync_url(db,tournament,division_label,url)
+
+
 def sync_laamba_periods(db:Session):
     result={};errors=[]
     for tournament,slug in TOURNAMENTS.items():
@@ -99,6 +122,13 @@ def sync_laamba_periods(db:Session):
                 part=_sync_one(db,tournament,slug,division);division_results[division]=part;total_m+=part['matches'];total_s+=part['standings']
             except Exception as exc:
                 db.rollback();errors.append(f'{tournament}/{division}: {exc}')
+        # Promocionales zII se integran a LAAMBA con nombres claros para el selector familiar.
+        promo_slug=PROMO_TOURNAMENTS[tournament]
+        for division_label,category_slug in PROMO_DIVISIONS.items():
+            try:
+                part=_sync_promo(db,tournament,promo_slug,division_label,category_slug);division_results[division_label]=part;total_m+=part['matches'];total_s+=part['standings']
+            except Exception as exc:
+                db.rollback();errors.append(f'{tournament}/{division_label}: {exc}')
         result[tournament.lower()]={'matches':total_m,'standings':total_s,'divisions':division_results}
 
     if result.get('clausura',{}).get('matches',0)>0:
