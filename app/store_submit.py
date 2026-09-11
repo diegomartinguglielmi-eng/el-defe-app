@@ -26,11 +26,6 @@ def _money(value):
 
 @router.post('/orders/submit')
 async def submit_order(request: Request, db: Session = Depends(get_db)):
-    """Checkout robusto para PWA/Android.
-
-    Usa un POST HTML tradicional y redirige a WhatsApp. No depende de fetch,
-    CORS ni del service worker del frontend.
-    """
     raw = (await request.body()).decode('utf-8', errors='replace')
     form = {k: v[-1] if v else '' for k, v in parse_qs(raw, keep_blank_values=True).items()}
 
@@ -54,22 +49,37 @@ async def submit_order(request: Request, db: Session = Depends(get_db)):
     complete = True
     for item in incoming:
         try:
-            product_id = int(item.get('product_id'))
-            size = str(item.get('size') or '')
+            size = str(item.get('size') or '').strip()
             qty = int(item.get('qty') or 0)
         except Exception:
             raise HTTPException(400, 'Ítem inválido')
         if qty < 1:
             raise HTTPException(400, 'Cantidad inválida')
 
-        product = db.query(StoreProduct).filter(
-            StoreProduct.id == product_id,
-            StoreProduct.active == True,
-        ).first()
+        product = None
+        raw_id = item.get('product_id')
+        if raw_id not in (None, '', 'null'):
+            try:
+                product_id = int(raw_id)
+                product = db.query(StoreProduct).filter(
+                    StoreProduct.id == product_id,
+                    StoreProduct.active == True,
+                ).first()
+            except Exception:
+                product = None
+
+        if not product:
+            product_name = str(item.get('product_name') or item.get('name') or '').strip()
+            if product_name:
+                product = db.query(StoreProduct).filter(
+                    StoreProduct.name == product_name,
+                    StoreProduct.active == True,
+                ).first()
+
         if not product:
             raise HTTPException(400, 'Producto no disponible')
 
-        allowed_sizes = [s for s in (product.sizes_csv or '').split(',') if s]
+        allowed_sizes = [s.strip() for s in (product.sizes_csv or '').split(',') if s.strip()]
         if size not in allowed_sizes:
             raise HTTPException(400, f'Talle inválido para {product.name}')
 
@@ -105,6 +115,15 @@ async def submit_order(request: Request, db: Session = Depends(get_db)):
         status='pending',
     )
     db.add(order)
+
+    for item in items:
+        inv = db.query(StoreInventory).filter(
+            StoreInventory.product_id == item['product_id'],
+            StoreInventory.size == item['size'],
+        ).first()
+        if inv:
+            inv.quantity -= item['qty']
+
     db.commit()
     db.refresh(order)
 
