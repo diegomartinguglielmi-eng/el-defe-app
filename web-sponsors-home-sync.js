@@ -13,6 +13,7 @@
   .dsl-name{margin-top:8px;font-size:13px;line-height:1.15;font-weight:900;min-height:30px;display:flex;align-items:flex-start;justify-content:center}
   .dsl-rubro{margin-top:3px;font-size:11px;line-height:1.15;color:#7a889b}
   .dsl-empty{font-size:13px;color:#64748b;padding:6px 0 2px}
+  [data-dynamic-sponsors="1"]{margin-top:18px!important;margin-bottom:18px!important}
   @media(max-width:420px){.dsl-card{width:98px;min-width:98px}.dsl-logo{height:80px}}
   `;
   document.head.appendChild(css);
@@ -43,7 +44,6 @@
     if(!candidates.length)return;
     candidates.sort((a,b)=>a.getBoundingClientRect().height-b.getBoundingClientRect().height || a.textContent.length-b.textContent.length);
     let target=candidates[0];
-    // Si el bloque detectado es sólo la tabla interior, subir hasta la tarjeta blanca sin llevarse otros módulos.
     for(let i=0;i<2&&target?.parentElement;i++){
       const p=target.parentElement;
       const t=String(p.textContent||'').replace(/\s+/g,' ').trim();
@@ -67,9 +67,36 @@
     }
     target?.remove();
   }
+  function removeHeadingOnly(label){
+    const home=document.querySelector('.defe-home'); if(!home)return;
+    const h=[...home.querySelectorAll('h1,h2,h3,h4,div,span,p')].find(el=>el.childElementCount===0&&String(el.textContent||'').trim().toLowerCase()===label.toLowerCase());
+    if(!h)return;
+    let target=h;
+    const p=h.parentElement;
+    if(p){const t=String(p.textContent||'').replace(/\s+/g,' ').trim();if(t.toLowerCase()===label.toLowerCase()&&p.children.length<=2)target=p}
+    target.remove();
+  }
+  function removeResultNewsCards(){
+    const home=document.querySelector('.defe-home'); if(!home)return;
+    const labels=[...home.querySelectorAll('div,span,p')].filter(el=>el.childElementCount===0&&String(el.textContent||'').trim()==='Resultados');
+    labels.forEach(label=>{
+      let n=label;
+      for(let i=0;i<5&&n?.parentElement;i++,n=n.parentElement){
+        const t=String(n.textContent||'').replace(/\s+/g,' ').trim();
+        if(t.length>30&&t.length<650&&!t.includes('Fixture')&&!t.includes('Nos acompañan')){n.remove();break}
+      }
+    });
+  }
+  function moveSponsorsLast(box){
+    const home=document.querySelector('.defe-home');
+    if(home&&box&&box.parentElement===home&&home.lastElementChild!==box)home.appendChild(box);
+  }
   function cleanupHome(){
     removeLegacyBabyResults();
     removeLegacyFutsalPromo();
+    removeHeadingOnly('Última fecha');
+    removeHeadingOnly('Últimos resultados');
+    removeResultNewsCards();
   }
   function render(){
     if(!isHome())return;
@@ -87,6 +114,7 @@
     box.querySelector('[data-all]')?.addEventListener('click',()=>window.defeAcompanantes?.show?.());
     box.querySelectorAll('.dsl-card').forEach(b=>{const s=rows.find(x=>Number(x.id)===Number(b.dataset.id));b.onclick=()=>{const u=s&&url(s);if(u)window.open(u,'_blank','noopener,noreferrer');else window.defeAcompanantes?.show?.()}});
     cleanupHome();
+    moveSponsorsLast(box);
   }
   async function refresh(){
     try{const r=await fetch(API+'/api/sponsors?ts='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error();const d=await r.json();rows=Array.isArray(d)?d:[];render()}catch(_){render()}
