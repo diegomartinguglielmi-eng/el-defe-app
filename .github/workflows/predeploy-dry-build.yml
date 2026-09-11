@@ -20,19 +20,23 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -R -q 'Mostrar en inicio' netlify-publish
-          grep -R -q 'Activar/Desactivar' netlify-publish
-          grep -R -q '/api/sponsors/featured' netlify-publish
+          grep -R -q 'Mostrar en inicio' netlify-publish/el-defe-app
+          grep -R -q 'data-toggle' netlify-publish/el-defe-app
+          grep -R -q 'data-delete' netlify-publish/el-defe-app
+          grep -R -q '/api/sponsors/featured' netlify-publish/el-defe-app
       - name: Validate store checkout survives build
         shell: bash
         run: |
           set -euo pipefail
-          grep -R -q '/api/store/orders/submit' netlify-publish
-          grep -R -q 'DEFE_STORE_CAPTURE_V2\|DEFE_STORE_NATIVE_RAILWAY_V1' netlify-publish
+          grep -R -q '/api/store/orders/submit' netlify-publish/el-defe-app
+          grep -R -q 'DEFE_STORE_NATIVE_EXACT_V4' netlify-publish/el-defe-app
+          grep -R -q 'DEFE_STORE_NATIVE_RAILWAY_V1' netlify-publish/el-defe-app
       - name: Validate core overlays survive build
         shell: bash
         run: |
           set -euo pipefail
-          test -f netlify-publish/web-acompanan-overlay.js
-          test -f netlify-publish/web-sponsors-live.js
+          ls netlify-publish/el-defe-app/web-acompanan-overlay-*.js >/dev/null
+          ls netlify-publish/el-defe-app/web-sponsors-home-sync-*.js >/dev/null
+          ls netlify-publish/el-defe-app/store-pickup-hardening-*.js >/dev/null
+          ls netlify-publish/el-defe-app/store-order-safety-*.js >/dev/null
           echo 'PREDEPLOY_DRY_BUILD_OK'
