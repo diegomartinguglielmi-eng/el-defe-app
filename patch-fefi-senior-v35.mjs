@@ -1,3 +1,4 @@
+import './patch-store-native-checkout.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 const f=path.join('defe-web-build','dist','fefi-senior-v30.js');
