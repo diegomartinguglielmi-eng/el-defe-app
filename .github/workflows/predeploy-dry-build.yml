@@ -1,0 +1,38 @@
+name: Predeploy dry build
+
+on:
+  push:
+    branches:
+      - sponsors-control-predeploy
+  workflow_dispatch:
+
+jobs:
+  dry-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run Netlify build without deploying
+        run: bash netlify-build.sh
+      - name: Validate sponsor controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -R -q 'Mostrar en inicio' netlify-publish
+          grep -R -q 'Activar/Desactivar' netlify-publish
+          grep -R -q '/api/sponsors/featured' netlify-publish
+      - name: Validate store checkout survives build
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -R -q '/api/store/orders/submit' netlify-publish
+          grep -R -q 'DEFE_STORE_CAPTURE_V2\|DEFE_STORE_NATIVE_RAILWAY_V1' netlify-publish
+      - name: Validate core overlays survive build
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f netlify-publish/web-acompanan-overlay.js
+          test -f netlify-publish/web-sponsors-live.js
+          echo 'PREDEPLOY_DRY_BUILD_OK'
