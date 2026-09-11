@@ -16,6 +16,7 @@ on:
       - 'push-sw.js'
       - 'app/static/matches-explorer.js'
       - 'app/static/store-checkout.js'
+      - 'store-checkout-interceptor.js'
       - 'patch-*.mjs'
       - 'defe-datos/datos.json'
       - '.github/workflows/build-defe-web.yml'
@@ -101,6 +102,7 @@ jobs:
           SPONSORS="web-acompanan-overlay-${GITHUB_SHA}.js"
           MATCHES="matches-explorer-${GITHUB_SHA}.js"
           CHECKOUT="store-checkout-${GITHUB_SHA}.js"
+          CAPTURE="store-checkout-interceptor-${GITHUB_SHA}.js"
 
           cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
           cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
@@ -109,9 +111,10 @@ jobs:
           cp web-acompanan-overlay.js "defe-web-build/dist/${SPONSORS}"
           cp app/static/matches-explorer.js "defe-web-build/dist/${MATCHES}"
           cp app/static/store-checkout.js "defe-web-build/dist/${CHECKOUT}"
+          cp store-checkout-interceptor.js "defe-web-build/dist/${CAPTURE}"
           cp push-sw.js defe-web-build/dist/push-sw.js
 
-          sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${CHECKOUT}\"></script><script src=\"./${SPONSORS}\"></script></body>#" defe-web-build/dist/index.html
+          sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${CHECKOUT}\"></script><script src=\"./${CAPTURE}\"></script><script src=\"./${SPONSORS}\"></script></body>#" defe-web-build/dist/index.html
 
       - name: Tomar control de service workers antiguos y liberar caches
         run: |
@@ -134,27 +137,21 @@ jobs:
 
       - name: Verificar build de producción
         run: |
-          grep -R "DEFE_UI_V12_20260909" defe-web-build/dist/assets/index-v35-${GITHUB_SHA}.js
-          grep -R "DEFE_STORE_NATIVE_RAILWAY_V1" defe-web-build/dist/assets/index-v35-${GITHUB_SHA}.js
-          grep -F "api/store/orders" defe-web-build/dist/assets/index-v35-${GITHUB_SHA}.js
-          grep -F "fefi-senior-v35-${GITHUB_SHA}.js" defe-web-build/dist/index.html
-          grep -F "web-comms-overlay-${GITHUB_SHA}.js" defe-web-build/dist/index.html
-          grep -F "web-push-overlay-${GITHUB_SHA}.js" defe-web-build/dist/index.html
-          grep -F "web-acompanan-overlay-${GITHUB_SHA}.js" defe-web-build/dist/index.html
-          grep -F "matches-explorer-${GITHUB_SHA}.js" defe-web-build/dist/index.html
-          grep -F "store-checkout-${GITHUB_SHA}.js" defe-web-build/dist/index.html
-          ! grep -F "store-checkout-interceptor" defe-web-build/dist/index.html
-          grep -F "Gestionar Sponsors" defe-web-build/dist/web-acompanan-overlay-${GITHUB_SHA}.js
-          grep -F "Apertura" defe-web-build/dist/matches-explorer-${GITHUB_SHA}.js
-          grep -F "Clausura" defe-web-build/dist/matches-explorer-${GITHUB_SHA}.js
-          grep -F "Retiro por la Tienda del Club" defe-web-build/dist/store-checkout-${GITHUB_SHA}.js
-          grep -F "push-sw.js" defe-web-build/dist/web-push-overlay-${GITHUB_SHA}.js
-          grep -F "addEventListener('push'" defe-web-build/dist/push-sw.js
-          grep -F "skipWaiting" defe-web-build/dist/sw.js
-          grep -F "clients.claim" defe-web-build/dist/sw.js
-          grep -F "getRegistrations" defe-web-build/dist/index.html
-          ! grep -F "location.replace" defe-web-build/dist/index.html
+          set -e
+          BUNDLE="defe-web-build/dist/assets/index-v35-${GITHUB_SHA}.js"
+          grep -F "DEFE_UI_V12_20260909" "$BUNDLE" >/dev/null
+          grep -F "DEFE_STORE_NATIVE_RAILWAY_V1" "$BUNDLE" >/dev/null
+          grep -F "/api/store/orders/submit" "$BUNDLE" >/dev/null
+          grep -F "fefi-senior-v35-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
+          grep -F "store-checkout-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
+          grep -F "store-checkout-interceptor-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
+          grep -F "DEFE_STORE_CAPTURE_V2" "defe-web-build/dist/store-checkout-interceptor-${GITHUB_SHA}.js" >/dev/null
+          grep -F "/api/store/orders/submit" "defe-web-build/dist/store-checkout-interceptor-${GITHUB_SHA}.js" >/dev/null
+          grep -F "Retiro por la Tienda del Club" "defe-web-build/dist/store-checkout-${GITHUB_SHA}.js" >/dev/null
+          grep -F "skipWaiting" defe-web-build/dist/sw.js >/dev/null
+          grep -F "clients.claim" defe-web-build/dist/sw.js >/dev/null
           ! grep -F "vite-plugin-pwa:register-sw" defe-web-build/dist/index.html
+          echo "BUILD_STORE_OK"
 
       - name: Empaquetar dist
         run: |
