@@ -46,8 +46,6 @@ AUTH="web-auth-overlay-${SHA}.js"
 BRIDGE="web-comms-push-bridge-${SHA}.js"
 COMMS="web-comms-overlay-${SHA}.js"
 PUSH="web-push-overlay-${SHA}.js"
-RECOVERY="web-render-recovery-${SHA}.js"
-PROFILERECOVERY="web-profile-recovery-${SHA}.js"
 ACOMP="web-acompanan-overlay-${SHA}.js"
 STORECHECKOUT="store-checkout-${SHA}.js"
 CHECKOUTMARKER="store-checkout-marker-${SHA}.js"
@@ -61,8 +59,6 @@ cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
 cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
 cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
 cp web-push-overlay.js "defe-web-build/dist/${PUSH}"
-cp web-render-recovery.js "defe-web-build/dist/${RECOVERY}"
-cp web-profile-recovery.js "defe-web-build/dist/${PROFILERECOVERY}"
 cp web-acompanan-overlay.js "defe-web-build/dist/${ACOMP}"
 cp app/static/store-checkout.js "defe-web-build/dist/${STORECHECKOUT}"
 cp app/static/store-checkout-marker.js "defe-web-build/dist/${CHECKOUTMARKER}"
@@ -75,7 +71,7 @@ cp app/static/store-ui-shield.js "defe-web-build/dist/${STOREUISHIELD}"
 cp push-sw.js defe-web-build/dist/push-sw.js
 cp manifest.webmanifest defe-web-build/dist/manifest.webmanifest
 cp mobile/assets/icon.png defe-web-build/dist/icon.png
-sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${RECOVERY}\"></script><script src=\"./${PROFILERECOVERY}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${STOREUISHIELD}\"></script><script src=\"./${STORECHECKOUT}\"></script><script src=\"./${CHECKOUTMARKER}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
+sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${STOREUISHIELD}\"></script><script src=\"./${STORECHECKOUT}\"></script><script src=\"./${CHECKOUTMARKER}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
 
 sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
 echo "// inert" > defe-web-build/dist/sw.js
@@ -88,9 +84,6 @@ sha = sys.argv[1]
 p = Path('defe-web-build/dist/index.html')
 s = p.read_text()
 pwa = '<link rel="manifest" href="/el-defe-app/manifest.webmanifest"><link rel="icon" type="image/png" href="/el-defe-app/icon.png"><meta name="theme-color" content="#0b3a7a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="El Defe">'
-# No forzar location.replace en cada build. Los assets ya llevan el SHA en el nombre,
-# por lo que el navegador obtiene la versión nueva sin provocar un bucle visual en la PWA.
-# Sólo limpiamos service workers/cachés antiguos una vez por versión, sin recargar la página.
 clean = f'''<script>(async function(){{var k='defe-clean-{sha}';if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{{if('serviceWorker' in navigator){{var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){{return r.unregister()}}));}}if('caches' in window){{var ks=await caches.keys();await Promise.all(ks.map(function(x){{return caches.delete(x)}}));}}}}catch(e){{}}}})();</script>'''
 s = s.replace('<head>', '<head>' + clean + pwa, 1)
 p.write_text(s)
