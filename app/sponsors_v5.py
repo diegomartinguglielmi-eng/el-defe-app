@@ -3,8 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import Boolean, Integer, String, Text
 from sqlalchemy.orm import Mapped, Session, mapped_column
-from .db import Base, get_db
+from .db import Base, get_db, SessionLocal
 from .auth import require_roles
+from .main import app
 
 class Sponsor(Base):
     __tablename__='sponsors'
@@ -44,34 +45,21 @@ def _clean_url(value:Optional[str])->Optional[str]:
     return value
 
 def _out(x:Sponsor):
-    return {
-        'id':x.id,'name':x.name,'category':x.category,'logo_url':x.logo_url,'short_mark':x.short_mark,
-        'website_url':x.website_url,'instagram_url':x.instagram_url,'facebook_url':x.facebook_url,
-        'whatsapp_url':x.whatsapp_url,'primary_url':x.primary_url,'active':x.active,'featured':x.featured,
-        'sort_order':x.sort_order,
-    }
+    return {'id':x.id,'name':x.name,'category':x.category,'logo_url':x.logo_url,'short_mark':x.short_mark,'website_url':x.website_url,'instagram_url':x.instagram_url,'facebook_url':x.facebook_url,'whatsapp_url':x.whatsapp_url,'primary_url':x.primary_url,'active':x.active,'featured':x.featured,'sort_order':x.sort_order}
 
 def _apply(row:Sponsor,p:SponsorIn):
     name=p.name.strip()
     if not name:raise HTTPException(400,'El nombre del sponsor es obligatorio')
-    row.name=name
-    row.category=(p.category or '').strip() or None
-    row.logo_url=(p.logo_url or '').strip() or None
+    row.name=name;row.category=(p.category or '').strip() or None;row.logo_url=(p.logo_url or '').strip() or None
     row.short_mark=((p.short_mark or '').strip() or ''.join(w[:1] for w in name.split()[:2])).upper()[:12] or None
-    row.website_url=_clean_url(p.website_url)
-    row.instagram_url=_clean_url(p.instagram_url)
-    row.facebook_url=_clean_url(p.facebook_url)
-    row.whatsapp_url=_clean_url(p.whatsapp_url)
-    row.primary_url=_clean_url(p.primary_url)
-    row.active=bool(p.active);row.featured=bool(p.featured);row.sort_order=int(p.sort_order or 0)
-    return row
+    row.website_url=_clean_url(p.website_url);row.instagram_url=_clean_url(p.instagram_url);row.facebook_url=_clean_url(p.facebook_url);row.whatsapp_url=_clean_url(p.whatsapp_url);row.primary_url=_clean_url(p.primary_url)
+    row.active=bool(p.active);row.featured=bool(p.featured);row.sort_order=int(p.sort_order or 0);return row
 
 router=APIRouter(prefix='/api/sponsors',tags=['Sponsors'])
 
 @router.get('')
 def public_sponsors(db:Session=Depends(get_db)):
-    rows=db.query(Sponsor).filter(Sponsor.active==True).order_by(Sponsor.featured.desc(),Sponsor.sort_order,Sponsor.id).all()
-    return [_out(x) for x in rows]
+    return [_out(x) for x in db.query(Sponsor).filter(Sponsor.active==True).order_by(Sponsor.featured.desc(),Sponsor.sort_order,Sponsor.id).all()]
 
 @router.get('/admin')
 def admin_sponsors(db:Session=Depends(get_db),user=Depends(require_roles('admin'))):
@@ -93,14 +81,17 @@ def deactivate_sponsor(sponsor_id:int,db:Session=Depends(get_db),user=Depends(re
     if not row:raise HTTPException(404,'Sponsor no encontrado')
     row.active=False;db.commit();return {'ok':True}
 
-DEFAULT_SPONSORS=[
-    ('JM Distribuidora','Distribución','JM'),('Wimer','Servicios','W'),('La Milagrosa Papelería','Papelería','LM'),
-    ('Matafuegos CADECI','Seguridad','MC'),('VA','Servicios','VA'),('Shop Ferretero','Ferretería','SF'),
-    ('Ascensores Pastorino','Ascensores','AP'),('Lo de Abru','Beauty Bar','LA')
-]
+DEFAULT_SPONSORS=[('JM Distribuidora','Distribución','JM'),('Wimer','Servicios','W'),('La Milagrosa Papelería','Papelería','LM'),('Matafuegos CADECI','Seguridad','MC'),('VA','Servicios','VA'),('Shop Ferretero','Ferretería','SF'),('Ascensores Pastorino','Ascensores','AP'),('Lo de Abru','Beauty Bar','LA')]
 
 def bootstrap_sponsors(db:Session):
     if db.query(Sponsor).count():return {'created':0,'skipped':True}
-    for i,(name,category,mark) in enumerate(DEFAULT_SPONSORS):
-        db.add(Sponsor(name=name,category=category,short_mark=mark,active=True,featured=i<6,sort_order=i))
+    for i,(name,category,mark) in enumerate(DEFAULT_SPONSORS):db.add(Sponsor(name=name,category=category,short_mark=mark,active=True,featured=i<6,sort_order=i))
     db.commit();return {'created':len(DEFAULT_SPONSORS),'skipped':False}
+
+app.include_router(router)
+
+@app.on_event('startup')
+def sponsors_startup():
+    db=SessionLocal()
+    try:bootstrap_sponsors(db)
+    finally:db.close()
