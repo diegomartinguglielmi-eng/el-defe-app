@@ -1,0 +1,48 @@
+name: Validar Competencias V4
+on:
+  push:
+    branches: [fix/competencias-filtros-v4]
+    paths:
+      - 'app/static/matches-explorer.js'
+      - 'web-fefi-dedupe.js'
+      - '.github/workflows/validate-competencias-v4.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Sintaxis JavaScript
+        run: |
+          node --check app/static/matches-explorer.js
+          node --check web-fefi-dedupe.js
+      - name: Contrato de filtros
+        run: |
+          set -e
+          grep -F "window.defeCompetenciasApi" app/static/matches-explorer.js
+          grep -F "['Zona H','Mayores B · +42']" app/static/matches-explorer.js
+          grep -F "if(comp==='SUPERLIGA')return ['Junior A']" app/static/matches-explorer.js
+          grep -F "if(comp==='LAAMBA')return ['apertura','clausura','anual']" app/static/matches-explorer.js
+          grep -F "if(comp==='FEFI')return /Mayores B" app/static/matches-explorer.js
+          grep -F "state.competition==='LAAMBA'&&state.tournament==='anual'" app/static/matches-explorer.js
+          grep -F "aggregateStandings([a,c])" app/static/matches-explorer.js
+          grep -F "canonicalTeam" app/static/matches-explorer.js
+          grep -F "DEFE_COMPETENCIAS_LAYOUT_V4" web-fefi-dedupe.js
+          grep -F "a.setCompetition" web-fefi-dedupe.js
+          grep -F "a.setDivision" web-fefi-dedupe.js
+          ! grep -F ".click()" web-fefi-dedupe.js
+          ! grep -F "dispatchEvent(new Event('change'" web-fefi-dedupe.js
+      - name: Verificar premisas visuales
+        run: |
+          set -e
+          grep -F "['FEFI','LAAMBA','ARGENLIGA','SUPERLIGA']" web-fefi-dedupe.js
+          grep -F "Sólo participaciones del Defe" web-fefi-dedupe.js
+          grep -F "Baby Fútbol" web-fefi-dedupe.js
+          grep -F "Futsal +42" web-fefi-dedupe.js
+          grep -F "data-ui-status" web-fefi-dedupe.js
+          echo COMPETENCIAS_V4_OK
