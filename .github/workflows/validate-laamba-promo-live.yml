@@ -1,0 +1,29 @@
+name: Validate LAAMBA promo live
+on:
+  push:
+    branches: [validate-laamba-promo-live]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate production API promotional 2016
+        run: |
+          python - <<'PY'
+          import json, urllib.parse, urllib.request
+          base='https://el-defe-v5-production.up.railway.app'
+          def get(path, params):
+              url=base+path+'?'+urllib.parse.urlencode(params)
+              with urllib.request.urlopen(url, timeout=30) as r:
+                  return json.load(r)
+          standings=get('/api/leagues/standings', {'competition':'LAAMBA','division':'Promocional 2016','tournament':'clausura'})
+          matches=get('/api/leagues/matches', {'competition':'LAAMBA','division':'Promocional 2016','tournament':'clausura'})
+          defe=next(x for x in standings if x.get('team')=='Defensores de SL')
+          assert defe.get('pts')==12, defe
+          assert defe.get('played')==5, defe
+          assert len(standings)>=10, len(standings)
+          assert len(matches)>=5, len(matches)
+          assert all(m.get('home')=='Defensores de SL' or m.get('away')=='Defensores de SL' for m in matches)
+          assert all(m.get('tournament')=='clausura' for m in matches)
+          print({'LAAMBA_PROMO_2016_OK':True,'defe':defe,'matches':len(matches),'standings':len(standings)})
+          PY
