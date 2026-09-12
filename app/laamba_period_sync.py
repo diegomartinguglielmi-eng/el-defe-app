@@ -81,7 +81,9 @@ def _sync_url(db:Session,tournament:str,division:str,url:str):
                     'external_key':f'LAAMBA|2026|{tournament}|{division}|F{round_index}|{home}|{away}',
                     'competition':'LAAMBA','division':division,'round_name':f'Fecha {round_index}','date':date,
                     'home':home,'away':away,'home_score':hs,'away_score':aw,'status':status,'venue':venue,
-                    'source_url':url,'source_kind':f'sync_{tournament.lower()}',
+                    # Distinguimos el sincronizador por períodos del sincronizador legado.
+                    # Así el cleanup no borra inmediatamente los partidos recién importados.
+                    'source_url':url,'source_kind':f'sync_period_{tournament.lower()}',
                 }
                 _upsert_match(db,payload);matches+=1
 
@@ -132,6 +134,8 @@ def sync_laamba_periods(db:Session):
         result[tournament.lower()]={'matches':total_m,'standings':total_s,'divisions':division_results}
 
     if result.get('clausura',{}).get('matches',0)>0:
+        # Solo eliminamos registros del sincronizador legado. Los nuevos usan
+        # sync_period_apertura / sync_period_clausura y deben conservarse.
         legacy_matches=db.query(Match).filter(Match.competition=='LAAMBA',Match.source_kind.in_(['sync','sync_clausura'])).delete(synchronize_session=False)
         legacy_standings=db.query(Standing).filter(Standing.competition=='LAAMBA',~Standing.unique_key.contains('|APERTURA|'),~Standing.unique_key.contains('|CLAUSURA|')).delete(synchronize_session=False)
         db.commit()
