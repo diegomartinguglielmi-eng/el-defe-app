@@ -1,0 +1,26 @@
+name: Validate matches UI
+on: [push]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build production bundle
+        run: bash netlify-build.sh
+      - name: Validate generated bundle
+        run: |
+          set -e
+          grep -q 'superliga-ui-' defe-web-build/dist/index.html
+          grep -q 'matches-explorer-' defe-web-build/dist/index.html
+          grep -R -q 'stable mount 2026-09-12' defe-web-build/dist
+          grep -R -q 'window.defeLoadMatchExplorer=load' defe-web-build/dist
+          ! grep -R -q 'tries<100' defe-web-build/dist
+          echo 'MATCHES_UI_BUILD_OK'
+      - name: Validate production league API
+        run: |
+          set -e
+          curl -fsS --max-time 20 'https://el-defe-v5-production.up.railway.app/api/leagues/matches' -o /tmp/matches.json
+          node -e "const x=require('/tmp/matches.json'); if(!Array.isArray(x)||!x.length) throw Error('No league matches'); const c=new Set(x.map(r=>r.competition)); for(const k of ['FEFI','LAAMBA','SUPERLIGA']) if(!c.has(k)) throw Error('Missing '+k); console.log('LEAGUE_API_OK',x.length,[...c].join(','))"
