@@ -1,4 +1,4 @@
-# redeploy 2026-09-12 authoritative partidos ui
+# redeploy 2026-09-12 competencias visual v3 + logo Super Liga
 [build]
   command = "bash netlify-build.sh"
   publish = "netlify-publish"
