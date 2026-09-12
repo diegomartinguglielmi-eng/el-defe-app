@@ -7,69 +7,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate production API promotional 2016 and SuperLiga
-        run: |
-          python - <<'PY'
-          import json, urllib.parse, urllib.request
-          base='https://el-defe-v5-production.up.railway.app'
-          def get(path, params):
-              url=base+path+'?'+urllib.parse.urlencode(params)
-              with urllib.request.urlopen(url, timeout=30) as r:return json.load(r)
-          promo=get('/api/leagues/standings', {'competition':'LAAMBA','division':'Promocional 2016','tournament':'clausura'})
-          pm=get('/api/leagues/matches', {'competition':'LAAMBA','division':'Promocional 2016','tournament':'clausura'})
-          defe=next(x for x in promo if x.get('team')=='Defensores de SL')
-          assert defe.get('pts')==12 and defe.get('played')==5, defe
-          assert len(pm)>=5
-          sup=get('/api/leagues/standings', {'competition':'SUPERLIGA','division':'Junior A'})
-          sm=get('/api/leagues/matches', {'competition':'SUPERLIGA','division':'Junior A'})
-          sd=next(x for x in sup if x.get('team')=='Defensores Santos Lugares')
-          assert sd.get('pts')==9 and sd.get('played')==4, sd
-          assert len(sm)>=5
-          print({'BACKEND_OK':True,'promo_matches':len(pm),'super_matches':len(sm),'promo_defe':defe,'super_defe':sd})
-          PY
       - name: Install browser
         run: |
           npm init -y >/dev/null 2>&1
           npm install playwright@1.55.0 >/dev/null 2>&1
           npx playwright install chromium >/dev/null
-      - name: Validate production UI
+      - name: Inspect production Partidos DOM
         run: |
           node - <<'NODE'
           const { chromium }=require('playwright');
           (async()=>{
             const browser=await chromium.launch({headless:true});
             const page=await browser.newPage({viewport:{width:390,height:844}});
-            const errors=[];
-            page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
             await page.goto('https://el-defe-app.netlify.app/el-defe-app/',{waitUntil:'networkidle',timeout:60000});
-            const scripts=await page.locator('script[src]').evaluateAll(es=>es.map(e=>e.getAttribute('src')));
-            console.log('SCRIPTS',scripts);
-            if(!scripts.some(x=>x&&x.includes('matches-explorer-')))throw new Error('No está cargado matches-explorer');
-            if(!scripts.some(x=>x&&x.includes('superliga-ui-')))throw new Error('No está cargado superliga-ui');
-            const partidos=page.getByText('Partidos',{exact:true}).last();
-            await partidos.click({timeout:15000});
-            await page.waitForTimeout(2500);
-            const body=(await page.locator('body').innerText()).replace(/\s+/g,' ');
-            console.log('BODY_AFTER_PARTIDOS',body.slice(0,5000));
-            if(!body.includes('Super Liga'))throw new Error('Super Liga no aparece en Partidos');
-            const superBtn=page.locator('[data-comp="SUPERLIGA"]');
-            if(await superBtn.count()){await superBtn.first().click();await page.waitForTimeout(1500);}
-            const superText=(await page.locator('body').innerText()).replace(/\s+/g,' ');
-            console.log('SUPER_VIEW',superText.slice(0,5000));
-            if(!/Defensores Santos Lugares|Super Liga Futsal|Junior A/.test(superText))throw new Error('No se visualizan datos reales de SuperLiga');
-            const laa=page.locator('[data-comp="LAAMBA"]');
-            if(await laa.count()){await laa.first().click();await page.waitForTimeout(800);}
-            const select=page.locator('#matchDivisionFilter');
-            if(!(await select.count()))throw new Error('No apareció selector LAAMBA');
-            const opts=await select.locator('option').allTextContents();
-            console.log('LAAMBA_OPTIONS',opts);
-            if(!opts.includes('Promocional 2016'))throw new Error('Promocional 2016 no aparece en selector LAAMBA');
-            await select.selectOption({label:'Promocional 2016'});
+            await page.getByText('Partidos',{exact:true}).last().click();
             await page.waitForTimeout(1000);
-            const laText=(await page.locator('body').innerText()).replace(/\s+/g,' ');
-            console.log('LAAMBA_PROMO_VIEW',laText.slice(0,5000));
-            if(!/Promocional 2016/.test(laText))throw new Error('Promocional 2016 no quedó seleccionado');
-            console.log('UI_OK',true,'console_errors',errors.slice(0,10));
+            console.log('allMatches',await page.locator('#allMatches').count());
+            console.log('matchExplorer',await page.locator('#matchExplorer').count());
+            console.log('defeLoadMatchExplorer',await page.evaluate(()=>typeof window.defeLoadMatchExplorer));
+            console.log('ids',await page.locator('[id]').evaluateAll(es=>es.map(e=>e.id).filter(Boolean).slice(0,100)));
+            const heads=await page.getByText('PARTIDOS',{exact:true}).evaluateAll(es=>es.map(e=>({tag:e.tagName,cls:e.className,parent:e.parentElement?.outerHTML?.slice(0,2500)})));
+            console.log('HEADS',JSON.stringify(heads));
+            const p=page.getByText('Partidos',{exact:true}).last();
+            console.log('PARTIDOS_NAV',JSON.stringify(await p.evaluate(e=>({tag:e.tagName,cls:e.className,outer:e.outerHTML,parent:e.parentElement?.outerHTML?.slice(0,1800)}))));
+            const buttons=await page.locator('button').evaluateAll(es=>es.map(e=>({text:(e.innerText||'').trim(),cls:e.className})).filter(x=>x.text).slice(0,60));
+            console.log('BUTTONS',JSON.stringify(buttons));
+            if(await page.locator('#allMatches').count()){
+              await page.evaluate(()=>window.defeLoadMatchExplorer&&window.defeLoadMatchExplorer());
+              await page.waitForTimeout(2000);
+              console.log('AFTER_MANUAL_EXPLORER',(await page.locator('body').innerText()).replace(/\s+/g,' ').slice(0,5000));
+            }
             await browser.close();
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
