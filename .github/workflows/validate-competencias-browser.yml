@@ -1,0 +1,37 @@
+name: Validate Competencias Browser
+on: [push]
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm i playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null 2>&1
+      - name: Validate production UI
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          (async()=>{
+            const b=await chromium.launch({headless:true});
+            const p=await b.newPage({viewport:{width:390,height:844}});
+            await p.goto('https://el-defe-app.netlify.app/el-defe-app/',{waitUntil:'networkidle',timeout:60000});
+            await p.waitForTimeout(1500);
+            const homeText=await p.locator('body').innerText();
+            if(!homeText.includes('Inicio')) throw Error('Home did not load');
+            const nav=p.getByText('Competencias',{exact:true}).last();
+            if(await nav.count()===0) throw Error('Competencias nav label missing');
+            await nav.click();
+            await p.waitForTimeout(3500);
+            const body=await p.locator('body').innerText();
+            if(!body.includes('COMPETENCIAS')) throw Error('Top title COMPETENCIAS missing');
+            if(body.includes('Cargando partidos…')||body.includes('Cargando competencias…')) throw Error('Competencias stuck loading');
+            if(!body.includes('FEFI')||!body.includes('LAAMBA')||!body.includes('Super Liga')) throw Error('Competition selectors missing');
+            console.log('PRODUCTION_COMPETENCIAS_UI_OK');
+            await b.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
