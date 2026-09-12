@@ -1,0 +1,31 @@
+name: Validate Competencias UI
+on:
+  push:
+    branches: [validate-competencias-55801f5]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build production bundle
+        run: bash netlify-build.sh
+      - name: Validate generated bundle
+        run: |
+          set -e
+          grep -q 'superliga-ui-' defe-web-build/dist/index.html
+          grep -q 'matches-explorer-' defe-web-build/dist/index.html
+          grep -R -q 'COMPETENCIAS' defe-web-build/dist/superliga-ui-*.js
+          grep -R -q "el.textContent='Competencias'" defe-web-build/dist/superliga-ui-*.js
+          grep -R -q '/api/sponsors/featured' defe-web-build/dist/web-sponsors-home-sync-*.js
+          ! grep -R -q 'tries<100' defe-web-build/dist
+          echo 'COMPETENCIAS_UI_BUILD_OK'
+      - name: Validate production APIs
+        run: |
+          set -e
+          curl -fsS --max-time 20 'https://el-defe-v5-production.up.railway.app/api/leagues/matches' -o /tmp/matches.json
+          node -e "const x=require('/tmp/matches.json'); if(!Array.isArray(x)||!x.length) throw Error('No league matches'); const c=new Set(x.map(r=>r.competition)); for(const k of ['FEFI','LAAMBA','SUPERLIGA']) if(!c.has(k)) throw Error('Missing '+k); console.log('LEAGUE_API_OK',x.length,[...c].join(','))"
+          curl -fsS --max-time 20 'https://el-defe-v5-production.up.railway.app/api/sponsors/featured' -o /tmp/sponsors.json
+          node -e "const x=require('/tmp/sponsors.json'); if(!Array.isArray(x)) throw Error('Featured sponsors response is not an array'); console.log('FEATURED_SPONSORS_API_OK',x.length)"
