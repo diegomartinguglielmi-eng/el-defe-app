@@ -54,6 +54,7 @@ FOLLOWING="web-following-overlay-${SHA}.js"
 MATCHES="matches-explorer-${SHA}.js"
 MATCHAUTH="superliga-ui-${SHA}.js"
 UIHOTFIX="web-ui-hotfix-${SHA}.js"
+FEFIDEDUPE="web-fefi-dedupe-${SHA}.js"
 PICKUPHARDENING="store-pickup-hardening-${SHA}.js"
 ORDERSAFETY="store-order-safety-${SHA}.js"
 STORERECEIVING="store-receiving-${SHA}.js"
@@ -69,6 +70,7 @@ cp web-following-overlay.js "defe-web-build/dist/${FOLLOWING}"
 cp app/static/matches-explorer.js "defe-web-build/dist/${MATCHES}"
 cp app/static/superliga-ui.js "defe-web-build/dist/${MATCHAUTH}"
 cp web-ui-hotfix.js "defe-web-build/dist/${UIHOTFIX}"
+cp web-fefi-dedupe.js "defe-web-build/dist/${FEFIDEDUPE}"
 cp app/static/store-pickup-hardening.js "defe-web-build/dist/${PICKUPHARDENING}"
 cp app/static/store-order-safety.js "defe-web-build/dist/${ORDERSAFETY}"
 cp app/static/store-receiving.js "defe-web-build/dist/${STORERECEIVING}"
@@ -79,7 +81,7 @@ cp manifest.webmanifest defe-web-build/dist/manifest.webmanifest
 cp mobile/assets/icon.png defe-web-build/dist/icon.png
 
 # La agenda autoritativa debe cargarse antes del controlador que reemplaza la agenda legacy.
-sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${MATCHAUTH}\"></script><script src=\"./${UIHOTFIX}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${FOLLOWING}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
+sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${MATCHAUTH}\"></script><script src=\"./${UIHOTFIX}\"></script><script src=\"./${FEFIDEDUPE}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${FOLLOWING}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
 
 sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
 echo "// inert" > defe-web-build/dist/sw.js
@@ -117,7 +119,9 @@ grep -F "web-following-overlay-${SHA}.js" defe-web-build/dist/index.html
 grep -F "matches-explorer-${SHA}.js" defe-web-build/dist/index.html
 grep -F "superliga-ui-${SHA}.js" defe-web-build/dist/index.html
 grep -F "web-ui-hotfix-${SHA}.js" defe-web-build/dist/index.html
+grep -F "web-fefi-dedupe-${SHA}.js" defe-web-build/dist/index.html
 grep -F "DEFE_UI_HOTFIX_20260912" "defe-web-build/dist/${UIHOTFIX}"
+grep -F "DEFE_FEFI_DEDUPE_20260912_V1" "defe-web-build/dist/${FEFIDEDUPE}"
 grep -F "Gestionar Sponsors" "defe-web-build/dist/${ACOMP}"
 grep -F "/api/sponsors/featured" "defe-web-build/dist/${SPONSORSHOME}"
 grep -F "Mostrar en inicio" "defe-web-build/dist/${ACOMP}"
@@ -136,4 +140,4 @@ grep -F "DEFE_STORE_NATIVE_RAILWAY_V1" "defe-web-build/dist/assets/${JS}"
 ! grep -F "web-push-overlay" defe-web-build/dist/index.html
 ! grep -F "location.replace" defe-web-build/dist/index.html
 
-echo "Netlify build listo: agenda autoritativa + UX ligas/ingreso + checkout nativo V5 + Tienda + Sponsors"
+echo "Netlify build listo: agenda autoritativa + UX ligas/ingreso + FEFI dedupe + checkout nativo V5 + Tienda + Sponsors"
