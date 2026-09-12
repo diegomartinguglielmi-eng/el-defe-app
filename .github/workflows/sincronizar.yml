@@ -9,6 +9,7 @@ on:
       - "defe-datos/manual.json"
       - "defe-datos/sync-ligas.mjs"
       - "defe-datos/run-sync.mjs"
+      - "defe-datos/sanitize-fefi-clausura.mjs"
       - "defe-datos/enrich-fefi-mayores.mjs"
       - "defe-datos/enrich-argenliga.mjs"
       - "defe-datos/avisos.mjs"
@@ -44,6 +45,9 @@ jobs:
 
       - name: Leer las ligas
         run: npm run sync
+
+      - name: Sanear FEFI Clausura
+        run: node sanitize-fefi-clausura.mjs
 
       - name: Avisar lo que cambió
         env:
