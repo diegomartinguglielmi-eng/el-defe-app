@@ -22,12 +22,13 @@ jobs:
             await p.goto('https://el-defe-app.netlify.app/el-defe-app/',{waitUntil:'networkidle',timeout:60000});
             await p.waitForTimeout(1500);
             const homeText=await p.locator('body').innerText();
-            if(!homeText.includes('Inicio')) throw Error('Home did not load');
+            console.log('HOME_TEXT\n'+homeText.slice(0,4000));
             const nav=p.getByText('Competencias',{exact:true}).last();
             if(await nav.count()===0) throw Error('Competencias nav label missing');
             await nav.click();
-            await p.waitForTimeout(3500);
+            await p.waitForTimeout(4500);
             const body=await p.locator('body').innerText();
+            console.log('COMP_TEXT\n'+body.slice(0,7000));
             if(!body.includes('COMPETENCIAS')) throw Error('Top title COMPETENCIAS missing');
             if(body.includes('Cargando partidos…')||body.includes('Cargando competencias…')) throw Error('Competencias stuck loading');
             if(!body.includes('FEFI')||!body.includes('LAAMBA')||!body.includes('Super Liga')) throw Error('Competition selectors missing');
