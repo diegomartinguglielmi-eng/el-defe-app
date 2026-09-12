@@ -1,6 +1,6 @@
 {
   "club": "DEF. DE SANTOS LUGARES",
-  "actualizado": "2026-09-12T15:41:44.515Z",
+  "actualizado": "2026-09-12T16:28:46.696Z",
   "ligas": [
     {
       "id": "fefi",
@@ -8,7 +8,7 @@
       "torneo": "Clausura 2026 · Zona H",
       "fuente": "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/",
       "conectada": true,
-      "actualizado": "2026-09-12T15:41:47.269Z",
+      "actualizado": "2026-09-12T16:28:50.043Z",
       "categorias": [
         "2013",
         "2014",
@@ -1347,7 +1347,7 @@
       "torneo": "Junior A · Torneo 2026",
       "fuente": "https://www.futsalargentina.com.ar/fixture.php?cat=1_1",
       "conectada": true,
-      "actualizado": "2026-09-12T15:41:27.593Z",
+      "actualizado": "2026-09-12T16:28:23.800Z",
       "categorias": [
         "Junior A"
       ],
@@ -1477,7 +1477,7 @@
       "torneo": "Argenliga A · Zona 1 · 2026",
       "fuente": "https://www.sofascore.com/es-la/futsal/team/defensores-de-santos-lugares/1214864",
       "conectada": true,
-      "actualizado": "2026-09-12T15:41:44.515Z",
+      "actualizado": "2026-09-12T16:28:46.696Z",
       "categorias": [
         "Primera"
       ],
@@ -1776,7 +1776,7 @@
           }
         ]
       },
-      "error": "403 en https://api.sofascore.com/api/v1/team/1214864/events/next/0",
+      "error": "403 en https://api.sofascore.com/api/v1/unique-tournament/34170/seasons",
       "disciplina": "Futsal",
       "partidos": [
         {
@@ -1855,7 +1855,7 @@
       "torneo": "Masculino · Elite I | Femenino · Ascenso I · Zona B · Reserva",
       "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026",
       "conectada": true,
-      "actualizado": "2026-09-12T15:41:42.435Z",
+      "actualizado": "2026-09-12T16:28:41.845Z",
       "categorias": [
         "1RA",
         "3RA",
@@ -5522,6 +5522,6 @@
       }
     ],
     "fuente": "https://fefi.com.ar/2026-futbol-sala-mayores-fefi/mayores-b/",
-    "actualizado": "2026-09-12T15:41:44.313Z"
+    "actualizado": "2026-09-12T16:28:46.420Z"
   }
 }
