@@ -1,0 +1,34 @@
+name: SuperLiga live validation
+
+on:
+  push:
+    branches:
+      - fix-superliga-live
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install parser dependencies
+        run: pip install -r requirements.txt
+      - name: Syntax check
+        run: python -m py_compile app/superliga_sync.py
+      - name: Validate official SuperLiga data
+        run: |
+          python - <<'PY'
+          from app.superliga_sync import _collect_live_data, TEAM
+          matches, standings, pages = _collect_live_data()
+          defe = next(x for x in standings if x['team'].casefold() == TEAM.casefold())
+          assert len(standings) >= 10, standings
+          assert len(matches) >= 4, matches
+          assert all(any(ch.isalpha() for ch in x['team']) for x in standings)
+          assert all(x['home'].casefold() == TEAM.casefold() or x['away'].casefold() == TEAM.casefold() for x in matches)
+          assert defe['played'] >= 4
+          assert defe['pts'] >= 0
+          print({'SUPERLIGA_LIVE_OK': True, 'matches': len(matches), 'standings': len(standings), 'defe': defe, 'pages': len(pages)})
+          PY
