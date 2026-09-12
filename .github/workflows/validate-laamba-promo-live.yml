@@ -12,31 +12,15 @@ jobs:
           npm init -y >/dev/null 2>&1
           npm install playwright@1.55.0 >/dev/null 2>&1
           npx playwright install chromium >/dev/null
-      - name: Inspect production Partidos DOM
+      - name: Inspect Partidos hierarchy
         run: |
           node - <<'NODE'
-          const { chromium }=require('playwright');
-          (async()=>{
-            const browser=await chromium.launch({headless:true});
-            const page=await browser.newPage({viewport:{width:390,height:844}});
-            await page.goto('https://el-defe-app.netlify.app/el-defe-app/',{waitUntil:'networkidle',timeout:60000});
-            await page.getByText('Partidos',{exact:true}).last().click();
-            await page.waitForTimeout(1000);
-            console.log('allMatches',await page.locator('#allMatches').count());
-            console.log('matchExplorer',await page.locator('#matchExplorer').count());
-            console.log('defeLoadMatchExplorer',await page.evaluate(()=>typeof window.defeLoadMatchExplorer));
-            console.log('ids',await page.locator('[id]').evaluateAll(es=>es.map(e=>e.id).filter(Boolean).slice(0,100)));
-            const heads=await page.getByText('PARTIDOS',{exact:true}).evaluateAll(es=>es.map(e=>({tag:e.tagName,cls:e.className,parent:e.parentElement?.outerHTML?.slice(0,2500)})));
-            console.log('HEADS',JSON.stringify(heads));
-            const p=page.getByText('Partidos',{exact:true}).last();
-            console.log('PARTIDOS_NAV',JSON.stringify(await p.evaluate(e=>({tag:e.tagName,cls:e.className,outer:e.outerHTML,parent:e.parentElement?.outerHTML?.slice(0,1800)}))));
-            const buttons=await page.locator('button').evaluateAll(es=>es.map(e=>({text:(e.innerText||'').trim(),cls:e.className})).filter(x=>x.text).slice(0,60));
-            console.log('BUTTONS',JSON.stringify(buttons));
-            if(await page.locator('#allMatches').count()){
-              await page.evaluate(()=>window.defeLoadMatchExplorer&&window.defeLoadMatchExplorer());
-              await page.waitForTimeout(2000);
-              console.log('AFTER_MANUAL_EXPLORER',(await page.locator('body').innerText()).replace(/\s+/g,' ').slice(0,5000));
-            }
-            await browser.close();
-          })().catch(e=>{console.error(e);process.exit(1)});
+          const {chromium}=require('playwright');
+          (async()=>{const b=await chromium.launch({headless:true});const p=await b.newPage({viewport:{width:390,height:844}});
+          await p.goto('https://el-defe-app.netlify.app/el-defe-app/',{waitUntil:'networkidle'});await p.getByText('Partidos',{exact:true}).last().click();await p.waitForTimeout(700);
+          const h=p.getByText('PARTIDOS',{exact:true});
+          console.log('ANCESTORS',JSON.stringify(await h.evaluate(e=>{const a=[];let x=e;for(let i=0;x&&i<9;i++,x=x.parentElement)a.push({i,tag:x.tagName,cls:x.className,id:x.id,children:x.children.length,text:(x.innerText||'').replace(/\s+/g,' ').slice(0,500)});return a})));
+          console.log('APP_CHILDREN',JSON.stringify(await p.locator('#app').evaluate(e=>Array.from(e.children).map((x,i)=>({i,tag:x.tagName,cls:x.className,id:x.id,text:(x.innerText||'').replace(/\s+/g,' ').slice(0,700)})))));
+          console.log('MAINLIKE',JSON.stringify(await p.locator('main,[role=main]').evaluateAll(es=>es.map(x=>({tag:x.tagName,cls:x.className,id:x.id,text:(x.innerText||'').replace(/\s+/g,' ').slice(0,800)})))));
+          await b.close()})().catch(e=>{console.error(e);process.exit(1)});
           NODE
