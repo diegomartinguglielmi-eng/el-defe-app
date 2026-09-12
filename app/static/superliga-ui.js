@@ -1,4 +1,4 @@
-// El Defe · Agenda deportiva autoritativa sobre la pantalla React real
+// El Defe · Agenda deportiva autoritativa sobre la pantalla React real · deploy 2026-09-12
 (function(){
   const API='https://el-defe-v5-production.up.railway.app';
   window.EL_DEFE_API_URL=window.EL_DEFE_API_URL||API;
