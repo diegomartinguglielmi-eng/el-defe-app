@@ -121,7 +121,7 @@ grep -F "superliga-ui-${SHA}.js" defe-web-build/dist/index.html
 grep -F "web-ui-hotfix-${SHA}.js" defe-web-build/dist/index.html
 grep -F "web-fefi-dedupe-${SHA}.js" defe-web-build/dist/index.html
 grep -F "DEFE_UI_HOTFIX_20260912_V5_LOGIN_ONLY" "defe-web-build/dist/${UIHOTFIX}"
-grep -F "DEFE_COMPETENCIAS_LAYOUT_V3" "defe-web-build/dist/${FEFIDEDUPE}"
+grep -F "DEFE_COMPETENCIAS_LAYOUT_V4" "defe-web-build/dist/${FEFIDEDUPE}"
 grep -F "Gestionar Sponsors" "defe-web-build/dist/${ACOMP}"
 grep -F "/api/sponsors/featured" "defe-web-build/dist/${SPONSORSHOME}"
 grep -F "Mostrar en inicio" "defe-web-build/dist/${ACOMP}"
@@ -140,4 +140,4 @@ grep -F "DEFE_STORE_NATIVE_RAILWAY_V1" "defe-web-build/dist/assets/${JS}"
 ! grep -F "web-push-overlay" defe-web-build/dist/index.html
 ! grep -F "location.replace" defe-web-build/dist/index.html
 
-echo "Netlify build listo: agenda autoritativa + UX ligas/ingreso + FEFI dedupe + checkout nativo V5 + Tienda + Sponsors"
+echo "Netlify build listo: agenda autoritativa + filtros competencias V4 + checkout nativo V5 + Tienda + Sponsors"
