@@ -7,20 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install browser
-        run: |
-          npm init -y >/dev/null 2>&1
-          npm install playwright@1.55.0 >/dev/null 2>&1
-          npx playwright install chromium >/dev/null
-      - name: Inspect Partidos hierarchy
+      - name: Inspect static league payloads
         run: |
           node - <<'NODE'
-          const {chromium}=require('playwright');
-          (async()=>{const b=await chromium.launch({headless:true});const p=await b.newPage({viewport:{width:390,height:844}});
-          await p.goto('https://el-defe-app.netlify.app/el-defe-app/',{waitUntil:'networkidle'});await p.getByText('Partidos',{exact:true}).last().click();await p.waitForTimeout(700);
-          const h=p.getByText('PARTIDOS',{exact:true});
-          console.log('ANCESTORS',JSON.stringify(await h.evaluate(e=>{const a=[];let x=e;for(let i=0;x&&i<9;i++,x=x.parentElement)a.push({i,tag:x.tagName,cls:x.className,id:x.id,children:x.children.length,text:(x.innerText||'').replace(/\s+/g,' ').slice(0,500)});return a})));
-          console.log('APP_CHILDREN',JSON.stringify(await p.locator('#app').evaluate(e=>Array.from(e.children).map((x,i)=>({i,tag:x.tagName,cls:x.className,id:x.id,text:(x.innerText||'').replace(/\s+/g,' ').slice(0,700)})))));
-          console.log('MAINLIKE',JSON.stringify(await p.locator('main,[role=main]').evaluateAll(es=>es.map(x=>({tag:x.tagName,cls:x.className,id:x.id,text:(x.innerText||'').replace(/\s+/g,' ').slice(0,800)})))));
-          await b.close()})().catch(e=>{console.error(e);process.exit(1)});
+          const j=require('./defe-datos/datos.json');
+          for(const id of ['superliga','lamba']){
+            const x=j.ligas.find(y=>y.id===id);
+            console.log('LEAGUE_'+id.toUpperCase(),JSON.stringify(x,null,2));
+          }
           NODE
