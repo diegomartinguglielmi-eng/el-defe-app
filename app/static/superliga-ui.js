@@ -1,5 +1,7 @@
 // El Defe · Competencias deportivas sobre la pantalla React real · stable mount 2026-09-12
 (function(){
+  const API='https://el-defe-v5-production.up.railway.app';
+  window.EL_DEFE_API_URL=window.EL_DEFE_API_URL||API;
   let observer=null, timer=null, lastContent=null;
   function visible(el){if(!el)return false;const s=getComputedStyle(el),r=el.getBoundingClientRect();return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0;}
   function renameLabels(){
