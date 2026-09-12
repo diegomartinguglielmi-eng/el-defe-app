@@ -1,6 +1,6 @@
 {
   "club": "DEF. DE SANTOS LUGARES",
-  "actualizado": "2026-09-12T12:33:55.839Z",
+  "actualizado": "2026-09-12T15:41:44.515Z",
   "ligas": [
     {
       "id": "fefi",
@@ -8,7 +8,7 @@
       "torneo": "Clausura 2026 · Zona H",
       "fuente": "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/",
       "conectada": true,
-      "actualizado": "2026-09-12T12:33:33.789Z",
+      "actualizado": "2026-09-12T15:41:47.269Z",
       "categorias": [
         "2013",
         "2014",
@@ -52,6 +52,10 @@
               2
             ]
           },
+          "pts": [
+            18,
+            9
+          ],
           "estado": "verificado"
         },
         {
@@ -92,7 +96,7 @@
           },
           "pts": [
             18,
-            null
+            10
           ],
           "estado": "verificado"
         },
@@ -132,6 +136,10 @@
               2
             ]
           },
+          "pts": [
+            14,
+            14
+          ],
           "estado": "verificado"
         },
         {
@@ -172,7 +180,7 @@
           },
           "pts": [
             16,
-            null
+            12
           ],
           "estado": "verificado"
         },
@@ -212,6 +220,10 @@
               0
             ]
           },
+          "pts": [
+            18,
+            10
+          ],
           "estado": "verificado"
         },
         {
@@ -219,190 +231,35 @@
           "fecha": "2026-09-12",
           "rival": "C. A. CENTENARIO S. M.",
           "local": true,
-          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES",
-          "marc": {
-            "2013": [
-              4,
-              13
-            ],
-            "2014": [
-              5,
-              0
-            ],
-            "2015": [
-              7,
-              3
-            ],
-            "2016": [
-              0,
-              4
-            ],
-            "2017": [
-              5,
-              3
-            ],
-            "2018": [
-              8,
-              0
-            ],
-            "2019": [
-              4,
-              1
-            ]
-          },
-          "estado": "verificado"
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
         },
         {
           "nro": 7,
           "fecha": "2026-09-19",
           "rival": "LAMADRID",
           "local": false,
-          "sede": "DESAGUADERO 3180, C.A.B.A.",
-          "marc": {
-            "2013": [
-              2,
-              5
-            ],
-            "2014": [
-              3,
-              1
-            ],
-            "2015": [
-              11,
-              0
-            ],
-            "2016": [
-              2,
-              5
-            ],
-            "2017": [
-              2,
-              4
-            ],
-            "2018": [
-              0,
-              1
-            ],
-            "2019": [
-              6,
-              0
-            ]
-          },
-          "estado": "verificado"
+          "sede": "DESAGUADERO 3180, C.A.B.A."
         },
         {
           "nro": 8,
           "fecha": "2026-09-26",
           "rival": "BOYA - C. A. I.",
           "local": true,
-          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES",
-          "marc": {
-            "2013": [
-              1,
-              10
-            ],
-            "2014": [
-              4,
-              1
-            ],
-            "2015": [
-              1,
-              2
-            ],
-            "2016": [
-              3,
-              3
-            ],
-            "2017": [
-              5,
-              1
-            ],
-            "2018": [
-              7,
-              0
-            ],
-            "2019": [
-              2,
-              0
-            ]
-          },
-          "estado": "verificado"
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
         },
         {
           "nro": 9,
           "fecha": "2026-10-03",
           "rival": "EL TREBOL",
           "local": false,
-          "sede": "GANDARA 2840, CABA",
-          "marc": {
-            "2013": [
-              7,
-              8
-            ],
-            "2014": [
-              2,
-              3
-            ],
-            "2015": [
-              9,
-              2
-            ],
-            "2016": [
-              4,
-              3
-            ],
-            "2017": [
-              11,
-              3
-            ],
-            "2018": [
-              5,
-              2
-            ],
-            "2019": [
-              3,
-              0
-            ]
-          },
-          "estado": "verificado"
+          "sede": "GANDARA 2840, CABA"
         },
         {
           "nro": 10,
           "fecha": "2026-10-10",
           "rival": "GIMNASIA",
           "local": true,
-          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES",
-          "marc": {
-            "2013": [
-              4,
-              0
-            ],
-            "2014": [
-              3,
-              4
-            ],
-            "2015": [
-              2,
-              1
-            ],
-            "2016": [
-              2,
-              5
-            ],
-            "2017": [
-              7,
-              0
-            ],
-            "2018": [
-              6,
-              1
-            ],
-            "2019": [
-              1,
-              4
-            ]
-          },
-          "estado": "verificado"
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
         },
         {
           "nro": 11,
@@ -416,114 +273,21 @@
           "fecha": "2026-10-24",
           "rival": "FRANJA DE ORO 1",
           "local": true,
-          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES",
-          "marc": {
-            "2013": [
-              4,
-              4
-            ],
-            "2014": [
-              4,
-              5
-            ],
-            "2015": [
-              9,
-              1
-            ],
-            "2016": [
-              1,
-              8
-            ],
-            "2017": [
-              7,
-              2
-            ],
-            "2018": [
-              3,
-              2
-            ],
-            "2019": [
-              4,
-              4
-            ]
-          },
-          "estado": "verificado"
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
         },
         {
           "nro": 13,
           "fecha": "2026-10-31",
           "rival": "ALVEAR",
           "local": false,
-          "sede": "JOSé E. RODO 4190, CABA",
-          "marc": {
-            "2013": [
-              1,
-              4
-            ],
-            "2014": [
-              4,
-              3
-            ],
-            "2015": [
-              5,
-              2
-            ],
-            "2016": [
-              1,
-              6
-            ],
-            "2017": [
-              4,
-              0
-            ],
-            "2018": [
-              0,
-              1
-            ],
-            "2019": [
-              3,
-              0
-            ]
-          },
-          "estado": "verificado"
+          "sede": "JOSé E. RODO 4190, CABA"
         },
         {
           "nro": 14,
           "fecha": "2026-11-07",
           "rival": "NOLTING",
           "local": true,
-          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES",
-          "marc": {
-            "2013": [
-              0,
-              3
-            ],
-            "2014": [
-              5,
-              6
-            ],
-            "2015": [
-              1,
-              4
-            ],
-            "2016": [
-              0,
-              3
-            ],
-            "2017": [
-              4,
-              0
-            ],
-            "2018": [
-              2,
-              2
-            ],
-            "2019": [
-              2,
-              1
-            ]
-          },
-          "estado": "verificado"
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
         },
         {
           "nro": 15,
@@ -1583,7 +1347,7 @@
       "torneo": "Junior A · Torneo 2026",
       "fuente": "https://www.futsalargentina.com.ar/fixture.php?cat=1_1",
       "conectada": true,
-      "actualizado": "2026-09-12T12:33:35.648Z",
+      "actualizado": "2026-09-12T15:41:27.593Z",
       "categorias": [
         "Junior A"
       ],
@@ -1713,7 +1477,7 @@
       "torneo": "Argenliga A · Zona 1 · 2026",
       "fuente": "https://www.sofascore.com/es-la/futsal/team/defensores-de-santos-lugares/1214864",
       "conectada": true,
-      "actualizado": "2026-09-12T12:33:55.839Z",
+      "actualizado": "2026-09-12T15:41:44.515Z",
       "categorias": [
         "Primera"
       ],
@@ -2012,7 +1776,7 @@
           }
         ]
       },
-      "error": "403 en https://api.sofascore.com/api/v1/unique-tournament/34170/seasons",
+      "error": "403 en https://api.sofascore.com/api/v1/team/1214864/events/next/0",
       "disciplina": "Futsal",
       "partidos": [
         {
@@ -2091,7 +1855,7 @@
       "torneo": "Masculino · Elite I | Femenino · Ascenso I · Zona B · Reserva",
       "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026",
       "conectada": true,
-      "actualizado": "2026-09-12T12:33:53.430Z",
+      "actualizado": "2026-09-12T15:41:42.435Z",
       "categorias": [
         "1RA",
         "3RA",
@@ -5758,6 +5522,6 @@
       }
     ],
     "fuente": "https://fefi.com.ar/2026-futbol-sala-mayores-fefi/mayores-b/",
-    "actualizado": "2026-09-12T12:33:55.692Z"
+    "actualizado": "2026-09-12T15:41:44.313Z"
   }
 }
