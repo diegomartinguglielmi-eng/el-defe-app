@@ -7,6 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Inspect static league data shape
+        run: |
+          node - <<'NODE'
+          const j=require('./defe-datos/datos.json');
+          console.log('TOP_KEYS',Object.keys(j));
+          console.log('LIGAS',Array.isArray(j.ligas)?j.ligas.map(x=>({id:x.id,nombre:x.nombre,keys:Object.keys(x)})):j.ligas);
+          for(const k of Object.keys(j)) if(/laam|lamb|super/i.test(k)) console.log('SPECIAL',k,JSON.stringify(j[k]).slice(0,3000));
+          NODE
       - name: Validate production API promotional 2016
         run: |
           python - <<'PY'
