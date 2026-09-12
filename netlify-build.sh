@@ -120,8 +120,8 @@ grep -F "matches-explorer-${SHA}.js" defe-web-build/dist/index.html
 grep -F "superliga-ui-${SHA}.js" defe-web-build/dist/index.html
 grep -F "web-ui-hotfix-${SHA}.js" defe-web-build/dist/index.html
 grep -F "web-fefi-dedupe-${SHA}.js" defe-web-build/dist/index.html
-grep -F "DEFE_UI_HOTFIX_20260912" "defe-web-build/dist/${UIHOTFIX}"
-grep -F "DEFE_FEFI_DEDUPE_20260912_V1" "defe-web-build/dist/${FEFIDEDUPE}"
+grep -F "DEFE_UI_HOTFIX_20260912_V5_LOGIN_ONLY" "defe-web-build/dist/${UIHOTFIX}"
+grep -F "DEFE_COMPETENCIAS_LAYOUT_V3" "defe-web-build/dist/${FEFIDEDUPE}"
 grep -F "Gestionar Sponsors" "defe-web-build/dist/${ACOMP}"
 grep -F "/api/sponsors/featured" "defe-web-build/dist/${SPONSORSHOME}"
 grep -F "Mostrar en inicio" "defe-web-build/dist/${ACOMP}"
