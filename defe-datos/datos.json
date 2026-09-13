@@ -1,6 +1,6 @@
 {
   "club": "DEF. DE SANTOS LUGARES",
-  "actualizado": "2026-09-13T00:37:13.510Z",
+  "actualizado": "2026-09-13T04:29:37.815Z",
   "ligas": [
     {
       "id": "fefi",
@@ -8,7 +8,7 @@
       "torneo": "Clausura 2026 · Zona H",
       "fuente": "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/",
       "conectada": true,
-      "actualizado": "2026-09-13T00:37:16.740Z",
+      "actualizado": "2026-09-13T04:29:41.562Z",
       "categorias": [
         "2013",
         "2014",
@@ -1347,7 +1347,7 @@
       "torneo": "Junior A · Torneo 2026",
       "fuente": "https://www.futsalargentina.com.ar/fixture.php?cat=1_1",
       "conectada": true,
-      "actualizado": "2026-09-13T00:36:51.148Z",
+      "actualizado": "2026-09-13T04:29:11.752Z",
       "categorias": [
         "Junior A"
       ],
@@ -1477,7 +1477,7 @@
       "torneo": "Argenliga A · Zona 1 · 2026",
       "fuente": "https://www.sofascore.com/es-la/futsal/team/defensores-de-santos-lugares/1214864",
       "conectada": true,
-      "actualizado": "2026-09-13T00:37:13.510Z",
+      "actualizado": "2026-09-13T04:29:37.815Z",
       "categorias": [
         "Primera"
       ],
@@ -1776,7 +1776,7 @@
           }
         ]
       },
-      "error": "403 en https://api.sofascore.com/api/v1/unique-tournament/34170/seasons",
+      "error": "403 en https://api.sofascore.com/api/v1/team/1214864/events/next/0",
       "disciplina": "Futsal",
       "partidos": [
         {
@@ -1855,7 +1855,7 @@
       "torneo": "Masculino · Elite I | Femenino · Ascenso I · Zona B · Reserva",
       "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026",
       "conectada": true,
-      "actualizado": "2026-09-13T00:37:08.018Z",
+      "actualizado": "2026-09-13T04:29:32.151Z",
       "categorias": [
         "1RA",
         "3RA",
@@ -4816,6 +4816,15 @@
             "dg": 0
           },
           {
+            "equipo": "Estrada de Almagro",
+            "pts": 3,
+            "pj": 2,
+            "g": 1,
+            "e": 0,
+            "p": 1,
+            "dg": 11
+          },
+          {
             "equipo": "Union Italiana",
             "pts": 3,
             "pj": 2,
@@ -4843,24 +4852,6 @@
             "dg": -6
           },
           {
-            "equipo": "Estrada de Almagro",
-            "pts": 0,
-            "pj": 1,
-            "g": 0,
-            "e": 0,
-            "p": 1,
-            "dg": -1
-          },
-          {
-            "equipo": "Estudiantes del Norte",
-            "pts": 0,
-            "pj": 2,
-            "g": 0,
-            "e": 0,
-            "p": 2,
-            "dg": -8
-          },
-          {
             "equipo": "Villa Mitre",
             "pts": 0,
             "pj": 3,
@@ -4868,6 +4859,15 @@
             "e": 0,
             "p": 3,
             "dg": -15
+          },
+          {
+            "equipo": "Estudiantes del Norte",
+            "pts": 0,
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "dg": -20
           },
           {
             "equipo": "Fecha Libre",
@@ -4917,6 +4917,15 @@
             "pts": 6
           },
           {
+            "equipo": "Estudiantes del Norte",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "dg": 3,
+            "pts": 6
+          },
+          {
             "equipo": "San Andres Futsal",
             "pj": 3,
             "g": 2,
@@ -4932,15 +4941,6 @@
             "e": 0,
             "p": 1,
             "dg": 2,
-            "pts": 3
-          },
-          {
-            "equipo": "Estudiantes del Norte",
-            "pj": 2,
-            "g": 1,
-            "e": 0,
-            "p": 1,
-            "dg": 0,
             "pts": 3
           },
           {
@@ -4981,11 +4981,11 @@
           },
           {
             "equipo": "Estrada de Almagro",
-            "pj": 1,
+            "pj": 2,
             "g": 0,
             "e": 0,
-            "p": 1,
-            "dg": -3,
+            "p": 2,
+            "dg": -6,
             "pts": 0
           },
           {
@@ -5522,6 +5522,6 @@
       }
     ],
     "fuente": "https://fefi.com.ar/2026-futbol-sala-mayores-fefi/mayores-b/",
-    "actualizado": "2026-09-13T00:37:13.353Z"
+    "actualizado": "2026-09-13T04:29:37.611Z"
   }
 }
