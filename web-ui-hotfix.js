@@ -1,8 +1,9 @@
-// El Defe · UX hotfix 2026-09-12 v5: ingreso solamente
+// El Defe · UX hotfix 2026-09-13 v6: ingreso + sesión operativa
 (() => {
   const API='https://el-defe-v5-production.up.railway.app';
-  const MARK='DEFE_UI_HOTFIX_20260912_V5_LOGIN_ONLY';
+  const MARK='DEFE_UI_HOTFIX_20260913_V6_STORE_SESSION';
 
+  function tokenRole(token){try{const p=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return String(JSON.parse(atob(p.padEnd(Math.ceil(p.length/4)*4,'='))).role||'').toLowerCase()}catch(_){return ''}}
   function closeLogin(){document.querySelector('[data-defe-login-modal]')?.remove();}
   function openLogin(){
     if(document.querySelector('[data-defe-login-modal]'))return;
@@ -23,8 +24,13 @@
         const r=await fetch(API+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
         const data=await r.json().catch(()=>({}));
         if(!r.ok)throw new Error(data.detail||'No se pudo iniciar sesión');
-        localStorage.setItem('defe_auth_token',data.access_token);
+        const t=data.access_token||'';
+        localStorage.setItem('defe_auth_token',t);
+        localStorage.setItem('defe_token',t);
         localStorage.setItem('defe_auth_user',JSON.stringify(data.user||{}));
+        const role=String(data.user?.role||tokenRole(t)||'').toLowerCase();
+        if(role)localStorage.setItem('defe_role',role);
+        window.defeSyncStoreAuth?.();
         closeLogin();location.reload();
       }catch(err){msg.textContent=String(err?.message||err);submit.disabled=false;submit.textContent='Ingresar';}
     };
