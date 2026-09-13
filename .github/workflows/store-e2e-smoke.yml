@@ -10,11 +10,55 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verificar interceptor
+
+      - name: Validar código del perfil Tienda
         run: |
+          set -euo pipefail
+          node --check web-ui-hotfix.js
+          node --check web-store-auth-sync.js
+          node --check app/static/store-role-view.js
+          node --check app/static/store-admin-bridge.js
+          node --check app/static/store-stock.js
+          node --check app/static/store-receiving.js
+          node --check app/static/store-orders.js
+          node --check app/static/store-settings.js
+          node --check app/static/store-image-upload.js
+          grep -F "defe_token" web-ui-hotfix.js
+          grep -F "defe_role" web-ui-hotfix.js
+          grep -F "'tienda'" app/static/store-role-view.js
+          grep -F "store-admin-bridge.js" app/static/store-role-view.js
+          grep -F "STORE_ROLES=('admin','delegado','tienda')" app/store_v5.py
+          grep -F "update_inventory" app/store_v5.py
+          grep -F "admin_orders" app/store_v5.py
+          grep -F "update_order_status" app/store_v5.py
+          grep -F "update_settings" app/store_v5.py
           grep -F "DEFE_STORE_CAPTURE_V2" store-checkout-interceptor.js
           grep -F "/api/store/orders/submit" store-checkout-interceptor.js
-      - name: Probar backend y crear pedido de prueba
+
+      - name: Validar API pública y protección administrativa
+        shell: bash
+        run: |
+          set -euo pipefail
+          API="https://el-defe-v5-production.up.railway.app"
+          curl -fsS "$API/api/store/products" -o /tmp/products.json
+          curl -fsS "$API/api/store/settings" -o /tmp/settings.json
+          python3 - <<'PY'
+          import json
+          products=json.load(open('/tmp/products.json'))
+          settings=json.load(open('/tmp/settings.json'))
+          assert isinstance(products,list) and products, 'Catálogo vacío'
+          for p in products:
+              assert {'id','slug','name','category','sizes','inventory','stock_managed','active'}.issubset(p), f'Producto incompleto: {p}'
+          assert settings.get('whatsapp_number'), 'Falta WhatsApp de Tienda'
+          print('Catálogo:',len(products),'productos; WhatsApp configurado')
+          PY
+          STATUS=$(curl -sS -o /tmp/admin-products -w '%{http_code}' "$API/api/store/admin/products")
+          test "$STATUS" = "401" -o "$STATUS" = "403"
+          STATUS=$(curl -sS -o /tmp/admin-orders -w '%{http_code}' "$API/api/store/admin/orders")
+          test "$STATUS" = "401" -o "$STATUS" = "403"
+          echo "STORE_AUTH_GUARD_OK"
+
+      - name: Probar pedido público cuando haya stock disponible
         shell: bash
         run: |
           set -euo pipefail
@@ -22,20 +66,33 @@ jobs:
           curl -fsS "$API/api/store/products" -o /tmp/products.json
           python3 - <<'PY'
           import json
-          d=json.load(open('/tmp/products.json'))
-          a=d if isinstance(d,list) else d.get('products',d.get('items',[]))
-          assert a, 'Catálogo vacío'
-          p=a[0]
-          sizes=p.get('sizes') or p.get('stock_by_size') or {}
-          if isinstance(sizes,dict) and sizes:
-              size=next(iter(sizes))
-          elif isinstance(sizes,list) and sizes:
-              x=sizes[0]; size=x if isinstance(x,str) else x.get('size',x.get('name','Único'))
-          else: size='Único'
-          open('/tmp/id','w').write(str(p['id']))
-          open('/tmp/size','w').write(str(size))
-          print('Producto:',p.get('name',p.get('nombre')), 'id=',p['id'],'talle=',size)
+          a=json.load(open('/tmp/products.json'))
+          chosen=None
+          for p in a:
+              sizes=p.get('sizes') or []
+              inv=p.get('inventory') or {}
+              managed=bool(p.get('stock_managed'))
+              if not sizes: continue
+              if not managed:
+                  chosen=(p,sizes[0]); break
+              for size in sizes:
+                  if int(inv.get(size,0) or 0)>0:
+                      chosen=(p,size); break
+              if chosen: break
+          if chosen:
+              p,size=chosen
+              open('/tmp/id','w').write(str(p['id']))
+              open('/tmp/size','w').write(str(size))
+              open('/tmp/has-stock','w').write('1')
+              print('Producto vendible:',p['name'],'id=',p['id'],'talle=',size)
+          else:
+              open('/tmp/has-stock','w').write('0')
+              print('Sin stock vendible: se omite creación de pedido, el control de stock está activo')
           PY
+          if [ "$(cat /tmp/has-stock)" = "0" ]; then
+            echo "STORE_NO_SELLABLE_STOCK_OK"
+            exit 0
+          fi
           ID=$(cat /tmp/id); SIZE=$(cat /tmp/size)
           curl -sS -D /tmp/headers -o /tmp/body -X POST "$API/api/store/orders/submit" \
             --data-urlencode "buyer_name=PRUEBA AUTOMATICA DEFE" \
@@ -43,7 +100,6 @@ jobs:
             --data-urlencode "buyer_category=TEST" \
             --data-urlencode "buyer_note=Smoke test automático GitHub Actions" \
             --data-urlencode "items=[{\"product_id\":$ID,\"size\":\"$SIZE\",\"qty\":1}]"
-          cat /tmp/headers
           STATUS=$(head -1 /tmp/headers | awk '{print $2}')
           test "$STATUS" = "302" -o "$STATUS" = "303" -o "$STATUS" = "307" -o "$STATUS" = "200"
           grep -i '^location:.*wa.me\|^location:.*whatsapp' /tmp/headers || { echo 'Falta redirección a WhatsApp'; cat /tmp/body; exit 1; }
