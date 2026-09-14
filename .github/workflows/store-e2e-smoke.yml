@@ -2,6 +2,14 @@ name: Probar Tienda end-to-end
 on:
   push:
     branches: [main]
+    paths:
+      - 'app/store_v5.py'
+      - 'app/store_submit.py'
+      - 'app/static/store-*.js'
+      - 'store-checkout-interceptor.js'
+      - 'web-store-auth-sync.js'
+      - 'web-ui-hotfix.js'
+      - '.github/workflows/store-e2e-smoke.yml'
   workflow_dispatch:
 permissions:
   contents: read
