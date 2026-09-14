@@ -1,13 +1,6 @@
 name: Build Netlify dist temporal
 
 on:
-  push:
-    paths:
-      - '.github/workflows/build-netlify-dist.yml'
-      - 'web-fefi-dedupe.js'
-      - 'web-ui-hotfix.js'
-      - 'netlify-build.sh'
-      - 'netlify.toml'
   workflow_dispatch:
 
 permissions:
