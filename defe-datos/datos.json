@@ -1,6 +1,6 @@
 {
   "club": "DEF. DE SANTOS LUGARES",
-  "actualizado": "2026-09-14T12:37:50.190Z",
+  "actualizado": "2026-09-14T16:31:14.270Z",
   "ligas": [
     {
       "id": "fefi",
@@ -8,7 +8,7 @@
       "torneo": "Clausura 2026 · Zona H",
       "fuente": "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/",
       "conectada": true,
-      "actualizado": "2026-09-14T12:37:53.655Z",
+      "actualizado": "2026-09-14T16:31:17.706Z",
       "categorias": [
         "2013",
         "2014",
@@ -1347,7 +1347,7 @@
       "torneo": "Junior A · Torneo 2026",
       "fuente": "https://www.futsalargentina.com.ar/fixture.php?cat=1_1",
       "conectada": true,
-      "actualizado": "2026-09-14T12:37:21.234Z",
+      "actualizado": "2026-09-14T16:30:50.498Z",
       "categorias": [
         "Junior A"
       ],
@@ -1477,7 +1477,7 @@
       "torneo": "Argenliga A · Zona 1 · 2026",
       "fuente": "https://www.sofascore.com/es-la/futsal/team/defensores-de-santos-lugares/1214864",
       "conectada": true,
-      "actualizado": "2026-09-14T12:37:50.189Z",
+      "actualizado": "2026-09-14T16:31:14.270Z",
       "categorias": [
         "Primera"
       ],
@@ -1855,7 +1855,7 @@
       "torneo": "Masculino · Elite I | Femenino · Ascenso I · Zona B · Reserva",
       "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026",
       "conectada": true,
-      "actualizado": "2026-09-14T12:37:45.028Z",
+      "actualizado": "2026-09-14T16:31:07.872Z",
       "categorias": [
         "1RA",
         "3RA",
@@ -5522,6 +5522,6 @@
       }
     ],
     "fuente": "https://fefi.com.ar/2026-futbol-sala-mayores-fefi/mayores-b/",
-    "actualizado": "2026-09-14T12:37:50.060Z"
+    "actualizado": "2026-09-14T16:31:14.105Z"
   }
 }
