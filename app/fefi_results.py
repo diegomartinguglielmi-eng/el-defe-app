@@ -133,13 +133,22 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
 
     parsed = parse_fefi_results(html)
     verified = 0
+    provisional = 0
     category_rows = 0
     notifications = 0
 
     for result in parsed:
-        if _norm(result.get("status")) != "VERIFICADO":
+        source_status = _norm(result.get("status"))
+        # FEFI publica primero la fecha como "Previo" con los marcadores ya cargados
+        # y luego la pasa a "Verificado". Para Mi Defe necesitamos mostrar la última
+        # fecha efectivamente jugada, aun mientras la validación oficial está pendiente.
+        if source_status not in {"VERIFICADO", "PREVIO"}:
             continue
-        verified += 1
+        is_verified = source_status == "VERIFICADO"
+        if is_verified:
+            verified += 1
+        else:
+            provisional += 1
 
         round_name = f"Fecha {result['round']}"
         match = db.query(Match).filter(
@@ -157,7 +166,7 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
                 home=result["home"],
                 away=result["away"],
                 source_url=FEFI_URL,
-                source_kind="verified_auto",
+                source_kind="verified_auto" if is_verified else "provisional_auto",
             )
             db.add(match)
             db.flush()
@@ -166,16 +175,19 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
         match.away = result["away"]
         match.home_score = result["points_home"]
         match.away_score = result["points_away"]
+        # La jornada ya fue disputada; "Previo" refiere a la validación de FEFI,
+        # no a que el partido esté pendiente de jugarse.
         match.status = "final"
         match.source_url = FEFI_URL
-        match.source_kind = "verified_auto"
+        match.source_kind = "verified_auto" if is_verified else "provisional_auto"
 
         for idx, category in enumerate(CATEGORIES):
             key = f"FEFI|2026|H|CLAUSURA|F{result['round']}|{category}"
             row = db.query(FefiCategoryResult).filter(FefiCategoryResult.external_key == key).first()
             new_home = result["scores_home"][idx] if idx < len(result["scores_home"]) else None
             new_away = result["scores_away"][idx] if idx < len(result["scores_away"]) else None
-            changed = row is None or row.home_value != new_home or row.away_value != new_away or _norm(row.status) != "VERIFICADO"
+            new_status = "Verificado" if is_verified else "Previo"
+            changed = row is None or row.home_value != new_home or row.away_value != new_away or _norm(row.status) != source_status
 
             if not row:
                 row = FefiCategoryResult(
@@ -191,10 +203,12 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
             row.away = result["away"]
             row.home_value = new_home
             row.away_value = new_away
-            row.status = "Verificado"
+            row.status = new_status
             category_rows += 1
 
-            if changed and _is_recent_match(match):
+            # Las notificaciones de resultado final se envían únicamente cuando
+            # FEFI ya lo marca como Verificado.
+            if is_verified and changed and _is_recent_match(match):
                 body = _result_body(result, idx)
                 exists = db.query(NotificationEvent).filter(
                     NotificationEvent.event_type == "result_final",
@@ -218,12 +232,13 @@ def sync_verified_results(db: Session, html: str | None = None) -> dict:
     db.add(SyncRun(
         source="FEFI_RESULTS",
         status="ok",
-        detail=f"Clausura: {verified} resultados verificados; {category_rows} filas de categoría; {notifications} avisos",
+        detail=f"Clausura: {verified} verificados; {provisional} previos; {category_rows} filas de categoría; {notifications} avisos",
     ))
     db.commit()
     return {
         "tournament": "CLAUSURA",
         "verified_results": verified,
+        "provisional_results": provisional,
         "category_rows": category_rows,
         "notifications": notifications,
     }
