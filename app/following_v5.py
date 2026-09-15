@@ -1,3 +1,5 @@
+import re
+import unicodedata
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from urllib.parse import quote_plus
@@ -10,7 +12,7 @@ from .auth import get_current_user
 from .db import get_db
 from .home_v5 import _canonical
 from .models import Favorite, FefiCategorySchedule, Match, Team
-from .fefi_results import FefiCategoryResult
+from .fefi_results import FefiCategoryResult, sync_verified_results
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 router = APIRouter(prefix="/api/following", tags=["Following"])
@@ -21,8 +23,15 @@ LAAMBA_PROMO_DEFAULT = ["Promocional 2016", "Promocional 2017", "Promocional 201
 ARGENLIGA_INFERIORES = ["3ra", "4ta", "5ta", "6ta", "7ma", "8va", "9na"]
 COMPETITIONS = ["FEFI", "LAAMBA", "ARGENLIGA", "SUPERLIGA"]
 
+ORDINAL_ALIASES = {
+    "1ra": {"1ra", "primera"}, "2da": {"2da", "segunda"}, "3ra": {"3ra", "tercera"},
+    "4ta": {"4ta", "cuarta"}, "5ta": {"5ta", "quinta"}, "6ta": {"6ta", "sexta"},
+    "7ma": {"7ma", "septima"}, "8va": {"8va", "octava"}, "9na": {"9na", "novena"},
+}
+
 class FollowingIn(BaseModel):
     selections: list[str] = []
+
 
 def _clean_key(value: str) -> str | None:
     raw=(value or "").strip()
@@ -30,6 +39,7 @@ def _clean_key(value: str) -> str | None:
     competition,category=raw.split("|",1);competition=competition.strip().upper();category=category.strip()
     if competition not in COMPETITIONS or not category:return None
     return f"{competition}|{category}"
+
 
 def _migrate_legacy(db:Session,user_id:int)->int:
     created=0;rows=db.query(Favorite).filter(Favorite.user_id==user_id,Favorite.favorite_type.in_(LEGACY_TYPES)).all()
@@ -41,12 +51,14 @@ def _migrate_legacy(db:Session,user_id:int)->int:
     if created:db.commit()
     return created
 
+
 def _current(db:Session,user_id:int)->list[str]:
     _migrate_legacy(db,user_id);rows=db.query(Favorite).filter(Favorite.user_id==user_id,Favorite.favorite_type==FOLLOW_TYPE).order_by(Favorite.id).all();out=[]
     for row in rows:
         key=_clean_key(row.favorite_id)
         if key and key not in out:out.append(key)
     return out
+
 
 def _options(db:Session)->dict[str,list[str]]:
     result={c:set() for c in COMPETITIONS}
@@ -73,6 +85,7 @@ def _options(db:Session)->dict[str,list[str]]:
         return (3,999,low)
     return {k:sorted(v,key=sort_key) for k,v in result.items() if v}
 
+
 def _date_parts(value:str|None)->tuple[str|None,str|None]:
     if not value:return None,None
     raw=str(value).strip();date=raw[:10] if len(raw)>=10 else raw;time=None
@@ -82,11 +95,32 @@ def _date_parts(value:str|None)->tuple[str|None,str|None]:
         if len(tail)>=5 and tail[2:3]==":":time=tail[:5]
     return date,time
 
+
 def _is_defe(name:str|None)->bool:
     low=(name or "").lower();return "defensores" in low or low.strip() in {"defe","def. de santos lugares","defensores de sl"}
 
+
 def _maps_url(query:str|None)->str|None:
     return "https://www.google.com/maps/search/?api=1&query="+quote_plus(query) if query else None
+
+
+def _norm(value:str|None)->str:
+    text=unicodedata.normalize("NFKD", str(value or "")).encode("ascii","ignore").decode("ascii").lower()
+    return re.sub(r"[^a-z0-9]+"," ",text).strip()
+
+
+def _category_matches(competition:str, selected:str, division:str|None)->bool:
+    if competition=="FEFI" and selected.isdigit():
+        return _norm(division) in {"zona h","h"}
+    a,b=_norm(selected),_norm(division)
+    if not a or not b:return False
+    if a==b or a in b or b in a:return True
+    if "mayores b" in a and "mayores b" in b:return True
+    for key,aliases in ORDINAL_ALIASES.items():
+        if any(alias in a.split() for alias in aliases) or a==key:
+            if any(alias in b.split() for alias in aliases) or b==key:return True
+    return False
+
 
 def _event_from_match(db:Session,m:Match,competition:str,category:str)->dict:
     date,time=_date_parts(m.date);note=None
@@ -96,18 +130,37 @@ def _event_from_match(db:Session,m:Match,competition:str,category:str)->dict:
     local=_is_defe(m.home);club=m.home or None;venue=(m.venue or "").strip() or None;address=venue
     if not address and competition=="FEFI" and local:address="Ernesto Sábato 3162, Santos Lugares, Buenos Aires"
     rival=m.away if local else m.home
-    return {"match_id":m.id,"competition":competition,"category":category,"selection":f"{competition}|{category}","date":date,"time":time,"rival":rival,"home":m.home,"away":m.away,"local":local,"club":club,"venue":venue,"address":address,"maps_url":_maps_url(address or venue or club),"round_name":m.round_name,"status":m.status,"note":note,"source_url":m.source_url}
+    return {"available":True,"match_id":m.id,"competition":competition,"category":category,"selection":f"{competition}|{category}","date":date,"time":time,"rival":rival,"home":m.home,"away":m.away,"local":local,"club":club,"venue":venue,"address":address,"maps_url":_maps_url(address or venue or club),"round_name":m.round_name,"status":m.status,"note":note,"source_url":m.source_url}
+
 
 def _events_for_selection(db:Session,selection:str,today:str)->list[dict]:
     competition,category=selection.split("|",1);rows=_canonical(db.query(Match).filter(Match.competition==competition).all());candidates=[]
     for m in rows:
         date,_=_date_parts(m.date)
         if not date or date<today or (m.status or "").lower()=="final" or (m.home_score is not None and m.away_score is not None):continue
-        if competition=="FEFI" and category.isdigit():
-            if (m.division or "").lower() not in {"zona h","h"}:continue
-        elif (m.division or "").strip().lower()!=category.strip().lower():continue
+        if not _category_matches(competition,category,m.division):continue
+        if not (_is_defe(m.home) or _is_defe(m.away)):continue
         candidates.append(_event_from_match(db,m,competition,category))
     candidates.sort(key=lambda x:((x["date"] or "9999-99-99"),(x["time"] or "99:99"),x["match_id"]));return candidates
+
+
+def _round_number(value:str|None)->int:
+    m=re.search(r"(\d+)",str(value or ""));return int(m.group(1)) if m else 0
+
+
+def _refresh_fefi_if_stale(db:Session)->None:
+    latest_row=db.query(FefiCategoryResult).filter(FefiCategoryResult.external_key.like("%|CLAUSURA|%"))\
+        .order_by(FefiCategoryResult.round_number.desc()).first()
+    latest_result_round=latest_row.round_number if latest_row else 0
+    final_matches=[]
+    for m in _canonical(db.query(Match).filter(Match.competition=="FEFI").all()):
+        if _norm(m.division) not in {"zona h","h"}:continue
+        if (m.status or "").lower()=="final" or (m.home_score is not None and m.away_score is not None):final_matches.append(m)
+    latest_match_round=max((_round_number(m.round_name) for m in final_matches),default=0)
+    if latest_match_round>latest_result_round:
+        try:sync_verified_results(db)
+        except Exception:db.rollback()
+
 
 def _recent_fefi_baby(db:Session,category:str)->dict|None:
     row=db.query(FefiCategoryResult).filter(
@@ -115,31 +168,30 @@ def _recent_fefi_baby(db:Session,category:str)->dict|None:
         FefiCategoryResult.external_key.like("%|CLAUSURA|%"),
     ).order_by(FefiCategoryResult.round_number.desc(),FefiCategoryResult.id.desc()).first()
     if not row:return None
-    match=db.query(Match).filter(
-        Match.competition=="FEFI",
-        Match.division=="Zona H",
-        Match.round_name==f"Fecha {row.round_number}",
-    ).order_by(Match.id.desc()).first()
+    matches=_canonical(db.query(Match).filter(Match.competition=="FEFI").all())
+    match=next((m for m in sorted(matches,key=lambda x:x.id,reverse=True)
+                if _norm(m.division) in {"zona h","h"} and _round_number(m.round_name)==row.round_number
+                and {_norm(m.home),_norm(m.away)}=={_norm(row.home),_norm(row.away)}),None)
     date,_=_date_parts(match.date if match else None)
     local=_is_defe(row.home);rival=row.away if local else row.home
     return {
-        "competition":"FEFI","category":category,"selection":f"FEFI|{category}",
+        "available":True,"competition":"FEFI","category":category,"selection":f"FEFI|{category}",
         "date":date,"round_name":f"Fecha {row.round_number}","home":row.home,"away":row.away,
         "home_score":row.home_value,"away_score":row.away_value,"local":local,"rival":rival,
         "status":row.status,"source_url":match.source_url if match else None,
     }
+
 
 def _recent_match(db:Session,competition:str,category:str)->dict|None:
     rows=_canonical(db.query(Match).filter(Match.competition==competition).all());candidates=[]
     for m in rows:
         if not (_is_defe(m.home) or _is_defe(m.away)):continue
         if (m.status or "").lower()!="final" and not(m.home_score is not None and m.away_score is not None):continue
-        if competition=="FEFI" and category.isdigit():continue
-        if (m.division or "").strip().lower()!=category.strip().lower():continue
+        if not _category_matches(competition,category,m.division):continue
         date,_=_date_parts(m.date)
         local=_is_defe(m.home);rival=m.away if local else m.home
         candidates.append({
-            "competition":competition,"category":category,"selection":f"{competition}|{category}",
+            "available":True,"competition":competition,"category":category,"selection":f"{competition}|{category}",
             "date":date,"round_name":m.round_name,"home":m.home,"away":m.away,
             "home_score":m.home_score,"away_score":m.away_score,"local":local,"rival":rival,
             "status":m.status,"source_url":m.source_url,"match_id":m.id,
@@ -147,18 +199,29 @@ def _recent_match(db:Session,competition:str,category:str)->dict|None:
     candidates.sort(key=lambda x:((x.get("date") or "0000-00-00"),x.get("match_id") or 0),reverse=True)
     return candidates[0] if candidates else None
 
+
 def _recent_for_selection(db:Session,selection:str)->dict|None:
     competition,category=selection.split("|",1)
     if competition=="FEFI" and category.isdigit():return _recent_fefi_baby(db,category)
     return _recent_match(db,competition,category)
 
+
+def _empty_item(selection:str,kind:str)->dict:
+    competition,category=selection.split("|",1)
+    return {"available":False,"competition":competition,"category":category,"selection":selection,
+            "date":None,"time":None,"round_name":None,"home":None,"away":None,"home_score":None,
+            "away_score":None,"local":None,"rival":None,"status":"unavailable","kind":kind}
+
+
 @router.get("/options")
 def following_options(db:Session=Depends(get_db)):
     grouped=_options(db);return {"competitions":[{"competition":comp,"categories":grouped.get(comp,[])} for comp in COMPETITIONS if grouped.get(comp)]}
 
+
 @router.get("/me")
 def get_following(db:Session=Depends(get_db),user=Depends(get_current_user)):
     selections=_current(db,user.id);return {"selections":selections,"count":len(selections)}
+
 
 @router.put("/me")
 def set_following(payload:FollowingIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
@@ -170,20 +233,22 @@ def set_following(payload:FollowingIn,db:Session=Depends(get_db),user=Depends(ge
     for key in clean:db.add(Favorite(user_id=user.id,favorite_type=FOLLOW_TYPE,favorite_id=key))
     db.commit();return {"ok":True,"selections":clean,"count":len(clean)}
 
+
 @router.get("/next")
-def next_followed(limit:int=10,db:Session=Depends(get_db),user=Depends(get_current_user)):
+def next_followed(limit:int=30,db:Session=Depends(get_db),user=Depends(get_current_user)):
     limit=max(1,min(limit,30));selections=_current(db,user.id);today=datetime.now(AR_TZ).date().isoformat();events=[]
-    for selection in selections:events.extend(_events_for_selection(db,selection,today))
-    first_by_selection={}
-    for event in events:first_by_selection.setdefault(event["selection"],event)
-    ordered=sorted(first_by_selection.values(),key=lambda x:((x["date"] or "9999-99-99"),(x["time"] or "99:99"),x["competition"],x["category"]))
-    return {"today":today,"selections":selections,"events":ordered[:limit]}
+    for selection in selections:
+        found=_events_for_selection(db,selection,today)
+        events.append(found[0] if found else _empty_item(selection,"next"))
+    return {"today":today,"selections":selections,"events":events[:limit]}
+
 
 @router.get("/recent")
-def recent_followed(limit:int=12,db:Session=Depends(get_db),user=Depends(get_current_user)):
-    limit=max(1,min(limit,30));selections=_current(db,user.id);results=[]
+def recent_followed(limit:int=30,db:Session=Depends(get_db),user=Depends(get_current_user)):
+    limit=max(1,min(limit,30));selections=_current(db,user.id)
+    if any(s.startswith("FEFI|") and s.split("|",1)[1].isdigit() for s in selections):_refresh_fefi_if_stale(db)
+    results=[]
     for selection in selections:
         item=_recent_for_selection(db,selection)
-        if item:results.append(item)
-    results.sort(key=lambda x:((x.get("date") or "0000-00-00"),x.get("competition") or "",x.get("category") or ""),reverse=True)
+        results.append(item if item else _empty_item(selection,"recent"))
     return {"selections":selections,"results":results[:limit]}
