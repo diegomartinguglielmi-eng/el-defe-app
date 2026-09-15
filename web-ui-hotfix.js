@@ -1,7 +1,7 @@
-// El Defe · UX hotfix 2026-09-13 v6: ingreso + sesión operativa
+// El Defe · UX hotfix 2026-09-15 v7: ingreso + sesión operativa
 (() => {
   const API='https://el-defe-v5-production.up.railway.app';
-  const MARK='DEFE_UI_HOTFIX_20260912_V5_LOGIN_ONLY';
+  const MARK='DEFE_UI_HOTFIX_20260915_V7_LOGIN_FIX';
 
   function tokenRole(token){try{const p=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return String(JSON.parse(atob(p.padEnd(Math.ceil(p.length/4)*4,'='))).role||'').toLowerCase()}catch(_){return ''}}
   function closeLogin(){document.querySelector('[data-defe-login-modal]')?.remove();}
