@@ -6,6 +6,7 @@ from .pending import run_fefi_pending_sync, FefiPendingChange
 from .fefi_results import sync_verified_results
 from .fefi_mayores import sync_fefi_mayores_b
 from .superliga_sync import sync_superliga
+from .argenliga_sync import sync_argenliga
 from .sync import sync_laamba
 from .data_quality import build_data_quality
 from .notification_reminders import run as run_notification_reminders
@@ -65,11 +66,13 @@ if __name__ == "__main__":
 
     db = SessionLocal()
     try:
-        # Keep every structurally automatable competition fresh on the same
-        # four-hour production cadence. Argenliga remains assisted/manual.
+        # Todas las competencias con fuente pública automatizable se refrescan
+        # cada cuatro horas. Si una fuente falla, cada sincronizador conserva
+        # el último estado válido en vez de borrar datos de producción.
         output["laamba"] = sync_laamba(db)
         output["fefi_mayores_b"] = sync_fefi_mayores_b(db)
         output["superliga"] = sync_superliga(db)
+        output["argenliga"] = sync_argenliga(db)
         if not result.get("ok"):
             output["source_alert_created"] = _create_source_alert_after_two_failures(db)
         else:
@@ -77,8 +80,6 @@ if __name__ == "__main__":
             output.update(sync_verified_results(db))
             output["source_health"] = "ok"
 
-        # Produce a read-only quality snapshot on every sync so production
-        # inconsistencies can be diagnosed from logs without touching the DB.
         try:
             output["data_quality"] = build_data_quality(db)
         except Exception as exc:
