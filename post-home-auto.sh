@@ -19,5 +19,5 @@ p.write_text(s)
 PY
 
 grep -F "web-home-news-${SHA}.js" "$HTML"
-grep -F "DEFE_HOME_NEWS_AUTO_V1" "$DST"
-echo "Novedades automáticas + icono Competencias integrados"
+grep -F "DEFE_HOME_NEWS_AUTO_V2" "$DST"
+echo "Novedades automáticas V2 + icono Competencias integrados"
