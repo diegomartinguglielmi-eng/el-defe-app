@@ -1,4 +1,4 @@
-// DEFE_HOME_NEWS_AUTO_V3
+// DEFE_HOME_NEWS_AUTO_V4
 (function(){
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
   const ymd=d=>{const x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`};
@@ -82,17 +82,13 @@
       const c=newsForMatch(m);if(c)candidates.push(c);
     }
     candidates.push(...streakCandidates(data));
-
-    // Primero recencia; a igual recencia, importancia deportiva.
     candidates.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||(+b.importance||0)-(+a.importance||0));
 
-    // Garantizar presencia de todas las competencias con datos recientes antes de repetir liga.
     const cards=[],usedTitles=new Set(),usedLeagues=new Set();
     for(const c of candidates){
       if(usedTitles.has(c.title)||usedLeagues.has(c.leagueKey))continue;
       cards.push(c);usedTitles.add(c.title);usedLeagues.add(c.leagueKey);
     }
-    // Después permitir noticias adicionales realmente destacadas (rachas, goleadas) aunque repitan liga.
     for(const c of candidates){
       if(cards.length>=6)break;
       if(usedTitles.has(c.title))continue;
@@ -125,7 +121,7 @@
   function ensureStyle(){
     if(document.getElementById('defe-auto-news-style'))return;
     const st=document.createElement('style');st.id='defe-auto-news-style';st.textContent=`
-      .defe-auto-news-wrap{margin-top:18px;margin-bottom:22px}.defe-auto-news-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.defe-auto-news-head h2{margin:0;color:#102f57;font-size:22px}.defe-auto-news-fresh{font-size:11px;color:#64748b;display:flex;align-items:center;gap:6px}.defe-auto-news-fresh:before{content:'';width:8px;height:8px;border-radius:50%;background:#22c55e}.defe-auto-news-grid{display:grid;grid-template-columns:repeat(6,minmax(230px,1fr));gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:3px}.defe-auto-news-card{scroll-snap-align:start;background:#fff;border:1px solid #dbe2ea;border-radius:18px;overflow:hidden;min-width:230px;box-shadow:0 4px 16px rgba(15,47,87,.06)}.defe-auto-news-art{height:90px;display:grid;place-items:center;background:linear-gradient(145deg,#0f5132,#198754);position:relative;overflow:hidden}.defe-auto-news-art.streak{background:linear-gradient(145deg,#4c1d95,#7c3aed)}.defe-auto-news-art.highlight{background:linear-gradient(145deg,#075985,#0ea5e9)}.defe-auto-news-art.summary{background:linear-gradient(145deg,#334155,#64748b)}.defe-auto-news-art:after{content:'';position:absolute;inset:auto -15px -35px auto;width:110px;height:110px;border:2px solid rgba(255,255,255,.15);border-radius:50%}.defe-auto-news-art span{font-size:38px}.defe-auto-news-body{padding:12px}.defe-auto-news-badge{display:inline-flex;border-radius:999px;padding:4px 8px;font-weight:800;font-size:9px;letter-spacing:.35px}.defe-auto-news-eye{margin-top:9px;color:#0b3a7a;font-size:10px;font-weight:800}.defe-auto-news-body h3{font-size:16px;line-height:1.15;color:#102f57;margin:5px 0}.defe-auto-news-body p{font-size:12px;line-height:1.35;color:#718096;margin:0;min-height:48px}.defe-auto-news-body button{margin-top:10px;width:100%;border:0;background:#eef5ff;color:#0b3a7a;border-radius:999px;padding:8px 11px;font-weight:800;text-align:left;display:flex;justify-content:space-between}.defe-goal-nav svg,.defe-goal-nav img{display:none!important}.defe-goal-nav .defe-goal-icon{display:block!important;width:25px;height:25px;margin:0 auto 3px;background-size:contain;background-position:center;background-repeat:no-repeat;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none' stroke='%230b3a7a' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 14h44v34M10 14v34M10 48l9-7M54 48l-9-7M17 19l6 22M47 19l-6 22M23 25h18M20 34h24'/%3E%3Ccircle cx='32' cy='43' r='10'/%3E%3C/svg%3E")}
+      .defe-auto-news-wrap{margin-top:18px;margin-bottom:22px}.defe-auto-news-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.defe-auto-news-head h2{margin:0;color:#102f57;font-size:22px}.defe-auto-news-fresh{font-size:11px;color:#64748b;display:flex;align-items:center;gap:6px}.defe-auto-news-fresh:before{content:'';width:8px;height:8px;border-radius:50%;background:#22c55e}.defe-auto-news-grid{display:grid;grid-template-columns:repeat(6,minmax(230px,1fr));gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding-bottom:3px;overscroll-behavior-x:contain;touch-action:pan-x}.defe-auto-news-card{scroll-snap-align:start;scroll-snap-stop:always;background:#fff;border:1px solid #dbe2ea;border-radius:18px;overflow:hidden;min-width:230px;box-shadow:0 4px 16px rgba(15,47,87,.06)}.defe-auto-news-art{height:90px;display:grid;place-items:center;background:linear-gradient(145deg,#0f5132,#198754);position:relative;overflow:hidden}.defe-auto-news-art.streak{background:linear-gradient(145deg,#4c1d95,#7c3aed)}.defe-auto-news-art.highlight{background:linear-gradient(145deg,#075985,#0ea5e9)}.defe-auto-news-art.summary{background:linear-gradient(145deg,#334155,#64748b)}.defe-auto-news-art:after{content:'';position:absolute;inset:auto -15px -35px auto;width:110px;height:110px;border:2px solid rgba(255,255,255,.15);border-radius:50%}.defe-auto-news-art span{font-size:38px}.defe-auto-news-body{padding:12px}.defe-auto-news-badge{display:inline-flex;border-radius:999px;padding:4px 8px;font-weight:800;font-size:9px;letter-spacing:.35px}.defe-auto-news-eye{margin-top:9px;color:#0b3a7a;font-size:10px;font-weight:800}.defe-auto-news-body h3{font-size:16px;line-height:1.15;color:#102f57;margin:5px 0}.defe-auto-news-body p{font-size:12px;line-height:1.35;color:#718096;margin:0;min-height:48px}.defe-auto-news-body button{margin-top:10px;width:100%;border:0;background:#eef5ff;color:#0b3a7a;border-radius:999px;padding:8px 11px;font-weight:800;text-align:left;display:flex;justify-content:space-between}.defe-goal-nav svg,.defe-goal-nav img{display:none!important}.defe-goal-nav .defe-goal-icon{display:block!important;width:25px;height:25px;margin:0 auto 3px;background-size:contain;background-position:center;background-repeat:no-repeat;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none' stroke='%230b3a7a' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 14h44v34M10 14v34M10 48l9-7M54 48l-9-7M17 19l6 22M47 19l-6 22M23 25h18M20 34h24'/%3E%3Ccircle cx='32' cy='43' r='10'/%3E%3C/svg%3E")}
       @media(max-width:700px){.defe-auto-news-grid{grid-template-columns:repeat(6,82%)}.defe-auto-news-head h2{font-size:20px}}
     `;document.head.appendChild(st);
   }
@@ -136,6 +132,10 @@
   }
   function openCompetencias(){const b=[...document.querySelectorAll('button,a')].find(x=>/Competencias/i.test((x.textContent||'').trim()));if(b){b.click();return}if(typeof window.nav==='function')window.nav('matches');else if(typeof window.show==='function')window.show('matches')}
 
+  function renderMarkup(cards){
+    return cards.length?`<div class="defe-auto-news-head"><h2>Novedades</h2><span class="defe-auto-news-fresh">Lo más nuevo de todas las competencias</span></div><div class="defe-auto-news-grid">${cards.map(card).join('')}</div>`:`<div class="defe-auto-news-head"><h2>Novedades</h2><span class="defe-auto-news-fresh">Actualizado automáticamente</span></div><div style="color:#718096;font-size:13px;padding:8px 0">Todavía no hay resultados nuevos para destacar.</div>`;
+  }
+
   async function render(){
     ensureStyle();patchNav();
     let data;try{const r=await fetch('/el-defe-app/datos.json',{cache:'no-store'});if(!r.ok)throw new Error();data=await r.json()}catch{return}
@@ -143,11 +143,26 @@
     const original=findNewsSection();if(!original)return;
     original.style.display='none';
     let host=document.getElementById('defe-auto-news');if(!host){host=document.createElement('section');host.id='defe-auto-news';host.className='defe-auto-news-wrap';original.insertAdjacentElement('afterend',host)}
-    host.innerHTML=cards.length?`<div class="defe-auto-news-head"><h2>Novedades</h2><span class="defe-auto-news-fresh">Lo más nuevo de todas las competencias</span></div><div class="defe-auto-news-grid">${cards.map(card).join('')}</div>`:`<div class="defe-auto-news-head"><h2>Novedades</h2><span class="defe-auto-news-fresh">Actualizado automáticamente</span></div><div style="color:#718096;font-size:13px;padding:8px 0">Todavía no hay resultados nuevos para destacar.</div>`;
+    const signature=JSON.stringify(cards.map(c=>[c.kind,c.leagueKey,c.title,c.body,c.date]));
+    if(host.dataset.newsSignature===signature)return;
+    const oldGrid=host.querySelector('.defe-auto-news-grid');
+    const oldScroll=oldGrid?.scrollLeft||0;
+    host.innerHTML=renderMarkup(cards);
+    host.dataset.newsSignature=signature;
+    const newGrid=host.querySelector('.defe-auto-news-grid');
+    if(newGrid&&oldScroll>0)requestAnimationFrame(()=>{newGrid.scrollLeft=oldScroll});
   }
 
   window.defeOpenCompetencias=openCompetencias;window.defeRefreshAutoNews=render;
-  let busy=false;const kick=()=>{if(busy)return;busy=true;setTimeout(()=>{busy=false;render()},120)};
+  let busy=false;const kick=()=>{if(busy)return;busy=true;setTimeout(()=>{busy=false;render()},180)};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{render();setTimeout(render,900)},{once:true});else{render();setTimeout(render,900)}
-  const obs=new MutationObserver(kick);obs.observe(document.documentElement,{subtree:true,childList:true});document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
+  const obs=new MutationObserver(muts=>{
+    const external=muts.some(m=>{
+      const t=m.target instanceof Element?m.target:m.target?.parentElement;
+      return !t?.closest?.('#defe-auto-news');
+    });
+    if(external)kick();
+  });
+  obs.observe(document.documentElement,{subtree:true,childList:true});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
 })();
