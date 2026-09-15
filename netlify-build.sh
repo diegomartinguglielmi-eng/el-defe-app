@@ -54,6 +54,7 @@ FOLLOWING="web-following-overlay-${SHA}.js"
 MATCHES="matches-explorer-${SHA}.js"
 MATCHAUTH="superliga-ui-${SHA}.js"
 UIHOTFIX="web-ui-hotfix-${SHA}.js"
+STOREADMINOVERLAY="web-store-admin-overlay-${SHA}.js"
 FEFIDEDUPE="web-fefi-dedupe-${SHA}.js"
 PICKUPHARDENING="store-pickup-hardening-${SHA}.js"
 ORDERSAFETY="store-order-safety-${SHA}.js"
@@ -70,6 +71,7 @@ cp web-following-overlay.js "defe-web-build/dist/${FOLLOWING}"
 cp app/static/matches-explorer.js "defe-web-build/dist/${MATCHES}"
 cp app/static/superliga-ui.js "defe-web-build/dist/${MATCHAUTH}"
 cp web-ui-hotfix.js "defe-web-build/dist/${UIHOTFIX}"
+cp web-store-admin-overlay.js "defe-web-build/dist/${STOREADMINOVERLAY}"
 cp web-fefi-dedupe.js "defe-web-build/dist/${FEFIDEDUPE}"
 cp app/static/store-pickup-hardening.js "defe-web-build/dist/${PICKUPHARDENING}"
 cp app/static/store-order-safety.js "defe-web-build/dist/${ORDERSAFETY}"
@@ -80,7 +82,7 @@ cp push-sw.js defe-web-build/dist/push-sw.js
 cp manifest.webmanifest defe-web-build/dist/manifest.webmanifest
 cp mobile/assets/icon.png defe-web-build/dist/icon.png
 
-sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${MATCHAUTH}\"></script><script src=\"./${UIHOTFIX}\"></script><script src=\"./${FEFIDEDUPE}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${FOLLOWING}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
+sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${MATCHAUTH}\"></script><script src=\"./${UIHOTFIX}\"></script><script src=\"./${STOREADMINOVERLAY}\"></script><script src=\"./${FEFIDEDUPE}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${FOLLOWING}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
 
 sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
 echo "// inert" > defe-web-build/dist/sw.js
@@ -115,8 +117,8 @@ HDR
 # Validaciones informativas: no deben bloquear el deploy temporal.
 set +e
 grep -F "web-ui-hotfix-${SHA}.js" defe-web-build/dist/index.html
-grep -F "DEFE_UI_HOTFIX_20260912_V5_LOGIN_ONLY" "defe-web-build/dist/${UIHOTFIX}"
+grep -F "web-store-admin-overlay-${SHA}.js" defe-web-build/dist/index.html
 grep -F "DEFE_COMPETENCIAS_LAYOUT_V5" "defe-web-build/dist/${FEFIDEDUPE}"
 set -e
 
-echo "Netlify build listo: navegación estabilizada + filtros competencias V5 + checkout nativo V5 + Tienda + Sponsors"
+echo "Netlify build listo: navegación estabilizada + filtros competencias V5 + checkout nativo V5 + panel Tienda + Sponsors"
