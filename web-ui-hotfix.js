@@ -1,7 +1,7 @@
-// El Defe · UX hotfix 2026-09-15 v11: sesión visible y estable
+// El Defe · UX hotfix 2026-09-15 v12: sesión visible sin loop de render
 (() => {
   const API='https://el-defe-v5-production.up.railway.app';
-  const MARK='DEFE_UI_HOTFIX_20260915_V11_SESSION_VISIBLE';
+  const MARK='DEFE_UI_HOTFIX_20260915_V12_SESSION_STABLE';
   const KEYS={token:'defe_auth_token',token2:'defe_token',user:'defe_auth_user',role:'defe_role'};
 
   function tokenRole(token){
@@ -24,22 +24,22 @@
   function clearSession(){Object.values(KEYS).forEach(k=>localStorage.removeItem(k))}
   function closeLogin(){document.querySelector('[data-defe-login-modal]')?.remove()}
   function closeAccount(){document.querySelector('[data-defe-account-modal]')?.remove()}
-
   function sessionLabel(){return getRole()==='tienda'?'Tienda':'Mi cuenta'}
 
   function syncSessionButtons(){
     const logged=!!getToken();
+    const desired=logged?sessionLabel():'Ingresar';
     document.querySelectorAll('button,a,[role="button"]').forEach(el=>{
       if(el.closest('[data-defe-login-modal],[data-defe-account-modal]'))return;
       const txt=String(el.textContent||'').trim().replace(/\s+/g,' ');
       if(!/^(Ingresar|Mi cuenta|Tienda)$/i.test(txt))return;
+      if(txt!==desired)el.textContent=desired;
       if(logged){
-        el.textContent=sessionLabel();
         el.dataset.defeSessionButton='1';
-        el.setAttribute('aria-label','Sesión activa: '+roleLabel(getRole()));
-        el.setAttribute('title','Sesión activa');
-      } else if(el.dataset.defeSessionButton){
-        el.textContent='Ingresar';
+        const aria='Sesión activa: '+roleLabel(getRole());
+        if(el.getAttribute('aria-label')!==aria)el.setAttribute('aria-label',aria);
+        if(el.getAttribute('title')!=='Sesión activa')el.setAttribute('title','Sesión activa');
+      }else{
         delete el.dataset.defeSessionButton;
         el.removeAttribute('title');
       }
@@ -127,8 +127,9 @@
     installIntercept();
     syncSessionButtons();
     refreshProfile();
-    const obs=new MutationObserver(()=>syncSessionButtons());
-    obs.observe(document.body,{childList:true,subtree:true});
+    // Sin MutationObserver: evitamos un ciclo de mutaciones que podía bloquear la PWA.
+    setTimeout(syncSessionButtons,500);
+    setTimeout(syncSessionButtons,1500);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
