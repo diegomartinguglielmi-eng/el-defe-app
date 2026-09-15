@@ -1,9 +1,9 @@
-// El Defe · Mi Defe v1 · reemplaza Planteles por experiencia personalizada
+// El Defe · Mi Defe v2 · acceso central destacado con escudo + experiencia personalizada
 (() => {
   if(window.__defeMiDefeLoaded)return;window.__defeMiDefeLoaded=true;
   const API='https://el-defe-v5-production.up.railway.app';
   const CFG='defe_mi_defe_config_v1';
-  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
   function jwtFromValue(v){if(!v||typeof v!=='string')return null;const m=v.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(m)return m[0];try{const p=JSON.parse(v);if(p&&typeof p==='object')for(const x of Object.values(p)){const f=jwtFromValue(typeof x==='string'?x:JSON.stringify(x));if(f)return f}}catch(_){}return null}
   function token(){for(const st of [localStorage,sessionStorage])for(let i=0;i<st.length;i++){const t=jwtFromValue(st.getItem(st.key(i)));if(t)return t}return null}
   async function api(path,init={}){const h=new Headers(init.headers||{});const t=token();if(t)h.set('Authorization','Bearer '+t);if(init.body)h.set('Content-Type','application/json');const r=await fetch(API+path,{...init,headers:h,cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.detail||'No se pudo cargar la información');return d}
@@ -13,10 +13,24 @@
 
   const css=document.createElement('style');css.textContent=`
   #defe-following-home{display:none!important}
+  [data-mi-defe-button="1"]{position:relative!important;overflow:visible!important;z-index:5!important;transform:translateY(-7px)!important}
+  [data-mi-defe-button="1"]:before{content:'';position:absolute;left:50%;top:50%;width:62px;height:62px;transform:translate(-50%,-50%);border-radius:22px;background:#fff;box-shadow:0 7px 18px #0b3b7833;border:1px solid #dce7f3;z-index:-1}
+  .md-nav-label{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important;line-height:1!important;min-width:56px!important;overflow:visible!important}
+  .md-nav-shield-wrap{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#0b3b78;box-shadow:0 5px 12px #0b3b7840;border:3px solid #fff;margin-top:-9px}
+  .md-nav-shield{width:33px;height:33px;object-fit:contain;display:block}
+  .md-nav-text{font-size:11px;font-weight:900;color:#0b3b78;white-space:nowrap;margin-top:2px;letter-spacing:-.15px}
   .md-page{position:fixed;inset:0;z-index:2147482000;background:#f3f6fb;color:#17365f;overflow:auto;font-family:inherit}.md-top{position:sticky;top:0;z-index:2;background:#0b3b78;color:#fff;padding:18px 16px 14px;box-shadow:0 2px 10px #0002}.md-toprow{display:flex;align-items:center;justify-content:space-between;gap:12px}.md-title{font-size:27px;font-weight:900}.md-sub{font-size:13px;opacity:.88;margin-top:3px}.md-close,.md-config{border:0;border-radius:12px;padding:10px 12px;font-weight:900}.md-close{background:#ffffff1c;color:#fff;font-size:18px}.md-config{background:#fff;color:#0b3b78}.md-body{padding:16px 16px 96px;max-width:760px;margin:auto}.md-card{background:#fff;border:1px solid #dbe4ef;border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px #0000000d}.md-card h3{margin:0 0 8px;font-size:18px}.md-muted{font-size:12px;color:#64748b}.md-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.md-chip{background:#eef4fb;color:#0b3b78;border-radius:999px;padding:6px 9px;font-size:12px;font-weight:900}.md-event,.md-row{border-top:1px solid #eef2f7;padding:10px 0}.md-event:first-child,.md-row:first-child{border-top:0}.md-kicker{font-size:11px;font-weight:900;color:#0b3b78}.md-main{font-size:15px;font-weight:900;margin-top:2px}.md-meta{font-size:12px;color:#64748b;margin-top:3px}.md-empty{border:1px dashed #cbd5e1;border-radius:13px;padding:12px;color:#64748b;font-size:12px}.md-panel{position:fixed;inset:0;z-index:2147482100;background:#f5f7fb;overflow:auto}.md-panel-head{position:sticky;top:0;background:#0b3b78;color:#fff;padding:16px;display:flex;align-items:center;gap:10px}.md-panel-body{padding:16px 16px 100px;max-width:760px;margin:auto}.md-sec{background:#fff;border:1px solid #dbe4ef;border-radius:16px;padding:14px;margin-bottom:12px}.md-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid #eef2f7}.md-toggle:first-of-type{border-top:0}.md-switch{width:46px;height:26px;border-radius:999px;background:#cbd5e1;position:relative;border:0}.md-switch[data-on="1"]{background:#0b3b78}.md-switch:after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.15s}.md-switch[data-on="1"]:after{left:23px}.md-league{margin:12px 0}.md-league b{font-size:13px}.md-options{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px}.md-option{border:1px solid #cbd5e1;border-radius:999px;background:#fff;padding:7px 10px;font-size:12px;font-weight:800}.md-option[data-on="1"]{background:#0b3b78;color:#fff;border-color:#0b3b78}.md-save{width:100%;border:0;border-radius:13px;background:#0b3b78;color:#fff;padding:13px;font-weight:900;margin-top:8px}
   `;document.head.appendChild(css);
 
-  function renameNav(){document.querySelectorAll('button,a,[role="button"],span,div').forEach(el=>{if(el.childElementCount>2)return;const t=(el.textContent||'').trim();if(/^Planteles?$/i.test(t)){el.textContent='Mi Defe';el.dataset.miDefeNav='1'}})}
+  function decorateNav(el){
+    if(el.querySelector?.('.md-nav-shield'))return;
+    el.dataset.miDefeNav='1';
+    el.classList.add('md-nav-label');
+    el.innerHTML='<span class="md-nav-shield-wrap"><img class="md-nav-shield" src="/el-defe-app/icon.png" alt=""></span><span class="md-nav-text">Mi Defe</span>';
+    const clickable=el.closest('button,a,[role="button"]')||el.parentElement;
+    if(clickable){clickable.dataset.miDefeButton='1';clickable.dataset.miDefeNav='1';}
+  }
+  function renameNav(){document.querySelectorAll('button,a,[role="button"],span,div').forEach(el=>{if(el.closest('#defe-mi-defe,#defe-mi-defe-config'))return;if(el.childElementCount>2)return;const t=(el.textContent||'').trim();if(!/^(Planteles?|Mi Defe)$/i.test(t))return;const r=el.getBoundingClientRect();if(r.bottom<window.innerHeight-150)return;decorateNav(el)})}
   function fmtDate(raw){if(!raw)return 'Fecha a confirmar';try{const [y,m,d]=raw.split('-').map(Number);return new Intl.DateTimeFormat('es-AR',{weekday:'short',day:'2-digit',month:'2-digit'}).format(new Date(y,m-1,d))}catch(_){return raw}}
   function selectionText(){return state.selections.length?`<div class="md-chips">${state.selections.map(x=>`<span class="md-chip">${esc(x.replace('|',' · '))}</span>`).join('')}</div>`:'<div class="md-empty">Todavía no elegiste ligas o categorías para seguir.</div>'}
   function nextHtml(){if(!state.config.next)return'';const list=state.events.slice(0,4);return `<section class="md-card"><h3>Lo próximo</h3><div class="md-muted">Tus próximos partidos y fechas.</div>${list.length?list.map(e=>`<div class="md-event"><div class="md-kicker">${esc(e.competition)} · ${esc(e.category)}</div><div class="md-main">${esc(e.rival||'Rival a confirmar')}</div><div class="md-meta">${esc(fmtDate(e.date))} · ${esc(e.time||'Hora a confirmar')} · ${e.local?'Local':'Visitante'}</div></div>`).join(''):'<div class="md-empty" style="margin-top:10px">No hay próximas fechas publicadas para tus selecciones.</div>'}</section>`}
@@ -30,5 +44,5 @@
   function renderPage(){const old=document.getElementById('defe-mi-defe');if(!old)return;const scroll=old.scrollTop;const w=document.createElement('div');w.innerHTML=pageHtml();old.replaceWith(w.firstElementChild);const n=document.getElementById('defe-mi-defe');n.scrollTop=scroll;n.querySelector('[data-md-close]').onclick=()=>n.remove();n.querySelector('[data-md-config]').onclick=openConfig}
   async function load(){if(state.loading)return;state.loading=true;try{const jobs=[];if(token())jobs.push(Promise.all([api('/api/following/options'),api('/api/following/me'),api('/api/following/next?limit=12')]).then(([o,m,n])=>{state.options=o.competitions||[];state.selections=m.selections||[];state.events=n.events||[]}));jobs.push(api('/api/leagues/matches').then(x=>state.matches=Array.isArray(x)?x:[]).catch(()=>{}));jobs.push(api('/api/news').then(x=>state.news=Array.isArray(x)?x:(x.items||x.news||[])).catch(()=>{}));await Promise.all(jobs);renderPage()}finally{state.loading=false}}
   document.addEventListener('click',e=>{const el=e.target.closest('[data-mi-defe-nav]');if(!el)return;e.preventDefault();e.stopImmediatePropagation();open()},true);
-  setInterval(renameNav,1200);setTimeout(renameNav,100);
+  setInterval(renameNav,900);setTimeout(renameNav,80);
 })();
