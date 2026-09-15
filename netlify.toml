@@ -1,6 +1,6 @@
-# redeploy 2026-09-12 competencias filtros v4 validado
+# redeploy 2026-09-15 novedades automáticas + icono competencias
 [build]
-  command = "bash netlify-build.sh"
+  command = "bash netlify-build.sh && bash post-home-auto.sh"
   publish = "netlify-publish"
 
 [build.environment]
