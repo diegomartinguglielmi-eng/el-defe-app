@@ -40,6 +40,7 @@
   function installLoginIntercept(){
     document.addEventListener('click',e=>{
       const el=e.target.closest('button,a,[role="button"]');if(!el)return;
+      if(el.closest('[data-defe-login-modal]'))return;
       const txt=String(el.textContent||'').trim().replace(/\s+/g,' ');
       if(!/^Ingresar$/i.test(txt))return;
       e.preventDefault();e.stopImmediatePropagation();openLogin();
