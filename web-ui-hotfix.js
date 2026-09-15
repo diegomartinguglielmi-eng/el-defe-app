@@ -1,10 +1,32 @@
-// El Defe · UX hotfix 2026-09-15 v7: ingreso + sesión operativa
+// El Defe · UX hotfix 2026-09-15 v8: login + estado visible de sesión
 (() => {
   const API='https://el-defe-v5-production.up.railway.app';
-  const MARK='DEFE_UI_HOTFIX_20260915_V7_LOGIN_FIX';
+  const MARK='DEFE_UI_HOTFIX_20260915_V8_SESSION_UI';
 
   function tokenRole(token){try{const p=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return String(JSON.parse(atob(p.padEnd(Math.ceil(p.length/4)*4,'='))).role||'').toLowerCase()}catch(_){return ''}}
+  function getToken(){return localStorage.getItem('defe_auth_token')||localStorage.getItem('defe_token')||''}
+  function getUser(){try{return JSON.parse(localStorage.getItem('defe_auth_user')||'{}')||{}}catch(_){return {}}}
+  function getRole(){return String(localStorage.getItem('defe_role')||getUser()?.role||tokenRole(getToken())||'').toLowerCase()}
+  function isLogged(){return !!getToken()}
+  function roleLabel(role){if(role==='tienda')return 'Tienda';if(role==='admin')return 'Administrador';if(role==='lector')return 'Usuario';return role?role.charAt(0).toUpperCase()+role.slice(1):'Usuario'}
+
   function closeLogin(){document.querySelector('[data-defe-login-modal]')?.remove();}
+  function closeAccount(){document.querySelector('[data-defe-account-modal]')?.remove();}
+
+  function openAccount(){
+    closeAccount();
+    const user=getUser(),role=getRole();
+    const email=String(user.email||user.username||user.correo||'Sesión activa');
+    const modal=document.createElement('div');
+    modal.dataset.defeAccountModal=MARK;
+    modal.style.cssText='position:fixed;inset:0;z-index:100001;background:rgba(8,28,58,.64);display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML=`<div style="width:min(420px,100%);background:#fff;border-radius:24px;padding:24px;box-shadow:0 24px 60px #0004;color:#17365f"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div><div style="font-size:12px;font-weight:900;letter-spacing:.08em;color:#0b4a8f">SESIÓN ACTIVA</div><h2 style="margin:5px 0 0;font-size:26px">${roleLabel(role)}</h2></div><button data-close aria-label="Cerrar" style="border:0;background:#eef3f8;border-radius:999px;width:38px;height:38px;font-size:20px;color:#17365f">×</button></div><div style="margin:18px 0;padding:14px 16px;background:#f4f8fc;border-radius:14px"><div style="font-size:12px;font-weight:800;color:#718096;margin-bottom:4px">Usuario</div><div style="font-size:15px;font-weight:800;word-break:break-word">${email}</div></div><button data-logout style="width:100%;border:1px solid #d7e0ea;border-radius:13px;padding:13px 16px;background:#fff;color:#17365f;font-weight:900;font-size:15px">Cerrar sesión</button></div>`;
+    document.body.appendChild(modal);
+    modal.querySelector('[data-close]').onclick=closeAccount;
+    modal.querySelector('[data-logout]').onclick=()=>{['defe_auth_token','defe_token','defe_auth_user','defe_role'].forEach(k=>localStorage.removeItem(k));closeAccount();location.reload();};
+    modal.addEventListener('click',e=>{if(e.target===modal)closeAccount();});
+  }
+
   function openLogin(){
     if(document.querySelector('[data-defe-login-modal]'))return;
     const modal=document.createElement('div');
@@ -27,7 +49,7 @@
         const t=data.access_token||'';
         localStorage.setItem('defe_auth_token',t);
         localStorage.setItem('defe_token',t);
-        localStorage.setItem('defe_auth_user',JSON.stringify(data.user||{}));
+        localStorage.setItem('defe_auth_user',JSON.stringify(data.user||{email:String(fd.get('username')||'').trim()}));
         const role=String(data.user?.role||tokenRole(t)||'').toLowerCase();
         if(role)localStorage.setItem('defe_role',role);
         window.defeSyncStoreAuth?.();
@@ -37,16 +59,35 @@
     setTimeout(()=>modal.querySelector('input[name="username"]')?.focus(),50);
   }
 
-  function installLoginIntercept(){
+  function syncSessionButtons(){
+    const logged=isLogged();
+    const role=getRole();
+    document.querySelectorAll('button,a,[role="button"]').forEach(el=>{
+      const txt=String(el.textContent||'').trim().replace(/\s+/g,' ');
+      if(!/^Ingresar$|^Mi cuenta$|^Tienda$/i.test(txt))return;
+      if(el.closest('[data-defe-login-modal],[data-defe-account-modal]'))return;
+      if(logged){el.textContent=role==='tienda'?'Tienda':'Mi cuenta';el.dataset.defeSessionButton='1';el.setAttribute('title','Sesión activa');}
+      else if(el.dataset.defeSessionButton){el.textContent='Ingresar';delete el.dataset.defeSessionButton;}
+    });
+  }
+
+  function installIntercept(){
     document.addEventListener('click',e=>{
       const el=e.target.closest('button,a,[role="button"]');if(!el)return;
-      if(el.closest('[data-defe-login-modal]'))return;
+      if(el.closest('[data-defe-login-modal],[data-defe-account-modal]'))return;
       const txt=String(el.textContent||'').trim().replace(/\s+/g,' ');
+      if(isLogged() && (/^Mi cuenta$/i.test(txt)||/^Tienda$/i.test(txt)||el.dataset.defeSessionButton==='1')){e.preventDefault();e.stopImmediatePropagation();openAccount();return;}
       if(!/^Ingresar$/i.test(txt))return;
       e.preventDefault();e.stopImmediatePropagation();openLogin();
     },true);
   }
 
-  function run(){document.documentElement.dataset.defeUiHotfix=MARK;installLoginIntercept();}
+  function run(){
+    document.documentElement.dataset.defeUiHotfix=MARK;
+    installIntercept();
+    syncSessionButtons();
+    const mo=new MutationObserver(()=>syncSessionButtons());
+    mo.observe(document.body,{childList:true,subtree:true});
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 })();
