@@ -1,7 +1,7 @@
-// El Defe · UX hotfix 2026-09-15 v12: sesión visible sin loop de render
+// El Defe · UX hotfix 2026-09-15 v13: sesión + acceso operativo Tienda
 (() => {
   const API='https://el-defe-v5-production.up.railway.app';
-  const MARK='DEFE_UI_HOTFIX_20260915_V12_SESSION_STABLE';
+  const MARK='DEFE_UI_HOTFIX_20260915_V13_STORE_ACCESS';
   const KEYS={token:'defe_auth_token',token2:'defe_token',user:'defe_auth_user',role:'defe_role'};
 
   function tokenRole(token){
@@ -26,14 +26,19 @@
   function closeAccount(){document.querySelector('[data-defe-account-modal]')?.remove()}
   function sessionLabel(){return getRole()==='tienda'?'Tienda':'Mi cuenta'}
 
+  function isSessionButton(el){
+    if(el?.dataset?.defeSessionButton==='1')return true;
+    const txt=String(el?.textContent||'').trim().replace(/\s+/g,' ');
+    return /^(Ingresar|Mi cuenta)$/i.test(txt);
+  }
+
   function syncSessionButtons(){
     const logged=!!getToken();
     const desired=logged?sessionLabel():'Ingresar';
     document.querySelectorAll('button,a,[role="button"]').forEach(el=>{
       if(el.closest('[data-defe-login-modal],[data-defe-account-modal]'))return;
-      const txt=String(el.textContent||'').trim().replace(/\s+/g,' ');
-      if(!/^(Ingresar|Mi cuenta|Tienda)$/i.test(txt))return;
-      if(txt!==desired)el.textContent=desired;
+      if(!isSessionButton(el))return;
+      if(String(el.textContent||'').trim()!==desired)el.textContent=desired;
       if(logged){
         el.dataset.defeSessionButton='1';
         const aria='Sesión activa: '+roleLabel(getRole());
@@ -42,6 +47,7 @@
       }else{
         delete el.dataset.defeSessionButton;
         el.removeAttribute('title');
+        el.removeAttribute('aria-label');
       }
     });
   }
@@ -61,16 +67,36 @@
     }catch(_){return null}
   }
 
+  function openStoreAdmin(){
+    closeAccount();
+    document.dispatchEvent(new CustomEvent('defe-store-auth-ready',{detail:{role:getRole(),user:getUser()}}));
+    if(typeof window.show==='function'){
+      window.show('admin');
+      setTimeout(()=>window.defeEnsureStoreAdmin?.(),120);
+      setTimeout(()=>window.defeEnsureStoreAdmin?.(),500);
+      return;
+    }
+    const admin=document.getElementById('admin');
+    if(admin){
+      document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));
+      admin.classList.add('on');
+      setTimeout(()=>window.defeEnsureStoreAdmin?.(),120);
+    }
+  }
+
   function openAccount(){
     closeAccount();
     const u=getUser(), role=getRole();
     const email=String(u.email||'Sesión activa');
+    const canManageStore=['tienda','admin','delegado'].includes(role);
     const modal=document.createElement('div');
     modal.dataset.defeAccountModal=MARK;
     modal.style.cssText='position:fixed;inset:0;z-index:100001;background:rgba(8,28,58,.64);display:flex;align-items:center;justify-content:center;padding:20px';
-    modal.innerHTML=`<div style="width:min(420px,100%);background:#fff;border-radius:24px;padding:24px;box-shadow:0 24px 60px #0004;color:#17365f"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div><div style="font-size:12px;font-weight:900;letter-spacing:.08em;color:#16865b">● SESIÓN ACTIVA</div><h2 style="margin:5px 0 0;font-size:27px">${roleLabel(role)}</h2></div><button data-close aria-label="Cerrar" style="border:0;background:#eef3f8;border-radius:999px;width:40px;height:40px;font-size:20px;color:#17365f">×</button></div><div style="margin:18px 0;padding:15px 16px;background:#f4f8fc;border-radius:14px"><div style="font-size:12px;font-weight:800;color:#718096;margin-bottom:4px">Usuario</div><div style="font-size:15px;font-weight:900;word-break:break-word">${email}</div><div style="font-size:12px;color:#718096;margin-top:9px">Perfil: <b>${roleLabel(role)}</b></div></div><button data-logout style="width:100%;border:1px solid #d7e0ea;border-radius:13px;padding:13px 16px;background:#fff;color:#17365f;font-weight:900;font-size:15px">Cerrar sesión</button></div>`;
+    modal.innerHTML=`<div style="width:min(420px,100%);background:#fff;border-radius:24px;padding:24px;box-shadow:0 24px 60px #0004;color:#17365f"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div><div style="font-size:12px;font-weight:900;letter-spacing:.08em;color:#16865b">● SESIÓN ACTIVA</div><h2 style="margin:5px 0 0;font-size:27px">${roleLabel(role)}</h2></div><button data-close aria-label="Cerrar" style="border:0;background:#eef3f8;border-radius:999px;width:40px;height:40px;font-size:20px;color:#17365f">×</button></div><div style="margin:18px 0;padding:15px 16px;background:#f4f8fc;border-radius:14px"><div style="font-size:12px;font-weight:800;color:#718096;margin-bottom:4px">Usuario</div><div style="font-size:15px;font-weight:900;word-break:break-word">${email}</div><div style="font-size:12px;color:#718096;margin-top:9px">Perfil: <b>${roleLabel(role)}</b></div></div>${canManageStore?'<button data-store-admin style="width:100%;border:0;border-radius:13px;padding:14px 16px;background:#0b4a8f;color:#fff;font-weight:900;font-size:15px;margin-bottom:10px">Administrar tienda</button>':''}<button data-logout style="width:100%;border:1px solid #d7e0ea;border-radius:13px;padding:13px 16px;background:#fff;color:#17365f;font-weight:900;font-size:15px">Cerrar sesión</button></div>`;
     document.body.appendChild(modal);
     modal.querySelector('[data-close]').onclick=closeAccount;
+    const manage=modal.querySelector('[data-store-admin]');
+    if(manage)manage.onclick=openStoreAdmin;
     modal.querySelector('[data-logout]').onclick=()=>{clearSession();closeAccount();syncSessionButtons()};
     modal.addEventListener('click',e=>{if(e.target===modal)closeAccount()});
   }
@@ -104,6 +130,7 @@
         await refreshProfile();
         closeLogin();
         syncSessionButtons();
+        document.dispatchEvent(new CustomEvent('defe-store-auth-ready',{detail:{role:getRole(),user:getUser()}}));
         openAccount();
         document.dispatchEvent(new CustomEvent('defe:session-changed',{detail:{logged:true,role:getRole(),user:getUser()}}));
       }catch(err){msg.textContent=String(err?.message||err);submit.disabled=false;submit.textContent='Ingresar';}
@@ -115,8 +142,7 @@
     document.addEventListener('click',e=>{
       const el=e.target.closest('button,a,[role="button"]'); if(!el)return;
       if(el.closest('[data-defe-login-modal],[data-defe-account-modal]'))return;
-      const txt=String(el.textContent||'').trim().replace(/\s+/g,' ');
-      if(!/^(Ingresar|Mi cuenta|Tienda)$/i.test(txt))return;
+      if(!isSessionButton(el))return;
       e.preventDefault();e.stopImmediatePropagation();
       getToken()?openAccount():openLogin();
     },true);
@@ -127,7 +153,6 @@
     installIntercept();
     syncSessionButtons();
     refreshProfile();
-    // Sin MutationObserver: evitamos un ciclo de mutaciones que podía bloquear la PWA.
     setTimeout(syncSessionButtons,500);
     setTimeout(syncSessionButtons,1500);
   }
