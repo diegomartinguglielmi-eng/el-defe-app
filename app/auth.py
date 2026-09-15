@@ -13,6 +13,7 @@ pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2 = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 ALGO="HS256"
 CANONICAL_ADMIN_EMAIL="admin@elde.fe"
+CANONICAL_STORE_EMAIL="store.defesl@gmail.com"
 
 def hash_password(p): return pwd.hash(p)
 def verify_password(p,h): return pwd.verify(p,h)
@@ -23,7 +24,12 @@ def _email(user):
 def create_token(user:User):
     exp=datetime.now(timezone.utc)+timedelta(minutes=settings.access_token_minutes)
     email=_email(user)
-    role="admin" if email==CANONICAL_ADMIN_EMAIL else user.role
+    if email==CANONICAL_ADMIN_EMAIL:
+        role="admin"
+    elif email==CANONICAL_STORE_EMAIL:
+        role="tienda"
+    else:
+        role=user.role
     return jwt.encode({
         "sub":str(user.id),
         "email":email,
@@ -63,11 +69,28 @@ def get_current_user(token:str|None=Depends(oauth2), db:Session=Depends(get_db))
             db.commit(); db.refresh(user)
         return user
 
+    if user is not None and _email(user)==CANONICAL_STORE_EMAIL:
+        changed=False
+        if user.role!="tienda":
+            user.role="tienda"; changed=True
+        if user.is_active is not True:
+            user.is_active=True; changed=True
+        if changed:
+            db.commit(); db.refresh(user)
+        return user
+
     if user is None and role=="admin":
         user=db.query(User).filter(func.lower(func.trim(User.email))==CANONICAL_ADMIN_EMAIL).first()
         if user is not None:
             if user.role!="admin" or user.is_active is not True:
                 user.role="admin"; user.is_active=True; db.commit(); db.refresh(user)
+            return user
+
+    if user is None and role=="tienda":
+        user=db.query(User).filter(func.lower(func.trim(User.email))==CANONICAL_STORE_EMAIL).first()
+        if user is not None:
+            if user.role!="tienda" or user.is_active is not True:
+                user.role="tienda"; user.is_active=True; db.commit(); db.refresh(user)
             return user
 
     if user is None or user.is_active is False:
