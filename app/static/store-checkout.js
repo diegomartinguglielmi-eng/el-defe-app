@@ -7,12 +7,27 @@
  const field=(root,needle)=>{const el=[...root.querySelectorAll('input,textarea')].find(x=>norm(x.placeholder||'').includes(norm(needle)));return String(el?.value||'').trim()};
  async function products(){
    if(productCache)return productCache;
-   const r=await fetch(API+'/api/store/products?checkout=capture-v6',{cache:'no-store'});
+   const r=await fetch(API+'/api/store/products?checkout=capture-v7',{cache:'no-store'});
    if(!r.ok)throw new Error('No pude leer el catálogo de la Tienda.');
    const j=await r.json(); productCache=Array.isArray(j)?j:(j.products||j.items||j.data||[]); return productCache;
  }
  const productName=p=>String(p?.name||p?.nombre||p?.title||p?.product_name||'').trim();
+ const productSlug=p=>norm(p?.slug||p?.id||'');
+ function bySlug(catalog,slug){const n=norm(slug);return catalog.find(p=>productSlug(p)===n)||null}
+ function semanticProduct(catalog,s){
+   const a=norm(s);
+   if(!a)return null;
+   if(a.includes('camiseta')&&(a.includes('titular')||a.includes('suplente')||a.includes('alternativa')||a.includes('2026')))return bySlug(catalog,'camiseta-partido');
+   if(a.includes('short'))return bySlug(catalog,'short-partido');
+   if(a.includes('medias'))return bySlug(catalog,'medias');
+   if(a.includes('remera')&&a.includes('entrenamiento'))return bySlug(catalog,'remera-entrenamiento');
+   if(a.includes('buzo'))return bySlug(catalog,'buzo');
+   if(a.includes('campera'))return bySlug(catalog,'campera');
+   if(a.includes('gorra'))return bySlug(catalog,'gorra');
+   return null;
+ }
  function bestProduct(catalog,s){
+   const semantic=semanticProduct(catalog,s); if(semantic)return semantic;
    const a=norm(s); let best=null,score=0;
    for(const p of catalog){
      const b=norm(productName(p)); if(!b)continue;
@@ -29,7 +44,7 @@
    for(const plus of [...root.querySelectorAll('button')].filter(b=>/^\+$/.test(text(b)))){
      let el=plus.parentElement;
      let best=null;
-     for(let i=0;el&&el!==root&&i<7;i++,el=el.parentElement){
+     for(let i=0;el&&el!==root&&i<8;i++,el=el.parentElement){
        const t=text(el);
        const hasSize=/Talle\s+[^·\s]+/i.test(t);
        const hasMinus=[...el.querySelectorAll('button')].some(b=>/^[-−]$/.test(text(b)));
@@ -43,6 +58,14 @@
      const bs=[...el.querySelectorAll('button')].map(text);
      return bs.some(x=>/^\+$/.test(x))&&bs.some(x=>/^[-−]$/.test(x));
    }).sort((a,b)=>text(a).length-text(b).length);
+ }
+ function productForRow(row,root,catalog){
+   let el=row;
+   for(let i=0;el&&el!==root&&i<8;i++,el=el.parentElement){
+     const p=bestProduct(catalog,text(el));
+     if(p)return p;
+   }
+   return bestProduct(catalog,text(row));
  }
  function parseRow(row,p){
    const t=text(row),sm=t.match(/Talle\s+([^·\s]+)/i); if(!sm)return null;
@@ -59,13 +82,13 @@
  function collectItems(root,catalog){
    const items=[],used=new Set();
    for(const row of compactRows(root)){
-     const rowText=text(row);
-     const p=bestProduct(catalog,rowText);
+     const p=productForRow(row,root,catalog);
      if(!p)continue;
      const it=parseRow(row,p);
      if(!it||!Number.isFinite(it.product_id))continue;
      const allowed=Array.isArray(p.sizes)?p.sizes.map(String):[];
-     if(allowed.length&&!allowed.includes(it.size))continue;
+     if(allowed.length&&!allowed.some(s=>norm(s)===norm(it.size)))continue;
+     const canonical=allowed.find(s=>norm(s)===norm(it.size)); if(canonical)it.size=canonical;
      const k=it.product_id+'|'+it.size;
      if(!used.has(k)){used.add(k);items.push(it)}
    }
@@ -85,5 +108,5 @@
    }catch(e){busy=false;btn.disabled=false;btn.textContent=old;alert(e?.message||'No se pudo registrar el pedido.')}
  }
  document.addEventListener('click',ev=>{const btn=ev.target?.closest?.('button');if(!btn||btn.disabled)return;if(/^Registrar y enviar por WhatsApp$/i.test(text(btn)))checkout(ev,btn)},true);
- window.__DEFE_STORE_CAPTURE_V6__='2026-09-16-compact-cart-row-match';
+ window.__DEFE_STORE_CAPTURE_V7__='2026-09-16-semantic-product-parent-match';
 })();
