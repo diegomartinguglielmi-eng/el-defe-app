@@ -144,6 +144,15 @@ def create_order(payload:OrderIn,db:Session=Depends(get_db)):
         else:total+=subtotal
         items.append({'product_id':p.id,'name':p.name,'size':item.size,'qty':item.qty,'unit_price':p.price,'subtotal':subtotal})
     row=StoreOrder(buyer_name=payload.buyer_name.strip(),buyer_phone=payload.buyer_phone.strip(),buyer_category=(payload.buyer_category or '').strip() or None,buyer_note=(payload.buyer_note or '').strip() or None,items_json=json.dumps(items,ensure_ascii=False),total=total if complete else None,status='pending');db.add(row);db.commit();db.refresh(row);return _order_out(row)
+
+@router.get('/orders/mine')
+def my_orders(phone:str,db:Session=Depends(get_db)):
+    cleaned=_clean_phone(phone)
+    if len(cleaned)<8:raise HTTPException(400,'Teléfono inválido')
+    rows=db.query(StoreOrder).order_by(StoreOrder.created_at.desc()).limit(500).all()
+    mine=[_order_out(x) for x in rows if _clean_phone(x.buyer_phone)==cleaned]
+    return mine[:50]
+
 @router.get('/admin/orders')
 def admin_orders(db:Session=Depends(get_db),user=Depends(require_roles(*STORE_ROLES))):return [_order_out(x) for x in db.query(StoreOrder).order_by(StoreOrder.created_at.desc()).limit(200).all()]
 @router.put('/admin/orders/{order_id}/status')
