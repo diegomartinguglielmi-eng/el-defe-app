@@ -52,6 +52,7 @@ ACOMP="web-acompanan-overlay-${SHA}.js"
 SPONSORSHOME="web-sponsors-home-sync-${SHA}.js"
 FOLLOWING="web-following-overlay-${SHA}.js"
 MIDEFE="web-mi-defe-overlay-${SHA}.js"
+DESIGN="web-design-system-${SHA}.js"
 MATCHES="matches-explorer-${SHA}.js"
 MATCHAUTH="superliga-ui-${SHA}.js"
 UIHOTFIX="web-ui-hotfix-${SHA}.js"
@@ -70,6 +71,7 @@ cp web-acompanan-overlay.js "defe-web-build/dist/${ACOMP}"
 cp web-sponsors-home-sync.js "defe-web-build/dist/${SPONSORSHOME}"
 cp web-following-overlay.js "defe-web-build/dist/${FOLLOWING}"
 cp web-mi-defe-overlay.js "defe-web-build/dist/${MIDEFE}"
+cp web-design-system.js "defe-web-build/dist/${DESIGN}"
 cp app/static/matches-explorer.js "defe-web-build/dist/${MATCHES}"
 cp app/static/superliga-ui.js "defe-web-build/dist/${MATCHAUTH}"
 cp web-ui-hotfix.js "defe-web-build/dist/${UIHOTFIX}"
@@ -84,7 +86,7 @@ cp push-sw.js defe-web-build/dist/push-sw.js
 cp manifest.webmanifest defe-web-build/dist/manifest.webmanifest
 cp mobile/assets/icon.png defe-web-build/dist/icon.png
 
-sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${MATCHAUTH}\"></script><script src=\"./${UIHOTFIX}\"></script><script src=\"./${STOREADMINOVERLAY}\"></script><script src=\"./${FEFIDEDUPE}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${FOLLOWING}\"></script><script src=\"./${MIDEFE}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
+sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${MATCHAUTH}\"></script><script src=\"./${UIHOTFIX}\"></script><script src=\"./${STOREADMINOVERLAY}\"></script><script src=\"./${FEFIDEDUPE}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${FOLLOWING}\"></script><script src=\"./${MIDEFE}\"></script><script src=\"./${DESIGN}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
 
 sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
 echo "// inert" > defe-web-build/dist/sw.js
@@ -120,7 +122,8 @@ set +e
 grep -F "web-ui-hotfix-${SHA}.js" defe-web-build/dist/index.html
 grep -F "web-store-admin-overlay-${SHA}.js" defe-web-build/dist/index.html
 grep -F "web-mi-defe-overlay-${SHA}.js" defe-web-build/dist/index.html
+grep -F "web-design-system-${SHA}.js" defe-web-build/dist/index.html
 grep -F "DEFE_COMPETENCIAS_LAYOUT_V5" "defe-web-build/dist/${FEFIDEDUPE}"
 set -e
 
-echo "Netlify build listo: Mi Defe personalizable + navegación + Competencias + Tienda + Sponsors"
+echo "Netlify build listo: design system + Mi Defe + navegación + Competencias + Tienda + Sponsors"
