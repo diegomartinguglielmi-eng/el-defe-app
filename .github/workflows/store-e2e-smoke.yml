@@ -6,6 +6,8 @@ on:
       - 'app/store_v5.py'
       - 'app/store_submit.py'
       - 'app/static/store-*.js'
+      - 'patch-store-native.mjs'
+      - 'post-store-checkout.sh'
       - 'web-store-auth-sync.js'
       - 'web-ui-hotfix.js'
       - '.github/workflows/store-e2e-smoke.yml'
@@ -30,7 +32,7 @@ jobs:
           node --check app/static/store-orders.js
           node --check app/static/store-settings.js
           node --check app/static/store-image-upload.js
-          node --check app/static/store-checkout.js
+          node --check patch-store-native.mjs
           grep -F "defe_token" web-ui-hotfix.js
           grep -F "defe_role" web-ui-hotfix.js
           grep -F "'tienda'" app/static/store-role-view.js
@@ -40,8 +42,11 @@ jobs:
           grep -F "admin_orders" app/store_v5.py
           grep -F "update_order_status" app/store_v5.py
           grep -F "update_settings" app/store_v5.py
-          grep -F "DEFE_STORE_CAPTURE_V7" app/static/store-checkout.js
-          grep -F "/api/store/orders/submit" app/static/store-checkout.js
+          grep -F "DEFE_STORE_NATIVE_EXACT_V6" patch-store-native.mjs
+          grep -F "checkout=native-v6" patch-store-native.mjs
+          grep -F "camiseta partido" patch-store-native.mjs
+          grep -F "/api/store/orders/submit" patch-store-native.mjs
+          grep -F "sin interceptor DOM" post-store-checkout.sh
 
       - name: Validar API pública y protección administrativa
         shell: bash
@@ -57,8 +62,11 @@ jobs:
           assert isinstance(products,list) and products, 'Catálogo vacío'
           for p in products:
               assert {'id','slug','name','category','sizes','inventory','stock_managed','active'}.issubset(p), f'Producto incompleto: {p}'
+          shirt=next((p for p in products if p.get('slug')=='camiseta-partido'),None)
+          assert shirt, 'No existe slug camiseta-partido en catálogo vivo'
+          assert any(str(x).upper()=='XL' for x in (shirt.get('sizes') or [])), f'Camiseta de partido sin talle XL: {shirt.get("sizes")}'
           assert settings.get('whatsapp_number'), 'Falta WhatsApp de Tienda'
-          print('Catálogo:',len(products),'productos; WhatsApp configurado')
+          print('Catálogo:',len(products),'productos; camiseta-partido id=',shirt['id'],'talles=',shirt['sizes'])
           PY
           STATUS=$(curl -sS -o /tmp/admin-products -w '%{http_code}' "$API/api/store/admin/products")
           test "$STATUS" = "401" -o "$STATUS" = "403"
