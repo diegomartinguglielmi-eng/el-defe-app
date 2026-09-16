@@ -6,7 +6,6 @@ on:
       - 'app/store_v5.py'
       - 'app/store_submit.py'
       - 'app/static/store-*.js'
-      - 'store-checkout-interceptor.js'
       - 'web-store-auth-sync.js'
       - 'web-ui-hotfix.js'
       - '.github/workflows/store-e2e-smoke.yml'
@@ -31,6 +30,7 @@ jobs:
           node --check app/static/store-orders.js
           node --check app/static/store-settings.js
           node --check app/static/store-image-upload.js
+          node --check app/static/store-checkout.js
           grep -F "defe_token" web-ui-hotfix.js
           grep -F "defe_role" web-ui-hotfix.js
           grep -F "'tienda'" app/static/store-role-view.js
@@ -40,8 +40,8 @@ jobs:
           grep -F "admin_orders" app/store_v5.py
           grep -F "update_order_status" app/store_v5.py
           grep -F "update_settings" app/store_v5.py
-          grep -F "DEFE_STORE_CAPTURE_V2" store-checkout-interceptor.js
-          grep -F "/api/store/orders/submit" store-checkout-interceptor.js
+          grep -F "DEFE_STORE_CAPTURE_V5" app/static/store-checkout.js
+          grep -F "/api/store/orders/submit" app/static/store-checkout.js
 
       - name: Validar API pública y protección administrativa
         shell: bash
