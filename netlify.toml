@@ -1,6 +1,6 @@
-# redeploy 2026-09-16 fix definitivo Competencias v2
+# redeploy 2026-09-16 polish navegación + Competencias
 [build]
-  command = "bash netlify-build.sh && bash post-home-auto.sh && bash post-final-ui.sh"
+  command = "bash netlify-build.sh && bash post-home-auto.sh && bash post-final-ui.sh && bash post-design-polish.sh"
   publish = "netlify-publish"
 
 [build.environment]
