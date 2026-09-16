@@ -1,6 +1,6 @@
-# redeploy 2026-09-16 créditos restablecidos + design system
+# redeploy 2026-09-16 fix definitivo Competencias
 [build]
-  command = "bash netlify-build.sh && bash post-home-auto.sh"
+  command = "bash netlify-build.sh && bash post-home-auto.sh && bash post-final-ui.sh"
   publish = "netlify-publish"
 
 [build.environment]
