@@ -40,7 +40,7 @@ jobs:
           grep -F "admin_orders" app/store_v5.py
           grep -F "update_order_status" app/store_v5.py
           grep -F "update_settings" app/store_v5.py
-          grep -F "DEFE_STORE_CAPTURE_V6" app/static/store-checkout.js
+          grep -F "DEFE_STORE_CAPTURE_V7" app/static/store-checkout.js
           grep -F "/api/store/orders/submit" app/static/store-checkout.js
 
       - name: Validar API pública y protección administrativa
