@@ -120,6 +120,7 @@ def _bootstrap_content():
 def v5_startup_hardening():
     try:scheduler.remove_job('daily-sync')
     except Exception:pass
+    scheduler.add_job(_bootstrap_superliga,'interval',hours=1,id='superliga-hourly-sync',replace_existing=True,max_instances=1,coalesce=True)
     db=SessionLocal()
     try:
         admin=db.query(User).filter(User.email==settings.admin_email).first()
