@@ -4,18 +4,23 @@
   const PHONE_KEY='defe_store_buyer_phone';
   const SEEN_KEY='defe_store_order_status_seen';
   const READ_KEY='defe_store_order_status_read';
-  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
   const clean=s=>String(s||'').replace(/\D/g,'');
   const labels={pending:'Pedido recibido',confirmed:'Confirmado',ready:'Listo para retirar',delivered:'Entregado',cancelled:'Cancelado'};
   const messages={pending:'La Tienda del Club recibió tu pedido.',confirmed:'Tu pedido fue confirmado por la Tienda del Club.',ready:'¡Tu pedido ya está listo para retirar!',delivered:'Pedido entregado. ¡Gracias por acompañar al Defe!',cancelled:'El pedido fue cancelado.'};
   const steps=['pending','confirmed','ready','delivered'];
   let orders=[],initialized=false,loading=false;
 
-  // Evitar escanear body.innerText en cada mutación: eso congelaba la UI en Android.
+  // Detección liviana y estable de la vista Tienda en esta SPA.
+  // No depende de body.innerText ni de la URL, porque la navegación es interna.
   function isStore(){
     const p=(location.pathname+' '+location.hash).toLowerCase();
     if(p.includes('tienda')||p.includes('store')) return true;
-    return !!Array.from(document.querySelectorAll('h1,h2,h3')).find(x=>/TIENDA DEL CLUB/i.test(x.textContent||''));
+    const search=Array.from(document.querySelectorAll('input')).find(i=>/buscar en la tienda/i.test(i.placeholder||''));
+    if(search) return true;
+    const title=Array.from(document.querySelectorAll('h1,h2,h3,[role="heading"]')).find(x=>/TIENDA DEL CLUB/i.test(x.textContent||''));
+    if(title) return true;
+    return false;
   }
   function phone(){return clean(localStorage.getItem(PHONE_KEY)||'')}
   function seen(){try{return JSON.parse(localStorage.getItem(SEEN_KEY)||'{}')}catch{return {}}}
@@ -47,7 +52,6 @@
   function tick(){const store=isStore(),b=document.getElementById('defeOrdersPill');if(!store){if(b)b.style.display='none';return}ensureUI();capturePhone();if(document.getElementById('defeOrdersPill'))document.getElementById('defeOrdersPill').style.display='flex';load(true)}
 
   const init=()=>{
-    // Sin MutationObserver sobre todo el body: evitamos bucles de render y congelamiento.
     tick();
     setInterval(tick,30000);
     document.addEventListener('click',()=>setTimeout(tick,350),{passive:true});
