@@ -19,5 +19,5 @@ s=s.replace('</body>',tag+'</body>',1)
 p.write_text(s)
 PY
 grep -F "store-checkout-${SHA}.js" "$HTML"
-grep -F "DEFE_STORE_CAPTURE_V6" "$DST"
-echo "Checkout comprador único V6 integrado"
+grep -F "DEFE_STORE_CAPTURE_V7" "$DST"
+echo "Checkout comprador único V7 integrado"
