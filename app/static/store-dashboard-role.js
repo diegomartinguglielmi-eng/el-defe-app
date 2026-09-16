@@ -6,8 +6,7 @@
   const API='https://el-defe-v5-production.up.railway.app';
   const token=()=>localStorage.getItem('defe_auth_token')||localStorage.getItem('defe_token')||'';
   const role=()=>String(localStorage.getItem('defe_role')||'').toLowerCase();
-  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-  const money=v=>v==null?'A confirmar':new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(v);
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
   const fmtDate=v=>{try{return new Intl.DateTimeFormat('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(v))}catch{return ''}};
   const labels={pending:'Pendiente',confirmed:'Confirmado',ready:'Listo para retirar',delivered:'Entregado',cancelled:'Cancelado'};
   let loading=false,lastLoad=0;
@@ -28,8 +27,8 @@
       .dsd-main{max-width:780px;margin:auto;padding:18px 16px 104px}.dsd-title{display:flex;justify-content:space-between;align-items:end;margin:2px 2px 12px}.dsd-title h2{margin:0;font-size:23px}.dsd-title span{font-size:12px;color:#6e7e91}
       .dsd-kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.dsd-kpi{border:1px solid #dbe4ee;background:#fff;border-radius:18px;padding:15px;box-shadow:0 4px 14px #001a3408}.dsd-kpi b{display:block;font-size:28px;color:#0b4a8f}.dsd-kpi span{font-size:12px;color:#66788e;font-weight:750}.dsd-kpi.warn b{color:#bf6b00}.dsd-kpi.good b{color:#16865b}.dsd-kpi.danger b{color:#b42318}
       .dsd-card{background:#fff;border:1px solid #dbe4ee;border-radius:20px;padding:16px;margin-top:14px;box-shadow:0 4px 14px #001a3408}.dsd-card h3{margin:0 0 12px;font-size:18px}.dsd-attn{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid #edf1f5}.dsd-attn:first-of-type{border-top:0;padding-top:0}.dsd-dot{width:10px;height:10px;border-radius:50%;background:#f3a320;margin-top:6px;flex:0 0 auto}.dsd-attn strong{display:block}.dsd-meta{font-size:12px;color:#748397;margin-top:3px}.dsd-link{border:0;background:#edf5ff;color:#0b4a8f;border-radius:11px;padding:8px 10px;font-weight:900;margin-left:auto;white-space:nowrap}
-      .dsd-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.dsd-action{border:1px solid #d8e3ee;background:#fff;border-radius:18px;padding:16px;text-align:left;color:#17365f;min-height:92px}.dsd-action i{font-style:normal;font-size:24px;display:block;margin-bottom:8px}.dsd-action b{display:block;font-size:15px}.dsd-action small{color:#708096}.dsd-activity{padding:10px 0;border-top:1px solid #edf1f5}.dsd-activity:first-of-type{border-top:0}.dsd-activity b{font-size:14px}.dsd-empty{color:#78879a;text-align:center;padding:18px 6px}
-      .dsd-nav{position:fixed;left:0;right:0;bottom:0;z-index:100160;background:#fff;border-top:1px solid #dce5ee;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 4px calc(7px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px #001a3410}.dsd-nav button{border:0;background:transparent;color:#7b899a;padding:6px 1px;font-size:10px;font-weight:800}.dsd-nav button i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}.dsd-nav button.active{color:#0b4a8f}.dsd-refresh{border:0;background:#eaf2fb;color:#0b4a8f;border-radius:12px;padding:8px 10px;font-weight:900}.dsd-error{background:#fff0f0;color:#b42318;border:1px solid #f1cccc;border-radius:14px;padding:12px;margin-top:12px}
+      .dsd-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.dsd-action{border:1px solid #d8e3ee;background:#fff;border-radius:18px;padding:16px;text-align:left;color:#17365f;min-height:92px}.dsd-action i{font-style:normal;font-size:24px;display:block;margin-bottom:8px}.dsd-action b{display:block;font-size:15px}.dsd-action small{color:#708096}.dsd-activity{padding:10px 0;border-top:1px solid #edf1f5}.dsd-activity:first-of-type{border-top:0}.dsd-activity b{font-size:14px}.dsd-empty{color:#78879a;text-align:center;padding:18px 6px}
+      .dsd-nav{position:fixed;left:0;right:0;bottom:0;z-index:100160;background:#fff;border-top:1px solid #dce5ee;display:grid;grid-template-columns:repeat(3,1fr);padding:8px 12px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px #001a3410}.dsd-nav button{border:0;background:transparent;color:#7b899a;padding:7px 1px;font-size:11px;font-weight:850}.dsd-nav button i{display:block;font-style:normal;font-size:21px;margin-bottom:3px}.dsd-nav button.active{color:#0b4a8f}.dsd-refresh{border:0;background:#eaf2fb;color:#0b4a8f;border-radius:12px;padding:8px 10px;font-weight:900}.dsd-error{background:#fff0f0;color:#b42318;border:1px solid #f1cccc;border-radius:14px;padding:12px;margin-top:12px}
     `;document.head.appendChild(s);
   }
 
@@ -46,9 +45,7 @@
       </main>
       <nav class="dsd-nav">
         <button class="active" data-go="panel"><i>▦</i>Panel</button>
-        <button data-go="orders"><i>▤</i>Pedidos</button>
-        <button data-go="products"><i>◫</i>Stock</button>
-        <button data-go="settings"><i>◉</i>WhatsApp</button>
+        <button data-go="gestion"><i>▤</i>Gestión</button>
         <button data-go="account"><i>○</i>Cuenta</button>
       </nav>`;
     document.body.appendChild(root);
@@ -66,7 +63,7 @@
     location.reload();
   }
 
-  function openManager(tab){
+  function openManager(tab='products'){
     if(typeof window.defeOpenNativeStoreManager!=='function')return;
     document.getElementById('defeStoreDashboard').style.display='none';
     window.defeOpenNativeStoreManager();
@@ -76,7 +73,7 @@
       if(back&&!back.dataset.dsdBack){back.dataset.dsdBack='1';back.addEventListener('click',()=>setTimeout(()=>{const d=document.getElementById('defeStoreDashboard');if(d){d.style.display='block';load(true)}},30));}
     },80);
   }
-  function go(where){if(where==='panel'){load(true);return}if(where==='account'){account();return}openManager(where)}
+  function go(where){if(where==='panel'){load(true);return}if(where==='gestion'){openManager('products');return}if(where==='account'){account();return}}
 
   function lowStock(products){
     const out=[];
@@ -106,10 +103,8 @@
       </div>
       <section class="dsd-card"><h3>Necesitan atención</h3>${attn.length?attn.map(a=>`<div class="dsd-attn"><span class="dsd-dot" style="background:${a.kind==='stock'?'#b42318':a.kind==='ready'?'#16865b':'#f3a320'}"></span><div><strong>${esc(a.text)}</strong><div class="dsd-meta">${esc(a.meta)}</div></div><button class="dsd-link" data-open-tab="${a.tab}">Ver</button></div>`).join(''):'<div class="dsd-empty">No hay tareas urgentes en este momento.</div>'}</section>
       <div class="dsd-actions">
-        <button class="dsd-action" data-open-tab="orders"><i>▤</i><b>Pedidos</b><small>Confirmar, preparar y entregar</small></button>
-        <button class="dsd-action" data-open-tab="products"><i>◫</i><b>Productos y stock</b><small>Precios, talles y existencias</small></button>
-        <button class="dsd-action" data-open-tab="settings"><i>◉</i><b>WhatsApp</b><small>Configuración de contacto</small></button>
-        <button class="dsd-action" data-refresh-card><i>↻</i><b>Actualizar</b><small>Refrescar información</small></button>
+        <button class="dsd-action" data-open-tab="products"><i>▤</i><b>Abrir gestión</b><small>Productos, pedidos y WhatsApp</small></button>
+        <button class="dsd-action" data-refresh-card><i>↻</i><b>Actualizar panel</b><small>Refrescar la información</small></button>
       </div>
       <section class="dsd-card"><h3>Actividad reciente</h3>${recent.length?recent.map(o=>`<div class="dsd-activity"><b>Pedido #${o.id} · ${esc(labels[o.status]||o.status)}</b><div class="dsd-meta">${esc(o.buyer_name||o.name||'Comprador')} · ${esc(orderItem(o))} · ${fmtDate(o.updated_at||o.created_at)}</div></div>`).join(''):'<div class="dsd-empty">Todavía no hay actividad registrada.</div>'}</section>`;
     box.querySelectorAll('[data-open-tab]').forEach(b=>b.onclick=()=>openManager(b.dataset.openTab));
