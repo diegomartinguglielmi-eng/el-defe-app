@@ -1,6 +1,6 @@
 {
   "club": "DEF. DE SANTOS LUGARES",
-  "actualizado": "2026-09-16T00:36:21.410Z",
+  "actualizado": "2026-09-16T08:32:54.595Z",
   "ligas": [
     {
       "id": "fefi",
@@ -8,7 +8,7 @@
       "torneo": "Clausura 2026 · Zona H",
       "fuente": "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/",
       "conectada": true,
-      "actualizado": "2026-09-16T00:36:24.436Z",
+      "actualizado": "2026-09-16T08:32:57.596Z",
       "categorias": [
         "2013",
         "2014",
@@ -1382,7 +1382,7 @@
       "torneo": "Junior A · Torneo 2026",
       "fuente": "https://www.futsalargentina.com.ar/fixture.php?cat=1_1",
       "conectada": true,
-      "actualizado": "2026-09-16T00:36:00.196Z",
+      "actualizado": "2026-09-16T08:32:32.088Z",
       "categorias": [
         "Junior A"
       ],
@@ -1512,7 +1512,7 @@
       "torneo": "Argenliga A · Zona 1 · 2026",
       "fuente": "https://www.sofascore.com/es-la/futsal/team/defensores-de-santos-lugares/1214864",
       "conectada": true,
-      "actualizado": "2026-09-16T00:36:21.410Z",
+      "actualizado": "2026-09-16T08:32:54.595Z",
       "categorias": [
         "Primera"
       ],
@@ -1811,7 +1811,7 @@
           }
         ]
       },
-      "error": "403 en https://api.sofascore.com/api/v1/team/1214864/events/next/0",
+      "error": "403 en https://api.sofascore.com/api/v1/team/1214864/events/last/0",
       "disciplina": "Futsal",
       "partidos": [
         {
@@ -1890,7 +1890,7 @@
       "torneo": "Masculino · Elite I | Femenino · Ascenso I · Zona B · Reserva",
       "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026",
       "conectada": true,
-      "actualizado": "2026-09-16T00:36:15.975Z",
+      "actualizado": "2026-09-16T08:32:49.622Z",
       "categorias": [
         "1RA",
         "3RA",
@@ -3784,6 +3784,15 @@
             "pts": 15
           },
           {
+            "equipo": "Club Pampero",
+            "pj": 7,
+            "g": 5,
+            "e": 0,
+            "p": 2,
+            "dg": 12,
+            "pts": 15
+          },
+          {
             "equipo": "CEDIMA",
             "pj": 6,
             "g": 4,
@@ -3802,15 +3811,6 @@
             "pts": 13
           },
           {
-            "equipo": "Club Pampero",
-            "pj": 6,
-            "g": 4,
-            "e": 0,
-            "p": 2,
-            "dg": 6,
-            "pts": 12
-          },
-          {
             "equipo": "El Lucero Futsal",
             "pj": 6,
             "g": 4,
@@ -3821,11 +3821,11 @@
           },
           {
             "equipo": "Amistad",
-            "pj": 6,
+            "pj": 7,
             "g": 3,
             "e": 1,
-            "p": 2,
-            "dg": -3,
+            "p": 3,
+            "dg": -9,
             "pts": 10
           },
           {
@@ -3922,12 +3922,12 @@
           },
           {
             "equipo": "Club Pampero",
-            "pj": 7,
-            "g": 4,
+            "pj": 8,
+            "g": 5,
             "e": 2,
             "p": 1,
-            "dg": 15,
-            "pts": 14
+            "dg": 17,
+            "pts": 17
           },
           {
             "equipo": "Parque Patricios",
@@ -4039,11 +4039,11 @@
           },
           {
             "equipo": "Amistad",
-            "pj": 6,
+            "pj": 7,
             "g": 1,
             "e": 0,
-            "p": 5,
-            "dg": -24,
+            "p": 6,
+            "dg": -26,
             "pts": 3
           },
           {
@@ -4094,6 +4094,15 @@
             "pts": 15
           },
           {
+            "equipo": "Club Pampero",
+            "pj": 8,
+            "g": 5,
+            "e": 0,
+            "p": 3,
+            "dg": 10,
+            "pts": 15
+          },
+          {
             "equipo": "CEDIMA",
             "pj": 6,
             "g": 4,
@@ -4109,15 +4118,6 @@
             "e": 0,
             "p": 2,
             "dg": 26,
-            "pts": 12
-          },
-          {
-            "equipo": "Club Pampero",
-            "pj": 7,
-            "g": 4,
-            "e": 0,
-            "p": 3,
-            "dg": 3,
             "pts": 12
           },
           {
@@ -4167,11 +4167,11 @@
           },
           {
             "equipo": "Amistad",
-            "pj": 6,
+            "pj": 7,
             "g": 1,
             "e": 1,
-            "p": 4,
-            "dg": -24,
+            "p": 5,
+            "dg": -31,
             "pts": 4
           },
           {
@@ -4213,6 +4213,15 @@
             "pts": 18
           },
           {
+            "equipo": "Club Pampero",
+            "pj": 8,
+            "g": 5,
+            "e": 2,
+            "p": 1,
+            "dg": 16,
+            "pts": 17
+          },
+          {
             "equipo": "Cantera Zona Norte",
             "pj": 8,
             "g": 5,
@@ -4229,15 +4238,6 @@
             "p": 2,
             "dg": 20,
             "pts": 15
-          },
-          {
-            "equipo": "Club Pampero",
-            "pj": 7,
-            "g": 4,
-            "e": 2,
-            "p": 1,
-            "dg": 15,
-            "pts": 14
           },
           {
             "equipo": "CEDIMA",
@@ -4331,11 +4331,11 @@
           },
           {
             "equipo": "Amistad",
-            "pj": 6,
+            "pj": 7,
             "g": 1,
             "e": 1,
-            "p": 4,
-            "dg": -10,
+            "p": 5,
+            "dg": -11,
             "pts": 4
           },
           {
@@ -4377,6 +4377,15 @@
             "pts": 16
           },
           {
+            "equipo": "Club Pampero",
+            "pj": 8,
+            "g": 5,
+            "e": 1,
+            "p": 2,
+            "dg": 7,
+            "pts": 16
+          },
+          {
             "equipo": "Cantera Zona Norte",
             "pj": 8,
             "g": 5,
@@ -4401,15 +4410,6 @@
             "e": 1,
             "p": 1,
             "dg": 16,
-            "pts": 13
-          },
-          {
-            "equipo": "Club Pampero",
-            "pj": 7,
-            "g": 4,
-            "e": 1,
-            "p": 2,
-            "dg": 5,
             "pts": 13
           },
           {
@@ -4486,11 +4486,11 @@
           },
           {
             "equipo": "Amistad",
-            "pj": 6,
+            "pj": 7,
             "g": 0,
             "e": 0,
-            "p": 6,
-            "dg": -37,
+            "p": 7,
+            "dg": -39,
             "pts": 0
           }
         ],
@@ -4506,12 +4506,12 @@
           },
           {
             "equipo": "Club Pampero",
-            "pj": 7,
-            "g": 6,
+            "pj": 8,
+            "g": 7,
             "e": 0,
             "p": 1,
-            "dg": 19,
-            "pts": 18
+            "dg": 25,
+            "pts": 21
           },
           {
             "equipo": "Nueva Pompeya",
@@ -4632,15 +4632,24 @@
           },
           {
             "equipo": "Amistad",
-            "pj": 6,
+            "pj": 7,
             "g": 0,
             "e": 0,
-            "p": 6,
-            "dg": -30,
+            "p": 7,
+            "dg": -36,
             "pts": 0
           }
         ],
         "8VA": [
+          {
+            "equipo": "Club Pampero",
+            "pj": 8,
+            "g": 7,
+            "e": 0,
+            "p": 1,
+            "dg": 29,
+            "pts": 21
+          },
           {
             "equipo": "Club Aliados",
             "pj": 8,
@@ -4657,15 +4666,6 @@
             "e": 0,
             "p": 0,
             "dg": 37,
-            "pts": 18
-          },
-          {
-            "equipo": "Club Pampero",
-            "pj": 7,
-            "g": 6,
-            "e": 0,
-            "p": 1,
-            "dg": 27,
             "pts": 18
           },
           {
@@ -4769,11 +4769,11 @@
           },
           {
             "equipo": "Amistad",
-            "pj": 6,
+            "pj": 7,
             "g": 0,
             "e": 0,
-            "p": 6,
-            "dg": -18,
+            "p": 7,
+            "dg": -20,
             "pts": 0
           },
           {
@@ -5573,6 +5573,6 @@
       }
     ],
     "fuente": "https://fefi.com.ar/2026-futbol-sala-mayores-fefi/mayores-b/",
-    "actualizado": "2026-09-16T00:36:21.246Z"
+    "actualizado": "2026-09-16T08:32:54.288Z"
   }
 }
