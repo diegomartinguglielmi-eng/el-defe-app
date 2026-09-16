@@ -5,7 +5,7 @@
 
   const ICONS={
     inicio:'<svg class="defe-nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 10.7 12 3.8l8.5 6.9v8.1a1.7 1.7 0 0 1-1.7 1.7h-4.4v-6.2H9.6v6.2H5.2a1.7 1.7 0 0 1-1.7-1.7z"/></svg>',
-    competencias:'<svg class="defe-nav-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.3"/><path d="M3 12h5m8 0h5M8 7.5v9M16 7.5v9"/><circle cx="12" cy="12" r="2.3"/></svg>',
+    competencias:'<svg class="defe-nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v4.2c0 3-1.6 5.3-4 6.4-2.4-1.1-4-3.4-4-6.4z"/><path d="M8 6H5.5v1.6c0 2.2 1.4 3.7 3.5 4.1M16 6h2.5v1.6c0 2.2-1.4 3.7-3.5 4.1M12 14.6V18M8.5 20h7"/></svg>',
     midefe:'<svg class="defe-nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.4 19 6v5.4c0 4.4-2.7 7.7-7 10-4.3-2.3-7-5.6-7-10V6z"/></svg>',
     comunidad:'<svg class="defe-nav-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2.2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
     tienda:'<svg class="defe-nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h14l-1 11.5H6z"/><path d="M9 8.5V6.4a3 3 0 0 1 6 0v2.1"/></svg>',
