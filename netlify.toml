@@ -1,4 +1,4 @@
-# redeploy 2026-09-16 fix definitivo Competencias
+# redeploy 2026-09-16 fix definitivo Competencias v2
 [build]
   command = "bash netlify-build.sh && bash post-home-auto.sh && bash post-final-ui.sh"
   publish = "netlify-publish"
