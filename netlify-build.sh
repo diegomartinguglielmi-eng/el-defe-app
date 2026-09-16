@@ -63,6 +63,7 @@ ORDERSAFETY="store-order-safety-${SHA}.js"
 STORERECEIVING="store-receiving-${SHA}.js"
 STORESTOCKALERTS="store-stock-alerts-${SHA}.js"
 STOREROLEVIEW="store-role-view-${SHA}.js"
+BUYERORDERS="store-buyer-orders-${SHA}.js"
 
 cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
 cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
@@ -82,11 +83,12 @@ cp app/static/store-order-safety.js "defe-web-build/dist/${ORDERSAFETY}"
 cp app/static/store-receiving.js "defe-web-build/dist/${STORERECEIVING}"
 cp app/static/store-stock-alerts.js "defe-web-build/dist/${STORESTOCKALERTS}"
 cp app/static/store-role-view.js "defe-web-build/dist/${STOREROLEVIEW}"
+cp app/static/store-buyer-orders.js "defe-web-build/dist/${BUYERORDERS}"
 cp push-sw.js defe-web-build/dist/push-sw.js
 cp manifest.webmanifest defe-web-build/dist/manifest.webmanifest
 cp mobile/assets/icon.png defe-web-build/dist/icon.png
 
-sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${MATCHAUTH}\"></script><script src=\"./${UIHOTFIX}\"></script><script src=\"./${STOREADMINOVERLAY}\"></script><script src=\"./${FEFIDEDUPE}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${FOLLOWING}\"></script><script src=\"./${MIDEFE}\"></script><script src=\"./${DESIGN}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script></body>#" defe-web-build/dist/index.html
+sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${MATCHAUTH}\"></script><script src=\"./${UIHOTFIX}\"></script><script src=\"./${STOREADMINOVERLAY}\"></script><script src=\"./${FEFIDEDUPE}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${FOLLOWING}\"></script><script src=\"./${MIDEFE}\"></script><script src=\"./${DESIGN}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script><script src=\"./${BUYERORDERS}\"></script></body>#" defe-web-build/dist/index.html
 
 sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
 echo "// inert" > defe-web-build/dist/sw.js
@@ -123,7 +125,8 @@ grep -F "web-ui-hotfix-${SHA}.js" defe-web-build/dist/index.html
 grep -F "web-store-admin-overlay-${SHA}.js" defe-web-build/dist/index.html
 grep -F "web-mi-defe-overlay-${SHA}.js" defe-web-build/dist/index.html
 grep -F "web-design-system-${SHA}.js" defe-web-build/dist/index.html
+grep -F "store-buyer-orders-${SHA}.js" defe-web-build/dist/index.html
 grep -F "DEFE_COMPETENCIAS_LAYOUT_V5" "defe-web-build/dist/${FEFIDEDUPE}"
 set -e
 
-echo "Netlify build listo: design system + Mi Defe + navegación + Competencias + Tienda + Sponsors"
+echo "Netlify build listo: design system + Mi Defe + navegación + Competencias + Tienda + Mis pedidos"
