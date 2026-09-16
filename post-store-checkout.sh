@@ -16,5 +16,5 @@ if tag not in s:
 p.write_text(s)
 PY
 grep -F "store-checkout-interceptor-${SHA}.js" "$HTML"
-grep -F "DEFE_STORE_CAPTURE_V4" "$DST"
-echo "Checkout comprador robusto integrado"
+grep -F "DEFE_STORE_CAPTURE_V5" "$DST"
+echo "Checkout comprador robusto V5 integrado"
