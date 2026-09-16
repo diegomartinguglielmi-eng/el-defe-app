@@ -12,6 +12,6 @@ s=re.sub(r'<script src="\./store-checkout-interceptor-[^"]+\.js"></script>','',s
 s=re.sub(r'<script src="\./store-checkout-[^"]+\.js"></script>','',s)
 p.write_text(s)
 PY
-# Confirmar que el bundle publicado contiene el checkout nativo nuevo.
-grep -R -F "DEFE_STORE_NATIVE_EXACT_V6" netlify-publish/el-defe-app/assets >/dev/null
-echo "Checkout Netlify: solo flujo nativo V6, sin interceptor DOM"
+# Confirmar que el bundle publicado contiene el checkout nativo actual.
+grep -R -F "DEFE_STORE_NATIVE_EXACT_V7" netlify-publish/el-defe-app/assets >/dev/null
+echo "Checkout Netlify: solo flujo nativo V7, sin interceptor DOM"
