@@ -145,7 +145,7 @@ jobs:
           grep -F "fefi-senior-v35-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
           grep -F "store-checkout-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
           grep -F "store-checkout-interceptor-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
-          grep -F "DEFE_STORE_CAPTURE_V2" "defe-web-build/dist/store-checkout-interceptor-${GITHUB_SHA}.js" >/dev/null
+          grep -F "DEFE_STORE_CAPTURE_V5" "defe-web-build/dist/store-checkout-interceptor-${GITHUB_SHA}.js" >/dev/null
           grep -F "/api/store/orders/submit" "defe-web-build/dist/store-checkout-interceptor-${GITHUB_SHA}.js" >/dev/null
           grep -F "skipWaiting" defe-web-build/dist/sw.js >/dev/null
           grep -F "clients.claim" defe-web-build/dist/sw.js >/dev/null
