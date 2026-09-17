@@ -21,10 +21,15 @@ async function enhance(league){
   if(!grid)return;
   const category=grid.querySelector('[data-category]');
   if(!category)return;
-  const existing=grid.parentElement?.querySelector(':scope > [data-laamba-extra]');
+  const parent=grid.parentElement;
+  const extras=[...(parent?.querySelectorAll(':scope > [data-laamba-extra]')||[])];
+  let existing=extras[0]||null;
+  extras.slice(1).forEach(x=>x.remove());
   if(league.value!=='LAAMBA'){
-    existing?.remove();
+    extras.forEach(x=>x.remove());
     category.dataset.laambaBranch='';
+    const label=category.closest('label');
+    if(label)label.childNodes[0].textContent='Categoría / división';
     return;
   }
   const map=await catalog();
@@ -48,8 +53,8 @@ async function enhance(league){
     extra.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px';
   }
   const third=extra.querySelector('[data-laamba-category]');
-  const fill=()=>{const vals=map[category.value]||[];third.innerHTML='<option value="">Seleccionar…</option>'+vals.map(x=>`<option value="${esc(x)}" ${x===division?'selected':''}>${esc(x)}</option>`).join('');third.disabled=!category.value;sync()};
   const sync=()=>{const root=grid.parentElement;const save=root?.querySelector('[data-save],[data-ok]');if(save)save.disabled=!(category.value&&third.value)};
+  const fill=()=>{const vals=map[category.value]||[];third.innerHTML='<option value="">Seleccionar…</option>'+vals.map(x=>`<option value="${esc(x)}" ${x===division?'selected':''}>${esc(x)}</option>`).join('');third.disabled=!category.value;sync()};
   category.onchange=()=>{division='';fill()};third.onchange=sync;fill();
 }
 
@@ -73,7 +78,10 @@ window.fetch=async function(input,init={}){
 };
 
 let busy=false;
-async function scan(){if(busy)return;busy=true;try{for(const l of document.querySelectorAll('[data-league]')){if(l.value==='LAAMBA'&&!l.dataset.laambaEnhanced){l.dataset.laambaEnhanced='1';await enhance(l)}if(!l.dataset.laambaWatch){l.dataset.laambaWatch='1';l.addEventListener('change',()=>{l.dataset.laambaEnhanced='';setTimeout(()=>enhance(l).catch(console.error),0)})}}}finally{busy=false}}
+async function scan(){if(busy)return;busy=true;try{
+  document.querySelectorAll('[data-league]').forEach(l=>{const g=l.closest('.df-grid'),p=g?.parentElement;if(p){const xs=[...p.querySelectorAll(':scope > [data-laamba-extra]')];xs.slice(1).forEach(x=>x.remove())}});
+  for(const l of document.querySelectorAll('[data-league]')){if(l.value==='LAAMBA'&&!l.dataset.laambaEnhanced){l.dataset.laambaEnhanced='1';await enhance(l)}if(!l.dataset.laambaWatch){l.dataset.laambaWatch='1';l.addEventListener('change',()=>{l.dataset.laambaEnhanced='';setTimeout(()=>enhance(l).catch(console.error),0)})}}
+}finally{busy=false}}
 new MutationObserver(()=>scan().catch(console.error)).observe(document.documentElement,{childList:true,subtree:true});
 setInterval(()=>scan().catch(console.error),700);scan().catch(console.error);
 })();
