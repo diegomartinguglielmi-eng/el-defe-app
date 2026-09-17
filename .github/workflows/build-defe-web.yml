@@ -5,7 +5,6 @@ on:
   push:
     paths:
       - 'web-family-onboarding.js'
-      - 'web-attendance-player-filter.js'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
@@ -33,31 +32,27 @@ jobs:
           mkdir -p /tmp/outer /tmp/recovered /tmp/pages
           unzip -q /tmp/operativo.zip -d /tmp/outer
           if [ -f /tmp/outer/netlify-publish.zip ]; then unzip -q /tmp/outer/netlify-publish.zip -d /tmp/recovered; else cp -a /tmp/outer/. /tmp/recovered/; fi
-      - name: Preparar base congelada e integrar Familias y asistencia por hijo
+      - name: Restaurar tablero operativo e integrar solo Familias
         run: |
           set -euo pipefail
           test -s /tmp/recovered/el-defe-app/index.html
           cp -a /tmp/recovered/el-defe-app/. /tmp/pages/
           cp web-family-onboarding.js /tmp/pages/web-family-onboarding.js
-          cp web-attendance-player-filter.js /tmp/pages/web-attendance-player-filter.js
           python3 - <<'PY'
           from pathlib import Path
           p=Path('/tmp/pages/index.html')
           s=p.read_text()
-          for tag in ['<script src="./web-family-onboarding.js"></script>','<script src="./web-attendance-player-filter.js"></script>']:
-              if tag not in s:s=s.replace('</body>',tag+'\n</body>')
+          s=s.replace('<script src="./web-attendance-player-filter.js"></script>','')
+          tag='<script src="./web-family-onboarding.js"></script>'
+          if tag not in s:s=s.replace('</body>',tag+'\n</body>')
           p.write_text(s)
           PY
-          test -s /tmp/pages/web-mi-defe-overlay-netlify.js
           test -s /tmp/pages/availability-ui-netlify.js
-          test -s /tmp/pages/web-auth-overlay-netlify.js
-          test -s /tmp/pages/escudo-dsl.svg
+          test -s /tmp/pages/web-mi-defe-overlay-netlify.js
           node --check /tmp/pages/web-family-onboarding.js
-          node --check /tmp/pages/web-attendance-player-filter.js
           grep -F '/api/availability/family/children' /tmp/pages/web-family-onboarding.js >/dev/null
-          grep -F '/api/availability/admin/player-links' /tmp/pages/web-attendance-player-filter.js >/dev/null
-          grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html >/dev/null
-          echo 'BASE_1021_FAMILIAS_ASISTENCIA_POR_HIJO_VALIDADA'
+          if grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html; then echo 'ERROR: filtro experimental sigue cargado'; exit 1; fi
+          echo 'TABLERO_ASISTENCIA_ORIGINAL_RESTAURADO'
       - name: Preparar GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
@@ -69,6 +64,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Publicar base validada + Familias + asistencia por hijo
+      - name: Publicar base validada + Familias
         id: deployment
         uses: actions/deploy-pages@v4
