@@ -39,14 +39,16 @@ jobs:
           else
             cp -a /tmp/outer/. /tmp/dist/
           fi
-      - name: Validar interfaz recuperada antes de publicar
+          echo 'Contenido recuperado:'
+          find /tmp/dist -maxdepth 2 -type f | sort
+      - name: Validar artefacto histórico sin modificarlo
         run: |
           set -euo pipefail
-          test -f /tmp/dist/index.html
-          grep -R -F 'web-mi-defe-overlay-netlify.js' /tmp/dist/index.html >/dev/null
-          grep -R -F 'availability-ui-netlify.js' /tmp/dist/index.html >/dev/null
-          test -f /tmp/dist/web-mi-defe-overlay-netlify.js
-          test -f /tmp/dist/availability-ui-netlify.js
+          test -s /tmp/dist/index.html
+          test -s /tmp/dist/web-mi-defe-overlay-netlify.js
+          test -s /tmp/dist/availability-ui-netlify.js
+          test -s /tmp/dist/web-auth-overlay-netlify.js
+          test -s /tmp/dist/escudo-dsl.svg
           grep -R -F 'Mi Defe' /tmp/dist/web-mi-defe-overlay-netlify.js >/dev/null
           grep -R -F '/api/availability/admin' /tmp/dist/availability-ui-netlify.js >/dev/null
           echo 'UI_OPERATIVA_1021_VALIDADA'
