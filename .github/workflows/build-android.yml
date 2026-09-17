@@ -8,19 +8,17 @@ on:
       - 'mobile/**'
       - '.github/workflows/build-android.yml'
 
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout actual
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Checkout UI validada
-        uses: actions/checkout@v4
-        with:
-          ref: 95a0630f32ce3be7866ba3e2dc401d85a9e04239
-          path: ui-validada
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -33,57 +31,35 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Reconstruir UI validada
-        working-directory: ui-validada
+      - name: Descargar artefacto web validado
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          rm -rf defe-web-build
-          mkdir defe-web-build
-          unzip -q defe-web-listo.zip -d defe-web-build
-          cd defe-web-build
-          npm install
-          npm run build -- --base=./
-          cd ..
-          node patch-web-auth.mjs
-          node patch-brand.mjs
-          node patch-ui-v5.mjs
-          node patch-ui-v8.mjs
-          node patch-ui-v9.mjs
-          node patch-ui-v11.mjs
-          node patch-runtime-v19.mjs
-          node patch-home-v20.mjs
-          node patch-results-v21.mjs
-          node patch-fixture-v23.mjs
-          node patch-laamba-v24.mjs
-          node patch-laamba-v25.mjs
-          node patch-argenliga-v26.mjs
-          node patch-league-logos-v29.mjs
-          node patch-fefi-senior-v30.mjs
-          node patch-fefi-senior-v31.mjs
-          node patch-fefi-senior-v32.mjs
-          node patch-fefi-senior-v33.mjs
-          node patch-fefi-senior-v35.mjs
-          node patch-store-native.mjs
-          cp defe-datos/datos.json defe-web-build/dist/datos.json
-          [ ! -f defe-datos/salud.json ] || cp defe-datos/salud.json defe-web-build/dist/salud.json
-          cp web-auth-overlay.js defe-web-build/dist/web-auth-overlay.js
-          cp web-comms-push-bridge.js defe-web-build/dist/web-comms-push-bridge.js
-          cp web-comms-overlay.js defe-web-build/dist/web-comms-overlay.js
-          cp web-push-overlay.js defe-web-build/dist/web-push-overlay.js
-          cp web-acompanan-overlay.js defe-web-build/dist/web-acompanan-overlay.js
-          cp app/static/matches-explorer.js defe-web-build/dist/matches-explorer.js
-          cp app/static/availability-ui.js defe-web-build/dist/availability-ui.js
-          sed -i 's#</body>#<script src="./web-auth-overlay.js"></script><script src="./web-comms-push-bridge.js"></script><script src="./web-comms-overlay.js"></script><script src="./web-push-overlay.js"></script><script src="./matches-explorer.js"></script><script src="./web-acompanan-overlay.js"></script><script src="./availability-ui.js"></script></body>#' defe-web-build/dist/index.html
+          rm -rf /tmp/defe-web-artifact /tmp/defe-web-dist
+          mkdir -p /tmp/defe-web-artifact /tmp/defe-web-dist
+          gh api repos/${{ github.repository }}/actions/artifacts/10501803696/zip > /tmp/defe-web-artifact.zip
+          unzip -q /tmp/defe-web-artifact.zip -d /tmp/defe-web-artifact
+          if [ -f /tmp/defe-web-artifact/defe-web-dist.zip ]; then
+            unzip -q /tmp/defe-web-artifact/defe-web-dist.zip -d /tmp/defe-web-dist
+          else
+            cp -a /tmp/defe-web-artifact/. /tmp/defe-web-dist/
+          fi
+          test -f /tmp/defe-web-dist/index.html
+          test -f /tmp/defe-web-dist/web-family-onboarding.js
+          grep -R -F 'Mis hijos' /tmp/defe-web-dist >/dev/null
+          grep -R -F 'Cerrar sesión' /tmp/defe-web-dist >/dev/null
+          grep -F '/api/availability/family/setup' /tmp/defe-web-dist/web-family-onboarding.js >/dev/null
+          echo 'ARTEFACTO_WEB_VALIDADO_OK'
 
-      - name: Reemplazar shell preliminar Android por UI validada
+      - name: Empaquetar UI validada en Android
         run: |
           rm -rf mobile/www
           mkdir -p mobile/www
-          cp -a ui-validada/defe-web-build/dist/. mobile/www/
-          grep -F 'Mi Defe' mobile/www/assets/index-*.js >/dev/null
-          grep -F 'Mi cuenta' mobile/www/assets/index-*.js >/dev/null
-          grep -F '/api/availability/admin' mobile/www/availability-ui.js >/dev/null
-          if grep -F 'EL DEFE' mobile/www/index.html >/dev/null && grep -F 'PRÓXIMO PARTIDO' mobile/www/index.html >/dev/null; then
-            echo 'ERROR: se empaquetó el shell Android preliminar'
+          cp -a /tmp/defe-web-dist/. mobile/www/
+          grep -R -F 'Mis hijos' mobile/www >/dev/null
+          grep -R -F 'Mi cuenta' mobile/www >/dev/null
+          if grep -R -F 'EL DEFE' mobile/www/index.html >/dev/null 2>&1 && grep -R -F 'PRÓXIMO PARTIDO' mobile/www/index.html >/dev/null 2>&1; then
+            echo 'ERROR: shell Android preliminar detectado'
             exit 1
           fi
           echo 'UI_VALIDADA_ANDROID_OK'
@@ -102,8 +78,14 @@ jobs:
 
       - name: Verificar assets empaquetados
         run: |
-          grep -F 'Mi cuenta' mobile/android/app/src/main/assets/public/assets/index-*.js >/dev/null
-          grep -F '/api/availability/admin' mobile/android/app/src/main/assets/public/availability-ui.js >/dev/null
+          test -f mobile/android/app/src/main/assets/public/index.html
+          grep -R -F 'Mis hijos' mobile/android/app/src/main/assets/public >/dev/null
+          grep -R -F 'Mi cuenta' mobile/android/app/src/main/assets/public >/dev/null
+          grep -F '/api/availability/family/setup' mobile/android/app/src/main/assets/public/web-family-onboarding.js >/dev/null
+          if grep -F 'diegomartinguglielmi-eng.github.io/el-defe-app' mobile/android/app/src/main/assets/capacitor.config.json >/dev/null 2>&1; then
+            echo 'ERROR: Android redirige a GitHub Pages'
+            exit 1
+          fi
           echo 'APK_ASSETS_VALIDATED_OK'
 
       - name: Build APK
