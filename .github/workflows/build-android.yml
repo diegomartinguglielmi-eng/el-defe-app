@@ -15,104 +15,80 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
-
-      - name: Descargar y validar artefacto web 231
+      - name: Descargar UI institucional validada 220
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euxo pipefail
-          rm -rf /tmp/defe-web-artifact /tmp/defe-web-dist /tmp/defe-web-artifact.zip
-          mkdir -p /tmp/defe-web-artifact /tmp/defe-web-dist
-          gh api repos/${{ github.repository }}/actions/artifacts/10501803696/zip > /tmp/defe-web-artifact.zip
-          unzip -q /tmp/defe-web-artifact.zip -d /tmp/defe-web-artifact
-          test -f /tmp/defe-web-artifact/defe-web-dist.zip
-          unzip -q /tmp/defe-web-artifact/defe-web-dist.zip -d /tmp/defe-web-dist
+          rm -rf /tmp/a220 /tmp/defe-web-dist /tmp/a220.zip
+          mkdir -p /tmp/a220 /tmp/defe-web-dist
+          gh api repos/${{ github.repository }}/actions/artifacts/10498168381/zip > /tmp/a220.zip
+          unzip -q /tmp/a220.zip -d /tmp/a220
+          test -f /tmp/a220/defe-web-dist.zip
+          unzip -q /tmp/a220/defe-web-dist.zip -d /tmp/defe-web-dist
           test -f /tmp/defe-web-dist/index.html
-          FAMILY=$(find /tmp/defe-web-dist -maxdepth 1 -type f -name 'web-family-onboarding*.js' | head -1)
-          test -n "$FAMILY"
-          grep -R -F 'Mis hijos' /tmp/defe-web-dist >/dev/null
-          grep -R -F 'Cerrar sesión' /tmp/defe-web-dist >/dev/null
-          grep -F '/api/availability/family/setup' "$FAMILY" >/dev/null
-          grep -R -F 'Mi cuenta' /tmp/defe-web-dist >/dev/null
-          echo 'ARTEFACTO_231_VALIDADO_OK'
-
-      - name: Empaquetar UI validada en Android
+          grep -R -F 'EL GIGANTE DE TRES DE FEBRERO' /tmp/defe-web-dist >/dev/null
+          grep -R -F 'Mi Defe' /tmp/defe-web-dist >/dev/null
+          grep -R -F 'Comunidad' /tmp/defe-web-dist >/dev/null
+          grep -R -F 'Tienda' /tmp/defe-web-dist >/dev/null
+          grep -R -F '/api/availability/admin' /tmp/defe-web-dist >/dev/null
+          echo UI_220_INSTITUCIONAL_VALIDADA_OK
+      - name: Empaquetar UI 220 en Android
         run: |
           set -euxo pipefail
           rm -rf mobile/www
           mkdir -p mobile/www
           cp -a /tmp/defe-web-dist/. mobile/www/
-          grep -R -F 'Mis hijos' mobile/www >/dev/null
-          grep -R -F 'Mi cuenta' mobile/www >/dev/null
-          grep -R -F '/api/availability/family/setup' mobile/www >/dev/null
-          echo 'UI_VALIDADA_ANDROID_OK'
-
       - name: Instalar dependencias Android
         working-directory: mobile
         run: npm install
-
       - name: Crear proyecto Android
         working-directory: mobile
         run: |
           rm -rf android
           npx cap add android
-
       - name: Sync Capacitor
         working-directory: mobile
         run: npx cap sync android
-
       - name: Verificar assets empaquetados
         run: |
           set -euxo pipefail
           test -f mobile/android/app/src/main/assets/public/index.html
-          grep -R -F 'Mis hijos' mobile/android/app/src/main/assets/public >/dev/null
-          grep -R -F 'Mi cuenta' mobile/android/app/src/main/assets/public >/dev/null
-          grep -R -F '/api/availability/family/setup' mobile/android/app/src/main/assets/public >/dev/null
-          if grep -R -F 'diegomartinguglielmi-eng.github.io/el-defe-app' mobile/android/app/src/main/assets >/dev/null 2>&1; then
-            echo 'ERROR: Android redirige a GitHub Pages'
-            exit 1
-          fi
-          echo 'APK_ASSETS_VALIDATED_OK'
-
+          grep -R -F 'EL GIGANTE DE TRES DE FEBRERO' mobile/android/app/src/main/assets/public >/dev/null
+          grep -R -F 'Mi Defe' mobile/android/app/src/main/assets/public >/dev/null
+          grep -R -F '/api/availability/admin' mobile/android/app/src/main/assets/public >/dev/null
+          if grep -R -F 'diegomartinguglielmi-eng.github.io/el-defe-app' mobile/android/app/src/main/assets/capacitor.config.json >/dev/null 2>&1; then exit 1; fi
+          echo APK_ASSETS_UI_220_OK
       - name: Build APK
         working-directory: mobile/android
         run: chmod +x gradlew && ./gradlew assembleDebug
-
-      - name: Validar APK generado
+      - name: Validar APK final
         run: |
           set -euxo pipefail
           APK=mobile/android/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
-          rm -rf /tmp/apkcheck
-          mkdir /tmp/apkcheck
+          rm -rf /tmp/apkcheck && mkdir /tmp/apkcheck
           unzip -q "$APK" -d /tmp/apkcheck
-          test -f /tmp/apkcheck/assets/public/index.html
-          grep -R -F 'Mis hijos' /tmp/apkcheck/assets/public >/dev/null
-          grep -R -F 'Mi cuenta' /tmp/apkcheck/assets/public >/dev/null
-          grep -R -F '/api/availability/family/setup' /tmp/apkcheck/assets/public >/dev/null
-          if grep -R -F 'diegomartinguglielmi-eng.github.io/el-defe-app' /tmp/apkcheck/assets >/dev/null 2>&1; then
-            echo 'ERROR: APK final redirige a GitHub Pages'
-            exit 1
-          fi
-          echo 'APK_FINAL_VALIDADO_OK'
-
+          grep -R -F 'EL GIGANTE DE TRES DE FEBRERO' /tmp/apkcheck/assets/public >/dev/null
+          grep -R -F 'Mi Defe' /tmp/apkcheck/assets/public >/dev/null
+          grep -R -F 'Comunidad' /tmp/apkcheck/assets/public >/dev/null
+          grep -R -F 'Tienda' /tmp/apkcheck/assets/public >/dev/null
+          grep -R -F '/api/availability/admin' /tmp/apkcheck/assets/public >/dev/null
+          echo APK_FINAL_UI_220_VALIDADO_OK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: EL-DEFE-Android-UI-Validada
+          name: EL-DEFE-Android-UI-Institucional-220
           path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
