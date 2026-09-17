@@ -42,11 +42,11 @@ jobs:
           grep -F "admin_orders" app/store_v5.py
           grep -F "update_order_status" app/store_v5.py
           grep -F "update_settings" app/store_v5.py
-          grep -F "DEFE_STORE_NATIVE_EXACT_V6" patch-store-native.mjs
+          grep -F "DEFE_STORE_NATIVE_EXACT_V7" patch-store-native.mjs
           grep -F "checkout=native-v6" patch-store-native.mjs
           grep -F "camiseta partido" patch-store-native.mjs
           grep -F "/api/store/orders/submit" patch-store-native.mjs
-          grep -F "sin interceptor DOM" post-store-checkout.sh
+          grep -F "solo flujo nativo V7" post-store-checkout.sh
 
       - name: Validar API pública y protección administrativa
         shell: bash
@@ -120,5 +120,3 @@ jobs:
           test "$STATUS" = "302" -o "$STATUS" = "303" -o "$STATUS" = "307" -o "$STATUS" = "200"
           grep -i '^location:.*wa.me\|^location:.*whatsapp' /tmp/headers || { echo 'Falta redirección a WhatsApp'; cat /tmp/body; exit 1; }
           echo "STORE_E2E_OK"
-
-      # Ejecución manual de control integral solicitada 2026-09-17.
