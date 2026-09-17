@@ -27,7 +27,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-      - name: Descargar UI institucional validada 220
+      - name: Descargar UI operativa validada de esta mañana
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -44,13 +44,20 @@ jobs:
           grep -R -F 'Comunidad' /tmp/defe-web-dist >/dev/null
           grep -R -F 'Tienda' /tmp/defe-web-dist >/dev/null
           grep -R -F '/api/availability/admin' /tmp/defe-web-dist >/dev/null
-          echo UI_220_INSTITUCIONAL_VALIDADA_OK
-      - name: Empaquetar UI 220 en Android
+          echo UI_OPERATIVA_VALIDADA_OK
+      - name: Empaquetar UI conservando su base GitHub Pages
         run: |
           set -euxo pipefail
           rm -rf mobile/www
-          mkdir -p mobile/www
-          cp -a /tmp/defe-web-dist/. mobile/www/
+          mkdir -p mobile/www/el-defe-app
+          cp -a /tmp/defe-web-dist/. mobile/www/el-defe-app/
+          cat > mobile/www/index.html <<'EOF'
+          <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=/el-defe-app/"><title>El Defe</title></head><body><script>location.replace('/el-defe-app/');</script></body></html>
+          EOF
+          test -f mobile/www/el-defe-app/assets/index-v35-95a0630f32ce3be7866ba3e2dc401d85a9e04239.js
+          test -f mobile/www/el-defe-app/escudo-dsl.svg
+          grep -F 'src="/el-defe-app/assets/' mobile/www/el-defe-app/index.html >/dev/null
+          echo BASE_LOCAL_ANDROID_COMPATIBLE_OK
       - name: Instalar dependencias Android
         working-directory: mobile
         run: npm install
@@ -62,33 +69,43 @@ jobs:
       - name: Sync Capacitor
         working-directory: mobile
         run: npx cap sync android
-      - name: Verificar assets empaquetados
+      - name: Verificar assets y rutas Android
         run: |
           set -euxo pipefail
-          test -f mobile/android/app/src/main/assets/public/index.html
-          grep -R -F 'EL GIGANTE DE TRES DE FEBRERO' mobile/android/app/src/main/assets/public >/dev/null
-          grep -R -F 'Mi Defe' mobile/android/app/src/main/assets/public >/dev/null
-          grep -R -F '/api/availability/admin' mobile/android/app/src/main/assets/public >/dev/null
+          ROOT=mobile/android/app/src/main/assets/public
+          test -f "$ROOT/index.html"
+          test -f "$ROOT/el-defe-app/index.html"
+          test -f "$ROOT/el-defe-app/assets/index-v35-95a0630f32ce3be7866ba3e2dc401d85a9e04239.js"
+          test -f "$ROOT/el-defe-app/escudo-dsl.svg"
+          grep -F "location.replace('/el-defe-app/')" "$ROOT/index.html" >/dev/null
+          grep -R -F 'EL GIGANTE DE TRES DE FEBRERO' "$ROOT/el-defe-app" >/dev/null
+          grep -R -F 'Mi Defe' "$ROOT/el-defe-app" >/dev/null
+          grep -R -F '/api/availability/admin' "$ROOT/el-defe-app" >/dev/null
           if grep -R -F 'diegomartinguglielmi-eng.github.io/el-defe-app' mobile/android/app/src/main/assets/capacitor.config.json >/dev/null 2>&1; then exit 1; fi
-          echo APK_ASSETS_UI_220_OK
+          echo APK_ASSETS_Y_RUTAS_OK
       - name: Build APK
         working-directory: mobile/android
         run: chmod +x gradlew && ./gradlew assembleDebug
-      - name: Validar APK final
+      - name: Validar APK final y arranque
         run: |
           set -euxo pipefail
           APK=mobile/android/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
           rm -rf /tmp/apkcheck && mkdir /tmp/apkcheck
           unzip -q "$APK" -d /tmp/apkcheck
-          grep -R -F 'EL GIGANTE DE TRES DE FEBRERO' /tmp/apkcheck/assets/public >/dev/null
-          grep -R -F 'Mi Defe' /tmp/apkcheck/assets/public >/dev/null
-          grep -R -F 'Comunidad' /tmp/apkcheck/assets/public >/dev/null
-          grep -R -F 'Tienda' /tmp/apkcheck/assets/public >/dev/null
-          grep -R -F '/api/availability/admin' /tmp/apkcheck/assets/public >/dev/null
-          echo APK_FINAL_UI_220_VALIDADO_OK
+          ROOT=/tmp/apkcheck/assets/public
+          test -f "$ROOT/index.html"
+          test -f "$ROOT/el-defe-app/index.html"
+          test -f "$ROOT/el-defe-app/assets/index-v35-95a0630f32ce3be7866ba3e2dc401d85a9e04239.js"
+          grep -F "location.replace('/el-defe-app/')" "$ROOT/index.html" >/dev/null
+          grep -R -F 'EL GIGANTE DE TRES DE FEBRERO' "$ROOT/el-defe-app" >/dev/null
+          grep -R -F 'Mi Defe' "$ROOT/el-defe-app" >/dev/null
+          grep -R -F 'Comunidad' "$ROOT/el-defe-app" >/dev/null
+          grep -R -F 'Tienda' "$ROOT/el-defe-app" >/dev/null
+          grep -R -F '/api/availability/admin' "$ROOT/el-defe-app" >/dev/null
+          echo APK_FINAL_UI_MANANA_Y_ARRANQUE_VALIDADO_OK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: EL-DEFE-Android-UI-Institucional-220
+          name: EL-DEFE-Android-Cierre-UI-Manana
           path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
