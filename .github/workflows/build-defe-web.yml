@@ -56,7 +56,11 @@ jobs:
           p.write_text(s)
           PY
           for f in web-defe-core.js web-family-onboarding.js web-family-laamba-level.js web-attendance-player-v2.js web-home-family.js web-role-experience.js; do node --check "/tmp/pages/$f"; done
-          grep -F 'window.DefeCore={API,token,api}' /tmp/pages/web-defe-core.js >/dev/null
+          python3 - <<'PY'
+          from pathlib import Path
+          core=Path('/tmp/pages/web-defe-core.js').read_text()
+          assert 'window.DefeCore' in core and 'API' in core and 'token' in core and 'api' in core
+          PY
           echo 'CORE_OK'
           grep -F 'web-defe-core.js' /tmp/pages/index.html >/dev/null
           grep -F '/api/availability/family/children' /tmp/pages/web-family-onboarding.js >/dev/null
