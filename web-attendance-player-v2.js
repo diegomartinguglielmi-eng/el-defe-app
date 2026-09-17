@@ -1,7 +1,7 @@
 // El Defe · adaptador de asistencia por hijo sobre la UI operativa validada
 (function(){
 if(window.__defeAttendancePlayerV2)return;window.__defeAttendancePlayerV2=true;
-const API='https://el-defe-v5-production.up.railway.app';
+const API='https://el-defe-v2-staging-production.up.railway.app';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 function jwt(v){if(!v||typeof v!=='string')return null;const m=v.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(m)return m[0];try{const o=JSON.parse(v);for(const x of Object.values(o||{})){const f=jwt(typeof x==='string'?x:JSON.stringify(x));if(f)return f}}catch(_){}return null}
 function token(){for(const st of [localStorage,sessionStorage])for(let i=0;i<st.length;i++){const t=jwt(st.getItem(st.key(i)));if(t)return t}return localStorage.getItem('defe_token')||localStorage.getItem('defe_auth_token')||sessionStorage.getItem('defe_token')||sessionStorage.getItem('defe_auth_token')||''}
