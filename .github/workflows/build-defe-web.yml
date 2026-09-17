@@ -109,19 +109,35 @@ jobs:
           cp app/static/availability-ui.js "defe-web-build/dist/${AVAILABILITY}"
           cp push-sw.js defe-web-build/dist/push-sw.js
           sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${FAMILY}\"></script><script src=\"./${FAMILYFIX}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${SPONSORS}\"></script><script src=\"./${AVAILABILITY}\"></script></body>#" defe-web-build/dist/index.html
-      - name: Actualización automática PWA
+      - name: Configurar actualización persistente PWA
         run: |
           sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
-          echo "// retired - ${GITHUB_SHA}" > defe-web-build/dist/registerSW.js
           cat > defe-web-build/dist/sw.js <<EOF
           const BUILD='${GITHUB_SHA}';
           self.addEventListener('install',()=>self.skipWaiting());
-          self.addEventListener('activate',event=>event.waitUntil((async()=>{try{const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)))}catch(_){}await self.clients.claim()})()));
-          self.addEventListener('fetch',event=>{if(event.request.mode==='navigate'){event.respondWith(fetch(event.request,{cache:'no-store'}).catch(()=>fetch('./index.html',{cache:'no-store'})));}});
+          self.addEventListener('activate',event=>event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)));await self.clients.claim()})()));
+          self.addEventListener('message',event=>{if(event.data&&event.data.type==='SKIP_WAITING')self.skipWaiting()});
+          self.addEventListener('fetch',event=>{
+            if(event.request.method!=='GET')return;
+            if(event.request.mode==='navigate'){
+              event.respondWith(fetch(event.request,{cache:'no-store'}).catch(()=>fetch('./index.html',{cache:'no-store'})));
+            }
+          });
           EOF
-          BOOT="<script data-defe-pwa-build='${GITHUB_SHA}'>(async()=>{const B='${GITHUB_SHA}',K='defe-pwa-build';try{if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.unregister()));}if('caches'in window){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}const prev=localStorage.getItem(K);localStorage.setItem(K,B);if(prev&&prev!==B&&!sessionStorage.getItem('defe-reloaded-'+B)){sessionStorage.setItem('defe-reloaded-'+B,'1');location.replace(location.pathname+'?build='+B+location.hash);}}catch(e){console.warn('PWA update',e)}})();</script>"
-          sed -i "s#<head>#<head>${BOOT}#" defe-web-build/dist/index.html
-      - name: Verificar módulos y actualización
+          cat > defe-web-build/dist/registerSW.js <<EOF
+          (()=>{if(!('serviceWorker'in navigator))return;let reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded)return;reloaded=true;location.reload()});window.addEventListener('load',async()=>{try{const reg=await navigator.serviceWorker.register('./sw.js?v=${GITHUB_SHA}',{scope:'./',updateViaCache:'none'});await reg.update();if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});reg.addEventListener('updatefound',()=>{const w=reg.installing;if(!w)return;w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)w.postMessage({type:'SKIP_WAITING'})})})}catch(e){console.warn('SW update',e)}})})();
+          EOF
+          BOOT="<script data-defe-pwa-build='${GITHUB_SHA}' src='./registerSW.js?v=${GITHUB_SHA}'></script>"
+          sed -i "s#</head>#${BOOT}</head>#" defe-web-build/dist/index.html
+          python - <<'PY'
+          import json
+          p='defe-web-build/dist/manifest.webmanifest'
+          d=json.load(open(p,encoding='utf-8'))
+          d['start_url']='./?source=pwa'
+          d['scope']='/el-defe-app/'
+          json.dump(d,open(p,'w',encoding='utf-8'),ensure_ascii=False,separators=(',',':'))
+          PY
+      - name: Verificar módulos y PWA
         run: |
           set -e
           test -f "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js"
@@ -133,13 +149,16 @@ jobs:
           grep -F "DEFE_FAMILY_NATIVE_V2" defe-web-build/dist/assets/index-*.js >/dev/null
           grep -F 'children:"Mis hijos"' defe-web-build/dist/assets/index-*.js >/dev/null
           grep -F 'children:"⇥  Cerrar sesión"' defe-web-build/dist/assets/index-*.js >/dev/null
-          grep -F "data-defe-pwa-build='${GITHUB_SHA}'" defe-web-build/dist/index.html >/dev/null
-          grep -F "defe-pwa-build" defe-web-build/dist/index.html >/dev/null
+          grep -F "registerSW.js?v=${GITHUB_SHA}" defe-web-build/dist/index.html >/dev/null
+          grep -F "serviceWorker.register('./sw.js?v=${GITHUB_SHA}'" defe-web-build/dist/registerSW.js >/dev/null
+          grep -F "updateViaCache:'none'" defe-web-build/dist/registerSW.js >/dev/null
+          grep -F "controllerchange" defe-web-build/dist/registerSW.js >/dev/null
           grep -F "cache:'no-store'" defe-web-build/dist/sw.js >/dev/null
-          grep -F "${GITHUB_SHA}" defe-web-build/dist/registerSW.js >/dev/null
+          grep -F '"start_url":"./?source=pwa"' defe-web-build/dist/manifest.webmanifest >/dev/null
           node --check "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js"
+          node --check defe-web-build/dist/registerSW.js
           node --check defe-web-build/dist/sw.js
-          echo "BUILD_PWA_AUTOUPDATE_OK"
+          echo "BUILD_PWA_PERSISTENT_UPDATE_OK"
       - name: Empaquetar dist
         run: |
           cd defe-web-build/dist
