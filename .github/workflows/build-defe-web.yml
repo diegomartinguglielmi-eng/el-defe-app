@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'web-family-onboarding.js'
+      - 'web-family-laamba-level.js'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
@@ -38,6 +39,7 @@ jobs:
           test -s /tmp/recovered/el-defe-app/index.html
           cp -a /tmp/recovered/el-defe-app/. /tmp/pages/
           cp web-family-onboarding.js /tmp/pages/web-family-onboarding.js
+          cp web-family-laamba-level.js /tmp/pages/web-family-laamba-level.js
           rm -f /tmp/pages/web-family-delete.js
           python3 - <<'PY'
           from pathlib import Path
@@ -45,19 +47,22 @@ jobs:
           s=p.read_text()
           s=s.replace('<script src="./web-attendance-player-filter.js"></script>','')
           s=s.replace('<script src="./web-family-delete.js"></script>','')
-          tag='<script src="./web-family-onboarding.js"></script>'
-          if tag not in s:s=s.replace('</body>',tag+'\n</body>')
+          family='<script src="./web-family-onboarding.js"></script>'
+          laamba='<script src="./web-family-laamba-level.js"></script>'
+          if family not in s:s=s.replace('</body>',family+'\n</body>')
+          if laamba not in s:s=s.replace('</body>',laamba+'\n</body>')
           p.write_text(s)
           PY
           test -s /tmp/pages/availability-ui-netlify.js
           test -s /tmp/pages/web-mi-defe-overlay-netlify.js
           node --check /tmp/pages/web-family-onboarding.js
+          node --check /tmp/pages/web-family-laamba-level.js
           grep -F '/api/availability/family/children' /tmp/pages/web-family-onboarding.js >/dev/null
-          grep -F 'data-del-child' /tmp/pages/web-family-onboarding.js >/dev/null
-          grep -F 'data-del-team' /tmp/pages/web-family-onboarding.js >/dev/null
+          grep -F '/api/family/catalog' /tmp/pages/web-family-laamba-level.js >/dev/null
+          grep -F 'data-laamba-category' /tmp/pages/web-family-laamba-level.js >/dev/null
           if grep -F 'web-family-delete.js' /tmp/pages/index.html; then echo 'ERROR: overlay duplicado de familias sigue cargado'; exit 1; fi
           if grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html; then echo 'ERROR: filtro experimental sigue cargado'; exit 1; fi
-          echo 'TABLERO_ASISTENCIA_ORIGINAL_Y_ABM_FAMILIAS_UNICO'
+          echo 'TABLERO_ASISTENCIA_ORIGINAL_Y_FAMILIAS_LAAMBA_3_NIVELES'
       - name: Preparar GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
