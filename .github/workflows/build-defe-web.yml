@@ -10,6 +10,7 @@ on:
       - 'web-attendance-player-v2.js'
       - 'web-home-family.js'
       - 'web-role-experience.js'
+      - 'web-defe-core.js'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
@@ -40,6 +41,7 @@ jobs:
           cp web-attendance-player-v2.js /tmp/pages/web-attendance-player-v2.js
           cp web-home-family.js /tmp/pages/web-home-family.js
           cp web-role-experience.js /tmp/pages/web-role-experience.js
+          cp web-defe-core.js /tmp/pages/web-defe-core.js
           rm -f /tmp/pages/web-family-delete.js /tmp/pages/web-attendance-player-filter.js
           python3 - <<'PY'
           from pathlib import Path
@@ -47,13 +49,15 @@ jobs:
           s=p.read_text()
           s=s.replace('<script src="./web-attendance-player-filter.js"></script>','')
           s=s.replace('<script src="./web-family-delete.js"></script>','')
-          for script in ('web-family-onboarding.js','web-family-laamba-level.js','web-attendance-player-v2.js','web-home-family.js','web-role-experience.js'):
+          for script in ('web-defe-core.js','web-family-onboarding.js','web-family-laamba-level.js','web-attendance-player-v2.js','web-home-family.js','web-role-experience.js'):
               tag=f'<script src="./{script}"></script>'
               if tag not in s:
                   s=s.replace('</body>',tag+'\n</body>')
           p.write_text(s)
           PY
-          for f in web-family-onboarding.js web-family-laamba-level.js web-attendance-player-v2.js web-home-family.js web-role-experience.js; do node --check "/tmp/pages/$f"; done
+          for f in web-defe-core.js web-family-onboarding.js web-family-laamba-level.js web-attendance-player-v2.js web-home-family.js web-role-experience.js; do node --check "/tmp/pages/$f"; done
+          grep -F 'window.DefeCore' /tmp/pages/web-defe-core.js >/dev/null
+          grep -F 'web-defe-core.js' /tmp/pages/index.html >/dev/null
           grep -F '/api/availability/family/children' /tmp/pages/web-family-onboarding.js >/dev/null
           grep -F '/api/availability/v2/me' /tmp/pages/web-attendance-player-v2.js >/dev/null
           grep -F '/api/home/personalized' /tmp/pages/web-home-family.js >/dev/null
