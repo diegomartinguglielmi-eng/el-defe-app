@@ -31,30 +31,31 @@ jobs:
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/10498124937/zip" \
             -o /tmp/operativo.zip
-          rm -rf /tmp/outer /tmp/publish
-          mkdir -p /tmp/outer /tmp/publish
+          rm -rf /tmp/outer /tmp/recovered /tmp/pages
+          mkdir -p /tmp/outer /tmp/recovered /tmp/pages
           unzip -q /tmp/operativo.zip -d /tmp/outer
           if [ -f /tmp/outer/netlify-publish.zip ]; then
-            unzip -q /tmp/outer/netlify-publish.zip -d /tmp/publish
+            unzip -q /tmp/outer/netlify-publish.zip -d /tmp/recovered
           else
-            cp -a /tmp/outer/. /tmp/publish/
+            cp -a /tmp/outer/. /tmp/recovered/
           fi
-      - name: Validar estructura real del artefacto histórico
+      - name: Preparar raíz correcta para GitHub Pages
         run: |
           set -euo pipefail
-          test -s /tmp/publish/_redirects
-          test -s /tmp/publish/el-defe-app/index.html
-          test -s /tmp/publish/el-defe-app/web-mi-defe-overlay-netlify.js
-          test -s /tmp/publish/el-defe-app/availability-ui-netlify.js
-          test -s /tmp/publish/el-defe-app/web-auth-overlay-netlify.js
-          test -s /tmp/publish/el-defe-app/escudo-dsl.svg
-          grep -F 'Mi Defe' /tmp/publish/el-defe-app/web-mi-defe-overlay-netlify.js >/dev/null
-          grep -F '/api/availability/admin' /tmp/publish/el-defe-app/availability-ui-netlify.js >/dev/null
-          echo 'UI_OPERATIVA_1021_VALIDADA'
+          test -s /tmp/recovered/el-defe-app/index.html
+          cp -a /tmp/recovered/el-defe-app/. /tmp/pages/
+          test -s /tmp/pages/index.html
+          test -s /tmp/pages/web-mi-defe-overlay-netlify.js
+          test -s /tmp/pages/availability-ui-netlify.js
+          test -s /tmp/pages/web-auth-overlay-netlify.js
+          test -s /tmp/pages/escudo-dsl.svg
+          grep -F 'Mi Defe' /tmp/pages/web-mi-defe-overlay-netlify.js >/dev/null
+          grep -F '/api/availability/admin' /tmp/pages/availability-ui-netlify.js >/dev/null
+          echo 'RAIZ_PAGES_CORRECTA_Y_UI_1021_VALIDADA'
       - name: Preparar GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: /tmp/publish
+          path: /tmp/pages
   deploy:
     environment:
       name: github-pages
@@ -62,6 +63,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Publicar artefacto exacto 10:21
+      - name: Publicar UI 10:21 en raíz del proyecto Pages
         id: deployment
         uses: actions/deploy-pages@v4
