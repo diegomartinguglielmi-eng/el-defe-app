@@ -35,7 +35,6 @@ class UserPlayerLink(Base):
     __table_args__ = (UniqueConstraint("user_id", "person_id", name="uq_user_player_link"),)
 
 class UserPlayerRequest(Base):
-    """Solicitud hecha por una familia; el administrador valida el vínculo antes de activarlo."""
     __tablename__ = "user_player_requests"
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
@@ -54,6 +53,14 @@ class UserPlayerLinkIn(BaseModel):
     person_id: int
 class PlayerRequestIn(BaseModel):
     person_id: int
+class FamilyChildIn(BaseModel):
+    first_name: str
+    last_name: str
+    competition: str
+    category: str
+class FamilyTeamIn(BaseModel):
+    competition: str
+    category: str
 
 def _today(): return datetime.now(AR_TZ).date().isoformat()
 def _next_event(db, selection):
@@ -65,7 +72,7 @@ def _player_teams(db, person_id):
     rows=db.query(TeamMember,Team).join(Team,Team.id==TeamMember.team_id).filter(TeamMember.person_id==person_id,Team.is_active==True).order_by(Team.competition,Team.division).all()
     return [{"team_id":t.id,"competition":t.competition,"category":t.division,"season":t.season} for _,t in rows]
 def _player(db,p):
-    return {"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"birth_year":p.birth_year,"teams":_player_teams(db,p.id)}
+    return {"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"first_name":p.first_name,"last_name":p.last_name,"birth_year":p.birth_year,"teams":_player_teams(db,p.id)}
 def _linked_players(db,user_id):
     rows=db.query(UserPlayerLink,Person).join(Person,Person.id==UserPlayerLink.person_id).filter(UserPlayerLink.user_id==user_id,Person.is_active==True).order_by(Person.last_name,Person.first_name).all()
     return [_player(db,p) for _,p in rows]
@@ -74,6 +81,27 @@ def _ensure_team_favorites(db,user_id,person_id):
         selection=f"{team['competition']}|{team['category']}"
         exists=db.query(Favorite).filter(Favorite.user_id==user_id,Favorite.favorite_type==FOLLOW_TYPE,Favorite.favorite_id==selection).first()
         if not exists: db.add(Favorite(user_id=user_id,favorite_type=FOLLOW_TYPE,favorite_id=selection))
+def _team_for(db,competition,category):
+    competition=(competition or '').strip(); category=(category or '').strip()
+    if not competition or not category: raise HTTPException(400,"Liga y categoría son obligatorias")
+    team=db.query(Team).filter(Team.competition==competition,Team.division==category,Team.is_active==True).order_by(Team.season.desc()).first()
+    if not team:
+        team=Team(competition=competition,division=category,season=2026,is_active=True);db.add(team);db.flush()
+    return team
+def _assert_family_child(db,user_id,person_id):
+    link=db.query(UserPlayerLink).filter(UserPlayerLink.user_id==user_id,UserPlayerLink.person_id==person_id).first()
+    if not link: raise HTTPException(404,"Hijo no vinculado a esta familia")
+    p=db.get(Person,person_id)
+    if not p or not p.is_active: raise HTTPException(404,"Hijo inexistente")
+    return p
+def _add_team(db,user_id,person_id,competition,category):
+    team=_team_for(db,competition,category)
+    member=db.query(TeamMember).filter(TeamMember.team_id==team.id,TeamMember.person_id==person_id,TeamMember.season==team.season).first()
+    if not member: db.add(TeamMember(team_id=team.id,person_id=person_id,season=team.season,member_role="player"))
+    selection=f"{team.competition}|{team.division}"
+    fav=db.query(Favorite).filter(Favorite.user_id==user_id,Favorite.favorite_type==FOLLOW_TYPE,Favorite.favorite_id==selection).first()
+    if not fav: db.add(Favorite(user_id=user_id,favorite_type=FOLLOW_TYPE,favorite_id=selection))
+    return team
 
 def _approve(db,user_id,person_id):
     link=db.query(UserPlayerLink).filter(UserPlayerLink.user_id==user_id,UserPlayerLink.person_id==person_id).first()
@@ -86,11 +114,26 @@ def _approve(db,user_id,person_id):
 @router.get("/family/setup")
 def family_setup(db:Session=Depends(get_db),user=Depends(get_current_user)):
     linked=_linked_players(db,user.id)
-    reqs=db.query(UserPlayerRequest,Person).join(Person,Person.id==UserPlayerRequest.person_id).filter(UserPlayerRequest.user_id==user.id,UserPlayerRequest.status=="pending",Person.is_active==True).all()
-    pending=[_player(db,p) for _,p in reqs]
-    people=db.query(Person).filter(Person.is_active==True,Person.role=="player").order_by(Person.last_name,Person.first_name).all()
-    available=[_player(db,p) for p in people]
-    return {"email":user.email,"linked":linked,"pending":pending,"players":available}
+    return {"email":user.email,"linked":linked,"pending":[],"needs_setup":len(linked)==0}
+
+@router.post("/family/children")
+def create_family_child(payload:FamilyChildIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
+    first=(payload.first_name or '').strip(); last=(payload.last_name or '').strip()
+    if not first or not last: raise HTTPException(400,"Nombre y apellido son obligatorios")
+    p=Person(first_name=first,last_name=last,role="player",is_active=True);db.add(p);db.flush()
+    db.add(UserPlayerLink(user_id=user.id,person_id=p.id));_add_team(db,user.id,p.id,payload.competition,payload.category)
+    db.commit();db.refresh(p);return {"ok":True,"child":_player(db,p)}
+
+@router.put("/family/children/{person_id}")
+def update_family_child(person_id:int,payload:FamilyChildIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
+    p=_assert_family_child(db,user.id,person_id);first=(payload.first_name or '').strip();last=(payload.last_name or '').strip()
+    if not first or not last: raise HTTPException(400,"Nombre y apellido son obligatorios")
+    p.first_name=first;p.last_name=last;_add_team(db,user.id,p.id,payload.competition,payload.category);db.commit();db.refresh(p)
+    return {"ok":True,"child":_player(db,p)}
+
+@router.post("/family/children/{person_id}/teams")
+def add_family_child_team(person_id:int,payload:FamilyTeamIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
+    p=_assert_family_child(db,user.id,person_id);_add_team(db,user.id,p.id,payload.competition,payload.category);db.commit();return {"ok":True,"child":_player(db,p)}
 
 @router.post("/family/requests")
 def request_player(payload:PlayerRequestIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
