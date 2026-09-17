@@ -1,7 +1,9 @@
 from .main_v5 import app
 from .store_submit import router as store_submit_router
+from .availability_v1 import router as availability_router
 
 app.include_router(store_submit_router)
+app.include_router(availability_router)
 
 @app.middleware('http')
 async def log_frontend_origin(request, call_next):
@@ -10,7 +12,7 @@ async def log_frontend_origin(request, call_next):
             'frontend_probe': request.url.path,
             'origin': request.headers.get('origin'),
             'referer': request.headers.get('referer'),
-            'sec_fetch_site': request.headers.get('sec-fetch-site'),
+            'sec_fetch_site': request.headers.get('sec_fetch_site'),
             'user_agent': request.headers.get('user-agent'),
         }, flush=True)
     return await call_next(request)
