@@ -1,8 +1,7 @@
 (() => {
   if(window.__defeRoleExperience)return; window.__defeRoleExperience=true;
-  const API='https://el-defe-v2-staging-production.up.railway.app';
-  function jwt(){for(const k of ['defe_token','access_token','token']){const v=localStorage.getItem(k);if(v)return v}return null}
-  async function me(){const t=jwt();if(!t)return null;const r=await fetch(API+'/api/me',{headers:{Authorization:'Bearer '+t},cache:'no-store'});return r.ok?r.json():null}
+  const core=window.DefeCore;
+  async function me(){if(!core?.token())return null;try{return await core.api('/api/me')}catch(_){return null}}
   function apply(u){
     document.documentElement.dataset.defeRole=u?.role||'guest';
     const role=u?.role||'guest';
