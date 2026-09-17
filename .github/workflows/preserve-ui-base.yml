@@ -2,6 +2,11 @@ name: Preservar UI operativa validada
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - mejora-01-asistencia-por-hijo
+    paths:
+      - '.github/workflows/preserve-ui-base.yml'
 
 permissions:
   contents: write
