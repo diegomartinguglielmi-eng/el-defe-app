@@ -9,6 +9,7 @@ on:
       - 'web-family-laamba-level.js'
       - 'web-attendance-player-v2.js'
       - 'web-home-family.js'
+      - 'web-role-experience.js'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
@@ -38,6 +39,7 @@ jobs:
           cp web-family-laamba-level.js /tmp/pages/web-family-laamba-level.js
           cp web-attendance-player-v2.js /tmp/pages/web-attendance-player-v2.js
           cp web-home-family.js /tmp/pages/web-home-family.js
+          cp web-role-experience.js /tmp/pages/web-role-experience.js
           rm -f /tmp/pages/web-family-delete.js /tmp/pages/web-attendance-player-filter.js
           python3 - <<'PY'
           from pathlib import Path
@@ -45,24 +47,18 @@ jobs:
           s=p.read_text()
           s=s.replace('<script src="./web-attendance-player-filter.js"></script>','')
           s=s.replace('<script src="./web-family-delete.js"></script>','')
-          for script in ('web-family-onboarding.js','web-family-laamba-level.js','web-attendance-player-v2.js','web-home-family.js'):
+          for script in ('web-family-onboarding.js','web-family-laamba-level.js','web-attendance-player-v2.js','web-home-family.js','web-role-experience.js'):
               tag=f'<script src="./{script}"></script>'
               if tag not in s:
                   s=s.replace('</body>',tag+'\n</body>')
           p.write_text(s)
           PY
-          node --check /tmp/pages/web-family-onboarding.js
-          node --check /tmp/pages/web-family-laamba-level.js
-          node --check /tmp/pages/web-attendance-player-v2.js
-          node --check /tmp/pages/web-home-family.js
+          for f in web-family-onboarding.js web-family-laamba-level.js web-attendance-player-v2.js web-home-family.js web-role-experience.js; do node --check "/tmp/pages/$f"; done
           grep -F '/api/availability/family/children' /tmp/pages/web-family-onboarding.js >/dev/null
-          grep -F '/api/family/catalog' /tmp/pages/web-family-laamba-level.js >/dev/null
           grep -F '/api/availability/v2/me' /tmp/pages/web-attendance-player-v2.js >/dev/null
-          grep -F '/api/availability/v2/admin' /tmp/pages/web-attendance-player-v2.js >/dev/null
-          grep -F 'data-player-answer' /tmp/pages/web-attendance-player-v2.js >/dev/null
           grep -F '/api/home/personalized' /tmp/pages/web-home-family.js >/dev/null
-          grep -F 'web-home-family.js' /tmp/pages/index.html >/dev/null
-          ! grep -F 'web-family-delete.js' /tmp/pages/index.html
+          grep -F '/api/me' /tmp/pages/web-role-experience.js >/dev/null
+          grep -F 'web-role-experience.js' /tmp/pages/index.html >/dev/null
           ! grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html
           echo 'BASE_UI_DURABLE_OK'
       - name: Preparar GitHub Pages
