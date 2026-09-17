@@ -3,7 +3,7 @@ const API='https://el-defe-v5-production.up.railway.app';
 const CATALOG={'FEFI':['2013','2014','2015','2016','2017','2018','2019','2020'],'LAAMBA':['Masculino','Femenino'],'ARGENLIGA':['Masculino'],'SUPER LIGA FUTSAL':['Junior']};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 function token(){for(const s of [localStorage,sessionStorage])for(let i=0;i<s.length;i++){const v=s.getItem(s.key(i))||'',m=v.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(m)return m[0]}return null}
-async function api(path,opt={}){const r=await fetch(API+path,opt);let d={};try{d=await r.json()}catch{}if(!r.ok)throw Error(d.detail||`Error ${r.status}`);return d}
+async function api(path,opt={}){const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),8000);try{const r=await fetch(API+path,{...opt,signal:ctrl.signal});let d={};try{d=await r.json()}catch{}if(!r.ok)throw Error(d.detail||`Error ${r.status}`);return d}catch(e){if(e.name==='AbortError')throw Error('El servidor no respondió a tiempo. Reintentá.');throw e}finally{clearTimeout(timer)}}
 const auth=t=>({Authorization:`Bearer ${t}`});
 const leagueOptions=v=>`<option value="">Seleccionar…</option>${Object.keys(CATALOG).map(x=>`<option ${x===v?'selected':''}>${esc(x)}</option>`).join('')}`;
 const categoryOptions=(l,v)=>`<option value="">${l?'Seleccionar…':'Primero elegí la liga'}</option>${(CATALOG[l]||[]).map(x=>`<option ${x===v?'selected':''}>${esc(x)}</option>`).join('')}`;
