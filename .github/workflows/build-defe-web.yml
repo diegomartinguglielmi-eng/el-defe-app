@@ -59,9 +59,9 @@ jobs:
           grep -F 'window.DefeCore' /tmp/pages/web-defe-core.js >/dev/null
           grep -F 'web-defe-core.js' /tmp/pages/index.html >/dev/null
           grep -F '/api/availability/family/children' /tmp/pages/web-family-onboarding.js >/dev/null
-          grep -F '/api/availability/v2/me' /tmp/pages/web-attendance-player-v2.js >/dev/null
-          grep -F '/api/home/personalized' /tmp/pages/web-home-family.js >/dev/null
-          grep -F '/api/me' /tmp/pages/web-role-experience.js >/dev/null
+          grep -F "core.api('/api/availability/v2/me')" /tmp/pages/web-attendance-player-v2.js >/dev/null
+          grep -F "core.api('/api/home/personalized')" /tmp/pages/web-home-family.js >/dev/null
+          grep -F "core.api('/api/me')" /tmp/pages/web-role-experience.js >/dev/null
           grep -F 'web-role-experience.js' /tmp/pages/index.html >/dev/null
           ! grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html
           echo 'BASE_UI_DURABLE_OK'
