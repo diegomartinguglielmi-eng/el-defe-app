@@ -9,7 +9,7 @@ from sqlalchemy.sql import func
 
 from .auth import get_current_user, require_roles
 from .db import Base, get_db
-from .models import Person
+from .models import User
 from .availability_v1 import UserPlayerLink, AvailabilityResponse, _linked_players, _next_event
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
@@ -80,8 +80,6 @@ def _status(db: Session, user_id: int, person_id: int, match_id: int, selection:
     row = _player_response(db, person_id, match_id, selection)
     if row:
         return row.status, row.note, row.updated_at, "player"
-    # Compatibilidad: una respuesta histórica de la familia se usa como valor
-    # inicial hasta que ese hijo responda individualmente en v2.
     legacy = _legacy_response(db, user_id, match_id, selection)
     if legacy:
         return legacy.status, legacy.note, legacy.updated_at, "legacy_family"
@@ -95,26 +93,12 @@ def my_player_availability(db: Session = Depends(get_db), user=Depends(get_curre
         for team in player.get("teams") or []:
             selection = f"{team['competition']}|{team['category']}"
             event = _next_event(db, selection)
-            base = {
-                "person_id": player["person_id"],
-                "player_name": player["name"],
-                "selection": selection,
-                "competition": team["competition"],
-                "category": team["category"],
-            }
+            base = {"person_id": player["person_id"], "player_name": player["name"], "selection": selection, "competition": team["competition"], "category": team["category"]}
             if not event:
                 items.append({**base, "available": False, "response": None, "response_source": None})
                 continue
             status, note, updated_at, source = _status(db, user.id, player["person_id"], event["match_id"], selection)
-            items.append({
-                **base,
-                **event,
-                "available": True,
-                "response": status,
-                "response_note": note,
-                "response_updated_at": updated_at,
-                "response_source": source,
-            })
+            items.append({**base, **event, "available": True, "response": status, "response_note": note, "response_updated_at": updated_at, "response_source": source})
     return {"today": _today(), "items": items}
 
 
@@ -143,8 +127,8 @@ def set_player_availability(match_id: int, payload: PlayerAvailabilityIn, db: Se
 @router.get("/admin")
 def admin_player_availability(db: Session = Depends(get_db), user=Depends(require_roles("admin", "delegado", "dt"))):
     links = db.query(UserPlayerLink).all()
-    grouped = {}
-    seen = set()
+    grouped, seen = {}, set()
+    emails = {u.id: u.email for u in db.query(User).filter(User.id.in_({link.user_id for link in links})).all()} if links else {}
     for link in links:
         for player in _linked_players(db, link.user_id):
             if int(player["person_id"]) != int(link.person_id):
@@ -164,20 +148,9 @@ def admin_player_availability(db: Session = Depends(get_db), user=Depends(requir
                 effective = status or "pending"
                 bucket["players"] += 1
                 bucket[effective] = bucket.get(effective, 0) + 1
-                person = db.get(Person, player["person_id"])
-                bucket["people"].append({
-                    "user_id": link.user_id,
-                    "person_id": player["person_id"],
-                    "email": None,
-                    "name": player["name"],
-                    "players": [player],
-                    "status": effective,
-                    "note": note,
-                    "updated_at": updated_at,
-                    "response_source": source,
-                })
+                bucket["people"].append({"user_id": link.user_id, "person_id": player["person_id"], "email": emails.get(link.user_id), "name": player["name"], "players": [player], "status": effective, "note": note, "updated_at": updated_at, "response_source": source})
     items = list(grouped.values())
     for item in items:
-        item["followers"] = item["players"]  # compatibilidad con tablero actual
+        item["followers"] = item["players"]
     items.sort(key=lambda x: ((x.get("date") or "9999-99-99"), x.get("selection") or ""))
     return {"items": items}
