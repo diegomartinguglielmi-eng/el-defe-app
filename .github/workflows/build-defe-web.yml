@@ -10,6 +10,7 @@ on:
       - 'defe-web-listo.zip'
       - 'web-auth-overlay.js'
       - 'web-family-onboarding.js'
+      - 'web-family-account-fix.js'
       - 'web-comms-overlay.js'
       - 'web-comms-push-bridge.js'
       - 'web-push-overlay.js'
@@ -89,6 +90,7 @@ jobs:
           if [ -f defe-datos/salud.json ]; then cp defe-datos/salud.json defe-web-build/dist/salud.json; fi
           AUTH="web-auth-overlay-${GITHUB_SHA}.js"
           FAMILY="web-family-onboarding-${GITHUB_SHA}.js"
+          FAMILYFIX="web-family-account-fix-${GITHUB_SHA}.js"
           BRIDGE="web-comms-push-bridge-${GITHUB_SHA}.js"
           COMMS="web-comms-overlay-${GITHUB_SHA}.js"
           PUSH="web-push-overlay-${GITHUB_SHA}.js"
@@ -97,6 +99,7 @@ jobs:
           AVAILABILITY="availability-ui-${GITHUB_SHA}.js"
           cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
           cp web-family-onboarding.js "defe-web-build/dist/${FAMILY}"
+          cp web-family-account-fix.js "defe-web-build/dist/${FAMILYFIX}"
           cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
           cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
           cp web-push-overlay.js "defe-web-build/dist/${PUSH}"
@@ -104,7 +107,7 @@ jobs:
           cp app/static/matches-explorer.js "defe-web-build/dist/${MATCHES}"
           cp app/static/availability-ui.js "defe-web-build/dist/${AVAILABILITY}"
           cp push-sw.js defe-web-build/dist/push-sw.js
-          sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${FAMILY}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${SPONSORS}\"></script><script src=\"./${AVAILABILITY}\"></script></body>#" defe-web-build/dist/index.html
+          sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${FAMILY}\"></script><script src=\"./${FAMILYFIX}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${SPONSORS}\"></script><script src=\"./${AVAILABILITY}\"></script></body>#" defe-web-build/dist/index.html
       - name: Tomar control de service workers antiguos y liberar caches
         run: |
           sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
@@ -125,11 +128,15 @@ jobs:
           set -e
           test -f "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js"
           test -f "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js"
+          test -f "defe-web-build/dist/web-family-account-fix-${GITHUB_SHA}.js"
           grep -F "availability-ui-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
           grep -F "web-family-onboarding-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
+          grep -F "web-family-account-fix-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
           grep -F "data-av-admin-fixed" "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js" >/dev/null
           grep -F "/api/availability/family/setup" "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js" >/dev/null
+          grep -F "data-defe-my-children-native" "defe-web-build/dist/web-family-account-fix-${GITHUB_SHA}.js" >/dev/null
           node --check "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js"
+          node --check "defe-web-build/dist/web-family-account-fix-${GITHUB_SHA}.js"
           grep -F "skipWaiting" defe-web-build/dist/sw.js >/dev/null
           echo "BUILD_FAMILY_OK"
       - name: Empaquetar dist
