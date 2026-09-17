@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 560" role="img" aria-label="Escudo Defensores de Santos Lugares">
+ <path d="M48 68 C120 83 182 73 256 28 C330 73 392 83 464 68 L450 326 C446 424 361 490 256 542 C151 490 66 424 62 326 Z" fill="#082D68" stroke="#FFFFFF" stroke-width="10"/>
+ <path d="M69 91 C134 102 190 91 256 52 C322 91 378 102 443 91 L431 321 C428 406 352 465 256 514 C160 465 84 406 81 321 Z" fill="#082D68" stroke="#FFFFFF" stroke-width="12"/>
+ <rect x="92" y="232" width="328" height="76" fill="#FFFFFF"/>
+ <circle cx="221" cy="270" r="9" fill="#082D68"/><circle cx="291" cy="270" r="9" fill="#082D68"/>
+ <text x="256" y="326" text-anchor="middle" font-family="Georgia,Times New Roman,serif" font-size="132" font-weight="700" fill="#082D68" stroke="#FFFFFF" stroke-width="4" paint-order="stroke">DSL</text>
+</svg>
