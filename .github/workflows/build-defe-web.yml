@@ -1,31 +1,16 @@
-name: Compilar y publicar app web
+name: Restaurar UI operativa 10:21
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Sincronizar ligas"]
-    types: [completed]
   push:
     paths:
-      - 'defe-web-listo.zip'
-      - 'web-auth-overlay.js'
-      - 'web-family-onboarding.js'
-      - 'web-family-account-fix.js'
-      - 'web-comms-overlay.js'
-      - 'web-comms-push-bridge.js'
-      - 'web-push-overlay.js'
-      - 'web-acompanan-overlay.js'
-      - 'push-sw.js'
-      - 'app/static/matches-explorer.js'
-      - 'app/static/availability-ui.js'
-      - 'patch-*.mjs'
-      - 'defe-datos/datos.json'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
 concurrency:
   group: pages
@@ -33,145 +18,42 @@ concurrency:
 
 jobs:
   build:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Preparar proyecto
+      - name: Descargar artefacto exacto del build operativo 10:21
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          rm -rf defe-web-build
-          mkdir defe-web-build
-          unzip -q defe-web-listo.zip -d defe-web-build
-      - name: Instalar dependencias
-        working-directory: defe-web-build
-        run: npm install
-      - name: Compilar para GitHub Pages
-        working-directory: defe-web-build
-        run: npm run build -- --base=/el-defe-app/
-      - name: Aplicar parches
+          set -euo pipefail
+          curl -L --fail \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/10498124937/zip" \
+            -o /tmp/operativo.zip
+          rm -rf /tmp/outer /tmp/dist
+          mkdir -p /tmp/outer /tmp/dist
+          unzip -q /tmp/operativo.zip -d /tmp/outer
+          if [ -f /tmp/outer/netlify-publish.zip ]; then
+            unzip -q /tmp/outer/netlify-publish.zip -d /tmp/dist
+          else
+            cp -a /tmp/outer/. /tmp/dist/
+          fi
+      - name: Validar interfaz recuperada antes de publicar
         run: |
-          node patch-web-auth.mjs
-          node patch-brand.mjs
-          node patch-ui-v5.mjs
-          node patch-ui-v8.mjs
-          node patch-ui-v9.mjs
-          node patch-ui-v11.mjs
-          node patch-runtime-v19.mjs
-          node patch-home-v20.mjs
-          node patch-results-v21.mjs
-          node patch-fixture-v23.mjs
-          node patch-laamba-v24.mjs
-          node patch-laamba-v25.mjs
-          node patch-argenliga-v26.mjs
-          node patch-league-logos-v29.mjs
-          node patch-fefi-senior-v30.mjs
-          node patch-fefi-senior-v31.mjs
-          node patch-fefi-senior-v32.mjs
-          node patch-fefi-senior-v33.mjs
-          node patch-fefi-senior-v35.mjs
-          node patch-store-native.mjs
-          node patch-family-native-v2.mjs
-      - name: Versionar archivos dinámicos
-        run: |
-          FEFI="fefi-senior-v35-${GITHUB_SHA}.js"
-          mv defe-web-build/dist/fefi-senior-v30.js "defe-web-build/dist/${FEFI}"
-          sed -i "s#fefi-senior-v30.js#${FEFI}#g" defe-web-build/dist/index.html
-      - name: Forzar bundle único
-        run: |
-          JS=$(basename $(ls defe-web-build/dist/assets/index-*.js | head -1))
-          UNIQUE="index-v35-${GITHUB_SHA}.js"
-          cp "defe-web-build/dist/assets/${JS}" "defe-web-build/dist/assets/${UNIQUE}"
-          sed -i "s#assets/${JS}#assets/${UNIQUE}#" defe-web-build/dist/index.html
-      - name: Incorporar datos y overlays de producción
-        run: |
-          cp defe-datos/datos.json defe-web-build/dist/datos.json
-          if [ -f defe-datos/salud.json ]; then cp defe-datos/salud.json defe-web-build/dist/salud.json; fi
-          AUTH="web-auth-overlay-${GITHUB_SHA}.js"
-          FAMILY="web-family-onboarding-${GITHUB_SHA}.js"
-          FAMILYFIX="web-family-account-fix-${GITHUB_SHA}.js"
-          BRIDGE="web-comms-push-bridge-${GITHUB_SHA}.js"
-          COMMS="web-comms-overlay-${GITHUB_SHA}.js"
-          PUSH="web-push-overlay-${GITHUB_SHA}.js"
-          SPONSORS="web-acompanan-overlay-${GITHUB_SHA}.js"
-          MATCHES="matches-explorer-${GITHUB_SHA}.js"
-          AVAILABILITY="availability-ui-${GITHUB_SHA}.js"
-          cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
-          cp web-family-onboarding.js "defe-web-build/dist/${FAMILY}"
-          cp web-family-account-fix.js "defe-web-build/dist/${FAMILYFIX}"
-          cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
-          cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
-          cp web-push-overlay.js "defe-web-build/dist/${PUSH}"
-          cp web-acompanan-overlay.js "defe-web-build/dist/${SPONSORS}"
-          cp app/static/matches-explorer.js "defe-web-build/dist/${MATCHES}"
-          cp app/static/availability-ui.js "defe-web-build/dist/${AVAILABILITY}"
-          cp push-sw.js defe-web-build/dist/push-sw.js
-          sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${FAMILY}\"></script><script src=\"./${FAMILYFIX}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${SPONSORS}\"></script><script src=\"./${AVAILABILITY}\"></script></body>#" defe-web-build/dist/index.html
-      - name: Configurar actualización persistente PWA
-        run: |
-          sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
-          cat > defe-web-build/dist/sw.js <<EOF
-          const BUILD='${GITHUB_SHA}';
-          self.addEventListener('install',()=>self.skipWaiting());
-          self.addEventListener('activate',event=>event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)));await self.clients.claim()})()));
-          self.addEventListener('message',event=>{if(event.data&&event.data.type==='SKIP_WAITING')self.skipWaiting()});
-          self.addEventListener('fetch',event=>{
-            if(event.request.method!=='GET')return;
-            if(event.request.mode==='navigate'){
-              event.respondWith(fetch(event.request,{cache:'no-store'}).catch(()=>fetch('./index.html',{cache:'no-store'})));
-            }
-          });
-          EOF
-          cat > defe-web-build/dist/registerSW.js <<EOF
-          (()=>{if(!('serviceWorker'in navigator))return;let reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded)return;reloaded=true;location.reload()});window.addEventListener('load',async()=>{try{const reg=await navigator.serviceWorker.register('./sw.js?v=${GITHUB_SHA}',{scope:'./',updateViaCache:'none'});await reg.update();if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});reg.addEventListener('updatefound',()=>{const w=reg.installing;if(!w)return;w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)w.postMessage({type:'SKIP_WAITING'})})})}catch(e){console.warn('SW update',e)}})})();
-          EOF
-          BOOT="<script data-defe-pwa-build='${GITHUB_SHA}' src='./registerSW.js?v=${GITHUB_SHA}'></script>"
-          sed -i "s#</head>#${BOOT}</head>#" defe-web-build/dist/index.html
-          python - <<'PY'
-          import json
-          p='defe-web-build/dist/manifest.webmanifest'
-          d=json.load(open(p,encoding='utf-8'))
-          d['start_url']='./?source=pwa'
-          d['scope']='/el-defe-app/'
-          json.dump(d,open(p,'w',encoding='utf-8'),ensure_ascii=False,separators=(',',':'))
-          PY
-      - name: Verificar módulos y PWA
-        run: |
-          set -e
-          test -f "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js"
-          test -f "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js"
-          grep -F "availability-ui-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
-          grep -F "web-family-onboarding-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
-          grep -F "data-av-admin-fixed" "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js" >/dev/null
-          grep -F "/api/availability/family/setup" "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js" >/dev/null
-          grep -F "DEFE_FAMILY_NATIVE_V2" defe-web-build/dist/assets/index-*.js >/dev/null
-          grep -F 'children:"Mis hijos"' defe-web-build/dist/assets/index-*.js >/dev/null
-          grep -F 'children:"⇥  Cerrar sesión"' defe-web-build/dist/assets/index-*.js >/dev/null
-          grep -F "registerSW.js?v=${GITHUB_SHA}" defe-web-build/dist/index.html >/dev/null
-          grep -F "serviceWorker.register('./sw.js?v=${GITHUB_SHA}'" defe-web-build/dist/registerSW.js >/dev/null
-          grep -F "updateViaCache:'none'" defe-web-build/dist/registerSW.js >/dev/null
-          grep -F "controllerchange" defe-web-build/dist/registerSW.js >/dev/null
-          grep -F "cache:'no-store'" defe-web-build/dist/sw.js >/dev/null
-          grep -F '"start_url":"./?source=pwa"' defe-web-build/dist/manifest.webmanifest >/dev/null
-          node --check "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js"
-          node --check defe-web-build/dist/registerSW.js
-          node --check defe-web-build/dist/sw.js
-          echo "BUILD_PWA_PERSISTENT_UPDATE_OK"
-      - name: Empaquetar dist
-        run: |
-          cd defe-web-build/dist
-          zip -qr ../../defe-web-dist.zip .
-      - uses: actions/upload-artifact@v4
-        with:
-          name: defe-web-dist
-          path: defe-web-dist.zip
-          retention-days: 7
-      - name: Preparar Pages
+          set -euo pipefail
+          test -f /tmp/dist/index.html
+          grep -R -F 'web-mi-defe-overlay-netlify.js' /tmp/dist/index.html >/dev/null
+          grep -R -F 'availability-ui-netlify.js' /tmp/dist/index.html >/dev/null
+          test -f /tmp/dist/web-mi-defe-overlay-netlify.js
+          test -f /tmp/dist/availability-ui-netlify.js
+          grep -R -F 'Mi Defe' /tmp/dist/web-mi-defe-overlay-netlify.js >/dev/null
+          grep -R -F '/api/availability/admin' /tmp/dist/availability-ui-netlify.js >/dev/null
+          echo 'UI_OPERATIVA_1021_VALIDADA'
+      - name: Preparar GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: defe-web-build/dist
+          path: /tmp/dist
   deploy:
     environment:
       name: github-pages
@@ -179,6 +61,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Publicar en GitHub Pages
+      - name: Publicar artefacto exacto 10:21
         id: deployment
         uses: actions/deploy-pages@v4
