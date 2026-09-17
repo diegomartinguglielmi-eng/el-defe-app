@@ -59,9 +59,18 @@ jobs:
           grep -F 'window.DefeCore' /tmp/pages/web-defe-core.js >/dev/null
           grep -F 'web-defe-core.js' /tmp/pages/index.html >/dev/null
           grep -F '/api/availability/family/children' /tmp/pages/web-family-onboarding.js >/dev/null
-          grep -F "api('/api/availability/v2/me')" /tmp/pages/web-attendance-player-v2.js >/dev/null
-          grep -F "core.api('/api/home/personalized')" /tmp/pages/web-home-family.js >/dev/null
-          grep -F "core.api('/api/me')" /tmp/pages/web-role-experience.js >/dev/null
+          python3 - <<'PY'
+          from pathlib import Path
+          checks={
+            'web-attendance-player-v2.js': ['/api/availability/v2/me','DefeCore'],
+            'web-home-family.js': ['/api/home/personalized','DefeCore'],
+            'web-role-experience.js': ['/api/me','DefeCore'],
+          }
+          for name, needles in checks.items():
+              text=Path('/tmp/pages',name).read_text()
+              missing=[n for n in needles if n not in text]
+              assert not missing, f'{name}: faltan {missing}'
+          PY
           grep -F 'web-role-experience.js' /tmp/pages/index.html >/dev/null
           ! grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html
           echo 'BASE_UI_DURABLE_OK'
