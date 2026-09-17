@@ -13,8 +13,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout actual
         uses: actions/checkout@v4
+
+      - name: Checkout UI validada
+        uses: actions/checkout@v4
+        with:
+          ref: 95a0630f32ce3be7866ba3e2dc401d85a9e04239
+          path: ui-validada
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -27,17 +33,78 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Install dependencies
+      - name: Reconstruir UI validada
+        working-directory: ui-validada
+        run: |
+          rm -rf defe-web-build
+          mkdir defe-web-build
+          unzip -q defe-web-listo.zip -d defe-web-build
+          cd defe-web-build
+          npm install
+          npm run build -- --base=./
+          cd ..
+          node patch-web-auth.mjs
+          node patch-brand.mjs
+          node patch-ui-v5.mjs
+          node patch-ui-v8.mjs
+          node patch-ui-v9.mjs
+          node patch-ui-v11.mjs
+          node patch-runtime-v19.mjs
+          node patch-home-v20.mjs
+          node patch-results-v21.mjs
+          node patch-fixture-v23.mjs
+          node patch-laamba-v24.mjs
+          node patch-laamba-v25.mjs
+          node patch-argenliga-v26.mjs
+          node patch-league-logos-v29.mjs
+          node patch-fefi-senior-v30.mjs
+          node patch-fefi-senior-v31.mjs
+          node patch-fefi-senior-v32.mjs
+          node patch-fefi-senior-v33.mjs
+          node patch-fefi-senior-v35.mjs
+          node patch-store-native.mjs
+          cp defe-datos/datos.json defe-web-build/dist/datos.json
+          [ ! -f defe-datos/salud.json ] || cp defe-datos/salud.json defe-web-build/dist/salud.json
+          cp web-auth-overlay.js defe-web-build/dist/web-auth-overlay.js
+          cp web-comms-push-bridge.js defe-web-build/dist/web-comms-push-bridge.js
+          cp web-comms-overlay.js defe-web-build/dist/web-comms-overlay.js
+          cp web-push-overlay.js defe-web-build/dist/web-push-overlay.js
+          cp web-acompanan-overlay.js defe-web-build/dist/web-acompanan-overlay.js
+          cp app/static/matches-explorer.js defe-web-build/dist/matches-explorer.js
+          cp app/static/availability-ui.js defe-web-build/dist/availability-ui.js
+          sed -i 's#</body>#<script src="./web-auth-overlay.js"></script><script src="./web-comms-push-bridge.js"></script><script src="./web-comms-overlay.js"></script><script src="./web-push-overlay.js"></script><script src="./matches-explorer.js"></script><script src="./web-acompanan-overlay.js"></script><script src="./availability-ui.js"></script></body>#' defe-web-build/dist/index.html
+
+      - name: Reemplazar shell preliminar Android por UI validada
+        run: |
+          rm -rf mobile/www
+          mkdir -p mobile/www
+          cp -a ui-validada/defe-web-build/dist/. mobile/www/
+          grep -F 'Mi Defe' mobile/www/assets/index-*.js >/dev/null
+          grep -F 'Mi cuenta' mobile/www/assets/index-*.js >/dev/null
+          grep -F '/api/availability/admin' mobile/www/availability-ui.js >/dev/null
+          if grep -F 'EL DEFE' mobile/www/index.html >/dev/null && grep -F 'PRÓXIMO PARTIDO' mobile/www/index.html >/dev/null; then
+            echo 'ERROR: se empaquetó el shell Android preliminar'
+            exit 1
+          fi
+          echo 'UI_VALIDADA_ANDROID_OK'
+
+      - name: Instalar dependencias Android
         working-directory: mobile
         run: npm install
 
-      - name: Create Android project
+      - name: Crear proyecto Android
         working-directory: mobile
         run: npx cap add android
 
       - name: Sync Capacitor
         working-directory: mobile
         run: npx cap sync android
+
+      - name: Verificar assets empaquetados
+        run: |
+          grep -F 'Mi cuenta' mobile/android/app/src/main/assets/public/assets/index-*.js >/dev/null
+          grep -F '/api/availability/admin' mobile/android/app/src/main/assets/public/availability-ui.js >/dev/null
+          echo 'APK_ASSETS_VALIDATED_OK'
 
       - name: Build APK
         working-directory: mobile/android
@@ -46,5 +113,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: EL-DEFE-Android
+          name: EL-DEFE-Android-UI-Validada
           path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
