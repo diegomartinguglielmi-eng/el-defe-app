@@ -44,6 +44,14 @@ def admin_availability_filtered(
         event = _next_event(db, selection)
         if not event:
             continue
+
+        # Asistencia es de jugadores, no de cuentas. Una cuenta administrativa,
+        # de Tienda o cualquier usuario sin hijo/jugador vinculado a esta
+        # liga/categoría no debe alterar jugadores, pendientes ni porcentajes.
+        players = _players_for_selection(db, person.id, selection)
+        if not players:
+            continue
+
         key = f"{selection}|{event['match_id']}"
         bucket = grouped.setdefault(
             key,
@@ -59,14 +67,18 @@ def admin_availability_filtered(
             .first()
         )
         status = response.status if response else "pending"
-        players = _players_for_selection(db, person.id, selection)
-        bucket["followers"] += 1
-        bucket[status] = bucket.get(status, 0) + 1
+
+        # El modelo actual guarda una respuesta por cuenta/categoría. Para las
+        # métricas contamos los jugadores vinculados de esa cuenta; la respuesta
+        # de la familia aplica a esos jugadores.
+        player_count = len(players)
+        bucket["followers"] += player_count
+        bucket[status] = bucket.get(status, 0) + player_count
         bucket["people"].append(
             {
                 "user_id": person.id,
                 "email": person.email,
-                "name": " / ".join(p["name"] for p in players) if players else None,
+                "name": " / ".join(p["name"] for p in players),
                 "players": players,
                 "status": status,
                 "note": response.note if response else None,
