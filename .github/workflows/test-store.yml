@@ -1,0 +1,41 @@
+name: Validar Tienda
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'app/store_v5.py'
+      - 'tests/test_store_contract.py'
+      - '.github/workflows/test-store.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  store:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: Contratos de estados
+        run: pytest -q tests/test_store_contract.py
+      - name: Contrato estático del backend
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path("app/store_v5.py").read_text()
+          required=[
+            "@router.get('/products')","@router.post('/orders')",
+            "@router.get('/orders/mine')","@router.get('/admin/orders')",
+            "@router.put('/admin/orders/{order_id}/status')",
+            "@router.put('/admin/products/{product_id}/inventory')",
+            "row.stock_applied=True","row.stock_applied=False",
+            "STORE_ROLES=('admin','delegado','tienda')"
+          ]
+          missing=[x for x in required if x not in s]
+          assert not missing, missing
+          print("store backend contract ok")
+          PY
