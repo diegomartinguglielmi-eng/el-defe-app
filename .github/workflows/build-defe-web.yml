@@ -62,8 +62,6 @@ jobs:
           assert 'window.DefeCore' in core and 'API' in core and 'token' in core and 'api' in core
           PY
           echo 'CORE_OK'
-          grep -F 'web-defe-core.js' /tmp/pages/index.html >/dev/null
-          grep -F '/api/availability/family/children' /tmp/pages/web-family-onboarding.js >/dev/null
           python3 - <<'PY'
           from pathlib import Path
           checks={
@@ -77,8 +75,15 @@ jobs:
               assert not missing, f'{name}: faltan {missing}'
           PY
           echo 'MODULE_CONTRACTS_OK'
-          grep -F 'web-role-experience.js' /tmp/pages/index.html >/dev/null
-          ! grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html
+          python3 - <<'PY'
+          from pathlib import Path
+          idx=Path('/tmp/pages/index.html').read_text()
+          for script in ('web-defe-core.js','web-family-onboarding.js','web-family-laamba-level.js','web-attendance-player-v2.js','web-home-family.js','web-role-experience.js'):
+              assert script in idx, f'no inyectado: {script}'
+          assert 'web-attendance-player-filter.js' not in idx
+          fam=Path('/tmp/pages/web-family-onboarding.js').read_text()
+          assert '/api/availability/family/children' in fam
+          PY
           echo 'FORBIDDEN_FILTER_ABSENT_OK'
           echo 'BASE_UI_DURABLE_OK'
       - name: Preparar GitHub Pages
