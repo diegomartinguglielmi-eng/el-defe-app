@@ -8,7 +8,6 @@ from .auth import get_current_user
 from .db import get_db
 from .models import Match
 from .family_context_v1 import family_context
-from .availability_v1 import _next_event
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 router = APIRouter(prefix="/api/home", tags=["Home"])
@@ -55,6 +54,8 @@ def next_match(db: Session = Depends(get_db)):
 
 @router.get("/personalized")
 def personalized_home(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    # Import diferido porque following_v5 reutiliza _canonical de este módulo.
+    from .availability_v1 import _next_event
     today, global_match = _global_next(db)
     ctx = family_context(db, user.id)
     family_matches = []
@@ -64,11 +65,4 @@ def personalized_home(db: Session = Depends(get_db), user=Depends(get_current_us
             if not event: continue
             family_matches.append({"person_id": child["person_id"], "player_name": child["name"], "competition": team["competition"], "category": team["category"], "selection": team["selection"], **event})
     family_matches.sort(key=lambda x: ((x.get("date") or "9999-99-99"), (x.get("time") or "99:99"), x["player_name"]))
-    return {
-        "today": today,
-        "personalized": bool(ctx["children"]),
-        "children": ctx["children"],
-        "next_matches": family_matches,
-        "primary_match": family_matches[0] if family_matches else ({c.name: getattr(global_match, c.name) for c in global_match.__table__.columns} if global_match else None),
-        "fallback": not bool(family_matches),
-    }
+    return {"today": today, "personalized": bool(ctx["children"]), "children": ctx["children"], "next_matches": family_matches, "primary_match": family_matches[0] if family_matches else ({c.name: getattr(global_match, c.name) for c in global_match.__table__.columns} if global_match else None), "fallback": not bool(family_matches)}
