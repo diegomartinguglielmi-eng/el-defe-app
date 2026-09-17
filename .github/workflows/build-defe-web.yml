@@ -9,6 +9,7 @@ on:
     paths:
       - 'defe-web-listo.zip'
       - 'web-auth-overlay.js'
+      - 'web-family-onboarding.js'
       - 'web-comms-overlay.js'
       - 'web-comms-push-bridge.js'
       - 'web-push-overlay.js'
@@ -87,6 +88,7 @@ jobs:
           cp defe-datos/datos.json defe-web-build/dist/datos.json
           if [ -f defe-datos/salud.json ]; then cp defe-datos/salud.json defe-web-build/dist/salud.json; fi
           AUTH="web-auth-overlay-${GITHUB_SHA}.js"
+          FAMILY="web-family-onboarding-${GITHUB_SHA}.js"
           BRIDGE="web-comms-push-bridge-${GITHUB_SHA}.js"
           COMMS="web-comms-overlay-${GITHUB_SHA}.js"
           PUSH="web-push-overlay-${GITHUB_SHA}.js"
@@ -94,6 +96,7 @@ jobs:
           MATCHES="matches-explorer-${GITHUB_SHA}.js"
           AVAILABILITY="availability-ui-${GITHUB_SHA}.js"
           cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
+          cp web-family-onboarding.js "defe-web-build/dist/${FAMILY}"
           cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
           cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
           cp web-push-overlay.js "defe-web-build/dist/${PUSH}"
@@ -101,7 +104,7 @@ jobs:
           cp app/static/matches-explorer.js "defe-web-build/dist/${MATCHES}"
           cp app/static/availability-ui.js "defe-web-build/dist/${AVAILABILITY}"
           cp push-sw.js defe-web-build/dist/push-sw.js
-          sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${SPONSORS}\"></script><script src=\"./${AVAILABILITY}\"></script></body>#" defe-web-build/dist/index.html
+          sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${FAMILY}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${SPONSORS}\"></script><script src=\"./${AVAILABILITY}\"></script></body>#" defe-web-build/dist/index.html
       - name: Tomar control de service workers antiguos y liberar caches
         run: |
           sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
@@ -117,15 +120,18 @@ jobs:
           echo "// retired" > defe-web-build/dist/registerSW.js
           CLEAN="<script>(async function(){var k='defe-clean-${GITHUB_SHA}';try{if(localStorage.getItem(k))return;localStorage.setItem(k,'1');if('serviceWorker' in navigator){var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){return r.update().catch(function(){});}));setTimeout(async function(){try{var rs2=await navigator.serviceWorker.getRegistrations();await Promise.all(rs2.map(function(r){return r.unregister()}));}catch(e){}},1200);}if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(x){return caches.delete(x)}));}}catch(e){}})();</script>"
           sed -i "s#<head>#<head>${CLEAN}#" defe-web-build/dist/index.html
-      - name: Verificar módulo de asistencia
+      - name: Verificar módulos de asistencia y familia
         run: |
           set -e
           test -f "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js"
+          test -f "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js"
           grep -F "availability-ui-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
+          grep -F "web-family-onboarding-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
           grep -F "data-av-admin-fixed" "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js" >/dev/null
-          grep -F "/api/availability/admin" "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js" >/dev/null
+          grep -F "/api/availability/family/setup" "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js" >/dev/null
+          node --check "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js"
           grep -F "skipWaiting" defe-web-build/dist/sw.js >/dev/null
-          echo "BUILD_AVAILABILITY_OK"
+          echo "BUILD_FAMILY_OK"
       - name: Empaquetar dist
         run: |
           cd defe-web-build/dist
