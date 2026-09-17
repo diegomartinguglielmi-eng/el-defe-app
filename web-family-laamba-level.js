@@ -2,8 +2,9 @@
 const API='https://el-defe-v5-production.up.railway.app';
 let catalogs={};
 const HIERARCHICAL=new Set(['LAAMBA','ARGENLIGA']);
+const CANONICAL_CATEGORIES=['1ra','3ra','4ta','5ta','6ta','7ma','8va','9na'];
 const originalFetch=window.fetch.bind(window);
-async function catalog(competition){if(catalogs[competition])return catalogs[competition];const r=await originalFetch(API+'/api/family/catalog');if(!r.ok)throw new Error('No se pudo cargar el catálogo de familias');const d=await r.json();for(const row of (d.competitions||[])){if(row.mode==='branch_category')catalogs[row.competition]=Object.fromEntries((row.branches||[]).map(x=>[x.branch,x.categories||[]]))}return catalogs[competition]||{}}
+async function catalog(competition){if(catalogs[competition])return catalogs[competition];const r=await originalFetch(API+'/api/family/catalog');if(!r.ok)throw new Error('No se pudo cargar el catálogo de familias');const d=await r.json();for(const row of (d.competitions||[])){if(row.mode==='branch_category')catalogs[row.competition]=Object.fromEntries((row.branches||[]).map(x=>[x.branch,x.categories||[]]))}if(competition==='ARGENLIGA')catalogs.ARGENLIGA={Masculino:[...CANONICAL_CATEGORIES]};if(competition==='LAAMBA'){catalogs.LAAMBA={Masculino:[...CANONICAL_CATEGORIES],Femenino:[...CANONICAL_CATEGORIES]}}return catalogs[competition]||{}}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
 function splitStored(v){const p=String(v||'').split('·').map(x=>x.trim());return p.length>1?p:['','']}
 function cleanup(parent,keep=null){if(!parent)return;const extras=[...parent.querySelectorAll('[data-hierarchy-extra],[data-laamba-extra]')];extras.forEach(x=>{if(x!==keep)x.remove()});const thirds=[...parent.querySelectorAll('[data-hierarchy-category],[data-laamba-category]')];thirds.forEach(x=>{if(!keep||!keep.contains(x)){const row=x.closest('.df-grid')||x.closest('label');row?.remove()}})}
