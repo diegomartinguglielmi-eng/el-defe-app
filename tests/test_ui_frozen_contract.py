@@ -15,7 +15,7 @@ def test_no_attendance_filter_regression():
     # Puede existir una copia histórica dentro de la base durable; el build final la elimina.
     workflow=Path(".github/workflows/build-defe-web.yml").read_text(errors="ignore")
     assert "rm -f /tmp/pages/web-family-delete.js /tmp/pages/web-attendance-player-filter.js" in workflow
-    assert "! grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html" in workflow
+    assert "assert 'web-attendance-player-filter.js' not in idx" in workflow
 
 def test_no_planteles_in_final_navigation_overlay():
     assert "data-mi-defe-button" in MIDEFE
