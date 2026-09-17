@@ -3,12 +3,13 @@ from sqlalchemy.orm import Session
 
 from .auth import get_current_user
 from .db import get_db
-from .availability_v1 import _linked_players, _next_event
 
 router = APIRouter(prefix="/api/family", tags=["Family context"])
 
 
 def family_context(db: Session, user_id: int):
+    # Import diferido: availability depende de following/home; evita ciclo durante bootstrap.
+    from .availability_v1 import _linked_players
     children = []
     selections = []
     seen = set()
@@ -30,6 +31,7 @@ def family_context(db: Session, user_id: int):
 
 @router.get("/context")
 def my_family_context(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    from .availability_v1 import _next_event
     ctx = family_context(db, user.id)
     next_matches = []
     for child in ctx["children"]:
