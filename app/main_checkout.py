@@ -3,12 +3,14 @@ from .store_submit import router as store_submit_router
 from .availability_admin_fix import router as availability_admin_fix_router
 from .availability_v1 import router as availability_router
 from .family_manage_v1 import router as family_manage_router
+from .family_catalog_v1 import router as family_catalog_router
 
 app.include_router(store_submit_router)
 # Debe registrarse antes del router histórico: FastAPI resuelve la primera ruta coincidente.
 app.include_router(availability_admin_fix_router)
 app.include_router(availability_router)
 app.include_router(family_manage_router)
+app.include_router(family_catalog_router)
 
 @app.middleware('http')
 async def log_frontend_origin(request, call_next):
