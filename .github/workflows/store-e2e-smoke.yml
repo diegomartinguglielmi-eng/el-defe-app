@@ -120,3 +120,5 @@ jobs:
           test "$STATUS" = "302" -o "$STATUS" = "303" -o "$STATUS" = "307" -o "$STATUS" = "200"
           grep -i '^location:.*wa.me\|^location:.*whatsapp' /tmp/headers || { echo 'Falta redirección a WhatsApp'; cat /tmp/body; exit 1; }
           echo "STORE_E2E_OK"
+
+      # Ejecución manual de control integral solicitada 2026-09-17.
