@@ -1,9 +1,7 @@
 (()=>{
 'use strict';
-const API='https://el-defe-v2-staging-production.up.railway.app';
+const core=window.DefeCore;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const token=()=>localStorage.getItem('defe_token')||localStorage.getItem('access_token')||localStorage.getItem('token')||'';
-function headers(){const t=token();return t?{Authorization:`Bearer ${t}`}:{}}
 function root(){
   const headings=[...document.querySelectorAll('h1,h2,h3')];
   const h=headings.find(x=>/pr[oó]ximas fechas/i.test(x.textContent||''));
@@ -35,8 +33,8 @@ function render(data){
   box.querySelector('[data-family-home-list]').innerHTML=data.next_matches.map(card).join('');
 }
 async function load(){
-  if(!token())return;
-  try{const r=await fetch(`${API}/api/home/personalized`,{headers:headers()});if(!r.ok)return;render(await r.json())}catch(_){/* conserva Home histórico */}
+  if(!core?.token())return;
+  try{render(await core.api('/api/home/personalized'))}catch(_){/* conserva Home histórico */}
 }
 window.addEventListener('focus',load);document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
 setTimeout(load,400);setTimeout(load,1800);
