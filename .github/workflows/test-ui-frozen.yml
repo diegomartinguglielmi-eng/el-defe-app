@@ -7,6 +7,7 @@ on:
       - 'web-*.js'
       - 'tests/test_ui_frozen_contract.py'
       - '.github/workflows/test-ui-frozen.yml'
+      - '.github/workflows/build-defe-web.yml'
 permissions:
   contents: read
 jobs:
@@ -21,6 +22,7 @@ jobs:
       - run: pytest -q tests/test_ui_frozen_contract.py
       - name: Prohibir regresiones conocidas
         run: |
-          test ! -e web-attendance-player-filter.js
           grep -F 'Mi Defe' ui-operativa-base/web-mi-defe-overlay-netlify.js >/dev/null
           test -s ui-operativa-base/availability-ui-netlify.js
+          grep -F 'rm -f /tmp/pages/web-family-delete.js /tmp/pages/web-attendance-player-filter.js' .github/workflows/build-defe-web.yml >/dev/null
+          grep -F "! grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html" .github/workflows/build-defe-web.yml >/dev/null
