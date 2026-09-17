@@ -7,16 +7,16 @@ from .following_v5 import _options
 router = APIRouter(prefix="/api/family", tags=["Family"])
 
 LAAMBA_CATEGORIES = ["1ra", "3ra", "4ta", "5ta", "6ta", "7ma", "8va", "9na"]
+ARGENLIGA_CATEGORIES = ["1ra", "3ra", "4ta", "5ta", "6ta", "7ma", "8va", "9na"]
 
 
 @router.get("/catalog")
 def family_catalog(db: Session = Depends(get_db)):
     """Catálogo jerárquico usado por el alta de hijos.
 
-    Mantiene las opciones canónicas existentes para las ligas de dos niveles y
-    explicita el tercer nivel de LAAMBA: rama (Masculino/Femenino) + categoría.
-    El valor persistido de LAAMBA queda como 'Rama · Categoría' para conservar
-    una selección inequívoca en favoritos, asistencia y comunicaciones.
+    LAAMBA y ARGENLIGA usan tres niveles: liga, rama y categoría.
+    El valor persistido queda como 'Rama · Categoría' para conservar una
+    selección inequívoca en favoritos, asistencia y comunicaciones.
     """
     options = _options(db)
     competitions = []
@@ -28,6 +28,14 @@ def family_catalog(db: Session = Depends(get_db)):
                 "branches": [
                     {"branch": "Masculino", "categories": LAAMBA_CATEGORIES},
                     {"branch": "Femenino", "categories": LAAMBA_CATEGORIES},
+                ],
+            })
+        elif competition == "ARGENLIGA":
+            competitions.append({
+                "competition": "ARGENLIGA",
+                "mode": "branch_category",
+                "branches": [
+                    {"branch": "Masculino", "categories": ARGENLIGA_CATEGORIES},
                 ],
             })
         else:
