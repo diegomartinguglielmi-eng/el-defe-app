@@ -3,7 +3,11 @@
   "appName": "El Defe",
   "webDir": "www",
   "server": {
+    "url": "https://diegomartinguglielmi-eng.github.io/el-defe-app/",
     "androidScheme": "https",
-    "cleartext": false
+    "cleartext": false,
+    "allowNavigation": [
+      "diegomartinguglielmi-eng.github.io"
+    ]
   }
 }
