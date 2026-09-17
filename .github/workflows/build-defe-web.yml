@@ -6,6 +6,7 @@ on:
     paths:
       - 'web-family-onboarding.js'
       - 'web-family-laamba-level.js'
+      - 'web-attendance-player-v2.js'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
@@ -40,6 +41,7 @@ jobs:
           cp -a /tmp/recovered/el-defe-app/. /tmp/pages/
           cp web-family-onboarding.js /tmp/pages/web-family-onboarding.js
           cp web-family-laamba-level.js /tmp/pages/web-family-laamba-level.js
+          cp web-attendance-player-v2.js /tmp/pages/web-attendance-player-v2.js
           rm -f /tmp/pages/web-family-delete.js
           python3 - <<'PY'
           from pathlib import Path
@@ -49,25 +51,32 @@ jobs:
           s=s.replace('<script src="./web-family-delete.js"></script>','')
           family='<script src="./web-family-onboarding.js"></script>'
           laamba='<script src="./web-family-laamba-level.js"></script>'
+          player='<script src="./web-attendance-player-v2.js"></script>'
           if family not in s:s=s.replace('</body>',family+'\n</body>')
           if laamba not in s:s=s.replace('</body>',laamba+'\n</body>')
+          if player not in s:s=s.replace('</body>',player+'\n</body>')
           p.write_text(s)
           PY
           test -s /tmp/pages/availability-ui-netlify.js
           test -s /tmp/pages/web-mi-defe-overlay-netlify.js
           node --check /tmp/pages/web-family-onboarding.js
           node --check /tmp/pages/web-family-laamba-level.js
+          node --check /tmp/pages/web-attendance-player-v2.js
           grep -F '/api/availability/family/children' /tmp/pages/web-family-onboarding.js >/dev/null
           grep -F '/api/family/catalog' /tmp/pages/web-family-laamba-level.js >/dev/null
-          grep -F 'data-laamba-category' /tmp/pages/web-family-laamba-level.js >/dev/null
+          grep -F '/api/availability/v2/me' /tmp/pages/web-attendance-player-v2.js >/dev/null
+          grep -F '/api/availability/v2/admin' /tmp/pages/web-attendance-player-v2.js >/dev/null
+          grep -F 'data-player-answer' /tmp/pages/web-attendance-player-v2.js >/dev/null
           if grep -F 'web-family-delete.js' /tmp/pages/index.html; then echo 'ERROR: overlay duplicado de familias sigue cargado'; exit 1; fi
           if grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html; then echo 'ERROR: filtro experimental sigue cargado'; exit 1; fi
-          echo 'TABLERO_ASISTENCIA_ORIGINAL_Y_FAMILIAS_LAAMBA_3_NIVELES'
+          echo 'ASISTENCIA_POR_HIJO_UI_PREPARADA'
       - name: Preparar GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: /tmp/pages
   deploy:
+    # Sólo main publica producción. Las ramas de mejora validan el build sin desplegar.
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
