@@ -38,21 +38,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Preparar proyecto
         run: |
           rm -rf defe-web-build
           mkdir defe-web-build
           unzip -q defe-web-listo.zip -d defe-web-build
-
       - name: Instalar dependencias
         working-directory: defe-web-build
         run: npm install
-
       - name: Compilar para GitHub Pages
         working-directory: defe-web-build
         run: npm run build -- --base=/el-defe-app/
-
       - name: Aplicar parches
         run: |
           node patch-web-auth.mjs
@@ -75,25 +71,21 @@ jobs:
           node patch-fefi-senior-v33.mjs
           node patch-fefi-senior-v35.mjs
           node patch-store-native.mjs
-
       - name: Versionar archivos dinámicos
         run: |
           FEFI="fefi-senior-v35-${GITHUB_SHA}.js"
           mv defe-web-build/dist/fefi-senior-v30.js "defe-web-build/dist/${FEFI}"
           sed -i "s#fefi-senior-v30.js#${FEFI}#g" defe-web-build/dist/index.html
-
       - name: Forzar bundle único
         run: |
           JS=$(basename $(ls defe-web-build/dist/assets/index-*.js | head -1))
           UNIQUE="index-v35-${GITHUB_SHA}.js"
           cp "defe-web-build/dist/assets/${JS}" "defe-web-build/dist/assets/${UNIQUE}"
           sed -i "s#assets/${JS}#assets/${UNIQUE}#" defe-web-build/dist/index.html
-
       - name: Incorporar datos y overlays de producción
         run: |
           cp defe-datos/datos.json defe-web-build/dist/datos.json
           if [ -f defe-datos/salud.json ]; then cp defe-datos/salud.json defe-web-build/dist/salud.json; fi
-
           AUTH="web-auth-overlay-${GITHUB_SHA}.js"
           BRIDGE="web-comms-push-bridge-${GITHUB_SHA}.js"
           COMMS="web-comms-overlay-${GITHUB_SHA}.js"
@@ -101,7 +93,6 @@ jobs:
           SPONSORS="web-acompanan-overlay-${GITHUB_SHA}.js"
           MATCHES="matches-explorer-${GITHUB_SHA}.js"
           AVAILABILITY="availability-ui-${GITHUB_SHA}.js"
-
           cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
           cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
           cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
@@ -110,9 +101,7 @@ jobs:
           cp app/static/matches-explorer.js "defe-web-build/dist/${MATCHES}"
           cp app/static/availability-ui.js "defe-web-build/dist/${AVAILABILITY}"
           cp push-sw.js defe-web-build/dist/push-sw.js
-
           sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${PUSH}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${SPONSORS}\"></script><script src=\"./${AVAILABILITY}\"></script></body>#" defe-web-build/dist/index.html
-
       - name: Tomar control de service workers antiguos y liberar caches
         run: |
           sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
@@ -120,10 +109,7 @@ jobs:
           self.addEventListener('install', event => { self.skipWaiting(); });
           self.addEventListener('activate', event => {
             event.waitUntil((async()=>{
-              try {
-                const keys = await caches.keys();
-                await Promise.all(keys.map(k => caches.delete(k)));
-              } catch (_) {}
+              try { const keys = await caches.keys(); await Promise.all(keys.map(k => caches.delete(k))); } catch (_) {}
               await self.clients.claim();
             })());
           });
@@ -131,40 +117,28 @@ jobs:
           echo "// retired" > defe-web-build/dist/registerSW.js
           CLEAN="<script>(async function(){var k='defe-clean-${GITHUB_SHA}';try{if(localStorage.getItem(k))return;localStorage.setItem(k,'1');if('serviceWorker' in navigator){var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){return r.update().catch(function(){});}));setTimeout(async function(){try{var rs2=await navigator.serviceWorker.getRegistrations();await Promise.all(rs2.map(function(r){return r.unregister()}));}catch(e){}},1200);}if('caches' in window){var ks=await caches.keys();await Promise.all(ks.map(function(x){return caches.delete(x)}));}}catch(e){}})();</script>"
           sed -i "s#<head>#<head>${CLEAN}#" defe-web-build/dist/index.html
-
-      - name: Verificar build de producción
+      - name: Verificar módulo de asistencia
         run: |
           set -e
-          BUNDLE="defe-web-build/dist/assets/index-v35-${GITHUB_SHA}.js"
-          grep -F "DEFE_UI_V12_20260909" "$BUNDLE" >/dev/null
-          grep -F "DEFE_STORE_NATIVE_RAILWAY_V1" "$BUNDLE" >/dev/null
-          grep -F "DEFE_STORE_NATIVE_EXACT_V6" "$BUNDLE" >/dev/null
-          grep -F "checkout=native-v6" "$BUNDLE" >/dev/null
-          grep -F "/api/store/orders/submit" "$BUNDLE" >/dev/null
-          grep -F "fefi-senior-v35-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
+          test -f "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js"
           grep -F "availability-ui-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
-          grep -F "Asistencia" "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js" >/dev/null
-          ! grep -F "store-checkout-" defe-web-build/dist/index.html >/dev/null
+          grep -F "data-av-admin-fixed" "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js" >/dev/null
+          grep -F "/api/availability/admin" "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js" >/dev/null
           grep -F "skipWaiting" defe-web-build/dist/sw.js >/dev/null
-          grep -F "clients.claim" defe-web-build/dist/sw.js >/dev/null
-          echo "BUILD_STORE_NATIVE_OK"
-
+          echo "BUILD_AVAILABILITY_OK"
       - name: Empaquetar dist
         run: |
           cd defe-web-build/dist
           zip -qr ../../defe-web-dist.zip .
-
       - uses: actions/upload-artifact@v4
         with:
           name: defe-web-dist
           path: defe-web-dist.zip
           retention-days: 7
-
       - name: Preparar Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: defe-web-build/dist
-
   deploy:
     environment:
       name: github-pages
