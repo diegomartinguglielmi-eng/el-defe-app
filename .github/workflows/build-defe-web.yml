@@ -73,6 +73,7 @@ jobs:
           node patch-fefi-senior-v33.mjs
           node patch-fefi-senior-v35.mjs
           node patch-store-native.mjs
+          node patch-family-native-v2.mjs
       - name: Versionar archivos dinámicos
         run: |
           FEFI="fefi-senior-v35-${GITHUB_SHA}.js"
@@ -128,18 +129,17 @@ jobs:
           set -e
           test -f "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js"
           test -f "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js"
-          test -f "defe-web-build/dist/web-family-account-fix-${GITHUB_SHA}.js"
           grep -F "availability-ui-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
           grep -F "web-family-onboarding-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
-          grep -F "web-family-account-fix-${GITHUB_SHA}.js" defe-web-build/dist/index.html >/dev/null
           grep -F "data-av-admin-fixed" "defe-web-build/dist/availability-ui-${GITHUB_SHA}.js" >/dev/null
           grep -F "/api/availability/family/setup" "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js" >/dev/null
-          grep -F "data-defe-my-children-native" "defe-web-build/dist/web-family-account-fix-${GITHUB_SHA}.js" >/dev/null
-          grep -F "insertAdjacentElement('beforebegin',b)" "defe-web-build/dist/web-family-account-fix-${GITHUB_SHA}.js" >/dev/null
+          grep -F "DEFE_FAMILY_NATIVE_V2" defe-web-build/dist/assets/index-*.js >/dev/null
+          grep -F 'className:"defe-my-children' defe-web-build/dist/assets/index-*.js >/dev/null
+          grep -F 'children:"Mis hijos"' defe-web-build/dist/assets/index-*.js >/dev/null
+          grep -F 'children:"⇥  Cerrar sesión"' defe-web-build/dist/assets/index-*.js >/dev/null
           node --check "defe-web-build/dist/web-family-onboarding-${GITHUB_SHA}.js"
-          node --check "defe-web-build/dist/web-family-account-fix-${GITHUB_SHA}.js"
           grep -F "skipWaiting" defe-web-build/dist/sw.js >/dev/null
-          echo "BUILD_FAMILY_ACCOUNT_OK"
+          echo "BUILD_FAMILY_NATIVE_V2_OK"
       - name: Empaquetar dist
         run: |
           cd defe-web-build/dist
