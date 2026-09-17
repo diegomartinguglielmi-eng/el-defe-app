@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'web-family-onboarding.js'
+      - 'web-family-delete.js'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
@@ -32,27 +33,30 @@ jobs:
           mkdir -p /tmp/outer /tmp/recovered /tmp/pages
           unzip -q /tmp/operativo.zip -d /tmp/outer
           if [ -f /tmp/outer/netlify-publish.zip ]; then unzip -q /tmp/outer/netlify-publish.zip -d /tmp/recovered; else cp -a /tmp/outer/. /tmp/recovered/; fi
-      - name: Restaurar tablero operativo e integrar solo Familias
+      - name: Restaurar tablero operativo e integrar Familias
         run: |
           set -euo pipefail
           test -s /tmp/recovered/el-defe-app/index.html
           cp -a /tmp/recovered/el-defe-app/. /tmp/pages/
           cp web-family-onboarding.js /tmp/pages/web-family-onboarding.js
+          cp web-family-delete.js /tmp/pages/web-family-delete.js
           python3 - <<'PY'
           from pathlib import Path
           p=Path('/tmp/pages/index.html')
           s=p.read_text()
           s=s.replace('<script src="./web-attendance-player-filter.js"></script>','')
-          tag='<script src="./web-family-onboarding.js"></script>'
-          if tag not in s:s=s.replace('</body>',tag+'\n</body>')
+          for tag in ['<script src="./web-family-onboarding.js"></script>','<script src="./web-family-delete.js"></script>']:
+              if tag not in s:s=s.replace('</body>',tag+'\n</body>')
           p.write_text(s)
           PY
           test -s /tmp/pages/availability-ui-netlify.js
           test -s /tmp/pages/web-mi-defe-overlay-netlify.js
           node --check /tmp/pages/web-family-onboarding.js
+          node --check /tmp/pages/web-family-delete.js
           grep -F '/api/availability/family/children' /tmp/pages/web-family-onboarding.js >/dev/null
+          grep -F 'method:'"'"'DELETE'"'"'' /tmp/pages/web-family-delete.js >/dev/null
           if grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html; then echo 'ERROR: filtro experimental sigue cargado'; exit 1; fi
-          echo 'TABLERO_ASISTENCIA_ORIGINAL_RESTAURADO'
+          echo 'TABLERO_ASISTENCIA_ORIGINAL_RESTAURADO_Y_FAMILIAS_EDITABLES'
       - name: Preparar GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
