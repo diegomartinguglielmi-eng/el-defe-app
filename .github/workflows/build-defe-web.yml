@@ -62,9 +62,9 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           checks={
-            'web-attendance-player-v2.js': ['/api/availability/v2/me','DefeCore'],
-            'web-home-family.js': ['/api/home/personalized','DefeCore'],
-            'web-role-experience.js': ['/api/me','DefeCore'],
+            'web-attendance-player-v2.js': ['/api/availability/v2/me','window.DefeCore'],
+            'web-home-family.js': ['/api/home/personalized','window.DefeCore'],
+            'web-role-experience.js': ['/api/me','window.DefeCore'],
           }
           for name, needles in checks.items():
               text=Path('/tmp/pages',name).read_text()
