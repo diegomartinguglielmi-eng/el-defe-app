@@ -1,6 +1,6 @@
 // Stable V35 + Comunicaciones V3 baseline; mobile FAB compactado para no tapar contenido.
 (() => {
- const API='https://el-defe-v5-production.up.railway.app', READ='defe_comunicaciones_leidas_v3'; let cache=[], adminState=false;
+ const API=String(window.EL_DEFE_API_URL||'https://el-defe-v5-production.up.railway.app').replace(/\/$/,''), READ='defe_comunicaciones_leidas_v3'; let cache=[], adminState=false;
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
  const COMPETITIONS={Baby:['FEFI','Superliga'],Futsal:['FEFI','LAAMBA','Argenliga']};
