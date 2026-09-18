@@ -1,6 +1,6 @@
 // El Defe · Panel operativo nativo de Tienda 2026-09-15
 (() => {
-  const API='https://el-defe-v5-production.up.railway.app';
+  const API=String(window.EL_DEFE_API_URL||'https://el-defe-v5-production.up.railway.app').replace(/\/$/,'');
   const token=()=>localStorage.getItem('defe_auth_token')||localStorage.getItem('defe_token')||'';
   const role=()=>String(localStorage.getItem('defe_role')||'').toLowerCase();
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
