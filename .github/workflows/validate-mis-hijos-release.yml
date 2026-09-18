@@ -1,0 +1,52 @@
+name: Validar release Mis hijos
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/availability_player_v2.py'
+      - 'app/family_context_v1.py'
+      - 'app/main_checkout.py'
+      - 'web-defe-core.js'
+      - 'web-family-onboarding.js'
+      - 'web-family-account-fix.js'
+      - 'web-family-laamba-level.js'
+      - 'web-attendance-player-v2.js'
+      - 'web-home-family.js'
+      - '.github/workflows/validate-mis-hijos-release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validar Python
+        run: |
+          python -m py_compile app/availability_player_v2.py app/family_context_v1.py app/main_checkout.py
+      - name: Validar JavaScript
+        run: |
+          node --check web-defe-core.js
+          node --check web-family-onboarding.js
+          node --check web-family-account-fix.js
+          node --check web-family-laamba-level.js
+          node --check web-attendance-player-v2.js
+          node --check web-home-family.js
+      - name: Validar integración backend
+        run: |
+          grep -F 'availability_player_v2_router' app/main_checkout.py
+          grep -F 'family_context_router' app/main_checkout.py
+          grep -F 'include_router(availability_player_v2_router)' app/main_checkout.py
+          grep -F 'include_router(family_context_router)' app/main_checkout.py
+      - name: Validar integración frontend
+        run: |
+          grep -F 'DefeCore' web-family-onboarding.js
+          grep -F '/api/availability/family/children' web-family-onboarding.js
+          grep -F '/api/family/catalog' web-family-laamba-level.js
+          grep -F '/api/availability/v2/me' web-attendance-player-v2.js
