@@ -6,6 +6,10 @@ on:
     paths:
       - 'web-family-onboarding.js'
       - 'web-family-laamba-level.js'
+      - 'web-family-account-fix.js'
+      - 'web-defe-core.js'
+      - 'web-attendance-player-v2.js'
+      - 'web-home-family.js'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
@@ -40,6 +44,10 @@ jobs:
           cp -a /tmp/recovered/el-defe-app/. /tmp/pages/
           cp web-family-onboarding.js /tmp/pages/web-family-onboarding.js
           cp web-family-laamba-level.js /tmp/pages/web-family-laamba-level.js
+          cp web-family-account-fix.js /tmp/pages/web-family-account-fix.js
+          cp web-defe-core.js /tmp/pages/web-defe-core.js
+          cp web-attendance-player-v2.js /tmp/pages/web-attendance-player-v2.js
+          cp web-home-family.js /tmp/pages/web-home-family.js
           rm -f /tmp/pages/web-family-delete.js
           python3 - <<'PY'
           from pathlib import Path
@@ -47,16 +55,20 @@ jobs:
           s=p.read_text()
           s=s.replace('<script src="./web-attendance-player-filter.js"></script>','')
           s=s.replace('<script src="./web-family-delete.js"></script>','')
-          family='<script src="./web-family-onboarding.js"></script>'
-          laamba='<script src="./web-family-laamba-level.js"></script>'
-          if family not in s:s=s.replace('</body>',family+'\n</body>')
-          if laamba not in s:s=s.replace('</body>',laamba+'\n</body>')
+          scripts=['web-defe-core.js','web-family-onboarding.js','web-family-account-fix.js','web-family-laamba-level.js','web-attendance-player-v2.js','web-home-family.js']
+          for name in scripts:
+              tag=f'<script src="./{name}"></script>'
+              if tag not in s:s=s.replace('</body>',tag+'\n</body>')
           p.write_text(s)
           PY
           test -s /tmp/pages/availability-ui-netlify.js
           test -s /tmp/pages/web-mi-defe-overlay-netlify.js
           node --check /tmp/pages/web-family-onboarding.js
           node --check /tmp/pages/web-family-laamba-level.js
+          node --check /tmp/pages/web-family-account-fix.js
+          node --check /tmp/pages/web-defe-core.js
+          node --check /tmp/pages/web-attendance-player-v2.js
+          node --check /tmp/pages/web-home-family.js
           grep -F '/api/availability/family/children' /tmp/pages/web-family-onboarding.js >/dev/null
           grep -F '/api/family/catalog' /tmp/pages/web-family-laamba-level.js >/dev/null
           grep -F 'data-laamba-category' /tmp/pages/web-family-laamba-level.js >/dev/null
