@@ -23,7 +23,10 @@ jobs:
           PASS="DefeTest2026!"
           REG=$(curl -fsS -X POST "$API/api/auth/register" -H 'Content-Type: application/json' -d "{\"email\":\"$EMAIL\",\"password\":\"$PASS\"}")
           TOKEN=$(python -c 'import json,sys; print(json.load(sys.stdin)["access_token"])' <<<"$REG")
-          LOGIN=$(curl -fsS -X POST "$API/api/auth/login" -H "Content-Type: application/x-www-form-urlencoded" --data-urlencode "username=$EMAIL" --data-urlencode "password=$PASS")\n          TOKEN=$(python -c "import json,sys; print(json.load(sys.stdin)[\x27access_token\x27])" <<<"$LOGIN")\n          AUTH="Authorization: Bearer $TOKEN"\n          curl -fsS "$API/api/me" -H "$AUTH" >/dev/null
+          LOGIN=$(curl -fsS -X POST "$API/api/auth/login" -H "Content-Type: application/x-www-form-urlencoded" --data-urlencode "username=$EMAIL" --data-urlencode "password=$PASS")
+          TOKEN=$(python -c 'import json,sys; print(json.load(sys.stdin)["access_token"])' <<<"$LOGIN")
+          AUTH="Authorization: Bearer $TOKEN"
+          curl -fsS "$API/api/me" -H "$AUTH" >/dev/null
           curl -fsS -X POST "$API/api/availability/family/children" -H "$AUTH" -H 'Content-Type: application/json' -d '{"first_name":"Benjamin","last_name":"E2E","competition":"FEFI","category":"2013"}' >/dev/null
           curl -fsS -X POST "$API/api/availability/family/children" -H "$AUTH" -H 'Content-Type: application/json' -d '{"first_name":"Santiago","last_name":"E2E","competition":"FEFI","category":"2016"}' >/dev/null
           CTX=$(curl -fsS "$API/api/family/context" -H "$AUTH")
