@@ -25,4 +25,4 @@ jobs:
           grep -F 'Mi Defe' ui-operativa-base/web-mi-defe-overlay-netlify.js >/dev/null
           test -s ui-operativa-base/availability-ui-netlify.js
           grep -F 'rm -f /tmp/pages/web-family-delete.js /tmp/pages/web-attendance-player-filter.js' .github/workflows/build-defe-web.yml >/dev/null
-          grep -F "! grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html" .github/workflows/build-defe-web.yml >/dev/null
+          grep -F "assert 'web-attendance-player-filter.js' not in idx" .github/workflows/build-defe-web.yml >/dev/null
