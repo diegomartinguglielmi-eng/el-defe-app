@@ -127,7 +127,10 @@
         localStorage.setItem(KEYS.user,JSON.stringify(data.user||{}));localStorage.setItem('defe_user',JSON.stringify(data.user||{}));localStorage.setItem(KEYS.session,JSON.stringify({token,user:data.user||{}}));
         const role=tokenRole(token)||String(data.user?.role||'').toLowerCase();
         if(role)localStorage.setItem(KEYS.role,role);
-        await refreshProfile();
+        const profile=await refreshProfile();
+        if(!profile){
+          throw new Error('La sesión no pudo validarse. Volvé a ingresar.');
+        }
         closeLogin();
         syncSessionButtons();
         document.dispatchEvent(new CustomEvent('defe-store-auth-ready',{detail:{role:getRole(),user:getUser()}}));
