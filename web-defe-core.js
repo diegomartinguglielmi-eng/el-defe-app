@@ -7,7 +7,7 @@ const IS_STAGING=location.hostname.includes('staging')||location.search.includes
 const API=IS_STAGING?STAGING:PROD;
 const SESSION_KEY='defe:railway:session', TOKEN_KEY='defe_access_token';
 if(IS_STAGING){
-  const marker='defe:staging:auth:v3';
+  const marker='defe:staging:auth:v4';
   if(localStorage.getItem(marker)!=='1'){
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem(TOKEN_KEY);
