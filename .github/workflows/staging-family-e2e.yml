@@ -29,9 +29,11 @@ jobs:
           CTX=$(curl -fsS "$API/api/family/context" -H "$AUTH")
           HOME=$(curl -fsS "$API/api/home/personalized" -H "$AUTH")
           FEED=$(curl -fsS "$API/api/notifications/feed" -H "$AUTH")
-          python - "$CTX" "$HOME" "$FEED" <<'PY'
+          AVAIL=$(curl -fsS "$API/api/availability/v2/me" -H "$AUTH")
+          ADMIN=$(curl -fsS "$API/api/availability/v2/admin" -H "$AUTH")
+          python - "$CTX" "$HOME" "$FEED" "$AVAIL" "$ADMIN" <<'PY'
           import json,sys
-          ctx=json.loads(sys.argv[1]); home=json.loads(sys.argv[2]); feed=json.loads(sys.argv[3])
+          ctx=json.loads(sys.argv[1]); home=json.loads(sys.argv[2]); feed=json.loads(sys.argv[3]); avail=json.loads(sys.argv[4]); admin=json.loads(sys.argv[5])
           sels=set(ctx["selections"])
           assert {"FEFI|2013","FEFI|2016"} <= sels, sels
           names={x["name"] for x in ctx["children"]}
@@ -39,5 +41,8 @@ jobs:
           assert home["personalized"] is True
           assert isinstance(home["next_matches"], list)
           assert isinstance(feed, list)
-          print({"family_context":"ok","selections":sorted(sels),"home":"personalized","feed":"authenticated"})
+          assert isinstance(avail.get("items",[]), list)
+          # El endpoint admin v2 debe responder con estructura de tablero aunque la familia lectora no tenga privilegios.
+          assert isinstance(admin, dict)
+          print({"family_context":"ok","selections":sorted(sels),"home":"personalized","feed":"authenticated","availability_v2":"ok","admin_v2":"ok"})
           PY
