@@ -74,7 +74,7 @@ ATTENDANCEPLAYER="web-attendance-player-v2-${SHA}.js"
 HOMEFAMILY="web-home-family-${SHA}.js"
 
 cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
-cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
+if [ "${CONTEXT:-}" = "production" ]; then cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"; else printf "// push fuera del piloto\n" > "defe-web-build/dist/${BRIDGE}"; fi
 cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
 cp web-acompanan-overlay.js "defe-web-build/dist/${ACOMP}"
 cp web-sponsors-home-sync.js "defe-web-build/dist/${SPONSORSHOME}"
@@ -116,6 +116,8 @@ import sys
 sha = sys.argv[1]
 p = Path('defe-web-build/dist/index.html')
 s = p.read_text()
+if 'deploy-preview-' in __import__('os').environ.get('DEPLOY_PRIME_URL',''):
+    s = s.replace('<head>', '<head><script>window.EL_DEFE_API_URL="https://el-defe-v2-staging-production.up.railway.app";</script>', 1)
 pwa = '<link rel="manifest" href="/el-defe-app/manifest.webmanifest"><link rel="icon" type="image/png" href="/el-defe-app/icon.png"><meta name="theme-color" content="#0b3a7a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="El Defe">'
 clean = f'''<script>(async function(){{var k='defe-clean-{sha}';try{{if(localStorage.getItem(k))return;localStorage.setItem(k,'1');if('serviceWorker' in navigator){{var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){{return r.unregister()}}));}}if('caches' in window){{var ks=await caches.keys();await Promise.all(ks.map(function(x){{return caches.delete(x)}}));}}}}catch(e){{}}}})();</script>'''
 s = s.replace('<head>', '<head>' + clean + pwa, 1)
