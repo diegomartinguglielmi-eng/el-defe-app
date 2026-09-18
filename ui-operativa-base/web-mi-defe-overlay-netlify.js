@@ -9,7 +9,7 @@
   async function api(path,init={}){const h=new Headers(init.headers||{});const t=token();if(t)h.set('Authorization','Bearer '+t);if(init.body)h.set('Content-Type','application/json');const r=await fetch(API+path,{...init,headers:h,cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.detail||'No se pudo cargar la información');return d}
   function cfg(){try{return {...{next:true,results:true,tables:true,news:true,store:false},...JSON.parse(localStorage.getItem(CFG)||'{}')}}catch(_){return {next:true,results:true,tables:true,news:true,store:false}}}
   function saveCfg(c){localStorage.setItem(CFG,JSON.stringify(c))}
-  let state={options:[],selections:[],manualSelections:[],familySelections:[],events:[],recent:[],tables:[],news:[],loading:false,config:cfg()};
+  let state={options:[],selections:[],manualSelections:[],familySelections:[],events:[],familyItems:[],recent:[],tables:[],news:[],loading:false,config:cfg()};
 
   const css=document.createElement('style');css.textContent=`
   #defe-following-home{display:none!important}
