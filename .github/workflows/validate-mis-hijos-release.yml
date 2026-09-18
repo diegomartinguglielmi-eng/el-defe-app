@@ -76,7 +76,7 @@ jobs:
             const email=`e2e-${stamp}@mail.com`, password='Qa-' + stamp + '-A9!';
             let r=await fetch(process.env.STAGING_API+'/api/auth/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,password,full_name:'Familia E2E'})});
             assert(r.ok,'registro staging '+r.status);
-            r=await fetch(process.env.STAGING_API+'/api/auth/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,password})});
+            r=await fetch(process.env.STAGING_API+'/api/auth/login',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({username:email,password})});
             assert(r.ok,'login staging '+r.status);
             const d=await r.json(); const token=d.access_token||d.token;
             assert(token,'token staging ausente');
