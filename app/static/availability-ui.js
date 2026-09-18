@@ -1,7 +1,7 @@
 // El Defe · disponibilidad + tablero operativo de jornada
 (function(){
 if(window.__defeAvailabilityLoaded)return;window.__defeAvailabilityLoaded=true;
-const API='https://el-defe-v5-production.up.railway.app';
+const API=String(window.EL_DEFE_API_URL||'https://el-defe-v5-production.up.railway.app').replace(/\/$/,'');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 function jwt(v){if(!v||typeof v!=='string')return null;const m=v.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(m)return m[0];try{const o=JSON.parse(v);for(const x of Object.values(o||{})){const f=jwt(typeof x==='string'?x:JSON.stringify(x));if(f)return f}}catch(_){}return null}
 function token(){for(const st of [localStorage,sessionStorage])for(let i=0;i<st.length;i++){const t=jwt(st.getItem(st.key(i)));if(t)return t}return localStorage.getItem('defe_token')||localStorage.getItem('defe_auth_token')||sessionStorage.getItem('defe_token')||sessionStorage.getItem('defe_auth_token')||''}
