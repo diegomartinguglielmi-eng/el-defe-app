@@ -1,0 +1,5578 @@
+{
+  "club": "DEF. DE SANTOS LUGARES",
+  "actualizado": "2026-09-17T12:35:54.782Z",
+  "ligas": [
+    {
+      "id": "fefi",
+      "nombre": "FEFI",
+      "torneo": "Clausura 2026 · Zona H",
+      "fuente": "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/",
+      "conectada": true,
+      "actualizado": "2026-09-17T12:35:57.726Z",
+      "categorias": [
+        "2013",
+        "2014",
+        "2015",
+        "2016",
+        "2017",
+        "2018",
+        "2019"
+      ],
+      "encuentros": [
+        {
+          "nro": 1,
+          "fecha": "2026-08-08",
+          "rival": "ATLETICO LUGANO",
+          "local": false,
+          "sede": "JOSé IGNACIO RUCCI 4170, CABA",
+          "marc": {
+            "2013": "GP",
+            "2014": [
+              2,
+              0
+            ],
+            "2015": [
+              7,
+              0
+            ],
+            "2016": [
+              1,
+              1
+            ],
+            "2017": [
+              2,
+              6
+            ],
+            "2018": [
+              4,
+              1
+            ],
+            "2019": [
+              5,
+              2
+            ]
+          },
+          "pts": [
+            18,
+            9
+          ],
+          "estado": "verificado"
+        },
+        {
+          "nro": 2,
+          "fecha": "2026-08-15",
+          "rival": "ESTRADA 2",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES",
+          "marc": {
+            "2013": [
+              2,
+              0
+            ],
+            "2014": [
+              2,
+              1
+            ],
+            "2015": [
+              10,
+              5
+            ],
+            "2016": [
+              1,
+              3
+            ],
+            "2017": [
+              1,
+              1
+            ],
+            "2018": [
+              11,
+              0
+            ],
+            "2019": [
+              4,
+              1
+            ]
+          },
+          "pts": [
+            18,
+            10
+          ],
+          "estado": "verificado"
+        },
+        {
+          "nro": 3,
+          "fecha": "2026-08-22",
+          "rival": "C. S. D. ARGENTINO \"1\"",
+          "local": false,
+          "sede": "ALBARIñO 2253, CAPITAL FEDERAL",
+          "marc": {
+            "2013": [
+              1,
+              4
+            ],
+            "2014": [
+              2,
+              2
+            ],
+            "2015": [
+              5,
+              1
+            ],
+            "2016": [
+              2,
+              0
+            ],
+            "2017": [
+              1,
+              2
+            ],
+            "2018": [
+              1,
+              1
+            ],
+            "2019": [
+              2,
+              2
+            ]
+          },
+          "pts": [
+            14,
+            14
+          ],
+          "estado": "verificado"
+        },
+        {
+          "nro": 4,
+          "fecha": "2026-08-29",
+          "rival": "DEFENSORES DE HAEDO",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES",
+          "marc": {
+            "2013": [
+              0,
+              2
+            ],
+            "2014": [
+              2,
+              2
+            ],
+            "2015": [
+              4,
+              1
+            ],
+            "2016": [
+              2,
+              5
+            ],
+            "2017": [
+              6,
+              1
+            ],
+            "2018": [
+              2,
+              0
+            ],
+            "2019": [
+              2,
+              0
+            ]
+          },
+          "pts": [
+            16,
+            12
+          ],
+          "estado": "verificado"
+        },
+        {
+          "nro": 5,
+          "fecha": "2026-09-05",
+          "rival": "CNEL. BRANDSEN",
+          "local": false,
+          "sede": "ROQUE SIMONE 3951, LA TABLADA",
+          "marc": {
+            "2013": [
+              4,
+              2
+            ],
+            "2014": [
+              2,
+              7
+            ],
+            "2015": [
+              5,
+              3
+            ],
+            "2016": [
+              0,
+              0
+            ],
+            "2017": [
+              4,
+              1
+            ],
+            "2018": [
+              3,
+              1
+            ],
+            "2019": [
+              9,
+              0
+            ]
+          },
+          "pts": [
+            18,
+            10
+          ],
+          "estado": "verificado"
+        },
+        {
+          "nro": 6,
+          "fecha": "2026-09-12",
+          "rival": "C. A. CENTENARIO S. M.",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES",
+          "marc": {
+            "2013": [
+              2,
+              3
+            ],
+            "2014": [
+              2,
+              2
+            ],
+            "2015": [
+              5,
+              1
+            ],
+            "2016": [
+              1,
+              5
+            ],
+            "2017": [
+              8,
+              1
+            ],
+            "2018": [
+              13,
+              0
+            ],
+            "2019": [
+              4,
+              0
+            ]
+          },
+          "pts": [
+            16,
+            12
+          ],
+          "estado": "verificado"
+        },
+        {
+          "nro": 7,
+          "fecha": "2026-09-19",
+          "rival": "LAMADRID",
+          "local": false,
+          "sede": "DESAGUADERO 3180, C.A.B.A."
+        },
+        {
+          "nro": 8,
+          "fecha": "2026-09-26",
+          "rival": "BOYA - C. A. I.",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
+        },
+        {
+          "nro": 9,
+          "fecha": "2026-10-03",
+          "rival": "EL TREBOL",
+          "local": false,
+          "sede": "GANDARA 2840, CABA"
+        },
+        {
+          "nro": 10,
+          "fecha": "2026-10-10",
+          "rival": "GIMNASIA",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
+        },
+        {
+          "nro": 11,
+          "fecha": "2026-10-17",
+          "rival": "A DOS TOQUES F. C.",
+          "local": false,
+          "sede": "PASO 399, AVELLANEDA"
+        },
+        {
+          "nro": 12,
+          "fecha": "2026-10-24",
+          "rival": "FRANJA DE ORO 1",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
+        },
+        {
+          "nro": 13,
+          "fecha": "2026-10-31",
+          "rival": "ALVEAR",
+          "local": false,
+          "sede": "JOSé E. RODO 4190, CABA"
+        },
+        {
+          "nro": 14,
+          "fecha": "2026-11-07",
+          "rival": "NOLTING",
+          "local": true,
+          "sede": "ERNESTO SABATO 3162, SANTOS LUGARES"
+        },
+        {
+          "nro": 15,
+          "fecha": "2026-11-14",
+          "rival": "EL FORTIN DE BELGRANO",
+          "local": false,
+          "sede": "CRAMER 3249, CABA"
+        }
+      ],
+      "tablas": {
+        "2013": [
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 6,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "pts": 17
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 6,
+            "g": 4,
+            "e": 1,
+            "p": 1,
+            "pts": 15
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "pts": 14
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 6,
+            "g": 3,
+            "e": 2,
+            "p": 1,
+            "pts": 14
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 5,
+            "g": 4,
+            "e": 1,
+            "p": 0,
+            "pts": 14
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 6,
+            "g": 2,
+            "e": 3,
+            "p": 1,
+            "pts": 13
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 6,
+            "g": 2,
+            "e": 2,
+            "p": 2,
+            "pts": 12
+          },
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "pts": 12
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "pts": 12
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 5,
+            "g": 2,
+            "e": 2,
+            "p": 1,
+            "pts": 11
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 6,
+            "g": 2,
+            "e": 1,
+            "p": 3,
+            "pts": 11
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 6,
+            "g": 2,
+            "e": 1,
+            "p": 3,
+            "pts": 11
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "pts": 10
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 6,
+            "g": 1,
+            "e": 0,
+            "p": 5,
+            "pts": 8
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 6,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 0
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 6,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 0
+          }
+        ],
+        "2014": [
+          {
+            "equipo": "EL TREBOL",
+            "pj": 6,
+            "g": 6,
+            "e": 0,
+            "p": 0,
+            "pts": 18
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 6,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "pts": 17
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 6,
+            "g": 4,
+            "e": 1,
+            "p": 1,
+            "pts": 15
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 6,
+            "g": 4,
+            "e": 1,
+            "p": 1,
+            "pts": 15
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 5,
+            "g": 4,
+            "e": 0,
+            "p": 1,
+            "pts": 13
+          },
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 6,
+            "g": 2,
+            "e": 3,
+            "p": 1,
+            "pts": 13
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "pts": 12
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 6,
+            "g": 2,
+            "e": 1,
+            "p": 3,
+            "pts": 11
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 5,
+            "g": 2,
+            "e": 2,
+            "p": 1,
+            "pts": 11
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "pts": 10
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "pts": 10
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "pts": 9
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "pts": 8
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 6,
+            "g": 1,
+            "e": 0,
+            "p": 5,
+            "pts": 8
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 6,
+            "g": 0,
+            "e": 0,
+            "p": 6,
+            "pts": 6
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 6,
+            "g": 1,
+            "e": 0,
+            "p": 3,
+            "pts": 6
+          }
+        ],
+        "2015": [
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 6,
+            "g": 6,
+            "e": 0,
+            "p": 0,
+            "pts": 18
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 6,
+            "g": 5,
+            "e": 0,
+            "p": 1,
+            "pts": 16
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 5,
+            "g": 5,
+            "e": 0,
+            "p": 0,
+            "pts": 15
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 6,
+            "g": 3,
+            "e": 1,
+            "p": 2,
+            "pts": 13
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 5,
+            "g": 4,
+            "e": 0,
+            "p": 1,
+            "pts": 13
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 5,
+            "g": 4,
+            "e": 0,
+            "p": 1,
+            "pts": 13
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 6,
+            "g": 3,
+            "e": 1,
+            "p": 2,
+            "pts": 13
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "pts": 12
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "pts": 9
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "pts": 9
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "pts": 9
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "pts": 9
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 4,
+            "g": 1,
+            "e": 1,
+            "p": 2,
+            "pts": 7
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 5,
+            "g": 0,
+            "e": 1,
+            "p": 4,
+            "pts": 6
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 5,
+            "pts": 5
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 5,
+            "pts": 5
+          }
+        ],
+        "2016": [
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 5,
+            "g": 5,
+            "e": 0,
+            "p": 0,
+            "pts": 15
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 5,
+            "g": 5,
+            "e": 0,
+            "p": 0,
+            "pts": 15
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "pts": 14
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 6,
+            "g": 3,
+            "e": 1,
+            "p": 2,
+            "pts": 13
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 6,
+            "g": 3,
+            "e": 1,
+            "p": 2,
+            "pts": 13
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 5,
+            "g": 3,
+            "e": 1,
+            "p": 1,
+            "pts": 12
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "pts": 11
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 6,
+            "g": 2,
+            "e": 1,
+            "p": 3,
+            "pts": 11
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "pts": 10
+          },
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 6,
+            "g": 1,
+            "e": 2,
+            "p": 3,
+            "pts": 10
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "pts": 10
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "pts": 10
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "pts": 9
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 5,
+            "g": 0,
+            "e": 2,
+            "p": 3,
+            "pts": 7
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 5,
+            "g": 0,
+            "e": 2,
+            "p": 3,
+            "pts": 7
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 4,
+            "g": 0,
+            "e": 1,
+            "p": 3,
+            "pts": 5
+          }
+        ],
+        "2017": [
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 5,
+            "g": 5,
+            "e": 0,
+            "p": 0,
+            "pts": 15
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 5,
+            "g": 5,
+            "e": 0,
+            "p": 0,
+            "pts": 15
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 5,
+            "g": 5,
+            "e": 0,
+            "p": 0,
+            "pts": 15
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "pts": 14
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 6,
+            "g": 3,
+            "e": 1,
+            "p": 2,
+            "pts": 13
+          },
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 6,
+            "g": 3,
+            "e": 1,
+            "p": 2,
+            "pts": 13
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 6,
+            "g": 3,
+            "e": 1,
+            "p": 2,
+            "pts": 13
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 5,
+            "g": 2,
+            "e": 2,
+            "p": 1,
+            "pts": 11
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 6,
+            "g": 2,
+            "e": 1,
+            "p": 3,
+            "pts": 11
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "pts": 10
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "pts": 9
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "pts": 9
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 6,
+            "g": 1,
+            "e": 0,
+            "p": 5,
+            "pts": 8
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "pts": 8
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 5,
+            "g": 1,
+            "e": 0,
+            "p": 4,
+            "pts": 7
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 5,
+            "pts": 5
+          }
+        ],
+        "2018": [
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 6,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "pts": 17
+          },
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 6,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "pts": 17
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 6,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "pts": 17
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 6,
+            "g": 4,
+            "e": 1,
+            "p": 1,
+            "pts": 15
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 6,
+            "g": 3,
+            "e": 2,
+            "p": 1,
+            "pts": 14
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 6,
+            "g": 3,
+            "e": 2,
+            "p": 1,
+            "pts": 14
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 6,
+            "g": 3,
+            "e": 1,
+            "p": 2,
+            "pts": 13
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "pts": 12
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 6,
+            "g": 2,
+            "e": 2,
+            "p": 2,
+            "pts": 12
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 6,
+            "g": 1,
+            "e": 2,
+            "p": 3,
+            "pts": 10
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "pts": 10
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "pts": 9
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 6,
+            "g": 1,
+            "e": 0,
+            "p": 5,
+            "pts": 8
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 6,
+            "g": 0,
+            "e": 2,
+            "p": 4,
+            "pts": 8
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 5,
+            "g": 0,
+            "e": 1,
+            "p": 4,
+            "pts": 6
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 5,
+            "g": 0,
+            "e": 1,
+            "p": 4,
+            "pts": 6
+          }
+        ],
+        "2019": [
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 6,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "pts": 17
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 6,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "pts": 17
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 6,
+            "g": 5,
+            "e": 0,
+            "p": 1,
+            "pts": 16
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 6,
+            "g": 5,
+            "e": 0,
+            "p": 1,
+            "pts": 16
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 6,
+            "g": 5,
+            "e": 0,
+            "p": 1,
+            "pts": 16
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "pts": 14
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "pts": 14
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "pts": 12
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 6,
+            "g": 2,
+            "e": 2,
+            "p": 2,
+            "pts": 12
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "pts": 10
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "pts": 9
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 6,
+            "g": 1,
+            "e": 0,
+            "p": 5,
+            "pts": 8
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "pts": 8
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 5,
+            "g": 1,
+            "e": 0,
+            "p": 4,
+            "pts": 7
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 6,
+            "g": 0,
+            "e": 0,
+            "p": 6,
+            "pts": 6
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 4,
+            "pts": 4
+          }
+        ],
+        "general": [
+          {
+            "equipo": "NOLTING",
+            "pj": 42,
+            "g": 27,
+            "e": 5,
+            "p": 10,
+            "pts": 101
+          },
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 42,
+            "g": 25,
+            "e": 8,
+            "p": 9,
+            "pts": 100
+          },
+          {
+            "equipo": "FRANJA DE ORO 1",
+            "pj": 42,
+            "g": 24,
+            "e": 5,
+            "p": 13,
+            "pts": 95
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 42,
+            "g": 22,
+            "e": 5,
+            "p": 15,
+            "pts": 91
+          },
+          {
+            "equipo": "ALVEAR",
+            "pj": 38,
+            "g": 20,
+            "e": 7,
+            "p": 11,
+            "pts": 85
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 42,
+            "g": 18,
+            "e": 6,
+            "p": 18,
+            "pts": 84
+          },
+          {
+            "equipo": "EL TREBOL",
+            "pj": 40,
+            "g": 20,
+            "e": 4,
+            "p": 16,
+            "pts": 84
+          },
+          {
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 38,
+            "g": 20,
+            "e": 4,
+            "p": 14,
+            "pts": 82
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 42,
+            "g": 14,
+            "e": 7,
+            "p": 20,
+            "pts": 76
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 39,
+            "g": 15,
+            "e": 4,
+            "p": 20,
+            "pts": 73
+          },
+          {
+            "equipo": "GIMNASIA",
+            "pj": 39,
+            "g": 13,
+            "e": 4,
+            "p": 22,
+            "pts": 69
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 42,
+            "g": 12,
+            "e": 2,
+            "p": 28,
+            "pts": 68
+          },
+          {
+            "equipo": "C. A. CENTENARIO S. M.",
+            "pj": 35,
+            "g": 14,
+            "e": 4,
+            "p": 17,
+            "pts": 67
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 39,
+            "g": 16,
+            "e": 4,
+            "p": 11,
+            "pts": 67
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
+            "pj": 39,
+            "g": 11,
+            "e": 3,
+            "p": 19,
+            "pts": 58
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 33,
+            "g": 6,
+            "e": 6,
+            "p": 20,
+            "pts": 50
+          }
+        ]
+      }
+    },
+    {
+      "id": "superliga",
+      "nombre": "Superliga",
+      "disciplina": "Futsal",
+      "torneo": "Junior A · Torneo 2026",
+      "fuente": "https://www.futsalargentina.com.ar/fixture.php?cat=1_1",
+      "conectada": true,
+      "actualizado": "2026-09-17T12:35:31.854Z",
+      "categorias": [
+        "Junior A"
+      ],
+      "partidos": [
+        {
+          "rival": "El Talar",
+          "local": true,
+          "sede": "Don Bosco",
+          "fecha": "2026-09-14",
+          "hora": "21:00",
+          "gf": 4,
+          "gc": 7
+        }
+      ],
+      "tablas": {
+        "general": [
+          {
+            "equipo": "1",
+            "pj": 16,
+            "g": 6,
+            "e": 5,
+            "p": 1,
+            "pts": null
+          },
+          {
+            "equipo": "2",
+            "pj": 13,
+            "g": 6,
+            "e": 4,
+            "p": 1,
+            "pts": null
+          },
+          {
+            "equipo": "3",
+            "pj": 13,
+            "g": 6,
+            "e": 4,
+            "p": 1,
+            "pts": null
+          },
+          {
+            "equipo": "4",
+            "pj": 13,
+            "g": 6,
+            "e": 4,
+            "p": 1,
+            "pts": null
+          },
+          {
+            "equipo": "5",
+            "pj": 12,
+            "g": 5,
+            "e": 4,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "6",
+            "pj": 9,
+            "g": 5,
+            "e": 3,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "7",
+            "pj": 9,
+            "g": 6,
+            "e": 3,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "8",
+            "pj": 7,
+            "g": 5,
+            "e": 2,
+            "p": 1,
+            "pts": null
+          },
+          {
+            "equipo": "9",
+            "pj": 4,
+            "g": 6,
+            "e": 1,
+            "p": 1,
+            "pts": null
+          },
+          {
+            "equipo": "10",
+            "pj": 3,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "11",
+            "pj": 3,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "12",
+            "pj": 3,
+            "g": 6,
+            "e": 1,
+            "p": 0,
+            "pts": null
+          },
+          {
+            "equipo": "13",
+            "pj": 0,
+            "g": 5,
+            "e": 0,
+            "p": 0,
+            "pts": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "argenliga",
+      "nombre": "Argenliga",
+      "torneo": "Argenliga A · Zona 1 · 2026",
+      "fuente": "https://www.sofascore.com/es-la/futsal/team/defensores-de-santos-lugares/1214864",
+      "conectada": true,
+      "actualizado": "2026-09-17T12:35:54.782Z",
+      "categorias": [
+        "Primera"
+      ],
+      "encuentros": [],
+      "tablas": {
+        "general": [
+          {
+            "equipo": "El Campito",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 15,
+            "dg": 11
+          },
+          {
+            "equipo": "Villa Luro Norte",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 13,
+            "dg": 10
+          },
+          {
+            "equipo": "Defensores de Santos Lugares",
+            "pj": 4,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 10,
+            "dg": 6
+          },
+          {
+            "equipo": "Velez de Martinez",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 10,
+            "dg": 5
+          },
+          {
+            "equipo": "Saenz Peña",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 9,
+            "dg": 9
+          },
+          {
+            "equipo": "Hurlingham",
+            "pj": 4,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 9,
+            "dg": 7
+          },
+          {
+            "equipo": "Newells (Bs. As.)",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 9,
+            "dg": -5
+          },
+          {
+            "equipo": "Arsenal de Sarandi (Argenliga)",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 8,
+            "dg": 1
+          },
+          {
+            "equipo": "Estrada de Almagro",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 7,
+            "dg": -1
+          },
+          {
+            "equipo": "Amigos de Villa Luro",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 5,
+            "dg": -4
+          },
+          {
+            "equipo": "IPA",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 4,
+            "dg": -5
+          },
+          {
+            "equipo": "Versailles",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 4,
+            "dg": -6
+          },
+          {
+            "equipo": "Bristol",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 2,
+            "dg": -4
+          },
+          {
+            "equipo": "Huracan (Argenliga)",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 2,
+            "dg": -5
+          },
+          {
+            "equipo": "Biblioteca",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 1,
+            "dg": -6
+          },
+          {
+            "equipo": "Centro Artiguense",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 1,
+            "dg": -13
+          }
+        ],
+        "Primera": [
+          {
+            "equipo": "El Campito",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 15,
+            "dg": 11
+          },
+          {
+            "equipo": "Villa Luro Norte",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 13,
+            "dg": 10
+          },
+          {
+            "equipo": "Defensores de Santos Lugares",
+            "pj": 4,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 10,
+            "dg": 6
+          },
+          {
+            "equipo": "Velez de Martinez",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 10,
+            "dg": 5
+          },
+          {
+            "equipo": "Saenz Peña",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 9,
+            "dg": 9
+          },
+          {
+            "equipo": "Hurlingham",
+            "pj": 4,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 9,
+            "dg": 7
+          },
+          {
+            "equipo": "Newells (Bs. As.)",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 9,
+            "dg": -5
+          },
+          {
+            "equipo": "Arsenal de Sarandi (Argenliga)",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 8,
+            "dg": 1
+          },
+          {
+            "equipo": "Estrada de Almagro",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 7,
+            "dg": -1
+          },
+          {
+            "equipo": "Amigos de Villa Luro",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 5,
+            "dg": -4
+          },
+          {
+            "equipo": "IPA",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 4,
+            "dg": -5
+          },
+          {
+            "equipo": "Versailles",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 4,
+            "dg": -6
+          },
+          {
+            "equipo": "Bristol",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 2,
+            "dg": -4
+          },
+          {
+            "equipo": "Huracan (Argenliga)",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 2,
+            "dg": -5
+          },
+          {
+            "equipo": "Biblioteca",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 1,
+            "dg": -6
+          },
+          {
+            "equipo": "Centro Artiguense",
+            "pj": 5,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "pts": 1,
+            "dg": -13
+          }
+        ]
+      },
+      "error": "403 en https://api.sofascore.com/api/v1/unique-tournament/34170/seasons",
+      "disciplina": "Futsal",
+      "partidos": [
+        {
+          "categoria": "Primera",
+          "rival": "Versailles",
+          "local": false,
+          "fecha": "2026-03-28",
+          "hora": "20:30",
+          "gf": 4,
+          "gc": 0,
+          "ronda": 1,
+          "jugado": true,
+          "fuente": "Sofascore"
+        },
+        {
+          "categoria": "Primera",
+          "rival": "Centro Artiguense",
+          "local": true,
+          "fecha": "2026-04-05",
+          "hora": "20:30",
+          "gf": 3,
+          "gc": 2,
+          "ronda": 2,
+          "jugado": true,
+          "fuente": "Sofascore"
+        },
+        {
+          "categoria": "Primera",
+          "rival": "Hurlingham",
+          "local": false,
+          "fecha": "2026-04-11",
+          "hora": "19:00",
+          "gf": null,
+          "gc": null,
+          "ronda": 3,
+          "jugado": false,
+          "estado": "postponed",
+          "fuente": "Sofascore"
+        },
+        {
+          "categoria": "Primera",
+          "rival": "Bristol",
+          "local": true,
+          "fecha": "2026-04-19",
+          "hora": "18:00",
+          "gf": 6,
+          "gc": 5,
+          "ronda": 4,
+          "jugado": true,
+          "fuente": "Sofascore"
+        },
+        {
+          "categoria": "Primera",
+          "rival": "Velez de Martinez",
+          "local": false,
+          "fecha": "2026-04-26",
+          "hora": "17:00",
+          "gf": 5,
+          "gc": 5,
+          "ronda": 5,
+          "jugado": true,
+          "fuente": "Sofascore"
+        }
+      ],
+      "parcial": true,
+      "errores": [
+        "last: 403 /team/1214864/events/last/0",
+        "next: 403 /team/1214864/events/next/0",
+        "tabla: 403 /unique-tournament/34170/seasons"
+      ]
+    },
+    {
+      "id": "lamba",
+      "nombre": "LAAMBA",
+      "disciplina": "Futsal",
+      "torneo": "Masculino · Elite I | Femenino · Ascenso I · Zona B · Reserva",
+      "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026",
+      "conectada": true,
+      "actualizado": "2026-09-17T12:35:49.809Z",
+      "categorias": [
+        "1RA",
+        "3RA",
+        "4TA",
+        "5TA",
+        "6TA",
+        "7MA",
+        "8VA",
+        "FEM RVA"
+      ],
+      "partidos": [
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 1,
+          "rival": "Club Aliados",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 2,
+          "gc": 1,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 2,
+          "rival": "Club Pampero",
+          "local": false,
+          "sede": "Balbastro 6151",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 7,
+          "gc": 10,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 3,
+          "rival": "El Lucero Futsal",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 3,
+          "gc": 0,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 4,
+          "rival": "Almafuerte de Ciudad Evita",
+          "local": false,
+          "sede": "El espinillo y El Tacuapi ciudad evita",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 8,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 5,
+          "rival": "La Marca",
+          "local": false,
+          "sede": "Don segundo sombra 2298-2250",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 6,
+          "gc": 4,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 6,
+          "rival": "Nueva Pompeya",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 5,
+          "gc": 4,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 7,
+          "rival": "Parque Patricios",
+          "local": false,
+          "sede": "Alberti 2135",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 6,
+          "gc": 4,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 8,
+          "rival": "Independiente",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 10,
+          "gc": 0,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 9,
+          "rival": "Mariano Moreno",
+          "local": false,
+          "sede": "Fray Cayetano Rodríguez 1353, Tigre",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 10,
+          "rival": "Amistad",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 11,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 12,
+          "rival": "Cantera Zona Norte",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 13,
+          "rival": "CEDIMA",
+          "local": false,
+          "sede": "Arieta 3950",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 14,
+          "rival": "Defensores de Barracas",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "1RA",
+          "ronda": 15,
+          "rival": "Federacion Caballito",
+          "local": false,
+          "sede": null,
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 1,
+          "rival": "Club Aliados",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 3,
+          "gc": 5,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 2,
+          "rival": "Club Pampero",
+          "local": false,
+          "sede": "Balbastro 6151",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 1,
+          "gc": 6,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 3,
+          "rival": "El Lucero Futsal",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 4,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 4,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 4,
+          "rival": "Almafuerte de Ciudad Evita",
+          "local": false,
+          "sede": "El espinillo y El Tacuapi ciudad evita",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 4,
+          "gc": 2,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 5,
+          "rival": "La Marca",
+          "local": false,
+          "sede": "Don segundo sombra 2298-2250",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 5,
+          "gc": 5,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 6,
+          "rival": "Nueva Pompeya",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 4,
+          "gc": 2,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 7,
+          "rival": "Parque Patricios",
+          "local": false,
+          "sede": "Alberti 2135",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 1,
+          "gc": 7,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 8,
+          "rival": "Independiente",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 4,
+          "gc": 5,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 9,
+          "rival": "Mariano Moreno",
+          "local": false,
+          "sede": "Fray Cayetano Rodríguez 1353, Tigre",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 10,
+          "rival": "Amistad",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 11,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 12,
+          "rival": "Cantera Zona Norte",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 13,
+          "rival": "CEDIMA",
+          "local": false,
+          "sede": "Arieta 3950",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 14,
+          "rival": "Defensores de Barracas",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "3RA",
+          "ronda": 15,
+          "rival": "Federacion Caballito",
+          "local": false,
+          "sede": null,
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/3ra/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 1,
+          "rival": "Club Aliados",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 2,
+          "rival": "Club Pampero",
+          "local": false,
+          "sede": "Balbastro 6151",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 5,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 3,
+          "rival": "El Lucero Futsal",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 8,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 4,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 4,
+          "rival": "Almafuerte de Ciudad Evita",
+          "local": false,
+          "sede": "El espinillo y El Tacuapi ciudad evita",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 1,
+          "gc": 9,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 5,
+          "rival": "La Marca",
+          "local": false,
+          "sede": "Don segundo sombra 2298-2250",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 2,
+          "gc": 18,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 6,
+          "rival": "Nueva Pompeya",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 2,
+          "gc": 10,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 7,
+          "rival": "Parque Patricios",
+          "local": false,
+          "sede": "Alberti 2135",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 8,
+          "rival": "Independiente",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 3,
+          "gc": 0,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 9,
+          "rival": "Mariano Moreno",
+          "local": false,
+          "sede": "Fray Cayetano Rodríguez 1353, Tigre",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 10,
+          "rival": "Amistad",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 11,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 12,
+          "rival": "Cantera Zona Norte",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 13,
+          "rival": "CEDIMA",
+          "local": false,
+          "sede": "Arieta 3950",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 14,
+          "rival": "Defensores de Barracas",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "4TA",
+          "ronda": 15,
+          "rival": "Federacion Caballito",
+          "local": false,
+          "sede": null,
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/4ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 1,
+          "rival": "Club Aliados",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 2,
+          "rival": "Club Pampero",
+          "local": false,
+          "sede": "Balbastro 6151",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 3,
+          "gc": 7,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 3,
+          "rival": "El Lucero Futsal",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 7,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 4,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 4,
+          "rival": "Almafuerte de Ciudad Evita",
+          "local": false,
+          "sede": "El espinillo y El Tacuapi ciudad evita",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 8,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 5,
+          "rival": "La Marca",
+          "local": false,
+          "sede": "Don segundo sombra 2298-2250",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 2,
+          "gc": 6,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 6,
+          "rival": "Nueva Pompeya",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 6,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 7,
+          "rival": "Parque Patricios",
+          "local": false,
+          "sede": "Alberti 2135",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 1,
+          "gc": 11,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 8,
+          "rival": "Independiente",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 4,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 9,
+          "rival": "Mariano Moreno",
+          "local": false,
+          "sede": "Fray Cayetano Rodríguez 1353, Tigre",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 10,
+          "rival": "Amistad",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 11,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 12,
+          "rival": "Cantera Zona Norte",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 13,
+          "rival": "CEDIMA",
+          "local": false,
+          "sede": "Arieta 3950",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 14,
+          "rival": "Defensores de Barracas",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "5TA",
+          "ronda": 15,
+          "rival": "Federacion Caballito",
+          "local": false,
+          "sede": null,
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/5ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 1,
+          "rival": "Club Aliados",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 2,
+          "rival": "Club Pampero",
+          "local": false,
+          "sede": "Balbastro 6151",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 3,
+          "rival": "El Lucero Futsal",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 4,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 4,
+          "rival": "Almafuerte de Ciudad Evita",
+          "local": false,
+          "sede": "El espinillo y El Tacuapi ciudad evita",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 5,
+          "rival": "La Marca",
+          "local": false,
+          "sede": "Don segundo sombra 2298-2250",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 6,
+          "rival": "Nueva Pompeya",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 7,
+          "rival": "Parque Patricios",
+          "local": false,
+          "sede": "Alberti 2135",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 8,
+          "rival": "Independiente",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 9,
+          "rival": "Mariano Moreno",
+          "local": false,
+          "sede": "Fray Cayetano Rodríguez 1353, Tigre",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 10,
+          "rival": "Amistad",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 11,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 12,
+          "rival": "Cantera Zona Norte",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 13,
+          "rival": "CEDIMA",
+          "local": false,
+          "sede": "Arieta 3950",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 14,
+          "rival": "Defensores de Barracas",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "6TA",
+          "ronda": 15,
+          "rival": "Federacion Caballito",
+          "local": false,
+          "sede": null,
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/6ta/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 1,
+          "rival": "Club Aliados",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 3,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 2,
+          "rival": "Club Pampero",
+          "local": false,
+          "sede": "Balbastro 6151",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 1,
+          "gc": 5,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 3,
+          "rival": "El Lucero Futsal",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 4,
+          "gc": 1,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 4,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 4,
+          "rival": "Almafuerte de Ciudad Evita",
+          "local": false,
+          "sede": "El espinillo y El Tacuapi ciudad evita",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 1,
+          "gc": 1,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 5,
+          "rival": "La Marca",
+          "local": false,
+          "sede": "Don segundo sombra 2298-2250",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 1,
+          "gc": 5,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 6,
+          "rival": "Nueva Pompeya",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 3,
+          "gc": 7,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 7,
+          "rival": "Parque Patricios",
+          "local": false,
+          "sede": "Alberti 2135",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 5,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 8,
+          "rival": "Independiente",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 2,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 9,
+          "rival": "Mariano Moreno",
+          "local": false,
+          "sede": "Fray Cayetano Rodríguez 1353, Tigre",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 10,
+          "rival": "Amistad",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 11,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 12,
+          "rival": "Cantera Zona Norte",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 13,
+          "rival": "CEDIMA",
+          "local": false,
+          "sede": "Arieta 3950",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 14,
+          "rival": "Defensores de Barracas",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "7MA",
+          "ronda": 15,
+          "rival": "Federacion Caballito",
+          "local": false,
+          "sede": null,
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/7ma/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 1,
+          "rival": "Club Aliados",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 2,
+          "rival": "Club Pampero",
+          "local": false,
+          "sede": "Balbastro 6151",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 6,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 3,
+          "rival": "El Lucero Futsal",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 2,
+          "gc": 2,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 4,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 4,
+          "rival": "Almafuerte de Ciudad Evita",
+          "local": false,
+          "sede": "El espinillo y El Tacuapi ciudad evita",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 0,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 5,
+          "rival": "La Marca",
+          "local": false,
+          "sede": "Don segundo sombra 2298-2250",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 1,
+          "gc": 6,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 6,
+          "rival": "Nueva Pompeya",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 3,
+          "gc": 1,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 7,
+          "rival": "Parque Patricios",
+          "local": false,
+          "sede": "Alberti 2135",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 2,
+          "gc": 3,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 8,
+          "rival": "Independiente",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 3,
+          "gc": 2,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 9,
+          "rival": "Mariano Moreno",
+          "local": false,
+          "sede": "Fray Cayetano Rodríguez 1353, Tigre",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 10,
+          "rival": "Amistad",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 11,
+          "rival": "California",
+          "local": false,
+          "sede": "C. Lincoln 3136 (San Martin)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 12,
+          "rival": "Cantera Zona Norte",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 13,
+          "rival": "CEDIMA",
+          "local": false,
+          "sede": "Arieta 3950",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 14,
+          "rival": "Defensores de Barracas",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "masculino",
+          "categoria": "8VA",
+          "ronda": 15,
+          "rival": "Federacion Caballito",
+          "local": false,
+          "sede": null,
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/8va/torneo/m-eliteiclausura/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 1,
+          "rival": "Estudiantes del Norte",
+          "local": false,
+          "sede": "Av Roberto Goyeneche 4051",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 2,
+          "rival": "Villa Mitre",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 6,
+          "gc": 2,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 3,
+          "rival": "Deportivo Vedia",
+          "local": false,
+          "sede": "Bustamante 39 ( crovara y gral paz)",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": 4,
+          "gc": 9,
+          "jugado": true,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 4,
+          "rival": "San Andres Futsal",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 5,
+          "rival": "Deportivo La Boca",
+          "local": false,
+          "sede": null,
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 6,
+          "rival": "Union Italiana",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 7,
+          "rival": "Cervantes LP",
+          "local": false,
+          "sede": "Cesar Diaz 5131 CABA",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 8,
+          "rival": "Pampa FC",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 9,
+          "rival": "Toque y Toque",
+          "local": false,
+          "sede": null,
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 10,
+          "rival": "Fecha Libre",
+          "local": false,
+          "sede": "Fecha Libre",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 11,
+          "rival": "Ituzaingo",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 12,
+          "rival": "Club Saenz Peña",
+          "local": false,
+          "sede": null,
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        },
+        {
+          "liga": "LAAMBA",
+          "rama": "femenino",
+          "categoria": "FEM RVA",
+          "ronda": 13,
+          "rival": "Estrada de Almagro",
+          "local": true,
+          "sede": "Ernesto sabato 3162",
+          "fechaTexto": null,
+          "hora": null,
+          "gf": null,
+          "gc": null,
+          "jugado": false,
+          "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
+        }
+      ],
+      "tablas": {
+        "1RA": [
+          {
+            "equipo": "Defensores de SL",
+            "pj": 8,
+            "g": 7,
+            "e": 0,
+            "p": 1,
+            "dg": 21,
+            "pts": 21
+          },
+          {
+            "equipo": "Cantera Zona Norte",
+            "pj": 8,
+            "g": 5,
+            "e": 0,
+            "p": 3,
+            "dg": 17,
+            "pts": 15
+          },
+          {
+            "equipo": "Club Pampero",
+            "pj": 7,
+            "g": 5,
+            "e": 0,
+            "p": 2,
+            "dg": 12,
+            "pts": 15
+          },
+          {
+            "equipo": "CEDIMA",
+            "pj": 6,
+            "g": 4,
+            "e": 1,
+            "p": 1,
+            "dg": 13,
+            "pts": 13
+          },
+          {
+            "equipo": "California",
+            "pj": 7,
+            "g": 4,
+            "e": 1,
+            "p": 2,
+            "dg": 9,
+            "pts": 13
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "dg": 4,
+            "pts": 12
+          },
+          {
+            "equipo": "Amistad",
+            "pj": 7,
+            "g": 3,
+            "e": 1,
+            "p": 3,
+            "dg": -9,
+            "pts": 10
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pj": 4,
+            "g": 3,
+            "e": 0,
+            "p": 1,
+            "dg": 12,
+            "pts": 9
+          },
+          {
+            "equipo": "La Marca",
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "dg": 4,
+            "pts": 9
+          },
+          {
+            "equipo": "Parque Patricios",
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "dg": 0,
+            "pts": 9
+          },
+          {
+            "equipo": "Club Aliados",
+            "pj": 8,
+            "g": 3,
+            "e": 0,
+            "p": 5,
+            "dg": -13,
+            "pts": 9
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pj": 7,
+            "g": 1,
+            "e": 1,
+            "p": 5,
+            "dg": -7,
+            "pts": 4
+          },
+          {
+            "equipo": "Independiente",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "dg": -13,
+            "pts": 4
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "dg": -14,
+            "pts": 4
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "dg": -15,
+            "pts": 4
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pj": 6,
+            "g": 0,
+            "e": 1,
+            "p": 5,
+            "dg": -21,
+            "pts": 1
+          }
+        ],
+        "3RA": [
+          {
+            "equipo": "Cantera Zona Norte",
+            "pj": 8,
+            "g": 8,
+            "e": 0,
+            "p": 0,
+            "dg": 39,
+            "pts": 24
+          },
+          {
+            "equipo": "Club Pampero",
+            "pj": 8,
+            "g": 5,
+            "e": 2,
+            "p": 1,
+            "dg": 17,
+            "pts": 17
+          },
+          {
+            "equipo": "Parque Patricios",
+            "pj": 6,
+            "g": 4,
+            "e": 2,
+            "p": 0,
+            "dg": 14,
+            "pts": 14
+          },
+          {
+            "equipo": "Club Aliados",
+            "pj": 8,
+            "g": 4,
+            "e": 1,
+            "p": 3,
+            "dg": 3,
+            "pts": 13
+          },
+          {
+            "equipo": "California",
+            "pj": 7,
+            "g": 4,
+            "e": 0,
+            "p": 3,
+            "dg": 10,
+            "pts": 12
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pj": 8,
+            "g": 4,
+            "e": 0,
+            "p": 4,
+            "dg": 2,
+            "pts": 12
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pj": 5,
+            "g": 3,
+            "e": 1,
+            "p": 1,
+            "dg": 12,
+            "pts": 10
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pj": 8,
+            "g": 3,
+            "e": 1,
+            "p": 4,
+            "dg": -9,
+            "pts": 10
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "dg": 12,
+            "pts": 9
+          },
+          {
+            "equipo": "CEDIMA",
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "dg": -1,
+            "pts": 9
+          },
+          {
+            "equipo": "Independiente",
+            "pj": 6,
+            "g": 3,
+            "e": 0,
+            "p": 3,
+            "dg": -9,
+            "pts": 9
+          },
+          {
+            "equipo": "La Marca",
+            "pj": 6,
+            "g": 2,
+            "e": 1,
+            "p": 3,
+            "dg": -2,
+            "pts": 7
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pj": 7,
+            "g": 2,
+            "e": 0,
+            "p": 5,
+            "dg": -16,
+            "pts": 6
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pj": 6,
+            "g": 1,
+            "e": 0,
+            "p": 5,
+            "dg": -22,
+            "pts": 3
+          },
+          {
+            "equipo": "Amistad",
+            "pj": 7,
+            "g": 1,
+            "e": 0,
+            "p": 6,
+            "dg": -26,
+            "pts": 3
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pj": 6,
+            "g": 0,
+            "e": 0,
+            "p": 6,
+            "dg": -24,
+            "pts": 0
+          }
+        ],
+        "4TA": [
+          {
+            "equipo": "Cantera Zona Norte",
+            "pj": 8,
+            "g": 7,
+            "e": 0,
+            "p": 1,
+            "dg": 56,
+            "pts": 21
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pj": 6,
+            "g": 5,
+            "e": 1,
+            "p": 0,
+            "dg": 24,
+            "pts": 16
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pj": 8,
+            "g": 5,
+            "e": 1,
+            "p": 2,
+            "dg": 20,
+            "pts": 16
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pj": 6,
+            "g": 5,
+            "e": 0,
+            "p": 1,
+            "dg": 15,
+            "pts": 15
+          },
+          {
+            "equipo": "Club Pampero",
+            "pj": 8,
+            "g": 5,
+            "e": 0,
+            "p": 3,
+            "dg": 10,
+            "pts": 15
+          },
+          {
+            "equipo": "CEDIMA",
+            "pj": 6,
+            "g": 4,
+            "e": 1,
+            "p": 1,
+            "dg": 19,
+            "pts": 13
+          },
+          {
+            "equipo": "La Marca",
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "dg": 26,
+            "pts": 12
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pj": 7,
+            "g": 3,
+            "e": 0,
+            "p": 4,
+            "dg": -2,
+            "pts": 9
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "dg": -3,
+            "pts": 9
+          },
+          {
+            "equipo": "Club Aliados",
+            "pj": 8,
+            "g": 3,
+            "e": 0,
+            "p": 5,
+            "dg": -15,
+            "pts": 9
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pj": 6,
+            "g": 2,
+            "e": 2,
+            "p": 2,
+            "dg": 0,
+            "pts": 8
+          },
+          {
+            "equipo": "Parque Patricios",
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "dg": -5,
+            "pts": 6
+          },
+          {
+            "equipo": "Amistad",
+            "pj": 7,
+            "g": 1,
+            "e": 1,
+            "p": 5,
+            "dg": -31,
+            "pts": 4
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pj": 8,
+            "g": 1,
+            "e": 0,
+            "p": 7,
+            "dg": -48,
+            "pts": 3
+          },
+          {
+            "equipo": "California",
+            "pj": 7,
+            "g": 0,
+            "e": 1,
+            "p": 6,
+            "dg": -30,
+            "pts": 1
+          },
+          {
+            "equipo": "Independiente",
+            "pj": 6,
+            "g": 0,
+            "e": 1,
+            "p": 5,
+            "dg": -36,
+            "pts": 1
+          }
+        ],
+        "5TA": [
+          {
+            "equipo": "Club Aliados",
+            "pj": 8,
+            "g": 6,
+            "e": 0,
+            "p": 2,
+            "dg": 3,
+            "pts": 18
+          },
+          {
+            "equipo": "Club Pampero",
+            "pj": 8,
+            "g": 5,
+            "e": 2,
+            "p": 1,
+            "dg": 16,
+            "pts": 17
+          },
+          {
+            "equipo": "Cantera Zona Norte",
+            "pj": 8,
+            "g": 5,
+            "e": 2,
+            "p": 1,
+            "dg": 11,
+            "pts": 17
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pj": 7,
+            "g": 5,
+            "e": 0,
+            "p": 2,
+            "dg": 20,
+            "pts": 15
+          },
+          {
+            "equipo": "CEDIMA",
+            "pj": 6,
+            "g": 4,
+            "e": 1,
+            "p": 1,
+            "dg": 14,
+            "pts": 13
+          },
+          {
+            "equipo": "La Marca",
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "dg": 16,
+            "pts": 12
+          },
+          {
+            "equipo": "Independiente",
+            "pj": 6,
+            "g": 3,
+            "e": 2,
+            "p": 1,
+            "dg": 4,
+            "pts": 11
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pj": 8,
+            "g": 3,
+            "e": 0,
+            "p": 5,
+            "dg": 0,
+            "pts": 9
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pj": 5,
+            "g": 2,
+            "e": 2,
+            "p": 1,
+            "dg": -1,
+            "pts": 8
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pj": 6,
+            "g": 2,
+            "e": 1,
+            "p": 3,
+            "dg": 3,
+            "pts": 7
+          },
+          {
+            "equipo": "Parque Patricios",
+            "pj": 6,
+            "g": 2,
+            "e": 1,
+            "p": 3,
+            "dg": -1,
+            "pts": 7
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pj": 6,
+            "g": 2,
+            "e": 1,
+            "p": 3,
+            "dg": -8,
+            "pts": 7
+          },
+          {
+            "equipo": "California",
+            "pj": 7,
+            "g": 1,
+            "e": 2,
+            "p": 4,
+            "dg": -17,
+            "pts": 5
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "dg": -3,
+            "pts": 4
+          },
+          {
+            "equipo": "Amistad",
+            "pj": 7,
+            "g": 1,
+            "e": 1,
+            "p": 5,
+            "dg": -11,
+            "pts": 4
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pj": 8,
+            "g": 0,
+            "e": 0,
+            "p": 8,
+            "dg": -46,
+            "pts": 0
+          }
+        ],
+        "6TA": [
+          {
+            "equipo": "Parque Patricios",
+            "pj": 6,
+            "g": 6,
+            "e": 0,
+            "p": 0,
+            "dg": 23,
+            "pts": 18
+          },
+          {
+            "equipo": "Club Aliados",
+            "pj": 8,
+            "g": 6,
+            "e": 0,
+            "p": 2,
+            "dg": -2,
+            "pts": 18
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pj": 7,
+            "g": 5,
+            "e": 1,
+            "p": 1,
+            "dg": 20,
+            "pts": 16
+          },
+          {
+            "equipo": "Club Pampero",
+            "pj": 8,
+            "g": 5,
+            "e": 1,
+            "p": 2,
+            "dg": 7,
+            "pts": 16
+          },
+          {
+            "equipo": "Cantera Zona Norte",
+            "pj": 8,
+            "g": 5,
+            "e": 0,
+            "p": 3,
+            "dg": 13,
+            "pts": 15
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pj": 6,
+            "g": 4,
+            "e": 2,
+            "p": 0,
+            "dg": 11,
+            "pts": 14
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pj": 6,
+            "g": 4,
+            "e": 1,
+            "p": 1,
+            "dg": 16,
+            "pts": 13
+          },
+          {
+            "equipo": "California",
+            "pj": 7,
+            "g": 3,
+            "e": 2,
+            "p": 2,
+            "dg": -2,
+            "pts": 11
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "dg": 13,
+            "pts": 7
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pj": 8,
+            "g": 2,
+            "e": 1,
+            "p": 5,
+            "dg": -5,
+            "pts": 7
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pj": 6,
+            "g": 2,
+            "e": 1,
+            "p": 3,
+            "dg": -7,
+            "pts": 7
+          },
+          {
+            "equipo": "La Marca",
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "dg": -6,
+            "pts": 6
+          },
+          {
+            "equipo": "CEDIMA",
+            "pj": 6,
+            "g": 1,
+            "e": 2,
+            "p": 3,
+            "dg": -7,
+            "pts": 5
+          },
+          {
+            "equipo": "Independiente",
+            "pj": 6,
+            "g": 1,
+            "e": 0,
+            "p": 5,
+            "dg": -11,
+            "pts": 3
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pj": 8,
+            "g": 0,
+            "e": 0,
+            "p": 8,
+            "dg": -24,
+            "pts": 0
+          },
+          {
+            "equipo": "Amistad",
+            "pj": 7,
+            "g": 0,
+            "e": 0,
+            "p": 7,
+            "dg": -39,
+            "pts": 0
+          }
+        ],
+        "7MA": [
+          {
+            "equipo": "Cantera Zona Norte",
+            "pj": 8,
+            "g": 8,
+            "e": 0,
+            "p": 0,
+            "dg": 47,
+            "pts": 24
+          },
+          {
+            "equipo": "Club Pampero",
+            "pj": 8,
+            "g": 7,
+            "e": 0,
+            "p": 1,
+            "dg": 25,
+            "pts": 21
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pj": 8,
+            "g": 5,
+            "e": 1,
+            "p": 2,
+            "dg": 14,
+            "pts": 16
+          },
+          {
+            "equipo": "La Marca",
+            "pj": 6,
+            "g": 5,
+            "e": 0,
+            "p": 1,
+            "dg": 29,
+            "pts": 15
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pj": 7,
+            "g": 3,
+            "e": 3,
+            "p": 1,
+            "dg": 18,
+            "pts": 12
+          },
+          {
+            "equipo": "Parque Patricios",
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "dg": 9,
+            "pts": 12
+          },
+          {
+            "equipo": "California",
+            "pj": 7,
+            "g": 4,
+            "e": 0,
+            "p": 3,
+            "dg": -2,
+            "pts": 12
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pj": 5,
+            "g": 3,
+            "e": 0,
+            "p": 2,
+            "dg": 0,
+            "pts": 9
+          },
+          {
+            "equipo": "Club Aliados",
+            "pj": 8,
+            "g": 2,
+            "e": 1,
+            "p": 5,
+            "dg": -10,
+            "pts": 7
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "dg": -12,
+            "pts": 6
+          },
+          {
+            "equipo": "CEDIMA",
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "dg": -16,
+            "pts": 6
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pj": 6,
+            "g": 1,
+            "e": 2,
+            "p": 3,
+            "dg": -13,
+            "pts": 5
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pj": 8,
+            "g": 1,
+            "e": 2,
+            "p": 5,
+            "dg": -15,
+            "pts": 5
+          },
+          {
+            "equipo": "Independiente",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "dg": -14,
+            "pts": 4
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pj": 6,
+            "g": 1,
+            "e": 0,
+            "p": 5,
+            "dg": -24,
+            "pts": 3
+          },
+          {
+            "equipo": "Amistad",
+            "pj": 7,
+            "g": 0,
+            "e": 0,
+            "p": 7,
+            "dg": -36,
+            "pts": 0
+          }
+        ],
+        "8VA": [
+          {
+            "equipo": "Club Pampero",
+            "pj": 8,
+            "g": 7,
+            "e": 0,
+            "p": 1,
+            "dg": 29,
+            "pts": 21
+          },
+          {
+            "equipo": "Club Aliados",
+            "pj": 8,
+            "g": 7,
+            "e": 0,
+            "p": 1,
+            "dg": 20,
+            "pts": 21
+          },
+          {
+            "equipo": "La Marca",
+            "pj": 6,
+            "g": 6,
+            "e": 0,
+            "p": 0,
+            "dg": 37,
+            "pts": 18
+          },
+          {
+            "equipo": "Almafuerte de Ciudad Evita",
+            "pj": 7,
+            "g": 5,
+            "e": 2,
+            "p": 0,
+            "dg": 15,
+            "pts": 17
+          },
+          {
+            "equipo": "California",
+            "pj": 7,
+            "g": 4,
+            "e": 1,
+            "p": 2,
+            "dg": 9,
+            "pts": 13
+          },
+          {
+            "equipo": "Cantera Zona Norte",
+            "pj": 8,
+            "g": 4,
+            "e": 0,
+            "p": 4,
+            "dg": 5,
+            "pts": 12
+          },
+          {
+            "equipo": "Federacion Caballito",
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "dg": 4,
+            "pts": 12
+          },
+          {
+            "equipo": "CEDIMA",
+            "pj": 6,
+            "g": 3,
+            "e": 1,
+            "p": 2,
+            "dg": 9,
+            "pts": 10
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pj": 8,
+            "g": 2,
+            "e": 1,
+            "p": 5,
+            "dg": -15,
+            "pts": 7
+          },
+          {
+            "equipo": "Independiente",
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "dg": 1,
+            "pts": 6
+          },
+          {
+            "equipo": "Mariano Moreno",
+            "pj": 5,
+            "g": 2,
+            "e": 0,
+            "p": 3,
+            "dg": -7,
+            "pts": 6
+          },
+          {
+            "equipo": "Parque Patricios",
+            "pj": 6,
+            "g": 2,
+            "e": 0,
+            "p": 4,
+            "dg": -13,
+            "pts": 6
+          },
+          {
+            "equipo": "Nueva Pompeya",
+            "pj": 8,
+            "g": 2,
+            "e": 0,
+            "p": 6,
+            "dg": -26,
+            "pts": 6
+          },
+          {
+            "equipo": "El Lucero Futsal",
+            "pj": 6,
+            "g": 1,
+            "e": 1,
+            "p": 4,
+            "dg": -21,
+            "pts": 4
+          },
+          {
+            "equipo": "Amistad",
+            "pj": 7,
+            "g": 0,
+            "e": 0,
+            "p": 7,
+            "dg": -20,
+            "pts": 0
+          },
+          {
+            "equipo": "Defensores de Barracas",
+            "pj": 6,
+            "g": 0,
+            "e": 0,
+            "p": 6,
+            "dg": -27,
+            "pts": 0
+          }
+        ],
+        "FEM 1RA": [
+          {
+            "equipo": "Pampa FC",
+            "pts": 9,
+            "pj": 3,
+            "g": 3,
+            "e": 0,
+            "p": 0,
+            "dg": 6
+          },
+          {
+            "equipo": "Toque y Toque",
+            "pts": 8,
+            "pj": 4,
+            "g": 2,
+            "e": 2,
+            "p": 0,
+            "dg": 7
+          },
+          {
+            "equipo": "Ituzaingo",
+            "pts": 7,
+            "pj": 3,
+            "g": 2,
+            "e": 1,
+            "p": 0,
+            "dg": 9
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pts": 6,
+            "pj": 2,
+            "g": 2,
+            "e": 0,
+            "p": 0,
+            "dg": 6
+          },
+          {
+            "equipo": "Club Saenz Peña",
+            "pts": 6,
+            "pj": 2,
+            "g": 2,
+            "e": 0,
+            "p": 0,
+            "dg": 5
+          },
+          {
+            "equipo": "Deportivo La Boca",
+            "pts": 4,
+            "pj": 4,
+            "g": 1,
+            "e": 1,
+            "p": 2,
+            "dg": 1
+          },
+          {
+            "equipo": "San Andres Futsal",
+            "pts": 4,
+            "pj": 3,
+            "g": 1,
+            "e": 1,
+            "p": 1,
+            "dg": 0
+          },
+          {
+            "equipo": "Estrada de Almagro",
+            "pts": 3,
+            "pj": 2,
+            "g": 1,
+            "e": 0,
+            "p": 1,
+            "dg": 11
+          },
+          {
+            "equipo": "Union Italiana",
+            "pts": 3,
+            "pj": 2,
+            "g": 1,
+            "e": 0,
+            "p": 1,
+            "dg": 0
+          },
+          {
+            "equipo": "Deportivo Vedia",
+            "pts": 2,
+            "pj": 4,
+            "g": 0,
+            "e": 2,
+            "p": 2,
+            "dg": -4
+          },
+          {
+            "equipo": "Cervantes LP",
+            "pts": 1,
+            "pj": 3,
+            "g": 0,
+            "e": 1,
+            "p": 2,
+            "dg": -6
+          },
+          {
+            "equipo": "Villa Mitre",
+            "pts": 0,
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "dg": -15
+          },
+          {
+            "equipo": "Estudiantes del Norte",
+            "pts": 0,
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "dg": -20
+          },
+          {
+            "equipo": "Fecha Libre",
+            "pts": 0,
+            "pj": 0,
+            "g": 0,
+            "e": 0,
+            "p": 0,
+            "dg": 0
+          }
+        ],
+        "FEM RVA": [
+          {
+            "equipo": "Deportivo Vedia",
+            "pj": 4,
+            "g": 4,
+            "e": 0,
+            "p": 0,
+            "dg": 18,
+            "pts": 12
+          },
+          {
+            "equipo": "Ituzaingo",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "dg": 5,
+            "pts": 6
+          },
+          {
+            "equipo": "Deportivo La Boca",
+            "pj": 4,
+            "g": 2,
+            "e": 0,
+            "p": 2,
+            "dg": 4,
+            "pts": 6
+          },
+          {
+            "equipo": "Pampa FC",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "dg": 3,
+            "pts": 6
+          },
+          {
+            "equipo": "Estudiantes del Norte",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "dg": 3,
+            "pts": 6
+          },
+          {
+            "equipo": "San Andres Futsal",
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "dg": 1,
+            "pts": 6
+          },
+          {
+            "equipo": "Toque y Toque",
+            "pj": 4,
+            "g": 2,
+            "e": 0,
+            "p": 2,
+            "dg": -6,
+            "pts": 6
+          },
+          {
+            "equipo": "Club Saenz Peña",
+            "pj": 2,
+            "g": 1,
+            "e": 0,
+            "p": 1,
+            "dg": 2,
+            "pts": 3
+          },
+          {
+            "equipo": "Defensores de SL",
+            "pj": 2,
+            "g": 1,
+            "e": 0,
+            "p": 1,
+            "dg": -1,
+            "pts": 3
+          },
+          {
+            "equipo": "Union Italiana",
+            "pj": 2,
+            "g": 0,
+            "e": 1,
+            "p": 1,
+            "dg": -3,
+            "pts": 1
+          },
+          {
+            "equipo": "Cervantes LP",
+            "pj": 3,
+            "g": 0,
+            "e": 1,
+            "p": 2,
+            "dg": -9,
+            "pts": 1
+          },
+          {
+            "equipo": "Estrada de Almagro",
+            "pj": 2,
+            "g": 0,
+            "e": 0,
+            "p": 2,
+            "dg": -6,
+            "pts": 0
+          },
+          {
+            "equipo": "Villa Mitre",
+            "pj": 3,
+            "g": 0,
+            "e": 0,
+            "p": 3,
+            "dg": -11,
+            "pts": 0
+          }
+        ]
+      },
+      "ramas": {
+        "masculino": [
+          "1RA",
+          "3RA",
+          "4TA",
+          "5TA",
+          "6TA",
+          "7MA",
+          "8VA"
+        ],
+        "femenino": [
+          "FEM RVA"
+        ]
+      }
+    }
+  ],
+  "fefiMayoresB": {
+    "id": "fefi-mayores-b",
+    "competencia": "FEFI",
+    "division": "Mayores B",
+    "equipo": "+42",
+    "temporada": 2026,
+    "fixture": [
+      {
+        "round_name": "Fecha 1",
+        "date": null,
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "SOL DE AMERICA"
+      },
+      {
+        "round_name": "Fecha 2",
+        "date": null,
+        "home": "ESTUDIANTES",
+        "away": "DEF. DE SANTOS LUGARES"
+      },
+      {
+        "round_name": "Fecha 3",
+        "date": null,
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "BRISAS DE HAEDO"
+      },
+      {
+        "round_name": "Fecha 4",
+        "date": null,
+        "home": "CLUB PATRIA",
+        "away": "DEF. DE SANTOS LUGARES"
+      },
+      {
+        "round_name": "Fecha 5",
+        "date": null,
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "MIRIÑAQUE"
+      },
+      {
+        "round_name": "Fecha 6",
+        "date": null,
+        "home": "NOLTING",
+        "away": "DEF. DE SANTOS LUGARES"
+      },
+      {
+        "round_name": "Fecha 7",
+        "date": null,
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "CLUB DEF. DE BELGRANO"
+      },
+      {
+        "round_name": "Fecha 8",
+        "date": null,
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "REAL CELINA"
+      },
+      {
+        "round_name": "Fecha 9",
+        "date": null,
+        "home": "AMISTAD \"B\"",
+        "away": "DEF. DE SANTOS LUGARES"
+      }
+    ],
+    "fixtureClausura": [
+      {
+        "round_name": "Fecha 1",
+        "date": null,
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "SOL DE AMERICA"
+      },
+      {
+        "round_name": "Fecha 2",
+        "date": null,
+        "home": "ESTUDIANTES",
+        "away": "DEF. DE SANTOS LUGARES"
+      },
+      {
+        "round_name": "Fecha 3",
+        "date": null,
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "BRISAS DE HAEDO"
+      },
+      {
+        "round_name": "Fecha 4",
+        "date": null,
+        "home": "CLUB PATRIA",
+        "away": "DEF. DE SANTOS LUGARES"
+      },
+      {
+        "round_name": "Fecha 5",
+        "date": null,
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "MIRIÑAQUE"
+      },
+      {
+        "round_name": "Fecha 6",
+        "date": null,
+        "home": "NOLTING",
+        "away": "DEF. DE SANTOS LUGARES"
+      },
+      {
+        "round_name": "Fecha 7",
+        "date": null,
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "CLUB DEF. DE BELGRANO"
+      },
+      {
+        "round_name": "Fecha 8",
+        "date": null,
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "REAL CELINA"
+      },
+      {
+        "round_name": "Fecha 9",
+        "date": null,
+        "home": "AMISTAD \"B\"",
+        "away": "DEF. DE SANTOS LUGARES"
+      }
+    ],
+    "resultadosApertura": [
+      {
+        "round_name": "Fecha 1",
+        "home": "SOL DE AMERICA",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 2,
+        "away_score": 3,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 2",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "ESTUDIANTES",
+        "home_score": 7,
+        "away_score": 6,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 3",
+        "home": "BRISAS DE HAEDO",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 4,
+        "away_score": 8,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 4",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "CLUB PATRIA",
+        "home_score": 8,
+        "away_score": 5,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 5",
+        "home": "MIRIÑAQUE",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 5,
+        "away_score": 4,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 6",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "NOLTING",
+        "home_score": 4,
+        "away_score": 2,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 7",
+        "home": "CLUB DEF. DE BELGRANO",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 3,
+        "away_score": 7,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 8",
+        "home": "REAL CELINA",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 6,
+        "away_score": 3,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 9",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "AMISTAD \"B\"",
+        "home_score": 6,
+        "away_score": 4,
+        "status": ""
+      }
+    ],
+    "resultadosClausura": [
+      {
+        "round_name": "Fecha 1",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "SOL DE AMERICA",
+        "home_score": 5,
+        "away_score": 4,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 2",
+        "home": "ESTUDIANTES",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 4,
+        "away_score": 3,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 3",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "BRISAS DE HAEDO",
+        "home_score": 6,
+        "away_score": 3,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 5",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "MIRIÑAQUE",
+        "home_score": 3,
+        "away_score": 2,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 6",
+        "home": "NOLTING",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 5,
+        "away_score": 3,
+        "status": ""
+      }
+    ],
+    "posicionesApertura": [
+      {
+        "equipo": "MIRIÑAQUE",
+        "pj": 9,
+        "g": 8,
+        "e": 0,
+        "p": 1,
+        "pts": 25
+      },
+      {
+        "equipo": "DEF. DE SANTOS LUGARES",
+        "pj": 9,
+        "g": 7,
+        "e": 0,
+        "p": 2,
+        "pts": 23
+      },
+      {
+        "equipo": "REAL CELINA",
+        "pj": 9,
+        "g": 4,
+        "e": 2,
+        "p": 3,
+        "pts": 19
+      },
+      {
+        "equipo": "SOL DE AMERICA",
+        "pj": 9,
+        "g": 4,
+        "e": 1,
+        "p": 4,
+        "pts": 18
+      },
+      {
+        "equipo": "ESTUDIANTES",
+        "pj": 9,
+        "g": 4,
+        "e": 1,
+        "p": 4,
+        "pts": 18
+      },
+      {
+        "equipo": "CLUB DEF. DE BELGRANO",
+        "pj": 9,
+        "g": 4,
+        "e": 1,
+        "p": 4,
+        "pts": 18
+      },
+      {
+        "equipo": "AMISTAD \"B\"",
+        "pj": 9,
+        "g": 3,
+        "e": 1,
+        "p": 5,
+        "pts": 16
+      },
+      {
+        "equipo": "BRISAS DE HAEDO",
+        "pj": 9,
+        "g": 3,
+        "e": 0,
+        "p": 6,
+        "pts": 15
+      },
+      {
+        "equipo": "CLUB PATRIA",
+        "pj": 9,
+        "g": 2,
+        "e": 2,
+        "p": 5,
+        "pts": 15
+      },
+      {
+        "equipo": "NOLTING",
+        "pj": 9,
+        "g": 1,
+        "e": 2,
+        "p": 6,
+        "pts": 13
+      }
+    ],
+    "posicionesClausura": [
+      {
+        "equipo": "MIRIÑAQUE",
+        "pj": 6,
+        "g": 5,
+        "e": 0,
+        "p": 1,
+        "pts": 16
+      },
+      {
+        "equipo": "ESTUDIANTES",
+        "pj": 5,
+        "g": 4,
+        "e": 0,
+        "p": 1,
+        "pts": 13
+      },
+      {
+        "equipo": "REAL CELINA",
+        "pj": 6,
+        "g": 3,
+        "e": 0,
+        "p": 3,
+        "pts": 12
+      },
+      {
+        "equipo": "CLUB DEF. DE BELGRANO",
+        "pj": 5,
+        "g": 3,
+        "e": 0,
+        "p": 2,
+        "pts": 11
+      },
+      {
+        "equipo": "DEF. DE SANTOS LUGARES",
+        "pj": 5,
+        "g": 3,
+        "e": 0,
+        "p": 2,
+        "pts": 11
+      },
+      {
+        "equipo": "CLUB PATRIA",
+        "pj": 4,
+        "g": 3,
+        "e": 0,
+        "p": 1,
+        "pts": 10
+      },
+      {
+        "equipo": "BRISAS DE HAEDO",
+        "pj": 4,
+        "g": 2,
+        "e": 0,
+        "p": 2,
+        "pts": 8
+      },
+      {
+        "equipo": "NOLTING",
+        "pj": 6,
+        "g": 1,
+        "e": 0,
+        "p": 5,
+        "pts": 8
+      },
+      {
+        "equipo": "SOL DE AMERICA",
+        "pj": 4,
+        "g": 1,
+        "e": 0,
+        "p": 3,
+        "pts": 6
+      },
+      {
+        "equipo": "AMISTAD \"B\"",
+        "pj": 5,
+        "g": 0,
+        "e": 0,
+        "p": 5,
+        "pts": 5
+      }
+    ],
+    "resultados": [
+      {
+        "round_name": "Fecha 1",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "SOL DE AMERICA",
+        "home_score": 5,
+        "away_score": 4,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 2",
+        "home": "ESTUDIANTES",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 4,
+        "away_score": 3,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 3",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "BRISAS DE HAEDO",
+        "home_score": 6,
+        "away_score": 3,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 5",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "MIRIÑAQUE",
+        "home_score": 3,
+        "away_score": 2,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 6",
+        "home": "NOLTING",
+        "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 5,
+        "away_score": 3,
+        "status": ""
+      }
+    ],
+    "posiciones": [
+      {
+        "equipo": "MIRIÑAQUE",
+        "pj": 6,
+        "g": 5,
+        "e": 0,
+        "p": 1,
+        "pts": 16
+      },
+      {
+        "equipo": "ESTUDIANTES",
+        "pj": 5,
+        "g": 4,
+        "e": 0,
+        "p": 1,
+        "pts": 13
+      },
+      {
+        "equipo": "REAL CELINA",
+        "pj": 6,
+        "g": 3,
+        "e": 0,
+        "p": 3,
+        "pts": 12
+      },
+      {
+        "equipo": "CLUB DEF. DE BELGRANO",
+        "pj": 5,
+        "g": 3,
+        "e": 0,
+        "p": 2,
+        "pts": 11
+      },
+      {
+        "equipo": "DEF. DE SANTOS LUGARES",
+        "pj": 5,
+        "g": 3,
+        "e": 0,
+        "p": 2,
+        "pts": 11
+      },
+      {
+        "equipo": "CLUB PATRIA",
+        "pj": 4,
+        "g": 3,
+        "e": 0,
+        "p": 1,
+        "pts": 10
+      },
+      {
+        "equipo": "BRISAS DE HAEDO",
+        "pj": 4,
+        "g": 2,
+        "e": 0,
+        "p": 2,
+        "pts": 8
+      },
+      {
+        "equipo": "NOLTING",
+        "pj": 6,
+        "g": 1,
+        "e": 0,
+        "p": 5,
+        "pts": 8
+      },
+      {
+        "equipo": "SOL DE AMERICA",
+        "pj": 4,
+        "g": 1,
+        "e": 0,
+        "p": 3,
+        "pts": 6
+      },
+      {
+        "equipo": "AMISTAD \"B\"",
+        "pj": 5,
+        "g": 0,
+        "e": 0,
+        "p": 5,
+        "pts": 5
+      }
+    ],
+    "fuente": "https://fefi.com.ar/2026-futbol-sala-mayores-fefi/mayores-b/",
+    "actualizado": "2026-09-17T12:35:54.560Z"
+  }
+}

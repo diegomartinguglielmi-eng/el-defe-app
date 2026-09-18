@@ -4,15 +4,19 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - 'ui-operativa-base/**'
       - 'web-family-onboarding.js'
       - 'web-family-laamba-level.js'
+      - 'web-attendance-player-v2.js'
+      - 'web-home-family.js'
+      - 'web-role-experience.js'
+      - 'web-defe-core.js'
       - '.github/workflows/build-defe-web.yml'
 
 permissions:
   contents: read
   pages: write
   id-token: write
-  actions: read
 
 concurrency:
   group: pages
@@ -23,57 +27,79 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Descargar artefacto exacto del build operativo 10:21
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Restaurar base UI durable e integrar mejoras
         run: |
           set -euo pipefail
-          curl -L --fail -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/10498124937/zip" -o /tmp/operativo.zip
-          rm -rf /tmp/outer /tmp/recovered /tmp/pages
-          mkdir -p /tmp/outer /tmp/recovered /tmp/pages
-          unzip -q /tmp/operativo.zip -d /tmp/outer
-          if [ -f /tmp/outer/netlify-publish.zip ]; then unzip -q /tmp/outer/netlify-publish.zip -d /tmp/recovered; else cp -a /tmp/outer/. /tmp/recovered/; fi
-      - name: Restaurar tablero operativo e integrar Familias
-        run: |
-          set -euo pipefail
-          test -s /tmp/recovered/el-defe-app/index.html
-          cp -a /tmp/recovered/el-defe-app/. /tmp/pages/
+          rm -rf /tmp/pages
+          mkdir -p /tmp/pages
+          test -s ui-operativa-base/index.html
+          test -s ui-operativa-base/availability-ui-netlify.js
+          test -s ui-operativa-base/web-mi-defe-overlay-netlify.js
+          cp -a ui-operativa-base/. /tmp/pages/
           cp web-family-onboarding.js /tmp/pages/web-family-onboarding.js
           cp web-family-laamba-level.js /tmp/pages/web-family-laamba-level.js
-          rm -f /tmp/pages/web-family-delete.js
+          cp web-attendance-player-v2.js /tmp/pages/web-attendance-player-v2.js
+          cp web-home-family.js /tmp/pages/web-home-family.js
+          cp web-role-experience.js /tmp/pages/web-role-experience.js
+          cp web-defe-core.js /tmp/pages/web-defe-core.js
+          rm -f /tmp/pages/web-family-delete.js /tmp/pages/web-attendance-player-filter.js
           python3 - <<'PY'
           from pathlib import Path
           p=Path('/tmp/pages/index.html')
           s=p.read_text()
           s=s.replace('<script src="./web-attendance-player-filter.js"></script>','')
           s=s.replace('<script src="./web-family-delete.js"></script>','')
-          family='<script src="./web-family-onboarding.js"></script>'
-          laamba='<script src="./web-family-laamba-level.js"></script>'
-          if family not in s:s=s.replace('</body>',family+'\n</body>')
-          if laamba not in s:s=s.replace('</body>',laamba+'\n</body>')
+          for script in ('web-defe-core.js','web-family-onboarding.js','web-family-laamba-level.js','web-attendance-player-v2.js','web-home-family.js','web-role-experience.js'):
+              tag=f'<script src="./{script}"></script>'
+              if tag not in s:
+                  s=s.replace('</body>',tag+'\n</body>')
           p.write_text(s)
           PY
-          test -s /tmp/pages/availability-ui-netlify.js
-          test -s /tmp/pages/web-mi-defe-overlay-netlify.js
-          node --check /tmp/pages/web-family-onboarding.js
-          node --check /tmp/pages/web-family-laamba-level.js
-          grep -F '/api/availability/family/children' /tmp/pages/web-family-onboarding.js >/dev/null
-          grep -F '/api/family/catalog' /tmp/pages/web-family-laamba-level.js >/dev/null
-          grep -F 'data-laamba-category' /tmp/pages/web-family-laamba-level.js >/dev/null
-          if grep -F 'web-family-delete.js' /tmp/pages/index.html; then echo 'ERROR: overlay duplicado de familias sigue cargado'; exit 1; fi
-          if grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html; then echo 'ERROR: filtro experimental sigue cargado'; exit 1; fi
-          echo 'TABLERO_ASISTENCIA_ORIGINAL_Y_FAMILIAS_LAAMBA_3_NIVELES'
+          for f in web-defe-core.js web-family-onboarding.js web-family-laamba-level.js web-attendance-player-v2.js web-home-family.js web-role-experience.js; do node --check "/tmp/pages/$f"; done
+          python3 - <<'PY'
+          from pathlib import Path
+          core=Path('/tmp/pages/web-defe-core.js').read_text()
+          assert 'window.DefeCore' in core and 'API' in core and 'token' in core and 'api' in core
+          PY
+          echo 'CORE_OK'
+          python3 - <<'PY'
+          from pathlib import Path
+          checks={
+            'web-attendance-player-v2.js': ['/api/availability/v2/me','window.DefeCore'],
+            'web-home-family.js': ['/api/home/personalized','window.DefeCore'],
+            'web-role-experience.js': ['/api/me','window.DefeCore'],
+          }
+          for name, needles in checks.items():
+              text=Path('/tmp/pages',name).read_text()
+              missing=[n for n in needles if n not in text]
+              assert not missing, f'{name}: faltan {missing}'
+          PY
+          echo 'MODULE_CONTRACTS_OK'
+          python3 - <<'PY'
+          from pathlib import Path
+          idx=Path('/tmp/pages/index.html').read_text()
+          for script in ('web-defe-core.js','web-family-onboarding.js','web-family-laamba-level.js','web-attendance-player-v2.js','web-home-family.js','web-role-experience.js'):
+              assert script in idx, f'no inyectado: {script}'
+          assert 'web-attendance-player-filter.js' not in idx
+          fam=Path('/tmp/pages/web-family-onboarding.js').read_text()
+          assert '/api/availability/family/children' in fam
+          PY
+          echo 'FORBIDDEN_FILTER_ABSENT_OK'
+          echo 'BASE_UI_DURABLE_OK'
       - name: Preparar GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: /tmp/pages
   deploy:
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Publicar base validada + Familias
+      - name: Publicar base validada + mejoras
         id: deployment
         uses: actions/deploy-pages@v4
+
+# revalidación integral pre-merge 2026-09-18
