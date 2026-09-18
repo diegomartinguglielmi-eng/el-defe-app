@@ -1,8 +1,9 @@
 (()=>{
-const API='https://el-defe-v5-production.up.railway.app';
+const core=window.DefeCore;
+const API=core?.API||'https://el-defe-v5-production.up.railway.app';
 let CATALOG={};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-function token(){for(const s of [localStorage,sessionStorage])for(let i=0;i<s.length;i++){const v=s.getItem(s.key(i))||'',m=v.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(m)return m[0]}return null}
+function token(){return core?.token()||null}
 async function api(path,opt={}){const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),10000);try{const r=await fetch(API+path,{...opt,signal:ctrl.signal});let d={};try{d=await r.json()}catch{}if(!r.ok)throw Error(d.detail||`Error ${r.status}`);return d}catch(e){if(e.name==='AbortError')throw Error('El servidor no respondió a tiempo. Reintentá.');throw e}finally{clearTimeout(timer)}}
 const auth=t=>({Authorization:`Bearer ${t}`});
 async function loadCatalog(){const d=await api('/api/following/options');const next={};for(const row of (d.competitions||[])){const comp=String(row.competition||'').trim();const cats=(row.categories||[]).map(x=>String(x).trim()).filter(Boolean);if(comp&&cats.length)next[comp]=cats}if(!Object.keys(next).length)throw Error('No se pudo obtener el catálogo de ligas y categorías.');CATALOG=next;return CATALOG}
