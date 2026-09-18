@@ -20,3 +20,5 @@ jobs:
       - run: python -m pip install pytest
       - run: node --check web-role-experience.js
       - run: pytest -q tests/test_role_experience_contract.py
+
+# validación integral 2026-09-18
