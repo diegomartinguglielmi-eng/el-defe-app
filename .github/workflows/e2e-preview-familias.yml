@@ -1,0 +1,44 @@
+name: E2E Preview Familias
+on:
+  push:
+    branches: [release-piloto-familias-20260918]
+    paths: ['.github/workflows/e2e-preview-familias.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - run: npm install playwright@1.55.0 && npx playwright install --with-deps chromium
+      - name: Esperar preview y validar Mi cuenta -> Mis hijos
+        env:
+          PREVIEW: https://deploy-preview-16--el-defe-app.netlify.app
+          API: https://el-defe-v2-staging-production.up.railway.app
+        run: |
+          cat > /tmp/e2e.js <<'JS'
+          const {chromium}=require('playwright');
+          (async()=>{
+            const api=process.env.API, preview=process.env.PREVIEW;
+            const email='familia-browser-'+Date.now()+'@example.com', pass='DefeTest2026!';
+            let r=await fetch(api+'/api/auth/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,password:pass})});
+            if(!r.ok) throw new Error('register '+r.status+' '+await r.text());
+            let d=await r.json(); const token=d.access_token;
+            const b=await chromium.launch({headless:true}); const p=await b.newPage({viewport:{width:390,height:844}});
+            await p.goto(preview,{waitUntil:'networkidle'});
+            await p.evaluate(t=>localStorage.setItem('defe_token',t),token);
+            await p.reload({waitUntil:'networkidle'});
+            const account=p.getByText('Mi cuenta',{exact:true}).first();
+            await account.waitFor({state:'visible',timeout:15000}); await account.click();
+            const kids=p.getByText('Mis hijos',{exact:true}).first();
+            await kids.waitFor({state:'visible',timeout:10000});
+            await kids.click();
+            await p.getByText(/Mis hijos|Familia/i).first().waitFor({state:'visible',timeout:10000});
+            console.log('E2E_OK Mi cuenta -> Mis hijos visible y abre');
+            await b.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node /tmp/e2e.js
