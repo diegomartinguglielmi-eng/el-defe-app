@@ -3,8 +3,8 @@
 if(window.DefeCore)return;
 const STAGING='https://el-defe-v2-staging-production.up.railway.app';
 const PROD='https://el-defe-v5-production.up.railway.app';
-const IS_STAGING=location.hostname.includes('staging')||location.hostname.startsWith('deploy-preview-')||location.search.includes('defe_staging=1');
-const API=window.EL_DEFE_API_URL|| (IS_STAGING?STAGING:PROD);
+const IS_STAGING=location.hostname.includes('staging')||location.search.includes('defe_staging=1');
+const API=IS_STAGING?STAGING:PROD;
 const SESSION_KEY='defe:railway:session', TOKEN_KEY='defe_access_token';
 function jwt(v){if(!v||typeof v!=='string')return'';const m=v.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);return m?m[0]:''}
 function token(){
