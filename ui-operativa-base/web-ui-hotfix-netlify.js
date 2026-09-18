@@ -1,8 +1,8 @@
 // El Defe · UX hotfix 2026-09-15 v13: sesión + acceso operativo Tienda
 (() => {
-  const API='https://el-defe-v5-production.up.railway.app';
+  const API='https://el-defe-v2-staging-production.up.railway.app';
   const MARK='DEFE_UI_HOTFIX_20260915_V13_STORE_ACCESS';
-  const KEYS={token:'defe_auth_token',token2:'defe_token',user:'defe_auth_user',role:'defe_role'};
+  const KEYS={token:'defe_access_token',token2:'defe_token',user:'defe_auth_user',role:'defe_role',session:'defe:railway:session'};
 
   function tokenRole(token){
     try{
@@ -10,7 +10,7 @@
       return String(JSON.parse(atob(p.padEnd(Math.ceil(p.length/4)*4,'='))).role||'').toLowerCase();
     }catch(_){return ''}
   }
-  function getToken(){return localStorage.getItem(KEYS.token)||localStorage.getItem(KEYS.token2)||''}
+  function getToken(){try{const direct=localStorage.getItem(KEYS.token)||localStorage.getItem(KEYS.token2);if(direct)return direct;const s=JSON.parse(localStorage.getItem(KEYS.session)||'null');return s?.token||''}catch(_){return ''}}
   function getUser(){try{return JSON.parse(localStorage.getItem(KEYS.user)||'{}')||{}}catch(_){return {}}}
   function getRole(){return String(localStorage.getItem(KEYS.role)||tokenRole(getToken())||getUser().role||'').toLowerCase()}
   function roleLabel(role){
@@ -21,7 +21,7 @@
     if(role==='lector')return 'Usuario';
     return role?role.charAt(0).toUpperCase()+role.slice(1):'Usuario';
   }
-  function clearSession(){Object.values(KEYS).forEach(k=>localStorage.removeItem(k))}
+  function clearSession(){Object.values(KEYS).forEach(k=>localStorage.removeItem(k));localStorage.removeItem('defe_auth_token');localStorage.removeItem('defe_user')}
   function closeLogin(){document.querySelector('[data-defe-login-modal]')?.remove()}
   function closeAccount(){document.querySelector('[data-defe-account-modal]')?.remove()}
   function sessionLabel(){return getRole()==='tienda'?'Tienda':'Mi cuenta'}
@@ -124,7 +124,7 @@
         const token=data.access_token||'';
         localStorage.setItem(KEYS.token,token);
         localStorage.setItem(KEYS.token2,token);
-        localStorage.setItem(KEYS.user,JSON.stringify(data.user||{}));
+        localStorage.setItem(KEYS.user,JSON.stringify(data.user||{}));localStorage.setItem('defe_user',JSON.stringify(data.user||{}));localStorage.setItem(KEYS.session,JSON.stringify({token,user:data.user||{}}));
         const role=tokenRole(token)||String(data.user?.role||'').toLowerCase();
         if(role)localStorage.setItem(KEYS.role,role);
         await refreshProfile();
