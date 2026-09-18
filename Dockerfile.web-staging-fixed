@@ -1,0 +1,6 @@
+FROM python:3.12-alpine
+WORKDIR /site
+COPY ui-operativa-base/ /site/
+RUN mkdir -p /site/el-defe-app && cp -a /site/assets /site/el-defe-app/assets && cp /site/icon.png /site/el-defe-app/icon.png && cp /site/manifest.webmanifest /site/el-defe-app/manifest.webmanifest
+EXPOSE 8080
+CMD ["python3","-m","http.server","8080","--directory","/site"]
