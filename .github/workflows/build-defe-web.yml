@@ -81,6 +81,11 @@ jobs:
           grep -F 'data-laamba-category' /tmp/pages/web-family-laamba-level.js >/dev/null
           if grep -F 'web-family-delete.js' /tmp/pages/index.html; then echo 'ERROR: overlay duplicado de familias sigue cargado'; exit 1; fi
           if grep -F 'web-attendance-player-filter.js' /tmp/pages/index.html; then echo 'ERROR: filtro experimental sigue cargado'; exit 1; fi
+          grep -F 'web-family-onboarding.js' /tmp/pages/index.html >/dev/null
+          grep -F 'web-family-account-fix.js' /tmp/pages/index.html >/dev/null
+          grep -F 'web-auth-overlay-netlify.js' /tmp/pages/index.html >/dev/null
+          grep -F 'deploy-preview-' /tmp/pages/index.html >/dev/null
+          grep -F 'el-defe-v2-staging-production.up.railway.app' /tmp/pages/index.html >/dev/null
           echo 'TABLERO_ASISTENCIA_ORIGINAL_Y_FAMILIAS_LAAMBA_3_NIVELES'
       - name: Preparar GitHub Pages
         uses: actions/upload-pages-artifact@v3
