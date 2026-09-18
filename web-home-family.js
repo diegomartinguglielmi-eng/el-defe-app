@@ -16,6 +16,7 @@ function card(x){
 }
 function wire(box){box.querySelectorAll('[data-family-answer]').forEach(b=>b.onclick=async()=>{const s=b.closest('.family-next-card').querySelector('.family-next-status');try{s.textContent='Guardando…';await core.api('/api/availability/v2/'+b.dataset.match,{method:'PUT',body:JSON.stringify({person_id:Number(b.dataset.person),selection:b.dataset.selection,status:b.dataset.familyAnswer})});await load()}catch(e){s.textContent=e.message||'No se pudo guardar'}})}
 function render(items){
+ if(document.getElementById('defe-mi-defe')){document.querySelectorAll('[data-family-home]').forEach(x=>x.remove());return}
  const host=root();if(!host)return;let box=host.querySelector('[data-family-home]');
  if(!items.length){box?.remove();return}
  if(!box){box=document.createElement('section');box.dataset.familyHome='1';host.prepend(box);const st=document.createElement('style');st.textContent=`
@@ -26,6 +27,6 @@ function render(items){
  .family-next-status{font-size:.78rem;opacity:.72;margin-top:7px}`;document.head.appendChild(st)}
  box.innerHTML='<div class="family-home-title">Tu Defe</div><div class="family-home-sub">Próximos partidos de tus hijos</div><div data-family-home-list>'+items.map(card).join('')+'</div>';wire(box)
 }
-async function load(){if(!core?.token())return;try{const d=await core.api('/api/availability/v2/me');render(d.items||[])}catch(_){}}
+async function load(){if(!core?.token())return;if(document.getElementById('defe-mi-defe'))return;try{const d=await core.api('/api/availability/v2/me');render(d.items||[])}catch(_){}}
 document.addEventListener('defe:session',load);window.addEventListener('focus',load);document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});setTimeout(load,400);setTimeout(load,1800);
 })();
