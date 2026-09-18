@@ -149,17 +149,15 @@ def _round_number(value:str|None)->int:
 
 
 def _refresh_fefi_if_stale(db:Session)->None:
-    latest_row=db.query(FefiCategoryResult).filter(FefiCategoryResult.external_key.like("%|CLAUSURA|%"))\
-        .order_by(FefiCategoryResult.round_number.desc()).first()
-    latest_result_round=latest_row.round_number if latest_row else 0
-    final_matches=[]
-    for m in _canonical(db.query(Match).filter(Match.competition=="FEFI").all()):
-        if _norm(m.division) not in {"zona h","h"}:continue
-        if (m.status or "").lower()=="final" or (m.home_score is not None and m.away_score is not None):final_matches.append(m)
-    latest_match_round=max((_round_number(m.round_name) for m in final_matches),default=0)
-    if latest_match_round>latest_result_round:
-        try:sync_verified_results(db)
-        except Exception:db.rollback()
+    # Mi Defe necesita el resultado por categoría. La tabla Match solo guarda el
+    # resultado global de la jornada, por lo que no alcanza para decidir si el
+    # cache FefiCategoryResult está actualizado. Refrescamos la fuente oficial
+    # cuando se consulta el último resultado FEFI; si FEFI no responde, se
+    # conserva el último cache válido.
+    try:
+        sync_verified_results(db)
+    except Exception:
+        db.rollback()
 
 
 def _recent_fefi_baby(db:Session,category:str)->dict|None:
