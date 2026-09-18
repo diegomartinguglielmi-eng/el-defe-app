@@ -37,7 +37,12 @@
     label.innerHTML='<span class="md-nav-shield-wrap"><img class="md-nav-shield" src="/el-defe-app/icon.png" alt=""></span><span class="md-nav-text">Mi Defe</span>';
     return true;
   }
-  function ensureNav(){if(decorateNav())return;setTimeout(ensureNav,500)}
+  function bindNativeMiDefe(){
+    const buttons=[...document.querySelectorAll('button')].filter(b=>/^Mi Defe$/i.test((b.textContent||'').replace(/\s+/g,' ').trim())&&!b.closest('#defe-mi-defe,#defe-mi-defe-config'));
+    buttons.forEach(b=>{b.dataset.miDefeButton='1';b.dataset.miDefeNav='1'});
+    return buttons.length>0;
+  }
+  function ensureNav(){decorateNav();bindNativeMiDefe();setTimeout(ensureNav,500)}
   function fmtDate(raw){if(!raw)return null;try{const [y,m,d]=raw.split('-').map(Number);return new Intl.DateTimeFormat('es-AR',{weekday:'short',day:'2-digit',month:'2-digit'}).format(new Date(y,m-1,d))}catch(_){return raw}}
   function selectionText(){return state.selections.length?`<div class="md-chips">${state.selections.map(x=>`<span class="md-chip">${esc(x.replace('|',' · '))}</span>`).join('')}</div>`:'<div class="md-empty">Cargá tus hijos en Mi cuenta para personalizar Mi Defe automáticamente.</div>'}
   function nextHtml(){if(!state.config.next)return'';const list=state.events;return `<section class="md-card"><h3>Lo próximo</h3><div class="md-muted">Una línea por cada liga o categoría que seguís.</div>${list.length?list.map(e=>e.available===false?`<div class="md-event"><div class="md-kicker">${esc(e.competition)} · ${esc(e.category)}</div><div class="md-main">Sin próxima fecha publicada</div><div class="md-meta">Todavía no tenemos fixture próximo disponible para esta selección.</div></div>`:`<div class="md-event"><div class="md-kicker">${esc(e.competition)} · ${esc(e.category)}</div><div class="md-main">${esc(e.rival||'Rival a confirmar')}</div><div class="md-meta">${esc(fmtDate(e.date)||'Fecha a confirmar')} · ${esc(e.time||'Hora a confirmar')} · ${e.local===true?'Local':e.local===false?'Visitante':'Condición a confirmar'}</div></div>`).join(''):'<div class="md-empty" style="margin-top:10px">No hay selecciones configuradas.</div>'}</section>`}
