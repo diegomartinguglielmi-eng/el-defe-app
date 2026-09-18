@@ -7,6 +7,9 @@ RUN python3 - <<'PY'
 from pathlib import Path
 idx=Path('/site/index.html').read_text()
 assert all(x in idx for x in ['web-defe-core.js','web-family-onboarding.js','web-attendance-player-v2.js','web-home-family.js'])
+assert 'defe:staging:preauth:v5' in idx
+assert idx.index('defe:staging:preauth:v5') < idx.index('defe-clean-netlify')
+assert idx.index('defe:staging:preauth:v5') < idx.index('type="module"')
 core=Path('/site/web-defe-core.js').read_text()
 assert 'el-defe-v2-staging-production.up.railway.app' in core
 bundle=Path('/site/el-defe-app/assets/index-v36-netlify.js').read_text()
