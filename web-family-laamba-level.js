@@ -1,5 +1,6 @@
 (()=>{
-const API='https://el-defe-v5-production.up.railway.app';
+const core=window.DefeCore;
+const API=core?.API||'https://el-defe-v5-production.up.railway.app';
 let catalogs={};
 const HIERARCHICAL=new Set(['LAAMBA','ARGENLIGA']);
 const CANONICAL_CATEGORIES=['1ra','3ra','4ta','5ta','6ta','7ma','8va','9na'];
