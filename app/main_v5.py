@@ -41,19 +41,31 @@ def _with_lock(key,fn,label):
     db=SessionLocal();locked=False
     try:
         locked=bool(db.execute(text('SELECT pg_try_advisory_lock(:k)'),{'k':key}).scalar())
-        if not locked:return
-        print({label:fn(db)})
-    except Exception as exc:db.rollback();print({label:'error','detail':str(exc)})
+        if not locked:
+            print({label:{'status':'skipped','reason':'advisory_lock_busy'}})
+            return
+        print({label:{'status':'started'}})
+        result=fn(db)
+        print({label:{'status':'completed','result':result}})
+    except Exception as exc:
+        db.rollback();print({label:{'status':'error','detail':str(exc)}})
     finally:
         if locked:
             try:db.execute(text('SELECT pg_advisory_unlock(:k)'),{'k':key});db.commit()
-            except Exception:db.rollback()
+            except Exception as exc:db.rollback();print({label:{'status':'unlock_error','detail':str(exc)}})
         db.close()
 
 def _bootstrap_laamba_clausura():_with_lock(LAAMBA_BOOTSTRAP_LOCK,sync_laamba,'laamba_sync')
 def _bootstrap_argenliga():
+    print({'argenliga_bootstrap':{'status':'thread_started'}})
     def run(db):
-        base=bootstrap_argenliga_2026(db);live=sync_argenliga(db);return {'baseline':base,'live':live}
+        print({'argenliga_bootstrap':{'status':'baseline_started'}})
+        base=bootstrap_argenliga_2026(db)
+        print({'argenliga_bootstrap':{'status':'baseline_completed','result':base}})
+        print({'argenliga_bootstrap':{'status':'live_started'}})
+        live=sync_argenliga(db)
+        print({'argenliga_bootstrap':{'status':'live_completed','result':live}})
+        return {'baseline':base,'live':live}
     _with_lock(ARGENLIGA_BOOTSTRAP_LOCK,run,'argenliga_sync')
 def _bootstrap_fefi_mayores():_with_lock(FEFI_MAYORES_BOOTSTRAP_LOCK,sync_fefi_mayores_b,'fefi_mayores_bootstrap')
 def _bootstrap_superliga():_with_lock(SUPERLIGA_BOOTSTRAP_LOCK,sync_superliga,'superliga_bootstrap')

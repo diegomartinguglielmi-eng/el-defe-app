@@ -20,7 +20,6 @@ TZ=ZoneInfo('America/Argentina/Buenos_Aires')
 
 def clean(x):
     return re.sub(r'\s+',' ',str(x or '')).strip()
-
 def as_int(x):
     try:return int(float(x))
     except:return None
@@ -46,9 +45,7 @@ def _ensure_argenliga_teams(db:Session):
 
 
 def _request_json(url):
-    r=requests.get(url,headers=UA,timeout=25)
-    r.raise_for_status()
-    return r.json()
+    r=requests.get(url,headers=UA,timeout=25);r.raise_for_status();return r.json()
 
 
 def _event_is_argenliga(event):
@@ -66,8 +63,7 @@ def _event_payload(event):
     dt=datetime.fromtimestamp(int(ts),tz=TZ);date=dt.strftime('%Y-%m-%d')
     status=(event.get('status') or {}).get('type') or ''
     finished=status in {'finished','afterpenalties','afterextra'} or (event.get('status') or {}).get('code')==100
-    hs=(event.get('homeScore') or {}).get('current') if finished else None
-    aws=(event.get('awayScore') or {}).get('current') if finished else None
+    hs=(event.get('homeScore') or {}).get('current') if finished else None;aws=(event.get('awayScore') or {}).get('current') if finished else None
     round_info=event.get('roundInfo') or {};round_value=round_info.get('round') or round_info.get('name')
     round_name=f"Fecha {round_value}" if round_value and str(round_value).isdigit() else (str(round_value) if round_value else 'Argenliga')
     if dt.strftime('%H:%M')!='00:00':round_name+=f" · {dt.strftime('%H:%M')}"
@@ -79,9 +75,7 @@ def _collect_matches():
     found={}
     for direction in ('last','next'):
         for page in range(0,6):
-            try:data=_request_json(f'{SOFASCORE_API}/team/{SOFASCORE_TEAM_ID}/events/{direction}/{page}')
-            except Exception:
-                break
+            data=_request_json(f'{SOFASCORE_API}/team/{SOFASCORE_TEAM_ID}/events/{direction}/{page}')
             events=data.get('events') or []
             if not events:break
             for event in events:
@@ -94,8 +88,7 @@ def _collect_matches():
 
 def _season_2026_id():
     data=_request_json(f'{SOFASCORE_API}/unique-tournament/{SOFASCORE_TOURNAMENT_ID}/seasons')
-    seasons=data.get('seasons') or []
-    for s in seasons:
+    for s in data.get('seasons') or []:
         if str(s.get('year') or '')=='2026' or '2026' in str(s.get('name') or ''):return s.get('id')
     return None
 
@@ -103,10 +96,8 @@ def _season_2026_id():
 def _collect_standings():
     season_id=_season_2026_id()
     if not season_id:return []
-    data=_request_json(f'{SOFASCORE_API}/unique-tournament/{SOFASCORE_TOURNAMENT_ID}/season/{season_id}/standings/total')
-    standings=[]
-    groups=data.get('standings') or []
-    for group in groups:
+    data=_request_json(f'{SOFASCORE_API}/unique-tournament/{SOFASCORE_TOURNAMENT_ID}/season/{season_id}/standings/total');standings=[]
+    for group in data.get('standings') or []:
         for row in group.get('rows') or []:
             team=(row.get('team') or {}).get('name') or ''
             if not team:continue
@@ -116,24 +107,29 @@ def _collect_standings():
 
 def sync_argenliga(db:Session):
     try:
-        created_teams=_ensure_argenliga_teams(db)
-        errors=[]
+        created_teams=_ensure_argenliga_teams(db);errors=[]
         try:matches=_collect_matches()
         except Exception as exc:matches=[];errors.append(f'matches: {exc}')
         try:standings=_collect_standings()
         except Exception as exc:standings=[];errors.append(f'standings: {exc}')
 
+        # Nunca destruir el baseline por una respuesta parcial o fallida de una fuente externa.
+        existing_matches=db.query(Match).filter(Match.competition==COMPETITION).count()
+        live_valid=len(matches)>=4 and any(m['status']=='final' for m in matches)
         replaced_matches=0
-        if len(matches)>=4 and any(m['status']=='final' for m in matches):
+        if live_valid:
             replaced_matches=db.query(Match).filter(Match.competition==COMPETITION).delete(synchronize_session=False)
             for p in matches:db.add(Match(**p))
         for p in standings:_upsert_standing(db,p)
 
         finals=sum(1 for m in matches if m['status']=='final');upcoming=sum(1 for m in matches if m['status']=='scheduled')
-        status='ok' if standings and matches else ('partial' if standings or matches else 'error')
-        detail=(f'A Z1: {len(standings)} filas; {len(matches)} partidos 2026 ({finals} resultados / {upcoming} próximos); '
-                f'inferiores activas 3ra-9na; equipos nuevos={created_teams}; reemplazados={replaced_matches}; errores={" | ".join(errors) if errors else "ninguno"}')
+        if live_valid and standings:status='ok';mode='live'
+        elif live_valid or standings:status='partial';mode='live_partial'
+        elif existing_matches:status='stale';mode='baseline_preserved'
+        else:status='error';mode='unavailable'
+        detail=(f'modo={mode}; A Z1: {len(standings)} filas live; {len(matches)} partidos live 2026 ({finals} resultados / {upcoming} próximos); '
+                f'baseline/existentes={existing_matches}; inferiores activas 3ra-9na; equipos nuevos={created_teams}; reemplazados={replaced_matches}; errores={" | ".join(errors) if errors else "ninguno"}')
         db.add(SyncRun(source='ARGENLIGA',status=status,detail=detail));db.commit()
-        return {'ok':status!='error','status':status,'standings':len(standings),'matches':len(matches),'results':finals,'upcoming':upcoming,'inferiores':ARGENLIGA_INFERIORES,'teams_created':created_teams,'replaced_matches':replaced_matches,'errors':errors,'source_url':SOFASCORE_URL,'secondary_source_url':SEGUNDO_PALO_URL}
+        return {'ok':status in {'ok','partial','stale'},'status':status,'mode':mode,'standings':len(standings),'matches':len(matches),'results':finals,'upcoming':upcoming,'preserved_matches':existing_matches if not live_valid else 0,'inferiores':ARGENLIGA_INFERIORES,'teams_created':created_teams,'replaced_matches':replaced_matches,'errors':errors,'source_url':SOFASCORE_URL,'secondary_source_url':SEGUNDO_PALO_URL}
     except Exception as exc:
-        db.rollback();db.add(SyncRun(source='ARGENLIGA',status='error',detail=str(exc)[:500]));db.commit();return {'ok':False,'error':str(exc),'source_url':SOFASCORE_URL}
+        db.rollback();db.add(SyncRun(source='ARGENLIGA',status='error',detail=str(exc)[:500]));db.commit();return {'ok':False,'status':'error','mode':'unavailable','error':str(exc),'source_url':SOFASCORE_URL,'secondary_source_url':SEGUNDO_PALO_URL}

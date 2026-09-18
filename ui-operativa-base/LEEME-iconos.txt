@@ -1,0 +1,10 @@
+Faltan dos archivos en esta carpeta:
+
+  icono-192.png   (192 x 192)
+  icono-512.png   (512 x 512)
+
+El escudo del club centrado sobre fondo azul #2E3192, con un margen de
+alrededor del 15% para que no quede pegado a los bordes cuando Android
+lo recorta en círculo.
+
+Se pueden exportar desde el mismo archivo del escudo que usa la tienda.
