@@ -1,0 +1,56 @@
+name: Staging familia E2E
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/staging-family-e2e.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  family-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Registrar familia y validar contexto
+        shell: bash
+        env:
+          API: https://el-defe-v2-staging-production.up.railway.app
+        run: |
+          set -euo pipefail
+          EMAIL="familia-e2e-${GITHUB_RUN_ID}@example.com"
+          PASS="DefeTest2026!"
+          REG=$(curl -fsS -X POST "$API/api/auth/register" -H 'Content-Type: application/json' -d "{\"email\":\"$EMAIL\",\"password\":\"$PASS\"}")
+          TOKEN=$(python -c 'import json,sys; print(json.load(sys.stdin)["access_token"])' <<<"$REG")
+          LOGIN=$(curl -fsS -X POST "$API/api/auth/login" -H "Content-Type: application/x-www-form-urlencoded" --data-urlencode "username=$EMAIL" --data-urlencode "password=$PASS")
+          TOKEN=$(python -c 'import json,sys; print(json.load(sys.stdin)["access_token"])' <<<"$LOGIN")
+          AUTH="Authorization: Bearer $TOKEN"
+          curl -fsS "$API/api/me" -H "$AUTH" >/dev/null
+          curl -fsS -X POST "$API/api/availability/family/children" -H "$AUTH" -H 'Content-Type: application/json' -d '{"first_name":"Benjamin","last_name":"E2E","competition":"FEFI","category":"2013"}' >/dev/null
+          curl -fsS -X POST "$API/api/availability/family/children" -H "$AUTH" -H 'Content-Type: application/json' -d '{"first_name":"Santiago","last_name":"E2E","competition":"FEFI","category":"2016"}' >/dev/null
+          CTX=$(curl -fsS "$API/api/family/context" -H "$AUTH")
+          HOME=$(curl -fsS "$API/api/home/personalized" -H "$AUTH")
+          FEED=$(curl -fsS "$API/api/notifications/feed" -H "$AUTH")
+          AVAIL=$(curl -fsS "$API/api/availability/v2/me" -H "$AUTH")
+          ADMIN_CODE=$(curl -sS -o /tmp/admin-v2.json -w "%{http_code}" "$API/api/availability/v2/admin" -H "$AUTH")
+          python - "$CTX" "$HOME" "$FEED" "$AVAIL" "$ADMIN_CODE" <<'PY'
+          import json,sys
+          ctx=json.loads(sys.argv[1]); home=json.loads(sys.argv[2]); feed=json.loads(sys.argv[3]); avail=json.loads(sys.argv[4]); admin_code=int(sys.argv[5])
+          sels=set(ctx["selections"])
+          assert {"FEFI|2013","FEFI|2016"} <= sels, sels
+          names={x["name"] for x in ctx["children"]}
+          assert {"Benjamin E2E","Santiago E2E"} <= names, names
+          assert home["personalized"] is True
+          assert isinstance(home["next_matches"], list)
+          assert isinstance(feed, list)
+          items=avail.get("items",[])
+          assert isinstance(items, list)
+          by_name={x.get("player_name"):x for x in items}
+          assert "Benjamin E2E" in by_name and "Santiago E2E" in by_name, by_name.keys()
+          assert by_name["Benjamin E2E"]["selection"]=="FEFI|2013", by_name["Benjamin E2E"]
+          assert by_name["Santiago E2E"]["selection"]=="FEFI|2016", by_name["Santiago E2E"]
+          # El endpoint admin v2 debe responder con estructura de tablero aunque la familia lectora no tenga privilegios.
+          assert admin_code in (401,403), admin_code
+          print({"family_context":"ok","selections":sorted(sels),"home":"personalized","feed":"authenticated","availability_v2":"ok","admin_v2":"protected"})
+          PY

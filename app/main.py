@@ -51,6 +51,20 @@ def startup():
         if not db.query(User).filter(User.email==settings.admin_email).first():
             db.add(User(email=settings.admin_email,password_hash=hash_password(settings.admin_password),role="admin"))
             db.commit()
+        # QA de staging: el secreto vive en Railway, nunca en el repositorio.
+        import os
+        qa_seed=os.getenv("STAGING_QA_SEED","").strip()
+        if qa_seed and os.getenv("RAILWAY_PROJECT_NAME","").strip()=="el-defe-staging":
+            qa_email="usuario@mail.com"
+            qa=db.query(User).filter(User.email==qa_email).first()
+            if qa is None:
+                qa=User(email=qa_email,password_hash=hash_password(qa_seed),role="lector",is_active=True)
+                db.add(qa)
+            else:
+                qa.password_hash=hash_password(qa_seed)
+                qa.role="lector"
+                qa.is_active=True
+            db.commit()
         if not db.query(News).first():
             db.add(News(title="Bienvenidos a El Defe",body="FEFI, LAAMBA y Argenliga en una sola aplicación."))
             db.commit()

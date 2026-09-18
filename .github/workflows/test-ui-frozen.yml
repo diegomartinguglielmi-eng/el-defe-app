@@ -1,0 +1,28 @@
+name: Validar UI congelada
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ui-operativa-base/**'
+      - 'web-*.js'
+      - 'tests/test_ui_frozen_contract.py'
+      - '.github/workflows/test-ui-frozen.yml'
+      - '.github/workflows/build-defe-web.yml'
+permissions:
+  contents: read
+jobs:
+  frozen-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - run: pytest -q tests/test_ui_frozen_contract.py
+      - name: Prohibir regresiones conocidas
+        run: |
+          grep -F 'Mi Defe' ui-operativa-base/web-mi-defe-overlay-netlify.js >/dev/null
+          test -s ui-operativa-base/availability-ui-netlify.js
+          grep -F 'rm -f /tmp/pages/web-family-delete.js /tmp/pages/web-attendance-player-filter.js' .github/workflows/build-defe-web.yml >/dev/null
+          grep -F "assert 'web-attendance-player-filter.js' not in idx" .github/workflows/build-defe-web.yml >/dev/null

@@ -1,0 +1,26 @@
+{
+  "id": "/el-defe-app/",
+  "name": "El Defe",
+  "short_name": "El Defe",
+  "description": "Club Atlético Defensores de Santos Lugares",
+  "start_url": "/el-defe-app/",
+  "scope": "/el-defe-app/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#071d3d",
+  "theme_color": "#0b3a7a",
+  "icons": [
+    {
+      "src": "/el-defe-app/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/el-defe-app/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

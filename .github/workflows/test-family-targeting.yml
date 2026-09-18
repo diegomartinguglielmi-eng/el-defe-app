@@ -1,0 +1,26 @@
+name: Validar comunicaciones por familia
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'app/notifications_v5.py'
+      - 'app/family_context_v1.py'
+      - 'tests/test_notifications_family_targeting.py'
+      - '.github/workflows/test-family-targeting.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  targeting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar dependencias
+        run: python -m pip install --disable-pip-version-check -r requirements.txt pytest
+      - name: Validar targeting familiar
+        run: pytest -q tests/test_notifications_family_targeting.py

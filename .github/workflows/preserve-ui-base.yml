@@ -1,0 +1,46 @@
+name: Preservar UI operativa validada
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - mejora-01-asistencia-por-hijo
+    paths:
+      - '.github/workflows/preserve-ui-base.yml'
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: mejora-01-asistencia-por-hijo
+      - name: Recuperar artifact operativo exacto
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -L --fail -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/10498124937/zip" -o /tmp/operativo.zip
+          rm -rf /tmp/outer /tmp/recovered
+          mkdir -p /tmp/outer /tmp/recovered
+          unzip -q /tmp/operativo.zip -d /tmp/outer
+          if [ -f /tmp/outer/netlify-publish.zip ]; then unzip -q /tmp/outer/netlify-publish.zip -d /tmp/recovered; else cp -a /tmp/outer/. /tmp/recovered/; fi
+          test -s /tmp/recovered/el-defe-app/index.html
+      - name: Guardar base durable en el repositorio
+        run: |
+          set -euo pipefail
+          rm -rf ui-operativa-base
+          mkdir -p ui-operativa-base
+          cp -a /tmp/recovered/el-defe-app/. ui-operativa-base/
+          test -s ui-operativa-base/index.html
+          test -s ui-operativa-base/availability-ui-netlify.js
+          test -s ui-operativa-base/web-mi-defe-overlay-netlify.js
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add ui-operativa-base
+          git commit -m "Preserva base UI operativa validada" || exit 0
+          git push origin HEAD:mejora-01-asistencia-por-hijo

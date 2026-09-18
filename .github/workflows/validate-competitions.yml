@@ -1,0 +1,25 @@
+name: Validar Competencias
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'app/**'
+      - 'tests/test_competitions_contract.py'
+      - '.github/workflows/validate-competitions.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar pytest
+        run: python -m pip install --disable-pip-version-check pytest
+      - name: Validar contratos de FEFI, LAAMBA, ARGENLIGA y SUPER LIGA
+        run: pytest -q tests/test_competitions_contract.py
