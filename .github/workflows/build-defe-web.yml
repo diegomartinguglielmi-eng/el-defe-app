@@ -38,16 +38,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Descargar artefacto exacto del build operativo 10:21
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Recuperar base operativa versionada
         run: |
           set -euo pipefail
-          curl -L --fail -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/10498124937/zip" -o /tmp/operativo.zip
-          rm -rf /tmp/outer /tmp/recovered /tmp/pages
-          mkdir -p /tmp/outer /tmp/recovered /tmp/pages
-          unzip -q /tmp/operativo.zip -d /tmp/outer
-          if [ -f /tmp/outer/netlify-publish.zip ]; then unzip -q /tmp/outer/netlify-publish.zip -d /tmp/recovered; else cp -a /tmp/outer/. /tmp/recovered/; fi
+          rm -rf /tmp/recovered /tmp/pages
+          mkdir -p /tmp/recovered/el-defe-app /tmp/pages
+          cp -a ui-operativa-base/. /tmp/recovered/el-defe-app/
       - name: Restaurar tablero operativo e integrar Familias
         run: |
           set -euo pipefail
