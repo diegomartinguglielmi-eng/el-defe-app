@@ -39,3 +39,5 @@ jobs:
           assert not missing, missing
           print("store backend contract ok")
           PY
+
+# validación integral 2026-09-18
