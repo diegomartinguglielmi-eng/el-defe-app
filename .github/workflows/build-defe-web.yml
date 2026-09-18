@@ -55,6 +55,8 @@ jobs:
           cp web-defe-core.js /tmp/pages/web-defe-core.js
           cp web-attendance-player-v2.js /tmp/pages/web-attendance-player-v2.js
           cp web-home-family.js /tmp/pages/web-home-family.js
+          cp app/static/store-role-view.js /tmp/pages/store-role-view-netlify.js
+          cp app/static/store-buyer-orders.js /tmp/pages/store-buyer-orders-netlify.js
           rm -f /tmp/pages/web-family-delete.js
           python3 - <<'PY'
           from pathlib import Path
@@ -70,6 +72,8 @@ jobs:
           PY
           test -s /tmp/pages/availability-ui-netlify.js
           test -s /tmp/pages/web-mi-defe-overlay-netlify.js
+          test -s /tmp/pages/store-role-view-netlify.js
+          test -s /tmp/pages/store-buyer-orders-netlify.js
           node --check /tmp/pages/web-family-onboarding.js
           node --check /tmp/pages/web-family-laamba-level.js
           node --check /tmp/pages/web-family-account-fix.js
