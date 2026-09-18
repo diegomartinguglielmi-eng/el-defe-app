@@ -87,6 +87,11 @@ jobs:
             await page.reload({waitUntil:'domcontentloaded',timeout:30000});
             await page.waitForTimeout(2500);
             await page.getByText('Mi cuenta',{exact:true}).first().click();
+            console.log('URL='+page.url());
+            console.log('BUTTONS='+JSON.stringify(await page.locator('button:visible').allTextContents()));
+            console.log('SCRIPTS='+JSON.stringify(await page.locator('script[src]').evaluateAll(es=>es.map(e=>e.getAttribute('src')))));
+            console.log('TOKEN_PRESENT='+await page.evaluate(()=>!!localStorage.getItem('defe_access_token')));
+            console.log('DEFE_FAMILY='+await page.evaluate(()=>typeof window.DefeFamily));
             const hijos=page.getByText('Mis hijos',{exact:true});
             await hijos.waitFor({state:'visible',timeout:20000});
             await hijos.click();
