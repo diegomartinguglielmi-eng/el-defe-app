@@ -1,5 +1,5 @@
 (() => {
-  const API = 'https://el-defe-v5-production.up.railway.app';
+  const API = String(window.EL_DEFE_API_URL || 'https://el-defe-v5-production.up.railway.app').replace(/\/$/,'');
   async function apiFetch(path, options = {}, timeoutMs = 12000) { const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeoutMs);try{return await fetch(`${API}${path}`,{...options,signal:controller.signal})}finally{clearTimeout(timer)} }
   function jwtFromValue(value){if(!value||typeof value!=='string')return null;const direct=value.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(direct)return direct[0];try{const parsed=JSON.parse(value);if(typeof parsed==='string')return jwtFromValue(parsed);if(parsed&&typeof parsed==='object')for(const v of Object.values(parsed)){const found=jwtFromValue(typeof v==='string'?v:JSON.stringify(v));if(found)return found}}catch(_){}return null}
   function getToken(){for(const store of [localStorage,sessionStorage])for(let i=0;i<store.length;i++){const t=jwtFromValue(store.getItem(store.key(i)));if(t)return t}return null}
