@@ -41,7 +41,7 @@ jobs:
           assert home["personalized"] is True
           assert isinstance(home["next_matches"], list)
           assert isinstance(feed, list)
-          assert isinstance(avail.get("items",[]), list)
+          items=avail.get("items",[])\n          assert isinstance(items, list)\n          by_name={x.get("player_name"):x for x in items}\n          assert "Benjamin E2E" in by_name and "Santiago E2E" in by_name, by_name.keys()\n          assert by_name["Benjamin E2E"]["selection"]=="FEFI|2013", by_name["Benjamin E2E"]\n          assert by_name["Santiago E2E"]["selection"]=="FEFI|2016", by_name["Santiago E2E"]
           # El endpoint admin v2 debe responder con estructura de tablero aunque la familia lectora no tenga privilegios.
           assert admin_code in (401,403), admin_code
           print({"family_context":"ok","selections":sorted(sels),"home":"personalized","feed":"authenticated","availability_v2":"ok","admin_v2":"protected"})
