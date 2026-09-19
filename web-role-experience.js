@@ -1,7 +1,7 @@
 (() => {
  if(window.__defeRoleExperience)return; window.__defeRoleExperience=true;
  const core=window.DefeCore;
- async function me(){if(!core?.token())return null;try{return await core.api('/api/me')}catch(_){return null}}
+ async function me(){try{if(core?.token())return await core.api('/api/me')}catch(_){} try{const r=await fetch(core.API+'/api/me',{credentials:'include',cache:'no-store'});if(r.ok)return await r.json()}catch(_){} const vals=[];for(const st of [localStorage,sessionStorage])for(let i=0;i<st.length;i++){const k=st.key(i),v=String(st.getItem(k)||'');if(/role/i.test(k))vals.push(v);try{const o=JSON.parse(v);if(o&&o.role)vals.push(o.role)}catch(_){}}const rr=vals.map(x=>String(x).toLowerCase()).find(x=>/profe|coach|profesor|entrenador|\bdt\b/.test(x));return rr?{role:rr}:null}
  let adminData=null,adminLoading=false;
  async function loadAdminData(){if(document.documentElement.dataset.defeRole!=='profe'||adminLoading)return;adminLoading=true;try{adminData=await core.api('/api/availability/v2/admin');renderAdminHome()}catch(_){ }finally{adminLoading=false}}
  function fmtDate(s){if(!s)return'Fecha a confirmar';const d=new Date(s+'T12:00:00');return new Intl.DateTimeFormat('es-AR',{weekday:'short',day:'2-digit',month:'2-digit'}).format(d)}
