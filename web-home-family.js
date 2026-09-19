@@ -8,14 +8,15 @@ function emptyHint(host){return [...host.querySelectorAll('div,p,span')].find(x=
 function when(x){return [x.date,x.time].filter(Boolean).map(esc).join(' · ')||'Fecha y hora a confirmar'}
 function card(x){
  const r=x.response||'pending', disabled=x.available===false;
+ const state=r==='yes'?['✓ Voy','yes']:r==='no'?['✕ No voy','no']:r==='maybe'?['◷ A confirmar','maybe']:null;
  return `<article class="family-next-card" data-family-next="${esc(x.person_id)}">
  <div class="family-next-player">${esc(x.player_name)}</div><div class="family-next-meta">${esc(x.competition)} · ${esc(x.category)}</div>
  <strong>${esc(disabled?'Sin próxima fecha publicada':(x.rival||'Rival a confirmar'))}</strong>
- <div class="family-next-when">${disabled?'':when(x)}</div>
- ${disabled?'':`<div class="family-next-question">¿${esc(x.player_name)} juega?</div><div class="family-next-actions">${[['yes','✓ Voy'],['no','✕ No voy'],['maybe','◷ A confirmar']].map(([v,l])=>`<button data-family-answer="${v}" data-person="${x.person_id}" data-match="${x.match_id}" data-selection="${esc(x.selection)}" class="${r===v?'active':''}">${l}</button>`).join('')}</div><div class="family-next-status">Estado: ${labels[r]||labels.pending}</div>`}
+ <div class="family-next-when">${disabled?'':when(x)}${disabled||!x.venue?'':' · '+esc(x.venue)}</div>
+ ${disabled?'':state?`<div class="family-next-state ${state[1]}">${state[0]}</div>`:`<button class="family-next-reminder" data-open-mi-defe="1">Confirmá la asistencia en Mi Defe</button>`}
  </article>`;
 }
-function wire(box){box.querySelectorAll('[data-family-answer]').forEach(b=>b.onclick=async()=>{const s=b.closest('.family-next-card').querySelector('.family-next-status');try{s.textContent='Guardando…';await core.api('/api/availability/v2/'+b.dataset.match,{method:'PUT',body:JSON.stringify({person_id:Number(b.dataset.person),selection:b.dataset.selection,status:b.dataset.familyAnswer})});await load()}catch(e){s.textContent=e.message||'No se pudo guardar'}})}
+function wire(box){box.querySelectorAll('[data-open-mi-defe]').forEach(b=>b.onclick=()=>{const nav=[...document.querySelectorAll('button')].find(x=>(x.textContent||'').trim()==='Mi Defe');if(nav)nav.click();else document.querySelector('[aria-label="Mi Defe"]')?.click()})}
 function render(items){
  if(document.getElementById('defe-mi-defe')){document.querySelectorAll('[data-family-home]').forEach(x=>x.remove());return}
  const host=root();if(!host)return;let box=host.querySelector('[data-family-home]');
@@ -25,7 +26,7 @@ function render(items){
  [data-family-home-list]{display:grid;gap:10px}.family-next-card{border:1px solid rgba(0,0,0,.12);border-radius:16px;padding:13px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.04)}
  .family-next-player{font-weight:900;font-size:1rem}.family-next-meta{font-size:.8rem;opacity:.68;margin:2px 0 7px}.family-next-when{margin-top:3px;font-size:.9rem}.family-next-question{font-weight:800;margin:11px 0 7px}
  .family-next-actions{display:flex;gap:6px;flex-wrap:wrap}.family-next-actions button{border:1px solid rgba(0,0,0,.15);background:#fff;border-radius:999px;padding:7px 10px;font-weight:700}.family-next-actions button.active{outline:2px solid currentColor}
- .family-next-status{font-size:.78rem;opacity:.72;margin-top:7px}`;document.head.appendChild(st)}
+ .family-next-state{display:inline-flex;margin-top:11px;border-radius:999px;padding:7px 11px;font-weight:900;font-size:.82rem}.family-next-state.yes{background:#e8f7ef;color:#087443;border:1px solid #15945b}.family-next-state.no{background:#fdecec;color:#b42318;border:1px solid #d92d20}.family-next-state.maybe{background:#fff4d6;color:#8a5a00;border:1px solid #d69e00}.family-next-reminder{margin-top:11px;border:0;border-radius:12px;background:#15589e;color:#fff;padding:10px 12px;font-weight:900;font:inherit}`;document.head.appendChild(st)}
  box.innerHTML='<div class="family-home-title">Tu Defe</div><div class="family-home-sub">Próximos partidos de tus hijos</div><div data-family-home-list>'+items.map(card).join('')+'</div>';wire(box)
 }
 async function load(){if(!core?.token())return;if(document.getElementById('defe-mi-defe'))return;try{const d=await core.api('/api/availability/v2/me');render(d.items||[])}catch(e){console.warn('DEFE_HOME_FAMILY',e)}}
