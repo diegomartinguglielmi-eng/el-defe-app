@@ -49,6 +49,21 @@
    box.querySelector('[data-profe-comms]').onclick=()=>{const b=document.querySelector('.dc-fab');if(b)b.click()};
    hint.parentElement?.parentElement?.appendChild(box);
  }
+ function closeAccountAnd(action){
+   const tool=document.querySelector('[data-profe-account-tools]');
+   const modal=tool?.closest('[role="dialog"],.modal,[class*="modal"],[class*="overlay"]');
+   const close=modal?.querySelector('button[aria-label*="errar" i],button[aria-label*="close" i]')||[...(modal?.querySelectorAll('button')||[])].find(b=>/^\\s*[×x]\\s*$/i.test(b.textContent||''));
+   if(close)close.click();
+   else if(modal)modal.style.display='none';
+   setTimeout(action,120);
+ }
+ document.addEventListener('click',e=>{
+   const b=e.target.closest('[data-p-account-att],[data-p-account-plant],[data-p-account-com]');if(!b)return;
+   e.preventDefault();e.stopImmediatePropagation();
+   if(b.matches('[data-p-account-com]'))return closeAccountAnd(()=>document.querySelector('.dc-fab')?.click());
+   if(b.matches('[data-p-account-att]'))return closeAccountAnd(()=>{const x=[...document.querySelectorAll('button,a')].find(x=>/^\\s*✓?\\s*Asistencia(?:\\s*\\/\\s*Jornada)?\\s*$/i.test((x.textContent||'').trim())&&!x.closest('[data-profe-account-tools]')&&getComputedStyle(x).display!=='none');x?.click()});
+   closeAccountAnd(()=>{const x=[...document.querySelectorAll('button,a')].find(x=>/^(?:👥\\s*)?(?:Plantel \/ Jugadores|Planteles)$/i.test((x.textContent||'').trim())&&!x.closest('[data-profe-account-tools]')&&getComputedStyle(x).display!=='none');x?.click()});
+ },true);
  function hideFloatingAttendance(){if(document.documentElement.dataset.defeRole!=='profe')return;[...document.querySelectorAll('button,a')].filter(x=>/^\s*✓?\s*Asistencia\s*$/i.test(x.textContent||'')&&!x.closest('[data-profe-panel]')).forEach(x=>{const cs=getComputedStyle(x);if(cs.position==='fixed'||cs.position==='absolute')x.style.display='none'})}
  function paint(){adminHome();adminProfile();adminQuick();hideFloatingAttendance();renderAdminHome()}
  function apply(u){document.documentElement.dataset.defeRole=u?.role||'guest';const role=u?.role||'guest';document.querySelectorAll('[data-role-only]').forEach(el=>{const allowed=(el.dataset.roleOnly||'').split(',').map(x=>x.trim());el.hidden=!allowed.includes(role)});window.dispatchEvent(new CustomEvent('defe:role',{detail:{role,user:u}}));setTimeout(paint,100);setTimeout(paint,800);if(role==='profe')setTimeout(loadAdminData,250)}
