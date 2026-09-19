@@ -125,7 +125,7 @@ def set_player_availability(match_id: int, payload: PlayerAvailabilityIn, db: Se
 
 
 @router.get("/admin")
-def admin_player_availability(db: Session = Depends(get_db), user=Depends(require_roles("admin", "delegado", "dt"))):
+def admin_player_availability(db: Session = Depends(get_db), user=Depends(require_roles("admin", "profe", "delegado", "dt"))):
     links = db.query(UserPlayerLink).all()
     grouped, seen = {}, set()
     emails = {u.id: u.email for u in db.query(User).filter(User.id.in_({link.user_id for link in links})).all()} if links else {}
