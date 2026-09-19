@@ -34,5 +34,5 @@ function render(items){
  box.innerHTML='<div class="family-home-title">Tu Defe</div><div class="family-home-sub">Próximos partidos de tus hijos</div><div data-family-home-list>'+items.map(card).join('')+'</div>';wire(box)
 }
 async function load(){if(!authToken())return;if(document.getElementById('defe-mi-defe'))return;try{const d=await familyApi('/api/availability/v2/me');render(d.items||[])}catch(e){console.warn('DEFE_HOME_FAMILY',e)}}
-document.addEventListener('defe:session',load);window.addEventListener('focus',load);document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});setTimeout(load,400);setTimeout(load,1800);
+let tries=0;const retry=setInterval(async()=>{tries++;await load();if(document.querySelector('[data-family-home]')||tries>=20)clearInterval(retry)},750);document.addEventListener('defe:session',load);window.addEventListener('focus',load);document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});setTimeout(load,200);
 })();
