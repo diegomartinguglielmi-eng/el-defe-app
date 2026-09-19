@@ -28,7 +28,7 @@ def _players_for_selection(db, user_id: int, selection: str):
 @router.get("/admin")
 def admin_availability_filtered(
     db: Session = Depends(get_db),
-    user=Depends(require_roles("admin", "delegado", "dt")),
+    user=Depends(require_roles("admin", "profe", "delegado", "dt")),
 ):
     followers = (
         db.query(Favorite, User)
