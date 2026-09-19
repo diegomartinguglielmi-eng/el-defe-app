@@ -166,9 +166,9 @@ def v5_startup_hardening():
         profe=db.query(User).filter(User.email==profe_email).first()
         if profe_password:
             if profe:
-                profe.password_hash=hash_password(profe_password);profe.role='admin';profe.is_active=True
+                profe.password_hash=hash_password(profe_password);profe.role='profe';profe.is_active=True
             else:
-                db.add(User(email=profe_email,password_hash=hash_password(profe_password),role='admin',is_active=True))
+                db.add(User(email=profe_email,password_hash=hash_password(profe_password),role='profe',is_active=True))
         db.commit()
     finally:db.close()
     Thread(target=_bootstrap_laamba_clausura,daemon=True).start();Thread(target=_bootstrap_argenliga,daemon=True).start();Thread(target=_bootstrap_fefi_freshness,daemon=True).start();Thread(target=_bootstrap_fefi_mayores,daemon=True).start();Thread(target=_bootstrap_superliga,daemon=True).start();Thread(target=_cleanup_laamba_conflicts,daemon=True).start();Thread(target=_cleanup_e2e_players,daemon=True).start();Thread(target=_bootstrap_content,daemon=True).start()
