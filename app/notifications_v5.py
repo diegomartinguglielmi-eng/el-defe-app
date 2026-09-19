@@ -123,13 +123,13 @@ def notification_feed(since_id:int=0,limit:int=50,db:Session=Depends(get_db),use
     return [{"id":x.id,"event_type":x.event_type,"title":x.title,"body":x.body,"competition":x.competition,"category":x.category,"match_id":x.match_id,"urgent":x.urgent,"created_at":x.created_at} for x in rows]
 
 @router.post("/communication")
-def create_communication_notice(payload:CommunicationNoticeIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado"))):
+def create_communication_notice(payload:CommunicationNoticeIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","profe","delegado"))):
     priority=(payload.priority or "Información").strip(); title=payload.title.strip() or "Nueva comunicación"; body=payload.body.strip()
     if not body: raise HTTPException(status_code=400,detail="El mensaje no puede estar vacío")
     event=publish_event(db,event_type="communication",title=title,body=body,competition=payload.competition,category=payload.category,urgent=False); db.commit(); db.refresh(event)
     return {"ok":True,"id":event.id,"priority":priority,"push":getattr(event,"push_result",None)}
 
 @router.post("/urgent")
-def create_urgent_notice(payload:UrgentNoticeIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado"))):
+def create_urgent_notice(payload:UrgentNoticeIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","profe","delegado"))):
     event=publish_event(db,event_type="urgent",title=payload.title.strip() or "Aviso urgente",body=payload.body.strip(),competition=payload.competition,category=payload.category,urgent=True); db.commit(); db.refresh(event)
     return {"ok":True,"id":event.id,"push":getattr(event,"push_result",None)}
