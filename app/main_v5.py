@@ -21,8 +21,10 @@ from .sponsors_v5 import router as sponsors_router, bootstrap_sponsors
 from .league_tournaments import router as league_tournaments_router
 from .league_stats import router as league_stats_router
 from .db import SessionLocal
-from .models import User, Match, SyncRun
+from .models import User, Match, SyncRun, Person, TeamMember, CallUpPlayer, PlayerMatchStat, Suspension, MediaItem, PlayerOfMatch
 from .auth import hash_password
+from .availability_v1 import UserPlayerLink, UserPlayerRequest
+from .availability_player_v2 import PlayerAvailabilityResponse
 from .config import settings
 from .sync import sync_laamba
 from .argenliga_baseline import bootstrap_argenliga_2026
@@ -120,6 +122,28 @@ def _cleanup_laamba_conflicts():
     except Exception as exc:db.rollback();print({'laamba_conflict_cleanup_error':str(exc)})
     finally:db.close()
 
+def _cleanup_e2e_players():
+    db=SessionLocal();removed=[]
+    try:
+        people=db.query(Person).filter(Person.first_name.in_(['Benjamín','Benjamin','Santiago']),Person.last_name=='E2E').all()
+        for person in people:
+            pid=person.id
+            db.query(PlayerAvailabilityResponse).filter(PlayerAvailabilityResponse.person_id==pid).delete(synchronize_session=False)
+            db.query(UserPlayerRequest).filter(UserPlayerRequest.person_id==pid).delete(synchronize_session=False)
+            db.query(UserPlayerLink).filter(UserPlayerLink.person_id==pid).delete(synchronize_session=False)
+            db.query(CallUpPlayer).filter(CallUpPlayer.person_id==pid).delete(synchronize_session=False)
+            db.query(PlayerMatchStat).filter(PlayerMatchStat.person_id==pid).delete(synchronize_session=False)
+            db.query(Suspension).filter(Suspension.person_id==pid).delete(synchronize_session=False)
+            db.query(MediaItem).filter(MediaItem.person_id==pid).delete(synchronize_session=False)
+            db.query(PlayerOfMatch).filter(PlayerOfMatch.person_id==pid).delete(synchronize_session=False)
+            db.query(TeamMember).filter(TeamMember.person_id==pid).delete(synchronize_session=False)
+            removed.append(f'{person.first_name} {person.last_name}#{pid}')
+            db.delete(person)
+        db.commit();print({'e2e_player_cleanup':{'removed':removed,'count':len(removed)}})
+    except Exception as exc:
+        db.rollback();print({'e2e_player_cleanup_error':str(exc)})
+    finally:db.close()
+
 def _bootstrap_content():
     db=SessionLocal()
     try:
@@ -141,4 +165,4 @@ def v5_startup_hardening():
         if legacy and legacy.email!=settings.admin_email:legacy.is_active=False;legacy.role='lector'
         db.commit()
     finally:db.close()
-    Thread(target=_bootstrap_laamba_clausura,daemon=True).start();Thread(target=_bootstrap_argenliga,daemon=True).start();Thread(target=_bootstrap_fefi_freshness,daemon=True).start();Thread(target=_bootstrap_fefi_mayores,daemon=True).start();Thread(target=_bootstrap_superliga,daemon=True).start();Thread(target=_cleanup_laamba_conflicts,daemon=True).start();Thread(target=_bootstrap_content,daemon=True).start()
+    Thread(target=_bootstrap_laamba_clausura,daemon=True).start();Thread(target=_bootstrap_argenliga,daemon=True).start();Thread(target=_bootstrap_fefi_freshness,daemon=True).start();Thread(target=_bootstrap_fefi_mayores,daemon=True).start();Thread(target=_bootstrap_superliga,daemon=True).start();Thread(target=_cleanup_laamba_conflicts,daemon=True).start();Thread(target=_cleanup_e2e_players,daemon=True).start();Thread(target=_bootstrap_content,daemon=True).start()
