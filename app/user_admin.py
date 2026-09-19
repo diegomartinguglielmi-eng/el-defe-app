@@ -36,7 +36,7 @@ class RoleIn(BaseModel):
     @classmethod
     def validate_role(cls, value: str):
         value = value.strip().lower()
-        if value not in {"lector", "tienda", "admin"}:
+        if value not in {"lector", "tienda", "profe", "admin"}:
             raise ValueError("Rol inválido")
         return value
 
