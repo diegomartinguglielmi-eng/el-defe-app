@@ -64,6 +64,22 @@
   }
   function syncProfileRole(){const t=getToken(),r=t?tokenRole(t):null;if(!r)return;const label=roleLabel(r);const email=[...document.querySelectorAll('div,span,p,strong')].find(el=>el.childElementCount===0&&/@/.test(el.textContent||'')&&el.offsetParent!==null);if(!email)return;const root=email.parentElement?.parentElement||email.parentElement;if(!root)return;const cand=[...root.querySelectorAll('div,span,p')].find(el=>el.childElementCount===0&&/^(Socio|Administrador|Tienda)\s*·/i.test((el.textContent||'').trim()));if(cand){const txt=(cand.textContent||'').trim();cand.textContent=txt.replace(/^(Socio|Administrador|Tienda)/i,label)}}
   function syncAdminButton(){const token=getToken(),isAdmin=token&&tokenRole(token)==='admin';let btn=document.querySelector('[data-defe-users-button]');if(!isAdmin){btn?.remove();return}if(!btn){btn=document.createElement('button');btn.dataset.defeUsersButton='1';btn.setAttribute('aria-label','Gestionar usuarios');btn.title='Usuarios';btn.innerHTML='👥<span class="defe-users-label"> Usuarios</span>';btn.onclick=manageUsers;document.body.appendChild(btn)}const compact=window.innerWidth<760;btn.style.cssText=`position:fixed;right:12px;top:76px;z-index:9998;background:#40368f;color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:999px;height:44px;min-width:44px;padding:${compact?'0':'0 14px'};font-weight:700;box-shadow:0 4px 14px #0002`;const label=btn.querySelector('.defe-users-label');if(label)label.style.display=compact?'none':'inline'}
-  function sync(){syncAdminButton();syncProfileRole();patchLoginModal()}
+  function syncProfeAccount(){
+    const t=getToken();if(!t||tokenRole(t)!=='profe')return;
+    const logout=[...document.querySelectorAll('button')].find(b=>/^Cerrar sesión$/i.test((b.textContent||'').replace(/\s+/g,' ').trim())&&b.offsetParent!==null);
+    if(!logout)return;
+    const root=logout.closest('[role=dialog]')||logout.parentElement?.parentElement?.parentElement||logout.parentElement;
+    if(!root)return;
+    [...root.querySelectorAll('button,a')].filter(b=>/Mis hijos/i.test((b.textContent||'').replace(/\s+/g,' ').trim())).forEach(b=>b.style.setProperty('display','none','important'));
+    if(root.querySelector('[data-profe-account-tools]'))return;
+    const box=document.createElement('div');box.dataset.profeAccountTools='1';box.style.cssText='display:grid;gap:10px;margin:12px 0';
+    box.innerHTML='<button data-pa-att>✓ Asistencia / Jornada</button><button data-pa-plant>👥 Plantel / Jugadores</button><button data-pa-com>✉ Comunicaciones</button>';
+    box.querySelectorAll('button').forEach(b=>b.style.cssText='width:100%;border:0;border-radius:14px;padding:14px;background:#15589e;color:#fff;font-weight:800;font-size:16px');
+    box.querySelector('[data-pa-att]').onclick=()=>{root.querySelector('[aria-label="Cerrar"],[data-close]')?.click();setTimeout(()=>[...document.querySelectorAll('button,a')].find(x=>/^\\s*✓?\\s*Asistencia\\s*$/i.test((x.textContent||'').trim())&&x.offsetParent!==null)?.click(),80)};
+    box.querySelector('[data-pa-plant]').onclick=()=>{root.querySelector('[aria-label="Cerrar"],[data-close]')?.click();setTimeout(()=>[...document.querySelectorAll('button,a')].find(x=>/Plantel \/ Jugadores|Planteles/i.test((x.textContent||'').trim())&&x.offsetParent!==null)?.click(),80)};
+    box.querySelector('[data-pa-com]').onclick=()=>{root.querySelector('[aria-label="Cerrar"],[data-close]')?.click();setTimeout(()=>document.querySelector('.dc-fab')?.click(),80)};
+    logout.parentElement.insertBefore(box,logout);
+  }
+  function sync(){syncAdminButton();syncProfileRole();patchLoginModal();syncProfeAccount()}
   sync();window.addEventListener('resize',sync);window.addEventListener('focus',sync);setInterval(sync,700);
 })();
