@@ -31,9 +31,9 @@
      const tools=document.createElement('div');tools.dataset.profeAccountTools='1';tools.style.cssText='display:grid;gap:10px;margin:12px 0';
      tools.innerHTML='<button data-p-account-att>✓ Asistencia / Jornada</button><button data-p-account-plant>👥 Plantel / Jugadores</button><button data-p-account-com>✉ Comunicaciones</button>';
      tools.querySelectorAll('button').forEach(b=>b.style.cssText='width:100%;border:0;border-radius:14px;padding:14px;background:#15589e;color:#fff;font-weight:800;font-size:16px');
-     tools.querySelector('[data-p-account-att]').onclick=()=>{document.querySelector('[data-p-att]')?.click()||[...document.querySelectorAll('button,a')].find(x=>/^\\s*✓?\\s*Asistencia\\s*$/i.test((x.textContent||'').trim())&&x!==tools.querySelector('[data-p-account-att]'))?.click()};
+     tools.querySelector('[data-p-account-att]').onclick=()=>closeAccountAnd(()=>window.DefeProfe?.openAttendance?.());
      tools.querySelector('[data-p-account-plant]').onclick=()=>{document.querySelector('[data-p-plant]')?.click()||[...document.querySelectorAll('button,a')].find(x=>/Plantel \/ Jugadores|Planteles/i.test((x.textContent||'').trim())&&x!==tools.querySelector('[data-p-account-plant]'))?.click()};
-     tools.querySelector('[data-p-account-com]').onclick=()=>document.querySelector('.dc-fab')?.click();
+     tools.querySelector('[data-p-account-com]').onclick=()=>closeAccountAnd(()=>window.DefeProfe?.openCommunications?.());
      logout.parentElement.insertBefore(tools,logout);
    }
    const gtitle=textLeaf(/^Gestión$/);if(gtitle)gtitle.textContent='Gestión deportiva';
@@ -45,8 +45,8 @@
    const box=document.createElement('div');box.dataset.profeQuick='1';box.innerHTML='<div style="font-weight:900;margin-bottom:8px">Herramientas del Profe</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button data-profe-att>✓ Asistencia</button><button data-profe-comms>✉ Comunicaciones</button></div>';
    box.style.cssText='margin:12px 0 18px;padding:14px;background:#fff;border:1px solid #d8e0ea;border-radius:16px';
    box.querySelectorAll('button').forEach(b=>b.style.cssText='border:0;border-radius:12px;padding:10px 12px;background:#15589e;color:#fff;font-weight:800');
-   box.querySelector('[data-profe-att]').onclick=()=>{const b=[...document.querySelectorAll('button')].find(x=>/Asistencia/.test(x.textContent||''));b?.click()};
-   box.querySelector('[data-profe-comms]').onclick=()=>{const b=document.querySelector('.dc-fab');if(b)b.click()};
+   box.querySelector('[data-profe-att]').onclick=()=>window.DefeProfe?.openAttendance?.();
+   box.querySelector('[data-profe-comms]').onclick=()=>window.DefeProfe?.openCommunications?.();
    hint.parentElement?.parentElement?.appendChild(box);
  }
  function closeAccountAnd(action){
@@ -60,12 +60,13 @@
  document.addEventListener('click',e=>{
    const b=e.target.closest('[data-p-account-att],[data-p-account-plant],[data-p-account-com]');if(!b)return;
    e.preventDefault();e.stopImmediatePropagation();
-   if(b.matches('[data-p-account-com]'))return closeAccountAnd(()=>document.querySelector('.dc-fab')?.click());
-   if(b.matches('[data-p-account-att]'))return closeAccountAnd(()=>{const x=[...document.querySelectorAll('button,a')].find(x=>/^\\s*✓?\\s*Asistencia(?:\\s*\\/\\s*Jornada)?\\s*$/i.test((x.textContent||'').trim())&&!x.closest('[data-profe-account-tools]')&&getComputedStyle(x).display!=='none');x?.click()});
+   if(b.matches('[data-p-account-com]'))return closeAccountAnd(()=>window.DefeProfe?.openCommunications?.());
+   if(b.matches('[data-p-account-att]'))return closeAccountAnd(()=>window.DefeProfe?.openAttendance?.());
    closeAccountAnd(()=>{const x=[...document.querySelectorAll('button,a')].find(x=>/^(?:👥\\s*)?(?:Plantel \/ Jugadores|Planteles)$/i.test((x.textContent||'').trim())&&!x.closest('[data-profe-account-tools]')&&getComputedStyle(x).display!=='none');x?.click()});
  },true);
  function hideFloatingAttendance(){if(document.documentElement.dataset.defeRole!=='profe')return;[...document.querySelectorAll('button,a')].filter(x=>/^\s*✓?\s*Asistencia\s*$/i.test(x.textContent||'')&&!x.closest('[data-profe-panel]')).forEach(x=>{const cs=getComputedStyle(x);if(cs.position==='fixed'||cs.position==='absolute')x.style.display='none'})}
  function paint(){adminHome();adminProfile();adminQuick();hideFloatingAttendance();renderAdminHome()}
  function apply(u){document.documentElement.dataset.defeRole=u?.role||'guest';const role=u?.role||'guest';document.querySelectorAll('[data-role-only]').forEach(el=>{const allowed=(el.dataset.roleOnly||'').split(',').map(x=>x.trim());el.hidden=!allowed.includes(role)});window.dispatchEvent(new CustomEvent('defe:role',{detail:{role,user:u}}));setTimeout(paint,100);setTimeout(paint,800);if(role==='profe')setTimeout(loadAdminData,250)}
  me().then(apply).catch(()=>apply(null));window.addEventListener('focus',()=>{me().then(apply).catch(()=>{});loadAdminData()});new MutationObserver(()=>paint()).observe(document.body,{childList:true,subtree:true});
+window.DefeProfe={openAttendance(){const b=document.querySelector('[data-av-admin-fixed]');if(b){b.click();return true}return false},openCommunications(){const b=document.querySelector('.dc-fab');if(b){b.click();return true}return false}};
 })();
