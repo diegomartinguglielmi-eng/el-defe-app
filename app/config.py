@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     access_token_minutes: int = 720
     admin_email: str = "admin@elde.fe"
     admin_password: str = "Cambiar123!"
+    profe_email: str = "profe@elde.fe"
+    profe_password: str = ""
     sync_hour: int = 7
     sync_minute: int = 30
     allowed_origins: str = "capacitor://localhost,http://localhost,https://localhost"
