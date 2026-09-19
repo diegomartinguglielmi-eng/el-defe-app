@@ -1,0 +1,11 @@
+// El Defe · acceso operativo para perfil Profe
+(function(){
+if(window.__defeCoachNav)return;window.__defeCoachNav=true;
+function jwt(v){if(!v||typeof v!=='string')return null;const m=v.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(m)return m[0];try{const o=JSON.parse(v);for(const x of Object.values(o||{})){const f=jwt(typeof x==='string'?x:JSON.stringify(x));if(f)return f}}catch(_){}return null}
+function token(){for(const st of [localStorage,sessionStorage])for(let i=0;i<st.length;i++){const t=jwt(st.getItem(st.key(i)));if(t)return t}return''}
+function role(){const t=token();try{let p=t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return String(JSON.parse(atob(p.padEnd(Math.ceil(p.length/4)*4,'='))).role||'').toLowerCase()}catch(_){return''}}
+const coach=()=>['dt','delegado','profe'].includes(role());
+const css=document.createElement('style');css.textContent=`.dc-coach{position:fixed;right:12px;bottom:144px;z-index:2147482490;display:flex;flex-direction:column;gap:9px}.dc-coach button{border:0;border-radius:999px;background:#0b5aa6;color:#fff;height:46px;padding:0 15px;font-weight:900;box-shadow:0 6px 20px #0b3b7835}@media(max-width:759px){.dc-coach{right:12px;bottom:142px}.dc-coach button{width:48px;padding:0;font-size:0}.dc-coach button:before{font-size:20px}.dc-coach [data-coach-att]:before{content:'✓'}.dc-coach [data-coach-comms]:before{content:'✉'}}`;document.head.appendChild(css);
+function ensure(){let w=document.querySelector('[data-coach-nav]');if(!coach()){w?.remove();return}if(w)return;w=document.createElement('div');w.className='dc-coach';w.dataset.coachNav='1';w.innerHTML='<button data-coach-att>✓ Asistencia</button><button data-coach-comms>✉ Comunicaciones</button>';document.body.appendChild(w);w.querySelector('[data-coach-att]').onclick=()=>{const b=document.querySelector('[data-av-admin-fixed]');if(b)b.click();else setTimeout(()=>document.querySelector('[data-av-admin-fixed]')?.click(),400)};w.querySelector('[data-coach-comms]').onclick=()=>document.querySelector('.dc-fab')?.click()}
+setInterval(ensure,700);window.addEventListener('focus',ensure);ensure();
+})();
