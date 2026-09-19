@@ -68,5 +68,5 @@
  function paint(){adminHome();adminProfile();adminQuick();hideFloatingAttendance();renderAdminHome()}
  function apply(u){document.documentElement.dataset.defeRole=u?.role||'guest';const role=u?.role||'guest';document.querySelectorAll('[data-role-only]').forEach(el=>{const allowed=(el.dataset.roleOnly||'').split(',').map(x=>x.trim());el.hidden=!allowed.includes(role)});window.dispatchEvent(new CustomEvent('defe:role',{detail:{role,user:u}}));setTimeout(paint,100);setTimeout(paint,800);if(role==='profe')setTimeout(loadAdminData,250)}
  me().then(apply).catch(()=>apply(null));window.addEventListener('focus',()=>{me().then(apply).catch(()=>{});loadAdminData()});new MutationObserver(()=>paint()).observe(document.body,{childList:true,subtree:true});
-window.DefeProfe={openAttendance(){const b=document.querySelector('[data-av-admin-fixed]');if(b){b.click();return true}return false},openCommunications(){const b=document.querySelector('.dc-fab');if(b){b.click();return true}return false}};
+window.DefeProfe={openAttendance(){if(window.DefeAvailability?.openAdmin){window.DefeAvailability.openAdmin();return true}const b=document.querySelector('[data-av-admin-fixed]');if(b){b.click();return true}return false},openCommunications(){const b=document.querySelector('.dc-fab');if(b){b.click();return true}return false}};
 })();
