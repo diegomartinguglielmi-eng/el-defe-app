@@ -10,7 +10,7 @@
  }
  function adminProfile(){
    if(document.documentElement.dataset.defeRole!=='admin')return;
-   const label=textLeaf(/^Dirigente · con acceso a Gestión/);if(label)label.textContent=(label.textContent||'').replace('Dirigente · con acceso a Gestión','Profe · gestión deportiva');
+   const label=textLeaf(/^(Dirigente · con acceso a Gestión|Administrador ·)/);if(label)label.textContent='Profe · gestión deportiva';const hijos=textLeaf(/^Mis hijos$/);if(hijos){const b=hijos.closest('button');if(b)b.style.display='none'}const gtitle=textLeaf(/^Gestión$/);if(gtitle)gtitle.textContent='Gestión deportiva';const gdesc=textLeaf(/^Herramientas disponibles para administradores\.$/);if(gdesc)gdesc.textContent='Herramientas disponibles para el Profe.';
    const gestion=textLeaf(/^Gestión$/);if(gestion){const btn=gestion.closest('button');const desc=btn&&[...btn.querySelectorAll('*')].find(x=>x.children.length===0&&/Tienda, pedidos, contenidos y fuentes/i.test(x.textContent||''));if(desc)desc.textContent='Administración general del club'}
  }
  function adminQuick(){
