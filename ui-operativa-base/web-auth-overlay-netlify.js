@@ -68,9 +68,11 @@
     const t=getToken();if(!t||tokenRole(t)!=='profe')return;
     const logout=[...document.querySelectorAll('button')].find(b=>/^Cerrar sesión$/i.test((b.textContent||'').replace(/\s+/g,' ').trim())&&b.offsetParent!==null);
     if(!logout)return;
-    const root=logout.closest('[role=dialog]')||logout.parentElement?.parentElement?.parentElement||logout.parentElement;
+    let root=logout.closest('[role=dialog]');
+    if(!root){let n=logout;for(let i=0;i<7&&n;i++,n=n.parentElement){if(/SESIÓN ACTIVA/i.test(n.textContent||'')&&/Perfil:\s*Profe/i.test(n.textContent||'')){root=n;break}}}
+    if(!root)root=logout.parentElement?.parentElement?.parentElement||logout.parentElement;
     if(!root)return;
-    [...root.querySelectorAll('button,a')].filter(b=>/Mis hijos/i.test((b.textContent||'').replace(/\s+/g,' ').trim())).forEach(b=>b.style.setProperty('display','none','important'));
+    [...document.querySelectorAll('button,a')].filter(b=>b.offsetParent!==null&&/^Mis hijos$/i.test((b.textContent||'').replace(/\s+/g,' ').trim())).forEach(b=>b.style.setProperty('display','none','important'));
     if(root.querySelector('[data-profe-account-tools]'))return;
     const box=document.createElement('div');box.dataset.profeAccountTools='1';box.style.cssText='display:grid;gap:10px;margin:12px 0';
     box.innerHTML='<button data-pa-att>✓ Asistencia / Jornada</button><button data-pa-plant>👥 Plantel / Jugadores</button><button data-pa-com>✉ Comunicaciones</button>';
