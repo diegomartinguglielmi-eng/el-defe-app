@@ -25,7 +25,7 @@
    if(!d){
      const top=page.querySelector('header')||page.firstElementChild;
      const content=[...page.children].filter(x=>x!==top);
-     content.forEach(x=>x.style.setProperty('display','none','important'));
+     content.forEach(x=>{if(!x.matches('nav,[class*=nav],[class*=bottom],[class*=dock]'))x.style.setProperty('display','none','important')});
      d=document.createElement('main');d.dataset.profeDashboard='1';d.style.cssText='padding:24px 26px 110px;display:grid;gap:16px;background:#f3f7fb;min-height:calc(100vh - 150px)';
      if(top?.nextSibling)page.insertBefore(d,top.nextSibling);else page.appendChild(d);
    }
