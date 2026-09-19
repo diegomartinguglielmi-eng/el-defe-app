@@ -1,6 +1,10 @@
 (()=>{
 'use strict';
 const core=window.DefeCore;
+const API=(core&&core.API)||'https://el-defe-v2-staging-production.up.railway.app';
+function jwtFromValue(v){if(!v)return'';const m=String(v).match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);return m?m[0]:''}
+function authToken(){if(core?.token())return core.token();for(const st of [localStorage,sessionStorage])for(let i=0;i<st.length;i++){const t=jwtFromValue(st.getItem(st.key(i)));if(t)return t}return''}
+async function familyApi(path){const t=authToken();if(!t)throw Error('Sin sesión');const r=await fetch(API+path,{headers:{Authorization:'Bearer '+t},cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.detail||('Error '+r.status));return d}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labels={yes:'Voy',no:'No voy',maybe:'A confirmar',pending:'Sin responder'};
 function root(){const hs=[...document.querySelectorAll('h1,h2,h3')];const h=hs.find(x=>/pr[oó]ximas fechas/i.test(x.textContent||''));return h?.parentElement||document.querySelector('main')||null}
@@ -29,6 +33,6 @@ function render(items){
  .family-next-state{display:inline-flex;margin-top:11px;border-radius:999px;padding:7px 11px;font-weight:900;font-size:.82rem}.family-next-state.yes{background:#e8f7ef;color:#087443;border:1px solid #15945b}.family-next-state.no{background:#fdecec;color:#b42318;border:1px solid #d92d20}.family-next-state.maybe{background:#fff4d6;color:#8a5a00;border:1px solid #d69e00}.family-next-reminder{margin-top:11px;border:0;border-radius:12px;background:#15589e;color:#fff;padding:10px 12px;font-weight:900;font:inherit}`;document.head.appendChild(st)}
  box.innerHTML='<div class="family-home-title">Tu Defe</div><div class="family-home-sub">Próximos partidos de tus hijos</div><div data-family-home-list>'+items.map(card).join('')+'</div>';wire(box)
 }
-async function load(){if(!core?.token())return;if(document.getElementById('defe-mi-defe'))return;try{const d=await core.api('/api/availability/v2/me');render(d.items||[])}catch(e){console.warn('DEFE_HOME_FAMILY',e)}}
+async function load(){if(!authToken())return;if(document.getElementById('defe-mi-defe'))return;try{const d=await familyApi('/api/availability/v2/me');render(d.items||[])}catch(e){console.warn('DEFE_HOME_FAMILY',e)}}
 document.addEventListener('defe:session',load);window.addEventListener('focus',load);document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});setTimeout(load,400);setTimeout(load,1800);
 })();
