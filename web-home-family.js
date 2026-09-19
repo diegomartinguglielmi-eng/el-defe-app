@@ -7,8 +7,8 @@ function authToken(){if(core?.token())return core.token();for(const st of [local
 async function familyApi(path){const t=authToken();if(!t)throw Error('Sin sesión');const r=await fetch(API+path,{headers:{Authorization:'Bearer '+t},cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.detail||('Error '+r.status));return d}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labels={yes:'Voy',no:'No voy',maybe:'A confirmar',pending:'Sin responder'};
-function root(){const hs=[...document.querySelectorAll('h1,h2,h3')];const h=hs.find(x=>/pr[oó]ximas fechas/i.test(x.textContent||''));return h?.parentElement||document.querySelector('main')||null}
-function emptyHint(host){return [...host.querySelectorAll('div,p,span')].find(x=>/Elegí qué categorías seguís para ver acá sus próximos partidos/i.test(x.textContent||'')&&x.children.length===0)}
+function root(){const all=[...document.querySelectorAll('body *')];const hint=all.find(x=>x.children.length===0&&/Elegí qué categorías seguís para ver acá sus próximos partidos/i.test((x.textContent||'').trim()));if(hint)return hint.parentElement;const h=all.find(x=>x.children.length===0&&/^Pr[oó]ximas fechas$/i.test((x.textContent||'').trim()));return h?.parentElement||document.querySelector('main')||null}
+function emptyHint(host){return [...host.querySelectorAll('*')].find(x=>x.children.length===0&&/Elegí qué categorías seguís para ver acá sus próximos partidos/i.test((x.textContent||'').trim()))}
 function when(x){return [x.date,x.time].filter(Boolean).map(esc).join(' · ')||'Fecha y hora a confirmar'}
 function card(x){
  const r=x.response||'pending', disabled=x.available===false;
