@@ -37,6 +37,20 @@
    const wire=(btn,fn)=>{if(!btn)return;btn.type='button';btn.style.pointerEvents='auto';btn.style.touchAction='manipulation';btn.onclick=e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();document.querySelector('.dc-modal')?.remove();document.getElementById('defe-profe-fixture')?.remove();document.getElementById('defe-profe-plantel')?.remove();fn()}};
    wire(fixtureBtn,openProfeFixture);wire(plantBtn,openPlantel);wire(comBtn,()=>window.DefeProfe?.openCommunications?.());wire(attBtn,()=>window.DefeProfe?.openAttendance?.());
  }
+ function handleProfeDashboardAction(e){
+   if(document.documentElement.dataset.defeRole!=='profe')return;
+   const target=e.target.closest?.('[data-profe-dash-fixture],[data-profe-dash-plant],[data-profe-dash-com],[data-profe-dash-att-main]');
+   if(!target||!target.closest('[data-profe-dashboard]'))return;
+   e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+   document.querySelector('.dc-modal')?.remove();
+   document.getElementById('defe-profe-fixture')?.remove();
+   document.getElementById('defe-profe-plantel')?.remove();
+   if(target.matches('[data-profe-dash-fixture]'))return openProfeFixture();
+   if(target.matches('[data-profe-dash-plant]'))return openPlantel();
+   if(target.matches('[data-profe-dash-com]'))return window.DefeProfe?.openCommunications?.();
+   if(target.matches('[data-profe-dash-att-main]'))return window.DefeProfe?.openAttendance?.();
+ }
+ ['pointerup','click'].forEach(type=>document.addEventListener(type,handleProfeDashboardAction,true));
  function adminHome(){
    if(document.documentElement.dataset.defeRole!=='profe'||document.getElementById('defe-mi-defe'))return;
    const hint=textLeaf(/Elegí qué categorías seguís para ver acá sus próximos partidos/i);
