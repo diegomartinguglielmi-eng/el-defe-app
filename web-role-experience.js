@@ -110,6 +110,19 @@ function openPlantel(){
   document.body.appendChild(page);page.addEventListener('click',e=>e.stopPropagation());page.querySelector('[data-back]').onclick=e=>{e.preventDefault();e.stopPropagation();page.remove()};
 }
 function hideFloatingAttendance(){if(document.documentElement.dataset.defeRole!=='profe')return;[...document.querySelectorAll('button,a')].filter(x=>/^\s*✓?\s*Asistencia\s*$/i.test(x.textContent||'')&&!x.closest('[data-profe-panel]')).forEach(x=>{const cs=getComputedStyle(x);if(cs.position==='fixed'||cs.position==='absolute')x.style.display='none'})}
+ function dashboardHitAction(e){
+   if(document.documentElement.dataset.defeRole!=='profe')return;
+   const d=document.querySelector('[data-profe-dashboard]');if(!d||!document.getElementById('defe-mi-defe'))return;
+   const x=e.clientX,y=e.clientY;if(x==null||y==null)return;
+   const actions=[
+     ['[data-profe-dash-fixture]',()=>openProfeFixture()],
+     ['[data-profe-dash-plant]',()=>openPlantel()],
+     ['[data-profe-dash-com]',()=>window.DefeProfe?.openCommunications?.()],
+     ['[data-profe-dash-att-main]',()=>window.DefeProfe?.openAttendance?.()]
+   ];
+   for(const [sel,fn] of actions){const b=d.querySelector(sel);if(!b)continue;const r=b.getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom){e.preventDefault();e.stopImmediatePropagation();fn();return}}
+ }
+ if(!window.__defeProfeHitFix){window.__defeProfeHitFix=true;document.addEventListener('click',dashboardHitAction,true)}
  function paint(){adminHome();adminProfile();renderProfeDashboard();hideFloatingAttendance();renderAdminHome()}
  function jwtRole(){try{const t=core?.token?.();if(!t)return'';const p=t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return String(JSON.parse(atob(p.padEnd(Math.ceil(p.length/4)*4,'='))).role||'').toLowerCase()}catch(_){return''}} function apply(u){const apiRole=String(u?.role||u?.user?.role||u?.profile?.role||'').toLowerCase(),storedRole=String(localStorage.getItem('defe_role')||sessionStorage.getItem('defe_role')||'').toLowerCase(),raw=apiRole||storedRole||jwtRole()||'guest';const role=(raw==='coach'||raw==='profesor'||raw==='entrenador'||raw==='dt')?'profe':raw;document.documentElement.dataset.defeRole=role;document.querySelectorAll('[data-role-only]').forEach(el=>{const allowed=(el.dataset.roleOnly||'').split(',').map(x=>x.trim());el.hidden=!allowed.includes(role)});window.dispatchEvent(new CustomEvent('defe:role',{detail:{role,user:u}}));setTimeout(paint,100);setTimeout(paint,800);if(role==='profe')setTimeout(loadAdminData,250)}
  me().then(apply).catch(()=>apply(null));window.addEventListener('focus',()=>{me().then(apply).catch(()=>{});loadAdminData()});let paintQueued=false;new MutationObserver(()=>{if(paintQueued)return;paintQueued=true;requestAnimationFrame(()=>{paintQueued=false;paint()})}).observe(document.body,{childList:true,subtree:true});
