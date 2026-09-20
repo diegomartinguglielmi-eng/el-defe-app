@@ -14,6 +14,7 @@ from sqlalchemy.sql import func
 from .auth import get_current_user, require_roles
 from .db import Base, get_db
 from .family_context_v1 import family_context
+from .profe_scope import profe_selections, selection_allowed
 
 class NotificationEvent(Base):
     __tablename__ = "notification_events"
@@ -112,8 +113,12 @@ def push_unsubscribe(payload:PushSubscriptionIn,db:Session=Depends(get_db),user=
 
 @router.get("/feed")
 def notification_feed(since_id:int=0,limit:int=50,db:Session=Depends(get_db),user=Depends(get_current_user)):
-    limit=max(1,min(limit,100)); rows=db.query(NotificationEvent).filter(NotificationEvent.id>since_id).order_by(NotificationEvent.id.asc()).limit(limit).all(); family=_family_selections(db,user.id)
+    limit=max(1,min(limit,100)); rows=db.query(NotificationEvent).filter(NotificationEvent.id>since_id).order_by(NotificationEvent.id.asc()).limit(limit).all(); family=_family_selections(db,user.id); assigned=profe_selections(db,user) if user.role == "profe" else set()
     def visible(x):
+        if user.role == "profe":
+            comp=(x.competition or "").upper().strip(); cat=(x.category or "").upper().strip()
+            if not comp and not cat: return True
+            return bool(comp and cat and f"{comp}|{cat}" in assigned)
         if x.urgent or not family: return True
         comp=(x.competition or "").upper().strip(); cat=(x.category or "").strip()
         if comp and cat: return f"{comp}|{cat}".upper() in family
@@ -124,6 +129,7 @@ def notification_feed(since_id:int=0,limit:int=50,db:Session=Depends(get_db),use
 
 @router.post("/communication")
 def create_communication_notice(payload:CommunicationNoticeIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","profe","delegado"))):
+    if not selection_allowed(db, user, payload.competition, payload.category): raise HTTPException(status_code=403,detail="Ese equipo/categoría no está asignado a este Profe")
     priority=(payload.priority or "Información").strip(); title=payload.title.strip() or "Nueva comunicación"; body=payload.body.strip()
     if not body: raise HTTPException(status_code=400,detail="El mensaje no puede estar vacío")
     event=publish_event(db,event_type="communication",title=title,body=body,competition=payload.competition,category=payload.category,urgent=False); db.commit(); db.refresh(event)
@@ -131,5 +137,6 @@ def create_communication_notice(payload:CommunicationNoticeIn,db:Session=Depends
 
 @router.post("/urgent")
 def create_urgent_notice(payload:UrgentNoticeIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","profe","delegado"))):
+    if not selection_allowed(db, user, payload.competition, payload.category): raise HTTPException(status_code=403,detail="Ese equipo/categoría no está asignado a este Profe")
     event=publish_event(db,event_type="urgent",title=payload.title.strip() or "Aviso urgente",body=payload.body.strip(),competition=payload.competition,category=payload.category,urgent=True); db.commit(); db.refresh(event)
     return {"ok":True,"id":event.id,"push":getattr(event,"push_result",None)}
