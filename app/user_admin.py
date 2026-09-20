@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 
 from .auth import hash_password, create_token, require_roles
 from .db import get_db
-from .models import User, AuditLog
+from .models import User, AuditLog, Favorite
+from .profe_scope import PROFE_TEAM_FAVORITE, normalize_selection, profe_selections
 
 router = APIRouter()
 
@@ -27,6 +28,22 @@ class RegisterIn(BaseModel):
         if len(value) < 8:
             raise ValueError("La contraseña debe tener al menos 8 caracteres")
         return value
+
+
+class ProfeTeamsIn(BaseModel):
+    selections: list[str]
+
+    @field_validator("selections")
+    @classmethod
+    def validate_selections(cls, values: list[str]):
+        cleaned = []
+        for value in values:
+            key = normalize_selection(value)
+            if not key:
+                raise ValueError("Equipo/categoría inválido")
+            if key not in cleaned:
+                cleaned.append(key)
+        return cleaned
 
 
 class RoleIn(BaseModel):
@@ -112,3 +129,26 @@ def change_role(user_id: int, payload: RoleIn, db: Session = Depends(get_db), ad
     _audit(db, admin, "change_role", target.id, f"{old_role}->{target.role}")
 
     return {"ok": True, "id": target.id, "email": target.email, "role": target.role}
+
+
+@router.get("/api/admin/users/{user_id}/profe-teams")
+def get_profe_teams(user_id: int, db: Session = Depends(get_db), admin: User = Depends(require_roles("admin"))):
+    target = db.get(User, user_id)
+    if not target:
+        raise HTTPException(status_code=404, detail="Usuario inexistente")
+    return {"user_id": target.id, "email": target.email, "role": target.role, "selections": sorted(profe_selections(db, target))}
+
+
+@router.put("/api/admin/users/{user_id}/profe-teams")
+def set_profe_teams(user_id: int, payload: ProfeTeamsIn, db: Session = Depends(get_db), admin: User = Depends(require_roles("admin"))):
+    target = db.get(User, user_id)
+    if not target:
+        raise HTTPException(status_code=404, detail="Usuario inexistente")
+    if target.role != "profe":
+        raise HTTPException(status_code=400, detail="El usuario no tiene rol Profe")
+    db.query(Favorite).filter(Favorite.user_id == target.id, Favorite.favorite_type == PROFE_TEAM_FAVORITE).delete(synchronize_session=False)
+    for selection in payload.selections:
+        db.add(Favorite(user_id=target.id, favorite_type=PROFE_TEAM_FAVORITE, favorite_id=selection))
+    db.commit()
+    _audit(db, admin, "set_profe_teams", target.id, ",".join(payload.selections))
+    return {"ok": True, "user_id": target.id, "selections": sorted(payload.selections)}
