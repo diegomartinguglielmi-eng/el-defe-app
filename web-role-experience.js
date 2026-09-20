@@ -111,5 +111,17 @@ function hideFloatingAttendance(){if(document.documentElement.dataset.defeRole!=
  function paint(){if(document.getElementById('defe-profe-fixture')||document.getElementById('defe-profe-plantel')||document.querySelector('.dc-modal'))return;adminHome();adminProfile();renderProfeDashboard();hideFloatingAttendance();renderAdminHome()}
  function jwtRole(){try{const t=core?.token?.();if(!t)return'';const p=t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return String(JSON.parse(atob(p.padEnd(Math.ceil(p.length/4)*4,'='))).role||'').toLowerCase()}catch(_){return''}} function apply(u){const apiRole=String(u?.role||u?.user?.role||u?.profile?.role||'').toLowerCase(),storedRole=String(localStorage.getItem('defe_role')||sessionStorage.getItem('defe_role')||'').toLowerCase(),raw=apiRole||storedRole||jwtRole()||'guest';const role=(raw==='coach'||raw==='profesor'||raw==='entrenador'||raw==='dt')?'profe':raw;document.documentElement.dataset.defeRole=role;document.querySelectorAll('[data-role-only]').forEach(el=>{const allowed=(el.dataset.roleOnly||'').split(',').map(x=>x.trim());el.hidden=!allowed.includes(role)});window.dispatchEvent(new CustomEvent('defe:role',{detail:{role,user:u}}));setTimeout(paint,100);setTimeout(paint,800);if(role==='profe')setTimeout(loadAdminData,250)}
  me().then(apply).catch(()=>apply(null));window.addEventListener('focus',()=>{me().then(apply).catch(()=>{});loadAdminData()});let paintQueued=false;new MutationObserver(()=>{if(paintQueued)return;paintQueued=true;requestAnimationFrame(()=>{paintQueued=false;paint()})}).observe(document.body,{childList:true,subtree:true});
+
+// Profe dashboard: delegated pointer handler. Avoids stale/replaced button nodes on mobile.
+document.addEventListener('pointerup',e=>{
+ if(document.documentElement.dataset.defeRole!=='profe')return;
+ const b=e.target.closest('[data-profe-dash-fixture],[data-profe-dash-plant],[data-profe-dash-com],[data-profe-dash-att-main]');
+ if(!b)return;
+ e.preventDefault();e.stopPropagation();
+ if(b.matches('[data-profe-dash-fixture]'))return openProfeFixture();
+ if(b.matches('[data-profe-dash-plant]'))return openPlantel();
+ if(b.matches('[data-profe-dash-com]'))return window.DefeProfe?.openCommunications?.();
+ if(b.matches('[data-profe-dash-att-main]'))return window.DefeProfe?.openAttendance?.();
+},{capture:true});
 window.DefeProfe={openAttendance(){if(window.DefeAvailability?.openAdmin){window.DefeAvailability.openAdmin();return true}const b=document.querySelector('[data-av-admin-fixed]');if(b){b.click();return true}return false},openCommunications(){document.getElementById('defe-profe-plantel')?.remove();document.getElementById('defe-profe-fixture')?.remove();document.querySelector('.dc-modal')?.remove();const b=document.querySelector('.dc-fab');if(b){b.click();return true}return false}};
 })();
