@@ -21,10 +21,11 @@ from .sponsors_v5 import router as sponsors_router, bootstrap_sponsors
 from .league_tournaments import router as league_tournaments_router
 from .league_stats import router as league_stats_router
 from .db import SessionLocal
-from .models import User, Match, SyncRun, Person, TeamMember, CallUpPlayer, PlayerMatchStat, Suspension, MediaItem, PlayerOfMatch
+from .models import User, Match, SyncRun, Person, TeamMember, CallUpPlayer, PlayerMatchStat, Suspension, MediaItem, PlayerOfMatch, Favorite
 from .auth import hash_password
 from .availability_v1 import UserPlayerLink, UserPlayerRequest
 from .availability_player_v2 import PlayerAvailabilityResponse
+from .profe_scope import PROFE_TEAM_FAVORITE
 from .config import settings
 from .sync import sync_laamba
 from .argenliga_baseline import bootstrap_argenliga_2026
@@ -170,5 +171,11 @@ def v5_startup_hardening():
             else:
                 db.add(User(email=profe_email,password_hash=hash_password(profe_password),role='profe',is_active=True))
         db.commit()
+        if profe:
+            has_scope=db.query(Favorite).filter(Favorite.user_id==profe.id,Favorite.favorite_type==PROFE_TEAM_FAVORITE).first()
+            if not has_scope:
+                db.add(Favorite(user_id=profe.id,favorite_type=PROFE_TEAM_FAVORITE,favorite_id='FEFI|2016'))
+                db.commit()
+                print({'profe_scope_seed':{'email':profe.email,'selection':'FEFI|2016'}})
     finally:db.close()
     Thread(target=_bootstrap_laamba_clausura,daemon=True).start();Thread(target=_bootstrap_argenliga,daemon=True).start();Thread(target=_bootstrap_fefi_freshness,daemon=True).start();Thread(target=_bootstrap_fefi_mayores,daemon=True).start();Thread(target=_bootstrap_superliga,daemon=True).start();Thread(target=_cleanup_laamba_conflicts,daemon=True).start();Thread(target=_cleanup_e2e_players,daemon=True).start();Thread(target=_bootstrap_content,daemon=True).start()
