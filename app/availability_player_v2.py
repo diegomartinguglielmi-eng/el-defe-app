@@ -11,6 +11,7 @@ from .auth import get_current_user, require_roles
 from .db import Base, get_db
 from .models import User
 from .availability_v1 import UserPlayerLink, AvailabilityResponse, _linked_players, _next_event
+from .profe_scope import profe_selections, normalize_selection
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 router = APIRouter(prefix="/api/availability/v2", tags=["Availability v2 - player"])
@@ -150,6 +151,9 @@ def admin_player_availability(db: Session = Depends(get_db), user=Depends(requir
                 bucket[effective] = bucket.get(effective, 0) + 1
                 bucket["people"].append({"user_id": link.user_id, "person_id": player["person_id"], "email": emails.get(link.user_id), "name": player["name"], "players": [player], "status": effective, "note": note, "updated_at": updated_at, "response_source": source})
     items = list(grouped.values())
+    if user.role == "profe":
+        allowed = profe_selections(db, user)
+        items = [item for item in items if normalize_selection(item.get("selection") or "") in allowed]
     for item in items:
         item["followers"] = item["players"]
     items.sort(key=lambda x: ((x.get("date") or "9999-99-99"), x.get("selection") or ""))
