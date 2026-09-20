@@ -127,5 +127,11 @@ document.addEventListener('pointerup',e=>{
  if(b.matches('[data-profe-dash-com]'))return window.DefeProfe?.openCommunications?.();
  if(b.matches('[data-profe-dash-att-main]'))return window.DefeProfe?.openAttendance?.();
 },{capture:true});
-window.DefeProfe={openAttendance(){if(window.DefeAvailability?.openAdmin){window.DefeAvailability.openAdmin();return true}const b=document.querySelector('[data-av-admin-fixed]');if(b){b.click();return true}return false},openCommunications(){document.getElementById('defe-profe-plantel')?.remove();document.getElementById('defe-profe-fixture')?.remove();document.querySelector('.dc-modal')?.remove();const b=document.querySelector('.dc-fab');if(b){b.click();return true}return false}};
+window.DefeProfe={openAttendance(){if(window.DefeAvailability?.openAdmin){window.DefeAvailability.openAdmin();return true}const b=document.querySelector('[data-av-admin-fixed]');if(b){b.click();return true}return false},openCommunications(){
+ document.getElementById('defe-profe-plantel')?.remove();document.getElementById('defe-profe-fixture')?.remove();document.querySelector('.dc-modal')?.remove();
+ // Diagnostic/direct path: do not depend on the floating communications button.
+ const m=document.createElement('div');m.className='dc-modal';m.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#11182788;padding:16px;display:flex;align-items:center;justify-content:center';
+ m.innerHTML='<div style="background:#fff;width:min(560px,100%);max-height:88vh;overflow:auto;border-radius:22px;padding:18px;color:#17365f"><div style="display:flex;justify-content:space-between;align-items:center"><div><h2 style="margin:0">Comunicaciones</h2><div style="font-size:12px;color:#64748b;margin-top:4px">Perfil Profe · prueba directa</div></div><button data-close style="border:0;background:#eef2f7;border-radius:11px;padding:10px 12px;font-weight:800">✕</button></div><p style="margin:18px 0 0">El acceso a Comunicaciones funciona.</p></div>';
+ document.body.appendChild(m);m.querySelector('[data-close]').onclick=()=>m.remove();return true;
+}};
 })();
