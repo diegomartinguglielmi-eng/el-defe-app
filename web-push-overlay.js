@@ -36,6 +36,6 @@
   async function refreshState(){await detectActualPush();paintPanel();setTimeout(()=>paintPanel(),150)}
   function observePanel(){let timer=0;new MutationObserver(muts=>{if(!muts.some(m=>m.addedNodes&&m.addedNodes.length))return;clearTimeout(timer);timer=setTimeout(()=>{removeLegacyButton();refreshState()},80)}).observe(document.body,{childList:true,subtree:true});refreshState()}
   async function init(){removeLegacyButton();observePanel();await detectActualPush();if(Notification.permission==='granted')await sync();refreshState();document.addEventListener('defe:preferences-updated',()=>{sync();refreshState()});window.addEventListener('focus',refreshState);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshState()})}
-  window.defeEnablePush=enable;window.defeSyncPush=()=>sync();
+  window.defeEnablePush=enable;window.defeSyncPush=()=>sync();window.defeRefreshPushState=refreshState;
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
