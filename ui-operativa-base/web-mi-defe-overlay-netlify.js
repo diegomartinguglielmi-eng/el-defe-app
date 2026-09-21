@@ -42,6 +42,9 @@
     if(!el)return;
     const label=(el.textContent||'').replace(/\s+/g,' ').trim();
     if(!el.matches('[data-mi-defe-nav],[data-mi-defe-button="1"]')&&!/Mi Defe/i.test(label))return;
+    // The native top "Mi Defe" account button must keep its own route/modal.
+    // This overlay only owns explicit overlay/center navigation controls.
+    if(!el.matches('[data-mi-defe-nav],[data-mi-defe-button="1"]'))return;
     e.preventDefault();e.stopImmediatePropagation();open();
   },true);
 
