@@ -26,7 +26,7 @@
      const top=page.querySelector('header')||page.firstElementChild;
      const content=[...page.children].filter(x=>x!==top);
      content.forEach(x=>{if(!x.matches('nav,[class*=nav],[class*=bottom],[class*=dock]'))x.style.setProperty('display','none','important')});
-     d=document.createElement('main');d.dataset.profeDashboard='1';d.style.cssText='position:fixed;inset:112px 0 74px 0;z-index:10020;padding:24px 26px 36px;display:grid;align-content:start;gap:16px;background:#f3f7fb;overflow:auto;overscroll-behavior:contain;pointer-events:auto;touch-action:pan-y';
+     d=document.createElement('main');d.dataset.profeDashboard='1';d.style.cssText='position:fixed;inset:112px 0 0 0;z-index:10020;padding:18px 20px calc(28px + env(safe-area-inset-bottom));display:grid;align-content:start;gap:14px;background:#f3f7fb;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;pointer-events:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch;box-sizing:border-box';
      if(top?.nextSibling)page.insertBefore(d,top.nextSibling);else page.appendChild(d);
    }
    page.querySelectorAll(':scope > *').forEach(x=>{if(x!==d&&x!==page.querySelector('header')){const s=(x.matches('nav,[class*=nav],[class*=bottom],[class*=dock]'));if(!s){x.style.setProperty('display','none','important');x.style.pointerEvents='none'}else{x.style.setProperty('position','relative','important');x.style.setProperty('z-index','10030','important')}}});
