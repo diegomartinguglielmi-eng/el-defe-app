@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from apscheduler.schedulers.background import BackgroundScheduler
 from .db import Base, engine, get_db, SessionLocal
 from .models import User, Match, Standing, News, AuditLog, Team, Person, TeamMember, CallUp, CallUpPlayer, PlayerMatchStat, Suspension, Favorite, NotificationPreference, MediaItem, PlayerOfMatch
