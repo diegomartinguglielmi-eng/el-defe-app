@@ -6,12 +6,12 @@
  const COMPETITIONS={Baby:['FEFI','Superliga'],Futsal:['FEFI','LAAMBA','Argenliga']};
  const CATEGORIES={'Baby|FEFI':['2019','2018','2017','2016','2015','2014','2013'],'Baby|Superliga':['2019','2018','2017','2016','2015','2014','2013'],'Futsal|FEFI':['Mayores B +42'],'Futsal|LAAMBA':['Reserva'],'Futsal|Argenliga':['1RA','3RA','4TA','5TA','6TA','7MA','8VA']};
  function jwtFromValue(value){if(!value||typeof value!=='string')return null;const m=value.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);return m?m[0]:null}
- function jwt(){try{const s=JSON.parse(localStorage.getItem('defe:railway:session')||'null');const t=jwtFromValue(s?.token);if(t)return t}catch(_){}return jwtFromValue(localStorage.getItem('defe_access_token'))}
+ function jwt(){try{const x=JSON.parse(localStorage.getItem('defe:railway:session')||'null');const t=jwtFromValue(x?.token);if(t)return t}catch(_){}for(const st of [localStorage,sessionStorage]){for(const k of ['defe_access_token','defe_token']){const t=jwtFromValue(st.getItem(k));if(t)return t}for(let i=0;i<st.length;i++){const t=jwtFromValue(st.getItem(st.key(i)));if(t)return t}}return null}
  function tokenRole(){try{const t=jwt();if(!t)return null;let p=t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(atob(p.padEnd(Math.ceil(p.length/4)*4,'='))).role||null}catch{return null}}
  function visibleAdmin(){return (document.body?.innerText||'').toLowerCase().includes('admin@elde.fe')}
  async function refreshAdmin(){const t=jwt();adminState=visibleAdmin()||tokenRole()==='admin'||!!document.querySelector('[data-defe-users-button]');if(!t)return adminState;try{const r=await fetch(API+'/api/me',{headers:{Authorization:`Bearer ${t}`},cache:'no-store'});if(r.ok){const me=await r.json();adminState=adminState||me.role==='admin'||String(me.email||'').toLowerCase()==='admin@elde.fe'}}catch(_){}return adminState}
  const isAdmin=()=>adminState||visibleAdmin()||tokenRole()==='admin'||!!document.querySelector('[data-defe-users-button]');
- const isProfe=()=>tokenRole()==='profe';
+ const isProfe=()=>tokenRole()==='profe'||sessionStorage.getItem('defe_profe_active')==='1'||document.documentElement.dataset.defeRole==='profe'||!!document.querySelector('[data-profe-dashboard],[data-profe-dash-com]');
  const canCompose=()=>isAdmin()||isProfe();
  async function profeTargets(){
    if(!isProfe())return[];
