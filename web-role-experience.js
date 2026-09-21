@@ -91,7 +91,7 @@
  async function openProfeFixture(){
   document.querySelector('.dc-modal')?.remove();document.getElementById('defe-profe-fixture')?.remove();
   const item=(adminData?.items||[])[0]||{},parts=String(item.selection||'FEFI|').split('|'),comp=parts[0]||'FEFI',cat=parts[1]||'';
-  const page=document.createElement('div');page.id='defe-profe-fixture';page.style.cssText='position:fixed;inset:0;z-index:10080;background:#f3f7fb;overflow:auto;color:#17365f';
+  const page=document.createElement('div');page.id='defe-profe-fixture';page.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#f3f7fb;overflow:auto;color:#17365f';
   page.innerHTML='<header style="background:#0f5ea8;color:white;padding:28px 20px 22px;display:flex;align-items:center;gap:16px"><button data-back style="border:1px solid rgba(255,255,255,.35);background:transparent;color:white;border-radius:14px;width:48px;height:48px;font-size:25px">‹</button><div><div style="font-size:13px;font-weight:900">EL DEFE</div><div style="font-size:30px">Fixture · '+comp+(cat?' · '+cat:'')+'</div></div></header><main data-list style="padding:20px 20px 100px"><div style="background:#fff;border-radius:18px;padding:18px">Cargando próximas fechas…</div></main>';
   document.body.appendChild(page);page.querySelector('[data-back]').onclick=e=>{e.preventDefault();e.stopPropagation();page.remove()};
   try{
@@ -106,7 +106,7 @@ function openPlantel(){
   document.querySelector('.dc-modal')?.remove();document.getElementById('defe-profe-plantel')?.remove();
   const items=adminData?.items||[],groups=new Map();
   items.forEach(it=>{const key=it.selection||'Plantel';if(!groups.has(key))groups.set(key,new Map());(it.people||[]).forEach(p=>groups.get(key).set(p.person_id||p.name,p))});
-  const page=document.createElement('div');page.id='defe-profe-plantel';page.style.cssText='position:fixed;inset:0;z-index:10060;background:#f3f7fb;overflow:auto;color:#17365f';
+  const page=document.createElement('div');page.id='defe-profe-plantel';page.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#f3f7fb;overflow:auto;color:#17365f';
   const cards=[...groups].map(([sel,people])=>{const [comp,cat]=String(sel).split('|');const rows=[...people.values()];return '<section style="background:#fff;border:1px solid #dbe4ef;border-radius:18px;padding:16px;margin:0 20px 14px"><div style="font-weight:950;font-size:18px">'+comp+' · '+(cat||'')+'</div><div style="color:#64748b;margin:4px 0 12px">'+rows.length+' jugador'+(rows.length===1?'':'es')+'</div>'+rows.map(p=>'<div style="padding:11px 0;border-top:1px solid #edf2f7;display:flex;justify-content:space-between;gap:12px"><b>'+String(p.name||'Jugador')+'</b><span style="color:#64748b;font-size:13px">'+(p.status==='yes'?'Confirmado':p.status==='no'?'No asiste':p.status==='maybe'?'A confirmar':'Pendiente')+'</span></div>').join('')+'</section>'}).join('');
   page.innerHTML='<header style="background:#0f5ea8;color:white;padding:28px 20px 22px;display:flex;align-items:center;gap:16px"><button data-back style="border:1px solid rgba(255,255,255,.35);background:transparent;color:white;border-radius:14px;width:48px;height:48px;font-size:25px">‹</button><div><div style="font-size:13px;font-weight:900">EL DEFE</div><div style="font-size:30px">Plantel · Jugadores</div></div></header><main style="padding:20px 0 100px">'+(cards||'<div style="margin:0 20px;background:#fff;border:1px dashed #cbd5e1;border-radius:18px;padding:20px;color:#64748b">No hay jugadores vinculados a los planteles disponibles.</div>')+'</main>';
   document.body.appendChild(page);page.querySelector('[data-back]').onclick=e=>{e.preventDefault();e.stopPropagation();page.remove()};
@@ -127,11 +127,5 @@ document.addEventListener('pointerup',e=>{
  if(b.matches('[data-profe-dash-com]'))return window.DefeProfe?.openCommunications?.();
  if(b.matches('[data-profe-dash-att-main]'))return window.DefeProfe?.openAttendance?.();
 },{capture:true});
-window.DefeProfe={openAttendance(){if(window.DefeAvailability?.openAdmin){window.DefeAvailability.openAdmin();return true}const b=document.querySelector('[data-av-admin-fixed]');if(b){b.click();return true}return false},openCommunications(){
- document.getElementById('defe-profe-plantel')?.remove();document.getElementById('defe-profe-fixture')?.remove();document.querySelector('.dc-modal')?.remove();
- // Diagnostic/direct path: do not depend on the floating communications button.
- const m=document.createElement('div');m.className='dc-modal';m.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#11182788;padding:16px;display:flex;align-items:center;justify-content:center';
- m.innerHTML='<div style="background:#fff;width:min(560px,100%);max-height:88vh;overflow:auto;border-radius:22px;padding:18px;color:#17365f"><div style="display:flex;justify-content:space-between;align-items:center"><div><h2 style="margin:0">Comunicaciones</h2><div style="font-size:12px;color:#64748b;margin-top:4px">Perfil Profe · prueba directa</div></div><button data-close style="border:0;background:#eef2f7;border-radius:11px;padding:10px 12px;font-weight:800">✕</button></div><p style="margin:18px 0 0">El acceso a Comunicaciones funciona.</p></div>';
- document.body.appendChild(m);m.querySelector('[data-close]').onclick=()=>m.remove();return true;
-}};
+window.DefeProfe={openAttendance(){if(window.DefeAvailability?.openAdmin){window.DefeAvailability.openAdmin();return true}const b=document.querySelector('[data-av-admin-fixed]');if(b){b.click();return true}return false},openCommunications(){document.getElementById('defe-profe-plantel')?.remove();document.getElementById('defe-profe-fixture')?.remove();document.querySelector('.dc-modal')?.remove();const b=document.querySelector('.dc-fab');if(b){b.click();return true}return false}};
 })();
