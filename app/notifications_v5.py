@@ -60,12 +60,19 @@ def _vapid(db):
     private_key, public_key, subject = _env_vapid()
     if private_key and public_key: return private_key, public_key, subject
     row=db.query(PushVapidConfig).filter(PushVapidConfig.id==1).first()
-    if not row:
-        key=ec.generate_private_key(ec.SECP256R1())
-        private_key=key.private_bytes(serialization.Encoding.PEM,serialization.PrivateFormat.PKCS8,serialization.NoEncryption()).decode()
-        raw=key.public_key().public_bytes(serialization.Encoding.X962,serialization.PublicFormat.UncompressedPoint)
-        public_key=base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
-        row=PushVapidConfig(id=1,private_key=private_key,public_key=public_key,subject=subject); db.add(row); db.commit(); db.refresh(row)
+    if row:
+        try:
+            serialization.load_pem_private_key(row.private_key.encode(), password=None)
+            return row.private_key,row.public_key,row.subject
+        except Exception:
+            # Recover legacy/invalid staging key pair. Existing browser subscriptions
+            # must be renewed against the replacement public key.
+            db.delete(row); db.flush()
+    key=ec.generate_private_key(ec.SECP256R1())
+    private_key=key.private_bytes(serialization.Encoding.PEM,serialization.PrivateFormat.PKCS8,serialization.NoEncryption()).decode()
+    raw=key.public_key().public_bytes(serialization.Encoding.X962,serialization.PublicFormat.UncompressedPoint)
+    public_key=base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
+    row=PushVapidConfig(id=1,private_key=private_key,public_key=public_key,subject=subject); db.add(row); db.commit(); db.refresh(row)
     return row.private_key,row.public_key,row.subject
 
 def _family_selections(db, user_id):
