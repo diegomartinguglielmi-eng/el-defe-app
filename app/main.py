@@ -159,7 +159,7 @@ def news(db:Session=Depends(get_db)):
     return [{"id":x.id,"title":x.title,"body":x.body,"published_at":x.published_at} for x in rows]
 
 @app.post("/api/news")
-def add_news(payload:NewsIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado"))):
+def add_news(payload:NewsIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","delegado","profe"))):
     n=News(title=payload.title,body=payload.body,author_id=user.id);db.add(n);db.commit();db.refresh(n)
     audit(db,user,"create","news",n.id,payload.title)
     return {"ok":True,"id":n.id}
