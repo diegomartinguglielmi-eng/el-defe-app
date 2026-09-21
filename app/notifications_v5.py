@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+import base64
 from datetime import datetime
 from typing import Optional
 
@@ -10,6 +11,8 @@ from pywebpush import WebPushException, webpush
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, Session, mapped_column
 from sqlalchemy.sql import func
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives import serialization
 
 from .auth import get_current_user, require_roles
 from .db import Base, get_db
@@ -34,6 +37,14 @@ class PushSubscription(Base):
     enabled: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now()); updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
+
+class PushVapidConfig(Base):
+    __tablename__ = "push_vapid_config"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
+    private_key: Mapped[str] = mapped_column(Text)
+    public_key: Mapped[str] = mapped_column(Text)
+    subject: Mapped[str] = mapped_column(String(180), default="mailto:admin@defensores-sl.app")
+
 class UrgentNoticeIn(BaseModel):
     title: str; body: str; competition: Optional[str] = None; category: Optional[str] = None
 class CommunicationNoticeIn(BaseModel):
@@ -42,9 +53,20 @@ class PushKeysIn(BaseModel): p256dh: str; auth: str
 class PushSubscriptionIn(BaseModel):
     endpoint: str; keys: PushKeysIn; followed: list[str] = []
 
-def _vapid_private_key(): return os.getenv("VAPID_PRIVATE_KEY", "").replace("\\n", "\n").strip()
-def _vapid_public_key(): return os.getenv("VAPID_PUBLIC_KEY", "").strip()
-def _vapid_subject(): return os.getenv("VAPID_SUBJECT", "mailto:admin@defensores-sl.app").strip()
+def _env_vapid():
+    return (os.getenv("VAPID_PRIVATE_KEY", "").replace("\\n", "\n").strip(), os.getenv("VAPID_PUBLIC_KEY", "").strip(), os.getenv("VAPID_SUBJECT", "mailto:admin@defensores-sl.app").strip())
+
+def _vapid(db):
+    private_key, public_key, subject = _env_vapid()
+    if private_key and public_key: return private_key, public_key, subject
+    row=db.query(PushVapidConfig).filter(PushVapidConfig.id==1).first()
+    if not row:
+        key=ec.generate_private_key(ec.SECP256R1())
+        private_key=key.private_bytes(serialization.Encoding.PEM,serialization.PrivateFormat.PKCS8,serialization.NoEncryption()).decode()
+        raw=key.public_key().public_bytes(serialization.Encoding.X962,serialization.PublicFormat.UncompressedPoint)
+        public_key=base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
+        row=PushVapidConfig(id=1,private_key=private_key,public_key=public_key,subject=subject); db.add(row); db.commit(); db.refresh(row)
+    return row.private_key,row.public_key,row.subject
 
 def _family_selections(db, user_id):
     if not user_id: return set()
@@ -69,14 +91,13 @@ def _wants(db, sub, event):
 def _push_payload(event): return json.dumps({"id":event.id,"title":event.title,"body":event.body,"urgent":event.urgent,"competition":event.competition,"category":event.category,"match_id":event.match_id,"url":"/el-defe-app/"},ensure_ascii=False)
 
 def deliver_pushes(db, event):
-    private_key=_vapid_private_key(); public_key=_vapid_public_key()
-    if not private_key or not public_key: return {"sent":0,"failed":0,"disabled":0,"eligible":0,"configured":False,"error":"VAPID not configured"}
+    private_key, public_key, subject=_vapid(db)
     rows=db.query(PushSubscription).filter(PushSubscription.enabled==True).all(); sent=disabled=failed=eligible=0; first_error=None
     for sub in rows:
         if not _wants(db,sub,event): continue
         eligible+=1
         try:
-            webpush(subscription_info={"endpoint":sub.endpoint,"keys":{"p256dh":sub.p256dh,"auth":sub.auth}},data=_push_payload(event),vapid_private_key=private_key,vapid_claims={"sub":_vapid_subject()},ttl=60 if event.urgent else 3600); sent+=1
+            webpush(subscription_info={"endpoint":sub.endpoint,"keys":{"p256dh":sub.p256dh,"auth":sub.auth}},data=_push_payload(event),vapid_private_key=private_key,vapid_claims={"sub":subject},ttl=60 if event.urgent else 3600); sent+=1
         except WebPushException as exc:
             failed+=1; status=getattr(getattr(exc,"response",None),"status_code",None); first_error=first_error or f"WebPush {status or 'error'}: {str(exc)[:180]}"
             if status in (404,410): sub.enabled=False; disabled+=1
@@ -91,9 +112,8 @@ def publish_event(db,*,event_type,title,body,competition=None,category=None,matc
 router=APIRouter(prefix="/api/notifications",tags=["Notifications"])
 
 @router.get("/push/public-key")
-def push_public_key():
-    key=_vapid_public_key()
-    if not key: raise HTTPException(status_code=503,detail="Web Push todavía no está configurado")
+def push_public_key(db:Session=Depends(get_db)):
+    _, key, _ = _vapid(db)
     return {"public_key":key}
 
 @router.post("/push/subscribe")
