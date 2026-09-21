@@ -77,6 +77,17 @@ def _wants(db, sub, event):
     if event.urgent: return True
     competition=(event.competition or "").upper().strip(); category=(event.category or "").strip()
     family = _family_selections(db, sub.user_id)
+    assigned=set()
+    if sub.user_id:
+        try:
+            from .models import User
+            sub_user=db.get(User,sub.user_id)
+            if sub_user and sub_user.role == "profe": assigned={x.upper() for x in profe_selections(db,sub_user)}
+        except Exception: assigned=set()
+    if assigned:
+        if competition and category: return f"{competition}|{category}".upper() in assigned
+        if competition: return any(x.startswith(f"{competition}|") for x in assigned)
+        return True
     if family:
         if competition and category: return f"{competition}|{category}".upper() in family
         if competition: return any(x.startswith(f"{competition}|") for x in family)
