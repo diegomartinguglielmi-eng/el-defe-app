@@ -1,6 +1,6 @@
 {
   "club": "DEF. DE SANTOS LUGARES",
-  "actualizado": "2026-09-21T16:30:23.949Z",
+  "actualizado": "2026-09-21T20:28:34.705Z",
   "ligas": [
     {
       "id": "fefi",
@@ -8,7 +8,7 @@
       "torneo": "Clausura 2026 · Zona H",
       "fuente": "https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/",
       "conectada": true,
-      "actualizado": "2026-09-21T16:30:27.543Z",
+      "actualizado": "2026-09-21T20:28:37.746Z",
       "categorias": [
         "2013",
         "2014",
@@ -273,7 +273,42 @@
           "fecha": "2026-09-19",
           "rival": "LAMADRID",
           "local": false,
-          "sede": "DESAGUADERO 3180, C.A.B.A."
+          "sede": "DESAGUADERO 3180, C.A.B.A.",
+          "marc": {
+            "2013": [
+              1,
+              3
+            ],
+            "2014": [
+              6,
+              2
+            ],
+            "2015": [
+              7,
+              1
+            ],
+            "2016": [
+              2,
+              4
+            ],
+            "2017": [
+              0,
+              4
+            ],
+            "2018": [
+              3,
+              1
+            ],
+            "2019": [
+              4,
+              1
+            ]
+          },
+          "pts": [
+            15,
+            13
+          ],
+          "estado": "previo"
         },
         {
           "nro": 8,
@@ -336,30 +371,46 @@
         "2013": [
           {
             "equipo": "BOYA - C. A. I.",
-            "pj": 6,
-            "g": 5,
+            "pj": 7,
+            "g": 6,
             "e": 1,
             "p": 0,
+            "pts": 20
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 7,
+            "g": 4,
+            "e": 2,
+            "p": 1,
             "pts": 17
           },
           {
             "equipo": "NOLTING",
-            "pj": 6,
+            "pj": 7,
             "g": 4,
             "e": 1,
-            "p": 1,
-            "pts": 15
+            "p": 2,
+            "pts": 16
           },
           {
             "equipo": "C. S. D. ARGENTINO \"1\"",
-            "pj": 6,
+            "pj": 7,
             "g": 4,
             "e": 0,
-            "p": 2,
-            "pts": 14
+            "p": 3,
+            "pts": 15
           },
           {
-            "equipo": "CNEL. BRANDSEN",
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 7,
+            "g": 4,
+            "e": 0,
+            "p": 3,
+            "pts": 15
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
             "pj": 6,
             "g": 3,
             "e": 2,
@@ -375,11 +426,27 @@
             "pts": 14
           },
           {
+            "equipo": "LAMADRID",
+            "pj": 7,
+            "g": 3,
+            "e": 1,
+            "p": 3,
+            "pts": 14
+          },
+          {
             "equipo": "ALVEAR",
             "pj": 6,
             "g": 2,
             "e": 3,
             "p": 1,
+            "pts": 13
+          },
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 7,
+            "g": 3,
+            "e": 0,
+            "p": 4,
             "pts": 13
           },
           {
@@ -391,30 +458,6 @@
             "pts": 12
           },
           {
-            "equipo": "DEF. DE SANTOS LUGARES",
-            "pj": 6,
-            "g": 3,
-            "e": 0,
-            "p": 3,
-            "pts": 12
-          },
-          {
-            "equipo": "DEFENSORES DE HAEDO",
-            "pj": 6,
-            "g": 3,
-            "e": 0,
-            "p": 3,
-            "pts": 12
-          },
-          {
-            "equipo": "A DOS TOQUES F. C.",
-            "pj": 5,
-            "g": 2,
-            "e": 2,
-            "p": 1,
-            "pts": 11
-          },
-          {
             "equipo": "FRANJA DE ORO 1",
             "pj": 6,
             "g": 2,
@@ -423,16 +466,8 @@
             "pts": 11
           },
           {
-            "equipo": "LAMADRID",
-            "pj": 6,
-            "g": 2,
-            "e": 1,
-            "p": 3,
-            "pts": 11
-          },
-          {
             "equipo": "ESTRADA 2",
-            "pj": 6,
+            "pj": 7,
             "g": 2,
             "e": 0,
             "p": 4,
@@ -456,7 +491,7 @@
           },
           {
             "equipo": "EL FORTIN DE BELGRANO",
-            "pj": 6,
+            "pj": 7,
             "g": 0,
             "e": 0,
             "p": 0,
@@ -474,11 +509,27 @@
           },
           {
             "equipo": "NOLTING",
-            "pj": 6,
+            "pj": 7,
             "g": 5,
             "e": 1,
-            "p": 0,
-            "pts": 17
+            "p": 1,
+            "pts": 18
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 7,
+            "g": 5,
+            "e": 1,
+            "p": 1,
+            "pts": 18
+          },
+          {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 7,
+            "g": 3,
+            "e": 3,
+            "p": 1,
+            "pts": 16
           },
           {
             "equipo": "FRANJA DE ORO 1",
@@ -489,12 +540,28 @@
             "pts": 15
           },
           {
-            "equipo": "CNEL. BRANDSEN",
-            "pj": 6,
-            "g": 4,
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 7,
+            "g": 3,
             "e": 1,
-            "p": 1,
-            "pts": 15
+            "p": 3,
+            "pts": 14
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 7,
+            "g": 3,
+            "e": 0,
+            "p": 4,
+            "pts": 13
+          },
+          {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 6,
+            "g": 3,
+            "e": 1,
+            "p": 2,
+            "pts": 13
           },
           {
             "equipo": "ALVEAR",
@@ -505,52 +572,20 @@
             "pts": 13
           },
           {
-            "equipo": "DEF. DE SANTOS LUGARES",
-            "pj": 6,
-            "g": 2,
-            "e": 3,
-            "p": 1,
+            "equipo": "ESTRADA 2",
+            "pj": 7,
+            "g": 3,
+            "e": 0,
+            "p": 4,
             "pts": 13
           },
           {
-            "equipo": "ESTRADA 2",
-            "pj": 6,
-            "g": 3,
-            "e": 0,
-            "p": 3,
-            "pts": 12
-          },
-          {
-            "equipo": "C. S. D. ARGENTINO \"1\"",
-            "pj": 6,
-            "g": 2,
-            "e": 1,
-            "p": 3,
-            "pts": 11
-          },
-          {
             "equipo": "DEFENSORES DE HAEDO",
-            "pj": 5,
+            "pj": 6,
             "g": 2,
             "e": 2,
-            "p": 1,
-            "pts": 11
-          },
-          {
-            "equipo": "BOYA - C. A. I.",
-            "pj": 6,
-            "g": 2,
-            "e": 0,
-            "p": 4,
-            "pts": 10
-          },
-          {
-            "equipo": "A DOS TOQUES F. C.",
-            "pj": 5,
-            "g": 2,
-            "e": 1,
             "p": 2,
-            "pts": 10
+            "pts": 12
           },
           {
             "equipo": "GIMNASIA",
@@ -561,19 +596,19 @@
             "pts": 9
           },
           {
+            "equipo": "LAMADRID",
+            "pj": 7,
+            "g": 1,
+            "e": 0,
+            "p": 6,
+            "pts": 9
+          },
+          {
             "equipo": "C. A. CENTENARIO S. M.",
             "pj": 5,
             "g": 1,
             "e": 1,
             "p": 3,
-            "pts": 8
-          },
-          {
-            "equipo": "LAMADRID",
-            "pj": 6,
-            "g": 1,
-            "e": 0,
-            "p": 5,
             "pts": 8
           },
           {
@@ -586,7 +621,7 @@
           },
           {
             "equipo": "EL FORTIN DE BELGRANO",
-            "pj": 6,
+            "pj": 7,
             "g": 1,
             "e": 0,
             "p": 3,
@@ -596,19 +631,19 @@
         "2015": [
           {
             "equipo": "DEF. DE SANTOS LUGARES",
-            "pj": 6,
-            "g": 6,
+            "pj": 7,
+            "g": 7,
             "e": 0,
             "p": 0,
-            "pts": 18
+            "pts": 21
           },
           {
             "equipo": "NOLTING",
-            "pj": 6,
-            "g": 5,
+            "pj": 7,
+            "g": 6,
             "e": 0,
             "p": 1,
-            "pts": 16
+            "pts": 19
           },
           {
             "equipo": "EL TREBOL",
@@ -619,23 +654,31 @@
             "pts": 15
           },
           {
-            "equipo": "BOYA - C. A. I.",
-            "pj": 6,
-            "g": 3,
-            "e": 1,
-            "p": 2,
-            "pts": 13
-          },
-          {
-            "equipo": "ALVEAR",
-            "pj": 5,
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 7,
             "g": 4,
             "e": 0,
-            "p": 1,
-            "pts": 13
+            "p": 3,
+            "pts": 15
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 7,
+            "g": 3,
+            "e": 1,
+            "p": 3,
+            "pts": 14
           },
           {
             "equipo": "DEFENSORES DE HAEDO",
+            "pj": 6,
+            "g": 4,
+            "e": 0,
+            "p": 2,
+            "pts": 14
+          },
+          {
+            "equipo": "ALVEAR",
             "pj": 5,
             "g": 4,
             "e": 0,
@@ -651,12 +694,12 @@
             "pts": 13
           },
           {
-            "equipo": "C. S. D. ARGENTINO \"1\"",
-            "pj": 6,
-            "g": 3,
-            "e": 0,
-            "p": 3,
-            "pts": 12
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "pts": 10
           },
           {
             "equipo": "GIMNASIA",
@@ -691,31 +734,23 @@
             "pts": 9
           },
           {
-            "equipo": "A DOS TOQUES F. C.",
-            "pj": 4,
-            "g": 1,
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 6,
+            "g": 0,
             "e": 1,
-            "p": 2,
+            "p": 5,
             "pts": 7
           },
           {
-            "equipo": "EL FORTIN DE BELGRANO",
-            "pj": 5,
+            "equipo": "LAMADRID",
+            "pj": 6,
             "g": 0,
-            "e": 1,
-            "p": 4,
+            "e": 0,
+            "p": 6,
             "pts": 6
           },
           {
             "equipo": "ATLETICO LUGANO",
-            "pj": 5,
-            "g": 0,
-            "e": 0,
-            "p": 5,
-            "pts": 5
-          },
-          {
-            "equipo": "LAMADRID",
             "pj": 5,
             "g": 0,
             "e": 0,
@@ -726,11 +761,19 @@
         "2016": [
           {
             "equipo": "DEFENSORES DE HAEDO",
-            "pj": 5,
-            "g": 5,
+            "pj": 6,
+            "g": 6,
             "e": 0,
             "p": 0,
-            "pts": 15
+            "pts": 18
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 7,
+            "g": 5,
+            "e": 0,
+            "p": 2,
+            "pts": 17
           },
           {
             "equipo": "C. A. CENTENARIO S. M.",
@@ -741,20 +784,20 @@
             "pts": 15
           },
           {
-            "equipo": "NOLTING",
+            "equipo": "LAMADRID",
             "pj": 6,
             "g": 4,
-            "e": 0,
-            "p": 2,
-            "pts": 14
+            "e": 1,
+            "p": 1,
+            "pts": 15
           },
           {
             "equipo": "BOYA - C. A. I.",
-            "pj": 6,
+            "pj": 7,
             "g": 3,
             "e": 1,
-            "p": 2,
-            "pts": 13
+            "p": 3,
+            "pts": 14
           },
           {
             "equipo": "FRANJA DE ORO 1",
@@ -765,11 +808,11 @@
             "pts": 13
           },
           {
-            "equipo": "LAMADRID",
-            "pj": 5,
-            "g": 3,
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 7,
+            "g": 2,
             "e": 1,
-            "p": 1,
+            "p": 4,
             "pts": 12
           },
           {
@@ -781,11 +824,11 @@
             "pts": 11
           },
           {
-            "equipo": "C. S. D. ARGENTINO \"1\"",
-            "pj": 6,
-            "g": 2,
-            "e": 1,
-            "p": 3,
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 7,
+            "g": 1,
+            "e": 2,
+            "p": 4,
             "pts": 11
           },
           {
@@ -794,14 +837,6 @@
             "g": 2,
             "e": 1,
             "p": 2,
-            "pts": 10
-          },
-          {
-            "equipo": "DEF. DE SANTOS LUGARES",
-            "pj": 6,
-            "g": 1,
-            "e": 2,
-            "p": 3,
             "pts": 10
           },
           {
@@ -829,49 +864,57 @@
             "pts": 9
           },
           {
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 5,
+            "g": 1,
+            "e": 1,
+            "p": 3,
+            "pts": 8
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 6,
+            "g": 0,
+            "e": 2,
+            "p": 4,
+            "pts": 8
+          },
+          {
             "equipo": "EL TREBOL",
             "pj": 5,
             "g": 0,
             "e": 2,
             "p": 3,
             "pts": 7
-          },
-          {
-            "equipo": "EL FORTIN DE BELGRANO",
-            "pj": 5,
-            "g": 0,
-            "e": 2,
-            "p": 3,
-            "pts": 7
-          },
-          {
-            "equipo": "A DOS TOQUES F. C.",
-            "pj": 4,
-            "g": 0,
-            "e": 1,
-            "p": 3,
-            "pts": 5
           }
         ],
         "2017": [
           {
-            "equipo": "ATLETICO LUGANO",
-            "pj": 5,
-            "g": 5,
-            "e": 0,
-            "p": 0,
-            "pts": 15
-          },
-          {
             "equipo": "LAMADRID",
-            "pj": 5,
-            "g": 5,
+            "pj": 6,
+            "g": 6,
             "e": 0,
             "p": 0,
-            "pts": 15
+            "pts": 18
           },
           {
             "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 6,
+            "g": 6,
+            "e": 0,
+            "p": 0,
+            "pts": 18
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 7,
+            "g": 4,
+            "e": 1,
+            "p": 2,
+            "pts": 16
+          },
+          {
+            "equipo": "ATLETICO LUGANO",
             "pj": 5,
             "g": 5,
             "e": 0,
@@ -887,28 +930,28 @@
             "pts": 14
           },
           {
-            "equipo": "BOYA - C. A. I.",
-            "pj": 6,
-            "g": 3,
-            "e": 1,
-            "p": 2,
-            "pts": 13
-          },
-          {
             "equipo": "DEF. DE SANTOS LUGARES",
-            "pj": 6,
+            "pj": 7,
             "g": 3,
             "e": 1,
-            "p": 2,
-            "pts": 13
+            "p": 3,
+            "pts": 14
           },
           {
             "equipo": "ESTRADA 2",
-            "pj": 6,
+            "pj": 7,
             "g": 3,
             "e": 1,
-            "p": 2,
-            "pts": 13
+            "p": 3,
+            "pts": 14
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 7,
+            "g": 3,
+            "e": 1,
+            "p": 3,
+            "pts": 14
           },
           {
             "equipo": "ALVEAR",
@@ -919,11 +962,11 @@
             "pts": 11
           },
           {
-            "equipo": "C. S. D. ARGENTINO \"1\"",
-            "pj": 6,
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 7,
             "g": 2,
-            "e": 1,
-            "p": 3,
+            "e": 0,
+            "p": 5,
             "pts": 11
           },
           {
@@ -936,22 +979,22 @@
           },
           {
             "equipo": "NOLTING",
-            "pj": 6,
+            "pj": 7,
             "g": 1,
             "e": 1,
-            "p": 4,
-            "pts": 9
+            "p": 5,
+            "pts": 10
           },
           {
             "equipo": "DEFENSORES DE HAEDO",
-            "pj": 5,
+            "pj": 6,
             "g": 2,
             "e": 0,
-            "p": 3,
-            "pts": 9
+            "p": 4,
+            "pts": 10
           },
           {
-            "equipo": "CNEL. BRANDSEN",
+            "equipo": "A DOS TOQUES F. C.",
             "pj": 6,
             "g": 1,
             "e": 0,
@@ -965,14 +1008,6 @@
             "e": 1,
             "p": 3,
             "pts": 8
-          },
-          {
-            "equipo": "A DOS TOQUES F. C.",
-            "pj": 5,
-            "g": 1,
-            "e": 0,
-            "p": 4,
-            "pts": 7
           },
           {
             "equipo": "GIMNASIA",
@@ -985,6 +1020,30 @@
         ],
         "2018": [
           {
+            "equipo": "DEF. DE SANTOS LUGARES",
+            "pj": 7,
+            "g": 6,
+            "e": 1,
+            "p": 0,
+            "pts": 20
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 7,
+            "g": 6,
+            "e": 1,
+            "p": 0,
+            "pts": 20
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 7,
+            "g": 5,
+            "e": 1,
+            "p": 1,
+            "pts": 18
+          },
+          {
             "equipo": "FRANJA DE ORO 1",
             "pj": 6,
             "g": 5,
@@ -993,28 +1052,12 @@
             "pts": 17
           },
           {
-            "equipo": "DEF. DE SANTOS LUGARES",
-            "pj": 6,
-            "g": 5,
-            "e": 1,
-            "p": 0,
-            "pts": 17
-          },
-          {
-            "equipo": "EL FORTIN DE BELGRANO",
-            "pj": 6,
-            "g": 5,
-            "e": 1,
-            "p": 0,
-            "pts": 17
-          },
-          {
-            "equipo": "C. S. D. ARGENTINO \"1\"",
-            "pj": 6,
+            "equipo": "NOLTING",
+            "pj": 7,
             "g": 4,
-            "e": 1,
+            "e": 2,
             "p": 1,
-            "pts": 15
+            "pts": 17
           },
           {
             "equipo": "GIMNASIA",
@@ -1025,20 +1068,12 @@
             "pts": 14
           },
           {
-            "equipo": "NOLTING",
-            "pj": 6,
-            "g": 3,
-            "e": 2,
-            "p": 1,
-            "pts": 14
-          },
-          {
             "equipo": "LAMADRID",
-            "pj": 6,
+            "pj": 7,
             "g": 3,
             "e": 1,
-            "p": 2,
-            "pts": 13
+            "p": 3,
+            "pts": 14
           },
           {
             "equipo": "ALVEAR",
@@ -1057,12 +1092,20 @@
             "pts": 12
           },
           {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 7,
+            "g": 2,
+            "e": 1,
+            "p": 4,
+            "pts": 12
+          },
+          {
             "equipo": "BOYA - C. A. I.",
-            "pj": 6,
+            "pj": 7,
             "g": 1,
             "e": 2,
-            "p": 3,
-            "pts": 10
+            "p": 4,
+            "pts": 11
           },
           {
             "equipo": "EL TREBOL",
@@ -1073,36 +1116,28 @@
             "pts": 10
           },
           {
-            "equipo": "CNEL. BRANDSEN",
-            "pj": 6,
+            "equipo": "ESTRADA 2",
+            "pj": 7,
             "g": 1,
-            "e": 1,
-            "p": 4,
+            "e": 0,
+            "p": 6,
             "pts": 9
           },
           {
-            "equipo": "ESTRADA 2",
-            "pj": 6,
-            "g": 1,
-            "e": 0,
-            "p": 5,
-            "pts": 8
-          },
-          {
             "equipo": "DEFENSORES DE HAEDO",
-            "pj": 6,
+            "pj": 7,
             "g": 0,
             "e": 2,
-            "p": 4,
-            "pts": 8
+            "p": 5,
+            "pts": 9
           },
           {
             "equipo": "A DOS TOQUES F. C.",
-            "pj": 5,
+            "pj": 6,
             "g": 0,
             "e": 1,
-            "p": 4,
-            "pts": 6
+            "p": 5,
+            "pts": 7
           },
           {
             "equipo": "C. A. CENTENARIO S. M.",
@@ -1116,19 +1151,35 @@
         "2019": [
           {
             "equipo": "DEF. DE SANTOS LUGARES",
-            "pj": 6,
-            "g": 5,
+            "pj": 7,
+            "g": 6,
             "e": 1,
             "p": 0,
-            "pts": 17
+            "pts": 20
           },
           {
             "equipo": "C. S. D. ARGENTINO \"1\"",
-            "pj": 6,
-            "g": 5,
+            "pj": 7,
+            "g": 6,
             "e": 1,
             "p": 0,
-            "pts": 17
+            "pts": 20
+          },
+          {
+            "equipo": "NOLTING",
+            "pj": 7,
+            "g": 6,
+            "e": 0,
+            "p": 1,
+            "pts": 19
+          },
+          {
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 7,
+            "g": 6,
+            "e": 0,
+            "p": 1,
+            "pts": 19
           },
           {
             "equipo": "FRANJA DE ORO 1",
@@ -1139,31 +1190,15 @@
             "pts": 16
           },
           {
-            "equipo": "NOLTING",
-            "pj": 6,
-            "g": 5,
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 7,
+            "g": 4,
             "e": 0,
-            "p": 1,
-            "pts": 16
-          },
-          {
-            "equipo": "EL FORTIN DE BELGRANO",
-            "pj": 6,
-            "g": 5,
-            "e": 0,
-            "p": 1,
-            "pts": 16
+            "p": 3,
+            "pts": 15
           },
           {
             "equipo": "GIMNASIA",
-            "pj": 6,
-            "g": 4,
-            "e": 0,
-            "p": 2,
-            "pts": 14
-          },
-          {
-            "equipo": "DEFENSORES DE HAEDO",
             "pj": 6,
             "g": 4,
             "e": 0,
@@ -1196,27 +1231,35 @@
           },
           {
             "equipo": "LAMADRID",
-            "pj": 6,
+            "pj": 7,
+            "g": 1,
+            "e": 1,
+            "p": 5,
+            "pts": 10
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 7,
+            "g": 1,
+            "e": 0,
+            "p": 6,
+            "pts": 9
+          },
+          {
+            "equipo": "ESTRADA 2",
+            "pj": 7,
+            "g": 1,
+            "e": 0,
+            "p": 6,
+            "pts": 9
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 7,
             "g": 1,
             "e": 1,
             "p": 4,
             "pts": 9
-          },
-          {
-            "equipo": "BOYA - C. A. I.",
-            "pj": 6,
-            "g": 1,
-            "e": 0,
-            "p": 5,
-            "pts": 8
-          },
-          {
-            "equipo": "CNEL. BRANDSEN",
-            "pj": 6,
-            "g": 1,
-            "e": 1,
-            "p": 3,
-            "pts": 8
           },
           {
             "equipo": "C. A. CENTENARIO S. M.",
@@ -1227,38 +1270,46 @@
             "pts": 7
           },
           {
-            "equipo": "ESTRADA 2",
+            "equipo": "A DOS TOQUES F. C.",
             "pj": 6,
             "g": 0,
             "e": 0,
-            "p": 6,
-            "pts": 6
-          },
-          {
-            "equipo": "A DOS TOQUES F. C.",
-            "pj": 5,
-            "g": 0,
-            "e": 0,
-            "p": 4,
-            "pts": 4
+            "p": 5,
+            "pts": 5
           }
         ],
         "general": [
           {
             "equipo": "NOLTING",
-            "pj": 42,
-            "g": 27,
+            "pj": 49,
+            "g": 31,
             "e": 5,
-            "p": 10,
-            "pts": 101
+            "p": 13,
+            "pts": 116
           },
           {
             "equipo": "DEF. DE SANTOS LUGARES",
-            "pj": 42,
-            "g": 25,
+            "pj": 49,
+            "g": 29,
             "e": 8,
-            "p": 9,
-            "pts": 100
+            "p": 12,
+            "pts": 115
+          },
+          {
+            "equipo": "C. S. D. ARGENTINO \"1\"",
+            "pj": 49,
+            "g": 27,
+            "e": 5,
+            "p": 17,
+            "pts": 108
+          },
+          {
+            "equipo": "BOYA - C. A. I.",
+            "pj": 49,
+            "g": 21,
+            "e": 6,
+            "p": 22,
+            "pts": 97
           },
           {
             "equipo": "FRANJA DE ORO 1",
@@ -1269,12 +1320,28 @@
             "pts": 95
           },
           {
-            "equipo": "C. S. D. ARGENTINO \"1\"",
-            "pj": 42,
+            "equipo": "DEFENSORES DE HAEDO",
+            "pj": 45,
             "g": 22,
-            "e": 5,
-            "p": 15,
-            "pts": 91
+            "e": 4,
+            "p": 19,
+            "pts": 93
+          },
+          {
+            "equipo": "CNEL. BRANDSEN",
+            "pj": 47,
+            "g": 18,
+            "e": 7,
+            "p": 21,
+            "pts": 89
+          },
+          {
+            "equipo": "LAMADRID",
+            "pj": 46,
+            "g": 18,
+            "e": 4,
+            "p": 24,
+            "pts": 86
           },
           {
             "equipo": "ALVEAR",
@@ -1285,14 +1352,6 @@
             "pts": 85
           },
           {
-            "equipo": "BOYA - C. A. I.",
-            "pj": 42,
-            "g": 18,
-            "e": 6,
-            "p": 18,
-            "pts": 84
-          },
-          {
             "equipo": "EL TREBOL",
             "pj": 40,
             "g": 20,
@@ -1301,28 +1360,20 @@
             "pts": 84
           },
           {
-            "equipo": "DEFENSORES DE HAEDO",
-            "pj": 38,
-            "g": 20,
+            "equipo": "EL FORTIN DE BELGRANO",
+            "pj": 46,
+            "g": 19,
             "e": 4,
-            "p": 14,
-            "pts": 82
+            "p": 13,
+            "pts": 78
           },
           {
-            "equipo": "CNEL. BRANDSEN",
-            "pj": 42,
-            "g": 14,
-            "e": 7,
-            "p": 20,
-            "pts": 76
-          },
-          {
-            "equipo": "LAMADRID",
-            "pj": 39,
-            "g": 15,
-            "e": 4,
-            "p": 20,
-            "pts": 73
+            "equipo": "ESTRADA 2",
+            "pj": 47,
+            "g": 13,
+            "e": 2,
+            "p": 31,
+            "pts": 74
           },
           {
             "equipo": "GIMNASIA",
@@ -1333,14 +1384,6 @@
             "pts": 69
           },
           {
-            "equipo": "ESTRADA 2",
-            "pj": 42,
-            "g": 12,
-            "e": 2,
-            "p": 28,
-            "pts": 68
-          },
-          {
             "equipo": "C. A. CENTENARIO S. M.",
             "pj": 35,
             "g": 14,
@@ -1349,12 +1392,12 @@
             "pts": 67
           },
           {
-            "equipo": "EL FORTIN DE BELGRANO",
-            "pj": 39,
-            "g": 16,
-            "e": 4,
-            "p": 11,
-            "pts": 67
+            "equipo": "A DOS TOQUES F. C.",
+            "pj": 40,
+            "g": 10,
+            "e": 6,
+            "p": 23,
+            "pts": 65
           },
           {
             "equipo": "ATLETICO LUGANO",
@@ -1363,14 +1406,6 @@
             "e": 3,
             "p": 19,
             "pts": 58
-          },
-          {
-            "equipo": "A DOS TOQUES F. C.",
-            "pj": 33,
-            "g": 6,
-            "e": 6,
-            "p": 20,
-            "pts": 50
           }
         ]
       }
@@ -1382,7 +1417,7 @@
       "torneo": "Junior A · Torneo 2026",
       "fuente": "https://www.futsalargentina.com.ar/fixture.php?cat=1_1",
       "conectada": true,
-      "actualizado": "2026-09-21T16:29:59.120Z",
+      "actualizado": "2026-09-21T20:28:14.630Z",
       "categorias": [
         "Junior A"
       ],
@@ -1512,7 +1547,7 @@
       "torneo": "Argenliga A · Zona 1 · 2026",
       "fuente": "https://www.sofascore.com/es-la/futsal/team/defensores-de-santos-lugares/1214864",
       "conectada": true,
-      "actualizado": "2026-09-21T16:30:23.949Z",
+      "actualizado": "2026-09-21T20:28:34.705Z",
       "categorias": [
         "Primera"
       ],
@@ -1811,7 +1846,7 @@
           }
         ]
       },
-      "error": "403 en https://api.sofascore.com/api/v1/unique-tournament/34170/seasons",
+      "error": "403 en https://api.sofascore.com/api/v1/team/1214864/events/next/0",
       "disciplina": "Futsal",
       "partidos": [
         {
@@ -1890,7 +1925,7 @@
       "torneo": "Masculino · Elite I | Femenino · Ascenso I · Zona B · Reserva",
       "fuente": "https://www.laamba.ar/torneoslaamba/masculino/m-elite-i/1ra/torneo/m-eliteiclausura/?db=2026",
       "conectada": true,
-      "actualizado": "2026-09-21T16:30:18.037Z",
+      "actualizado": "2026-09-21T20:28:30.017Z",
       "categorias": [
         "1RA",
         "3RA",
@@ -3637,9 +3672,9 @@
           "sede": null,
           "fechaTexto": null,
           "hora": null,
-          "gf": null,
-          "gc": null,
-          "jugado": false,
+          "gf": 2,
+          "gc": 6,
+          "jugado": true,
           "fuente": "https://www.laamba.ar/torneoslaamba/femenino/f-ascenso-i-zona-b/reserva/torneo/f-ascensoi-zonab/?db=2026"
         },
         {
@@ -4806,40 +4841,49 @@
             "dg": 7
           },
           {
-            "equipo": "Ituzaingo",
+            "equipo": "Deportivo La Boca",
+            "pts": 7,
+            "pj": 5,
+            "g": 2,
+            "e": 1,
+            "p": 2,
+            "dg": 5
+          },
+          {
+            "equipo": "Club Saenz Peña",
             "pts": 7,
             "pj": 3,
             "g": 2,
             "e": 1,
             "p": 0,
-            "dg": 9
+            "dg": 5
+          },
+          {
+            "equipo": "Ituzaingo",
+            "pts": 7,
+            "pj": 4,
+            "g": 2,
+            "e": 1,
+            "p": 1,
+            "dg": -1
+          },
+          {
+            "equipo": "Estrada de Almagro",
+            "pts": 6,
+            "pj": 3,
+            "g": 2,
+            "e": 0,
+            "p": 1,
+            "dg": 21
           },
           {
             "equipo": "Defensores de SL",
             "pts": 6,
-            "pj": 2,
+            "pj": 3,
             "g": 2,
             "e": 0,
-            "p": 0,
-            "dg": 6
-          },
-          {
-            "equipo": "Club Saenz Peña",
-            "pts": 6,
-            "pj": 2,
-            "g": 2,
-            "e": 0,
-            "p": 0,
-            "dg": 5
-          },
-          {
-            "equipo": "Deportivo La Boca",
-            "pts": 4,
-            "pj": 4,
-            "g": 1,
-            "e": 1,
-            "p": 2,
-            "dg": 1
+            "p": 1,
+            "dg": 2
           },
           {
             "equipo": "San Andres Futsal",
@@ -4849,15 +4893,6 @@
             "e": 1,
             "p": 1,
             "dg": 0
-          },
-          {
-            "equipo": "Estrada de Almagro",
-            "pts": 3,
-            "pj": 2,
-            "g": 1,
-            "e": 0,
-            "p": 1,
-            "dg": 11
           },
           {
             "equipo": "Union Italiana",
@@ -4870,10 +4905,10 @@
           },
           {
             "equipo": "Deportivo Vedia",
-            "pts": 2,
-            "pj": 4,
+            "pts": 3,
+            "pj": 5,
             "g": 0,
-            "e": 2,
+            "e": 3,
             "p": 2,
             "dg": -4
           },
@@ -4917,30 +4952,30 @@
         "FEM RVA": [
           {
             "equipo": "Deportivo Vedia",
-            "pj": 4,
-            "g": 4,
+            "pj": 5,
+            "g": 5,
             "e": 0,
             "p": 0,
-            "dg": 18,
-            "pts": 12
-          },
-          {
-            "equipo": "Ituzaingo",
-            "pj": 3,
-            "g": 2,
-            "e": 0,
-            "p": 1,
-            "dg": 5,
-            "pts": 6
+            "dg": 20,
+            "pts": 15
           },
           {
             "equipo": "Deportivo La Boca",
-            "pj": 4,
-            "g": 2,
+            "pj": 5,
+            "g": 3,
             "e": 0,
             "p": 2,
-            "dg": 4,
-            "pts": 6
+            "dg": 8,
+            "pts": 9
+          },
+          {
+            "equipo": "Ituzaingo",
+            "pj": 4,
+            "g": 3,
+            "e": 0,
+            "p": 1,
+            "dg": 8,
+            "pts": 9
           },
           {
             "equipo": "Pampa FC",
@@ -4980,20 +5015,20 @@
           },
           {
             "equipo": "Club Saenz Peña",
-            "pj": 2,
+            "pj": 3,
             "g": 1,
             "e": 0,
-            "p": 1,
-            "dg": 2,
+            "p": 2,
+            "dg": 0,
             "pts": 3
           },
           {
             "equipo": "Defensores de SL",
-            "pj": 2,
+            "pj": 3,
             "g": 1,
             "e": 0,
-            "p": 1,
-            "dg": -1,
+            "p": 2,
+            "dg": -5,
             "pts": 3
           },
           {
@@ -5016,11 +5051,11 @@
           },
           {
             "equipo": "Estrada de Almagro",
-            "pj": 2,
+            "pj": 3,
             "g": 0,
             "e": 0,
-            "p": 2,
-            "dg": -6,
+            "p": 3,
+            "dg": -9,
             "pts": 0
           },
           {
@@ -5279,8 +5314,16 @@
         "round_name": "Fecha 6",
         "home": "NOLTING",
         "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 3,
+        "away_score": 5,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 7",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "CLUB DEF. DE BELGRANO",
         "home_score": 5,
-        "away_score": 3,
+        "away_score": 2,
         "status": ""
       }
     ],
@@ -5369,6 +5412,14 @@
     "posicionesClausura": [
       {
         "equipo": "MIRIÑAQUE",
+        "pj": 7,
+        "g": 6,
+        "e": 0,
+        "p": 1,
+        "pts": 19
+      },
+      {
+        "equipo": "ESTUDIANTES",
         "pj": 6,
         "g": 5,
         "e": 0,
@@ -5376,15 +5427,23 @@
         "pts": 16
       },
       {
-        "equipo": "ESTUDIANTES",
-        "pj": 5,
-        "g": 4,
+        "equipo": "DEF. DE SANTOS LUGARES",
+        "pj": 6,
+        "g": 5,
         "e": 0,
         "p": 1,
-        "pts": 13
+        "pts": 16
       },
       {
         "equipo": "REAL CELINA",
+        "pj": 7,
+        "g": 3,
+        "e": 0,
+        "p": 4,
+        "pts": 13
+      },
+      {
+        "equipo": "CLUB DEF. DE BELGRANO",
         "pj": 6,
         "g": 3,
         "e": 0,
@@ -5392,15 +5451,7 @@
         "pts": 12
       },
       {
-        "equipo": "CLUB DEF. DE BELGRANO",
-        "pj": 5,
-        "g": 3,
-        "e": 0,
-        "p": 2,
-        "pts": 11
-      },
-      {
-        "equipo": "DEF. DE SANTOS LUGARES",
+        "equipo": "BRISAS DE HAEDO",
         "pj": 5,
         "g": 3,
         "e": 0,
@@ -5409,22 +5460,14 @@
       },
       {
         "equipo": "CLUB PATRIA",
-        "pj": 4,
+        "pj": 5,
         "g": 3,
         "e": 0,
-        "p": 1,
-        "pts": 10
-      },
-      {
-        "equipo": "BRISAS DE HAEDO",
-        "pj": 4,
-        "g": 2,
-        "e": 0,
         "p": 2,
-        "pts": 8
+        "pts": 11
       },
       {
-        "equipo": "NOLTING",
+        "equipo": "AMISTAD \"B\"",
         "pj": 6,
         "g": 1,
         "e": 0,
@@ -5433,19 +5476,19 @@
       },
       {
         "equipo": "SOL DE AMERICA",
-        "pj": 4,
+        "pj": 5,
         "g": 1,
         "e": 0,
-        "p": 3,
-        "pts": 6
+        "p": 4,
+        "pts": 7
       },
       {
-        "equipo": "AMISTAD \"B\"",
-        "pj": 5,
+        "equipo": "NOLTING",
+        "pj": 7,
         "g": 0,
         "e": 0,
-        "p": 5,
-        "pts": 5
+        "p": 7,
+        "pts": 7
       }
     ],
     "resultados": [
@@ -5485,14 +5528,30 @@
         "round_name": "Fecha 6",
         "home": "NOLTING",
         "away": "DEF. DE SANTOS LUGARES",
+        "home_score": 3,
+        "away_score": 5,
+        "status": ""
+      },
+      {
+        "round_name": "Fecha 7",
+        "home": "DEF. DE SANTOS LUGARES",
+        "away": "CLUB DEF. DE BELGRANO",
         "home_score": 5,
-        "away_score": 3,
+        "away_score": 2,
         "status": ""
       }
     ],
     "posiciones": [
       {
         "equipo": "MIRIÑAQUE",
+        "pj": 7,
+        "g": 6,
+        "e": 0,
+        "p": 1,
+        "pts": 19
+      },
+      {
+        "equipo": "ESTUDIANTES",
         "pj": 6,
         "g": 5,
         "e": 0,
@@ -5500,15 +5559,23 @@
         "pts": 16
       },
       {
-        "equipo": "ESTUDIANTES",
-        "pj": 5,
-        "g": 4,
+        "equipo": "DEF. DE SANTOS LUGARES",
+        "pj": 6,
+        "g": 5,
         "e": 0,
         "p": 1,
-        "pts": 13
+        "pts": 16
       },
       {
         "equipo": "REAL CELINA",
+        "pj": 7,
+        "g": 3,
+        "e": 0,
+        "p": 4,
+        "pts": 13
+      },
+      {
+        "equipo": "CLUB DEF. DE BELGRANO",
         "pj": 6,
         "g": 3,
         "e": 0,
@@ -5516,15 +5583,7 @@
         "pts": 12
       },
       {
-        "equipo": "CLUB DEF. DE BELGRANO",
-        "pj": 5,
-        "g": 3,
-        "e": 0,
-        "p": 2,
-        "pts": 11
-      },
-      {
-        "equipo": "DEF. DE SANTOS LUGARES",
+        "equipo": "BRISAS DE HAEDO",
         "pj": 5,
         "g": 3,
         "e": 0,
@@ -5533,22 +5592,14 @@
       },
       {
         "equipo": "CLUB PATRIA",
-        "pj": 4,
+        "pj": 5,
         "g": 3,
         "e": 0,
-        "p": 1,
-        "pts": 10
-      },
-      {
-        "equipo": "BRISAS DE HAEDO",
-        "pj": 4,
-        "g": 2,
-        "e": 0,
         "p": 2,
-        "pts": 8
+        "pts": 11
       },
       {
-        "equipo": "NOLTING",
+        "equipo": "AMISTAD \"B\"",
         "pj": 6,
         "g": 1,
         "e": 0,
@@ -5557,22 +5608,22 @@
       },
       {
         "equipo": "SOL DE AMERICA",
-        "pj": 4,
+        "pj": 5,
         "g": 1,
         "e": 0,
-        "p": 3,
-        "pts": 6
+        "p": 4,
+        "pts": 7
       },
       {
-        "equipo": "AMISTAD \"B\"",
-        "pj": 5,
+        "equipo": "NOLTING",
+        "pj": 7,
         "g": 0,
         "e": 0,
-        "p": 5,
-        "pts": 5
+        "p": 7,
+        "pts": 7
       }
     ],
     "fuente": "https://fefi.com.ar/2026-futbol-sala-mayores-fefi/mayores-b/",
-    "actualizado": "2026-09-21T16:30:23.728Z"
+    "actualizado": "2026-09-21T20:28:34.480Z"
   }
 }
