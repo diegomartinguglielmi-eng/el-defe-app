@@ -164,7 +164,9 @@ def create_communication_notice(payload:CommunicationNoticeIn,db:Session=Depends
     priority=(payload.priority or "Información").strip(); title=payload.title.strip() or "Nueva comunicación"; body=payload.body.strip()
     if not body: raise HTTPException(status_code=400,detail="El mensaje no puede estar vacío")
     event=publish_event(db,event_type="communication",title=title,body=body,competition=payload.competition,category=payload.category,urgent=False); db.commit(); db.refresh(event)
-    return {"ok":True,"id":event.id,"priority":priority,"push":getattr(event,"push_result",None)}
+    push_result=getattr(event,"push_result",None)
+    print(f"[push communication] event={event.id} competition={payload.competition} category={payload.category} result={push_result}", flush=True)
+    return {"ok":True,"id":event.id,"priority":priority,"push":push_result}
 
 @router.post("/urgent")
 def create_urgent_notice(payload:UrgentNoticeIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","profe","delegado"))):
