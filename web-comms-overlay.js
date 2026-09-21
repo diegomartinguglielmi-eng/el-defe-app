@@ -13,7 +13,7 @@
  const isAdmin=()=>adminState||visibleAdmin()||tokenRole()==='admin'||!!document.querySelector('[data-defe-users-button]');
  const isProfe=()=>document.documentElement.dataset.defeRole==='profe'||tokenRole()==='profe'||!!document.querySelector('[data-profe-dashboard]')||!!document.querySelector('[data-profe-dash-com]')||sessionStorage.getItem('defe_profe_active')==='1';
  const canPublish=()=>isAdmin()||isProfe();
- window.DefeComms={...(window.DefeComms||{}),setProfe:()=>sessionStorage.setItem('defe_profe_active','1')};
+ window.DefeComms={...(window.DefeComms||{}),setProfe:()=>sessionStorage.setItem('defe_profe_active','1'),openInbox:()=>openInbox()};
  const reads=()=>{try{return new Set(JSON.parse(localStorage.getItem(READ)||'[]'))}catch{return new Set}}; const saveReads=x=>localStorage.setItem(READ,JSON.stringify([...x]));
  function profileText(){const parts=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||k.includes('token')||k.includes('session')||k.includes('comunicaciones'))continue;const v=localStorage.getItem(k);if(v&&v.length<12000)parts.push(k+' '+v)}try{const u=JSON.parse(localStorage.getItem('defe_user')||'null');if(u)parts.push(JSON.stringify(u))}catch(_){}return norm(parts.join(' '))}
  function profileMatches(target){if(isAdmin())return true;if(!target||target.scope==='club')return true;const p=profileText();const vals=[target.discipline,target.competition,target.category].filter(Boolean).map(norm);return vals.every(v=>p.includes(v))}
