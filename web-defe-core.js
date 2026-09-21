@@ -11,6 +11,9 @@ function token(){
   const direct=jwt(localStorage.getItem(TOKEN_KEY))||jwt(sessionStorage.getItem(TOKEN_KEY));
   if(direct)return direct;
   for(const st of [localStorage,sessionStorage]){try{const o=JSON.parse(st.getItem(SESSION_KEY)||'null');const t=jwt(o&&o.token);if(t)return t}catch(_){}}
+  // Legacy/base UI may persist the active JWT under a different key.
+  // Match the auth overlay behavior so every role-aware request uses the same session.
+  for(const st of [localStorage,sessionStorage])for(let i=0;i<st.length;i++){const t=jwt(st.getItem(st.key(i)));if(t)return t}
   return '';
 }
 async function api(path,init={}){
