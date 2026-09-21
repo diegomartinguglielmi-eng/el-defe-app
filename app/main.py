@@ -114,10 +114,28 @@ def register(payload:UserCreate,db:Session=Depends(get_db)):
     if not first or not last: raise HTTPException(status_code=422,detail="Completá nombre y apellido.")
     digits="".join(ch for ch in phone if ch.isdigit())
     if len(digits)<8: raise HTTPException(status_code=422,detail="Ingresá un número de celular válido.")
+    # Normalización AR: guardamos formato internacional para reutilizarlo en contacto/WhatsApp.
+    if digits.startswith("00"): digits=digits[2:]
+    if digits.startswith("54"): phone="+"+digits
+    elif digits.startswith("0"): phone="+54"+digits[1:]
+    else: phone="+54"+digits
     if db.query(User).filter(func.lower(func.trim(User.email))==email).first(): raise HTTPException(status_code=409,detail="Ese email ya tiene cuenta.")
     u=User(email=email,first_name=first,last_name=last,phone=phone,password_hash=hash_password(payload.password),role="lector",is_active=True)
     db.add(u);db.commit();db.refresh(u);audit(db,u,"register","user",u.id,"self_registration")
     return {"access_token":create_token(u),"token_type":"bearer","user":{"id":u.id,"email":u.email,"role":u.role,"first_name":u.first_name,"last_name":u.last_name,"phone":u.phone}}
+
+@app.patch("/api/me/phone")
+def update_my_phone(payload:dict,db:Session=Depends(get_db),user=Depends(get_current_user)):
+    raw=str(payload.get("phone") or "").strip()
+    digits="".join(ch for ch in raw if ch.isdigit())
+    if len(digits)<8: raise HTTPException(status_code=422,detail="Ingresá un número de celular válido.")
+    if digits.startswith("00"): digits=digits[2:]
+    if digits.startswith("54"): phone="+"+digits
+    elif digits.startswith("0"): phone="+54"+digits[1:]
+    else: phone="+54"+digits
+    user.phone=phone
+    db.commit();db.refresh(user);audit(db,user,"update","user",user.id,"phone")
+    return {"ok":True,"phone":user.phone}
 
 @app.post("/api/users")
 def create_user(payload:UserCreate,db:Session=Depends(get_db),user=Depends(require_roles("admin"))):
