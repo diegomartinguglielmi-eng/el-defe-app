@@ -11,32 +11,39 @@
     const panel=document.createElement('div');
     panel.dataset.defeRegisterPanel='1';
     panel.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(17,24,39,.58);padding:18px;display:flex;align-items:center;justify-content:center';
-    panel.innerHTML=`<div style="background:#fff;width:min(520px,100%);border-radius:24px;padding:24px;box-shadow:0 18px 50px #0003">
+    panel.innerHTML=`<div style="background:#fff;width:min(520px,100%);max-height:92vh;overflow:auto;border-radius:24px;padding:24px;box-shadow:0 18px 50px #0003">
       <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0b3a7a;margin-bottom:8px">CLUB ATLÉTICO DEFENSORES DE SANTOS LUGARES</div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h2 style="margin:0;color:#17365d;font-size:32px;font-weight:500">Crear usuario</h2><button data-close aria-label="Cerrar" style="border:0;border-radius:999px;width:48px;height:48px;background:#eef2f7;color:#17365d;font-size:22px">×</button></div>
-      <p style="color:#718096;font-size:15px;line-height:1.45;margin:16px 0 20px">Creá el acceso con tu correo electrónico. Luego el administrador asignará el perfil correspondiente.</p>
-      <label style="display:block;font-size:14px;font-weight:800;color:#17365d;margin-bottom:7px">Correo electrónico</label>
-      <input data-email type="email" autocomplete="email" style="box-sizing:border-box;width:100%;padding:16px 18px;border:1px solid #d7dee7;border-radius:16px;font-size:17px;outline:none" placeholder="nombre@correo.com">
-      <label style="display:block;font-size:14px;font-weight:800;color:#17365d;margin:18px 0 7px">Contraseña</label>
-      <input data-pass type="password" autocomplete="new-password" minlength="8" style="box-sizing:border-box;width:100%;padding:16px 18px;border:1px solid #d7dee7;border-radius:16px;font-size:17px;outline:none" placeholder="Mínimo 8 caracteres">
-      <button data-create style="width:100%;margin-top:22px;padding:16px;border:0;border-radius:16px;background:#15589e;color:#fff;font-weight:800;font-size:18px">Crear usuario</button>
+      <p style="color:#718096;font-size:15px;line-height:1.45;margin:16px 0 20px">Creá tu acceso. Después el administrador podrá asignarte el perfil correspondiente.</p>
+      <label style="display:block;font-size:14px;font-weight:800;color:#17365d;margin-bottom:7px">Nombre y apellido</label>
+      <input data-name autocomplete="name" style="box-sizing:border-box;width:100%;padding:14px 18px;border:1px solid #d7dee7;border-radius:16px;font-size:17px" placeholder="Juan Pérez">
+      <label style="display:block;font-size:14px;font-weight:800;color:#17365d;margin:16px 0 7px">Celular</label>
+      <input data-phone type="tel" autocomplete="tel" inputmode="tel" style="box-sizing:border-box;width:100%;padding:14px 18px;border:1px solid #d7dee7;border-radius:16px;font-size:17px" placeholder="11 5555 5555">
+      <label style="display:block;font-size:14px;font-weight:800;color:#17365d;margin:16px 0 7px">Correo electrónico</label>
+      <input data-email type="email" autocomplete="email" style="box-sizing:border-box;width:100%;padding:14px 18px;border:1px solid #d7dee7;border-radius:16px;font-size:17px" placeholder="nombre@correo.com">
+      <label style="display:block;font-size:14px;font-weight:800;color:#17365d;margin:16px 0 7px">Contraseña</label>
+      <input data-pass type="password" autocomplete="new-password" minlength="8" style="box-sizing:border-box;width:100%;padding:14px 18px;border:1px solid #d7dee7;border-radius:16px;font-size:17px" placeholder="Mínimo 8 caracteres">
+      <button data-create style="width:100%;margin-top:20px;padding:16px;border:0;border-radius:16px;background:#15589e;color:#fff;font-weight:800;font-size:18px">Crear usuario</button>
       <div data-msg style="min-height:22px;margin-top:12px;font-size:13px;color:#64748b"></div>
     </div>`;
     document.body.appendChild(panel);
     panel.querySelector('[data-close]').onclick=()=>panel.remove();
-    const email=panel.querySelector('[data-email]'),pass=panel.querySelector('[data-pass]'),btn=panel.querySelector('[data-create]'),msg=panel.querySelector('[data-msg]');
+    const name=panel.querySelector('[data-name]'),phone=panel.querySelector('[data-phone]'),email=panel.querySelector('[data-email]'),pass=panel.querySelector('[data-pass]'),btn=panel.querySelector('[data-create]'),msg=panel.querySelector('[data-msg]');
     const visibleLogin=[...document.querySelectorAll('input[type=email]')].find(x=>x.offsetParent!==null&&x.value);
     if(visibleLogin)email.value=visibleLogin.value.trim();
     btn.onclick=async()=>{
-      const e=email.value.trim().toLowerCase(),p=pass.value;
+      const full=name.value.trim().replace(/\s+/g,' '),parts=full.split(' '),first_name=parts.shift()||'',last_name=parts.join(' '),ph=phone.value.trim(),e=email.value.trim().toLowerCase(),p=pass.value;
+      msg.style.color='#b42318';
+      if(!first_name||!last_name){msg.textContent='Completá nombre y apellido.';return}
+      if(ph.replace(/\D/g,'').length<8){msg.textContent='Ingresá un número de celular válido.';return}
       if(!e||!e.includes('@')){msg.textContent='Ingresá un correo válido.';return}
       if((p||'').length<8){msg.textContent='La contraseña debe tener al menos 8 caracteres.';return}
       btn.disabled=true;btn.textContent='Creando…';msg.textContent='';
       try{
-        const r=await apiFetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})});
+        const r=await apiFetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p,first_name,last_name,phone:ph})});
         const d=await r.json().catch(()=>({}));
         if(!r.ok)throw new Error(d.detail||'No se pudo crear el usuario');
-        msg.style.color='#15803d';msg.textContent='Usuario creado correctamente. Ya podés cerrar esta ventana e ingresar.';
+        msg.style.color='#15803d';msg.textContent='Usuario creado correctamente. Ya podés ingresar.';
         btn.textContent='Usuario creado';
       }catch(err){msg.style.color='#b42318';msg.textContent=err.message||'No se pudo crear el usuario';btn.disabled=false;btn.textContent='Crear usuario'}
     };
