@@ -11,9 +11,11 @@ from .config import settings
 from .auth import hash_password, verify_password, create_token, get_current_user, require_roles
 from .schemas import UserCreate, NewsIn, MatchIn, ArgenImport, TeamIn, PersonIn, TeamMemberIn, CallUpIn, AttendanceIn, PlayerStatIn, SuspensionIn, FavoriteIn, NotificationPrefsIn, MediaIn, PlayerOfMatchIn
 from .sync import sync_fefi, sync_laamba, upsert_match
+from .notifications_v5 import router as notifications_router
 
 BASE=Path(__file__).resolve().parent
 app=FastAPI(title="El Defe API",version="4.0")
+app.include_router(notifications_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.origins,
