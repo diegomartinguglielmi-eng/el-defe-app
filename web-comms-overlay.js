@@ -11,7 +11,7 @@
  function visibleAdmin(){return (document.body?.innerText||'').toLowerCase().includes('admin@elde.fe')}
  async function refreshAdmin(){const t=jwt();adminState=visibleAdmin()||tokenRole()==='admin'||!!document.querySelector('[data-defe-users-button]');if(!t)return adminState;try{const r=await fetch(API+'/api/me',{headers:{Authorization:`Bearer ${t}`},cache:'no-store'});if(r.ok){const me=await r.json();adminState=adminState||me.role==='admin'||String(me.email||'').toLowerCase()==='admin@elde.fe'}}catch(_){}return adminState}
  const isAdmin=()=>adminState||visibleAdmin()||tokenRole()==='admin'||!!document.querySelector('[data-defe-users-button]');
- const isProfe=()=>document.documentElement.dataset.defeRole==='profe'||tokenRole()==='profe';
+ const isProfe=()=>document.documentElement.dataset.defeRole==='profe'||tokenRole()==='profe'||!!document.querySelector('[data-profe-dashboard]');
  const canPublish=()=>isAdmin()||isProfe();
  const reads=()=>{try{return new Set(JSON.parse(localStorage.getItem(READ)||'[]'))}catch{return new Set}}; const saveReads=x=>localStorage.setItem(READ,JSON.stringify([...x]));
  function profileText(){const parts=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||k.includes('token')||k.includes('session')||k.includes('comunicaciones'))continue;const v=localStorage.getItem(k);if(v&&v.length<12000)parts.push(k+' '+v)}try{const u=JSON.parse(localStorage.getItem('defe_user')||'null');if(u)parts.push(JSON.stringify(u))}catch(_){}return norm(parts.join(' '))}
