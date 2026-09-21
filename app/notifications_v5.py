@@ -9,6 +9,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from pywebpush import WebPushException, webpush
+from py_vapid import Vapid
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, Session, mapped_column
 from sqlalchemy.sql import func
@@ -116,8 +117,12 @@ def deliver_pushes(db, event):
         if not _wants(db,sub,event): continue
         eligible+=1
         try:
-            key_obj=serialization.load_pem_private_key(private_key.encode(), password=None) if isinstance(private_key,str) and private_key.lstrip().startswith("-----BEGIN") else private_key
-            webpush(subscription_info={"endpoint":sub.endpoint,"keys":{"p256dh":sub.p256dh,"auth":sub.auth}},data=_push_payload(event),vapid_private_key=key_obj,vapid_claims={"sub":subject},ttl=60 if event.urgent else 3600); sent+=1
+            if isinstance(private_key,str) and private_key.lstrip().startswith("-----BEGIN"):
+                key_obj=serialization.load_pem_private_key(private_key.encode(), password=None)
+                vapid_key=Vapid(key_obj)
+            else:
+                vapid_key=private_key
+            webpush(subscription_info={"endpoint":sub.endpoint,"keys":{"p256dh":sub.p256dh,"auth":sub.auth}},data=_push_payload(event),vapid_private_key=vapid_key,vapid_claims={"sub":subject},ttl=60 if event.urgent else 3600); sent+=1
         except WebPushException as exc:
             failed+=1; status=getattr(getattr(exc,"response",None),"status_code",None); first_error=first_error or f"WebPush {status or 'error'}: {str(exc)[:180]}"
             if status in (404,410): sub.enabled=False; disabled+=1
