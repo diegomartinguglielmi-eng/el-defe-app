@@ -100,13 +100,29 @@ def login(username:str=Form(...),password:str=Form(...),db:Session=Depends(get_d
     return {"access_token":create_token(u),"token_type":"bearer","user":{"email":u.email,"role":u.role}}
 
 @app.get("/api/me")
-def me(user=Depends(get_current_user)): return {"id":user.id,"email":user.email,"role":user.role}
+def me(user=Depends(get_current_user)): return {"id":user.id,"email":user.email,"role":user.role,"first_name":user.first_name,"last_name":user.last_name,"phone":user.phone}
+
+@app.post("/api/auth/register")
+def register(payload:UserCreate,db:Session=Depends(get_db)):
+    email=str(payload.email or "").strip().lower()
+    first=str(payload.first_name or "").strip()
+    last=str(payload.last_name or "").strip()
+    phone=str(payload.phone or "").strip()
+    if not email or "@" not in email: raise HTTPException(status_code=422,detail="Ingresá un email válido.")
+    if len(payload.password or "")<8: raise HTTPException(status_code=422,detail="La contraseña debe tener al menos 8 caracteres.")
+    if not first or not last: raise HTTPException(status_code=422,detail="Completá nombre y apellido.")
+    digits="".join(ch for ch in phone if ch.isdigit())
+    if len(digits)<8: raise HTTPException(status_code=422,detail="Ingresá un número de celular válido.")
+    if db.query(User).filter(func.lower(func.trim(User.email))==email).first(): raise HTTPException(status_code=409,detail="Ese email ya tiene cuenta.")
+    u=User(email=email,first_name=first,last_name=last,phone=phone,password_hash=hash_password(payload.password),role="lector",is_active=True)
+    db.add(u);db.commit();db.refresh(u);audit(db,u,"register","user",u.id,"self_registration")
+    return {"access_token":create_token(u),"token_type":"bearer","user":{"id":u.id,"email":u.email,"role":u.role,"first_name":u.first_name,"last_name":u.last_name,"phone":u.phone}}
 
 @app.post("/api/users")
 def create_user(payload:UserCreate,db:Session=Depends(get_db),user=Depends(require_roles("admin"))):
     if db.query(User).filter(User.email==payload.email).first():
         raise HTTPException(status_code=409,detail="Ya existe")
-    u=User(email=payload.email,password_hash=hash_password(payload.password),role=payload.role)
+    u=User(email=payload.email,first_name=payload.first_name,last_name=payload.last_name,phone=payload.phone,password_hash=hash_password(payload.password),role=payload.role)
     db.add(u);db.commit();db.refresh(u);audit(db,user,"create","user",u.id,payload.role)
     return {"ok":True,"id":u.id}
 
