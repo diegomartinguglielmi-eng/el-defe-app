@@ -48,6 +48,14 @@ def scheduled_sync():
 @app.on_event("startup")
 def startup():
     Base.metadata.create_all(bind=engine)
+    # Backward-compatible profile fields for existing databases.
+    # create_all does not add columns to an existing table.
+    from sqlalchemy import inspect, text
+    existing={c["name"] for c in inspect(engine).get_columns("users")}
+    with engine.begin() as conn:
+        if "first_name" not in existing: conn.execute(text("ALTER TABLE users ADD COLUMN first_name VARCHAR(100)"))
+        if "last_name" not in existing: conn.execute(text("ALTER TABLE users ADD COLUMN last_name VARCHAR(100)"))
+        if "phone" not in existing: conn.execute(text("ALTER TABLE users ADD COLUMN phone VARCHAR(40)"))
     db=SessionLocal()
     try:
         if not db.query(User).filter(User.email==settings.admin_email).first():
