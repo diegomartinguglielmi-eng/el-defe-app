@@ -17,12 +17,13 @@
 
   async function registerPushSW(){const reg=await navigator.serviceWorker.register(SW,{scope:BASE,updateViaCache:'none'});await reg.update().catch(()=>{});return reg}
   async function detectActualPush(){
-    if(!supported()||Notification.permission!=='granted'){actualPush=false;return false}
+    if(!supported()||Notification.permission!=='granted'){actualPush=false;if(Notification.permission!=='granted')localStorage.removeItem(ENABLED);return false}
     try{
-      const regs=await navigator.serviceWorker.getRegistrations();
-      for(const reg of regs){const sub=await reg.pushManager?.getSubscription?.();if(sub){actualPush=true;localStorage.setItem(ENABLED,'1');return true}}
-    }catch(_){}
-    actualPush=false;return false
+      const reg=await navigator.serviceWorker.getRegistration(BASE)||await navigator.serviceWorker.getRegistration();
+      const sub=await reg?.pushManager?.getSubscription?.();
+      if(sub){actualPush=true;localStorage.setItem(ENABLED,'1');return true}
+    }catch(e){console.warn('El Defe push state',e)}
+    actualPush=false;localStorage.removeItem(ENABLED);return false
   }
   async function retire(reg,sub){try{const j=sub?.toJSON?.();if(j?.endpoint&&j?.keys?.p256dh&&j?.keys?.auth){await fetch(API+'/api/notifications/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+jwt()},body:JSON.stringify({endpoint:j.endpoint,keys:j.keys,followed:followed()})})}}catch(_){}try{await sub?.unsubscribe?.()}catch(_){}}
   async function sync(){if(!pushOn())return false;try{const kr=await fetch(API+'/api/notifications/push/public-key',{cache:'no-store'});if(!kr.ok)throw new Error('public-key '+kr.status);const {public_key}=await kr.json();const reg=await registerPushSW();let sub=await reg.pushManager.getSubscription();const oldKey=localStorage.getItem(KEY);if(sub&&oldKey&&oldKey!==public_key){await retire(reg,sub);sub=null}if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64ToBytes(public_key)});const j=sub.toJSON();const r=await fetch(API+'/api/notifications/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+jwt()},body:JSON.stringify({endpoint:j.endpoint,keys:j.keys,followed:followed()})});if(!r.ok)throw new Error('subscribe '+r.status);actualPush=true;localStorage.setItem(KEY,public_key);localStorage.setItem(ENABLED,'1');paintPanel();return true}catch(e){console.warn('El Defe push sync',e);return false}}
@@ -34,7 +35,7 @@
   function paintPanel(state){if(painting)return;painting=true;try{removeLegacyButton();const b=findPanelButton();if(!b)return false;b.setAttribute('data-defe-notifications-panel','1');if(!b.dataset.defePushBound){b.dataset.defePushBound='1';b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();enable()})}if(!supported()){setText(b,'Notificaciones no disponibles');b.disabled=true;return true}if(state==='busy'&&!pushOn()){setText(b,'Activando notificaciones…');b.disabled=true;return true}b.disabled=false;const on=pushOn();setText(b,on?'✓ Notificaciones activas':'Activar notificaciones del dispositivo');const st=findStatus();if(st)setText(st,on?'Las notificaciones del dispositivo están activas. Recibirás los avisos según tus categorías y preferencias.':Notification.permission==='denied'?'Las notificaciones están bloqueadas en el dispositivo.':'Los avisos todavía no están configurados.');return true}finally{painting=false}}
   async function refreshState(){await detectActualPush();paintPanel();setTimeout(()=>paintPanel(),150)}
   function observePanel(){let timer=0;new MutationObserver(muts=>{if(!muts.some(m=>m.addedNodes&&m.addedNodes.length))return;clearTimeout(timer);timer=setTimeout(()=>{removeLegacyButton();refreshState()},80)}).observe(document.body,{childList:true,subtree:true});refreshState()}
-  async function init(){removeLegacyButton();observePanel();await detectActualPush();if(pushOn())await sync();refreshState();document.addEventListener('defe:preferences-updated',()=>{sync();refreshState()});window.addEventListener('focus',refreshState);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshState()})}
+  async function init(){removeLegacyButton();observePanel();await detectActualPush();if(Notification.permission==='granted')await sync();refreshState();document.addEventListener('defe:preferences-updated',()=>{sync();refreshState()});window.addEventListener('focus',refreshState);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshState()})}
   window.defeEnablePush=enable;window.defeSyncPush=()=>sync();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
