@@ -1,7 +1,7 @@
 self.addEventListener('push',event=>{
   let d={title:'El Defe',body:'Hay una novedad del club.',url:'/el-defe-app/'};
   try{if(event.data)d={...d,...event.data.json()}}catch(_){}
-  const opts={body:d.body||'',tag:d.id?`defe-${d.id}`:'defe-push',data:{url:d.url||'/el-defe-app/',id:d.id||null},renotify:!!d.urgent};
+  const opts={body:d.body||'',icon:'/el-defe-app/escudo-dsl.svg',badge:'/el-defe-app/escudo-dsl.svg',tag:d.id?`defe-${d.id}`:'defe-push',data:{url:d.url||'/el-defe-app/',id:d.id||null},renotify:!!d.urgent};
   event.waitUntil(self.registration.showNotification(d.title||'El Defe',opts));
 });
 
