@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 class LoginIn(BaseModel): username:str; password:str
-class UserCreate(BaseModel): email:str; password:str; role:str="lector"
+class UserCreate(BaseModel): email:str; password:str; role:str="lector"; first_name:Optional[str]=None; last_name:Optional[str]=None; phone:Optional[str]=None
 class NewsIn(BaseModel): title:str; body:str
 class CommunicationIn(BaseModel):
     title:str
