@@ -1,5 +1,5 @@
 (() => {
-  const API='https://el-defe-v5-production.up.railway.app';
+  const API='https://el-defe-v2-staging-production.up.railway.app';
   const nativeFetch=window.fetch.bind(window);
 
   function decodeCommunication(body){
