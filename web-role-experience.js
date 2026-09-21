@@ -89,7 +89,7 @@
    closeAccountAnd(()=>{const x=[...document.querySelectorAll('button,a')].find(x=>/^(?:👥\\s*)?(?:Plantel \/ Jugadores|Planteles)$/i.test((x.textContent||'').trim())&&!x.closest('[data-profe-account-tools]')&&getComputedStyle(x).display!=='none');x?.click()});
  },true);
  async function openProfeFixture(){
-  document.querySelector('.dc-modal')?.remove();document.getElementById('defe-profe-fixture')?.remove();
+  document.getElementById('defe-mi-defe')?.remove();document.querySelector('.dc-modal')?.remove();document.getElementById('defe-profe-fixture')?.remove();
   const item=(adminData?.items||[])[0]||{},parts=String(item.selection||'FEFI|').split('|'),comp=parts[0]||'FEFI',cat=parts[1]||'';
   const page=document.createElement('div');page.id='defe-profe-fixture';page.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#f3f7fb;overflow:auto;color:#17365f';
   page.innerHTML='<header style="background:#0f5ea8;color:white;padding:28px 20px 22px;display:flex;align-items:center;gap:16px"><button data-back style="border:1px solid rgba(255,255,255,.35);background:transparent;color:white;border-radius:14px;width:48px;height:48px;font-size:25px">‹</button><div><div style="font-size:13px;font-weight:900">EL DEFE</div><div style="font-size:30px">Fixture · '+comp+(cat?' · '+cat:'')+'</div></div></header><main data-list style="padding:20px 20px 100px"><div style="background:#fff;border-radius:18px;padding:18px">Cargando próximas fechas…</div></main>';
@@ -103,7 +103,7 @@
   }catch(e){page.querySelector('[data-list]').innerHTML='<div style="background:#fff;border-radius:18px;padding:18px;color:#64748b">No se pudo cargar el fixture.</div>'}
 }
 function openPlantel(){
-  document.querySelector('.dc-modal')?.remove();document.getElementById('defe-profe-plantel')?.remove();
+  document.getElementById('defe-mi-defe')?.remove();document.querySelector('.dc-modal')?.remove();document.getElementById('defe-profe-plantel')?.remove();
   const items=adminData?.items||[],groups=new Map();
   items.forEach(it=>{const key=it.selection||'Plantel';if(!groups.has(key))groups.set(key,new Map());(it.people||[]).forEach(p=>groups.get(key).set(p.person_id||p.name,p))});
   const page=document.createElement('div');page.id='defe-profe-plantel';page.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#f3f7fb;overflow:auto;color:#17365f';
