@@ -384,3 +384,21 @@ button.primary,.primary.wide,.loginHero{background:var(--md-blue)!important;bord
 .addMini,.adminEditTeams,.clearSentBtn{border-radius:11px!important}
 .coachActive,.statusOk,.pill.active,.adminCoachCats span{background:var(--md-blue-soft)!important;color:var(--md-blue)!important}
 h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
+
+/* Familia · premium pass */
+.familyApp article{padding-bottom:92px}
+.familyApp .familyTabs{position:sticky;top:0;z-index:20;margin:0 10px 12px!important;border-radius:0 0 18px 18px!important;border-top:0!important}
+.familyApp .familyTabs button{min-height:54px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important}
+.familyApp .familyTabs .tabIcon{width:19px;height:19px}
+.familyApp .playerContext{background:#fff;border:1px solid var(--md-line);border-radius:16px;padding:10px 12px;margin-bottom:12px;box-shadow:var(--md-shadow)}
+.familyApp .playerContext label{font-size:9px;font-weight:900;letter-spacing:.08em;color:var(--md-muted)}
+.familyApp .playerContext select{margin-top:5px;border:0;background:var(--md-blue-soft);color:var(--md-ink);font-weight:800;border-radius:11px;padding:10px;width:100%}
+.familyWelcome{align-items:center!important;margin:5px 2px 13px}.familyWelcome h1{font-size:25px!important;color:var(--md-ink)!important;margin-bottom:2px!important}.familyWelcome p{color:var(--md-muted)!important}
+.familyNextCompact{position:relative;overflow:hidden;background:linear-gradient(145deg,#1f4a9b,#285eb8)!important;color:#fff!important;border:0!important;padding:17px!important}
+.familyNextCompact:after{content:"";position:absolute;width:150px;height:150px;border:26px solid rgba(255,255,255,.055);border-radius:50%;right:-65px;top:-55px}
+.familyNextCompact small,.familyNextCompact p,.familyNextCompact h3{color:#fff!important}.familyNextCompact h3{font-size:18px!important;margin:12px 0 7px!important}.familyNextCompact .homeMatchAction{position:relative;z-index:2;background:#fff!important;color:var(--md-blue)!important;border:0!important;border-radius:12px!important;padding:10px 14px!important;font-weight:900!important;box-shadow:0 5px 12px rgba(0,0,0,.1)}
+.familyNextCompact .homeAttendance{background:#ffffff20!important;color:#fff!important;border:1px solid #ffffff55!important;border-radius:999px!important;padding:6px 8px!important}
+.homeLastResult,.familyMessagePreview,.familyBirthdayPreview{background:#fff!important}
+.homeScore strong{color:var(--md-blue)!important;font-size:24px!important}
+.textAction{color:var(--md-blue)!important;font-weight:900!important}
+.familyMessagePreview .sectionTitleRow h3{color:var(--md-ink)!important}
