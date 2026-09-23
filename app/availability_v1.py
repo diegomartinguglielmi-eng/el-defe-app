@@ -9,8 +9,9 @@ from sqlalchemy.sql import func
 
 from .auth import get_current_user, require_roles
 from .db import Base, get_db
-from .models import Favorite, User, Person, Team, TeamMember, CallUp, CallUpPlayer, Match
+from .models import Favorite, User, Person, Team, TeamMember, CallUp, CallUpPlayer, Match, FefiCategorySchedule
 from .following_v5 import _current, _events_for_selection, FOLLOW_TYPE
+from .sync import sync_fefi
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 router = APIRouter(prefix="/api/availability", tags=["Availability"])
@@ -113,6 +114,25 @@ def _approve(db,user_id,person_id):
 
 class FamilyCallupResponseIn(BaseModel):
     attendance: str
+
+
+@router.get("/family/next-match/{person_id}")
+def family_next_match(person_id:int,db:Session=Depends(get_db),user=Depends(get_current_user)):
+    _assert_family_child(db,user.id,person_id)
+    team=(db.query(Team).join(TeamMember,TeamMember.team_id==Team.id).filter(TeamMember.person_id==person_id,Team.competition=="FEFI",Team.is_active==True).order_by(Team.season.desc()).first())
+    if not team:return {"match":None}
+    today=_today()
+    def find_match():return db.query(Match).filter(Match.competition=="FEFI",Match.division=="Zona H",Match.status=="scheduled",Match.date>=today).order_by(Match.date,Match.id).first()
+    match=find_match()
+    if not match:
+        try:sync_fefi(db)
+        except Exception:pass
+        match=find_match()
+    if not match:return {"match":None,"category":team.division}
+    schedule=db.query(FefiCategorySchedule).filter(FefiCategorySchedule.match_id==match.id,FefiCategorySchedule.category==team.division).first()
+    standard={"2019":"14:30","2013":"15:15","2018":"16:10","2014":"16:55","2017":"17:50","2016":"18:45","2015":"19:40"}
+    club="DEF. DE SANTOS LUGARES"
+    return {"match":{"id":match.id,"round_name":match.round_name,"date":match.date,"home":match.home,"away":match.away,"venue":match.venue,"home_away":"local" if club in (match.home or "").upper() else "visitante","category":team.division,"match_time":schedule.time if schedule and schedule.time else standard.get(team.division),"source_url":match.source_url}}
 
 
 @router.get("/family/callups")
