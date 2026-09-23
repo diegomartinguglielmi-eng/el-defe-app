@@ -279,3 +279,7 @@ button.primary,.familyApp button.primary,.coachApp button.primary,.adminApp butt
 .familyTabPanel>.programMatch{margin-top:20px;padding:15px 16px;border:1px solid #dce5f0;border-radius:14px;background:#fff}
 .familyTabPanel>.programMatch b{font-size:15px;line-height:1.4;color:#173f78}
 @media(max-width:420px){.familyTabPanel .attendance{grid-template-columns:1fr}.familyTabPanel .callupInline{padding:14px}}
+
+/* Family Partidos · final compact spacing */
+.familyTabPanel .directionsBtn{margin-bottom:2px}
+.familyTabPanel .callupInline{margin-top:10px;padding-top:14px}
