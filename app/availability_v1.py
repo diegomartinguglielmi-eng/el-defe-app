@@ -9,7 +9,7 @@ from sqlalchemy.sql import func
 
 from .auth import get_current_user, require_roles
 from .db import Base, get_db
-from .models import Favorite, User, Person, Team, TeamMember
+from .models import Favorite, User, Person, Team, TeamMember, CallUp, CallUpPlayer, Match
 from .following_v5 import _current, _events_for_selection, FOLLOW_TYPE
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
@@ -110,6 +110,37 @@ def _approve(db,user_id,person_id):
     req=db.query(UserPlayerRequest).filter(UserPlayerRequest.user_id==user_id,UserPlayerRequest.person_id==person_id).first()
     if req: req.status="approved";req.resolved_at=datetime.now(AR_TZ)
     db.commit()
+
+class FamilyCallupResponseIn(BaseModel):
+    attendance: str
+
+
+@router.get("/family/callups")
+def family_callups(db:Session=Depends(get_db),user=Depends(get_current_user)):
+    links=db.query(UserPlayerLink).filter(UserPlayerLink.user_id==user.id).all()
+    person_ids=[x.person_id for x in links]
+    if not person_ids:return {"items":[]}
+    rows=(db.query(CallUpPlayer,CallUp,Person,Match,Team)
+        .join(CallUp,CallUp.id==CallUpPlayer.callup_id)
+        .join(Person,Person.id==CallUpPlayer.person_id)
+        .join(Match,Match.id==CallUp.match_id)
+        .join(Team,Team.id==CallUp.team_id)
+        .filter(CallUpPlayer.person_id.in_(person_ids),CallUp.status=="published")
+        .order_by(Match.date.desc(),CallUp.id.desc()).all())
+    return {"items":[{"row_id":cp.id,"callup_id":c.id,"person_id":p.id,"player_name":f"{p.first_name} {p.last_name}".strip(),"category":team.division,"attendance":cp.attendance,"notes":c.notes,"match":{"id":m.id,"date":m.date,"round_name":m.round_name,"home":m.home,"away":m.away,"venue":m.venue}} for cp,c,p,m,team in rows]}
+
+
+@router.patch("/family/callups/{row_id}")
+def family_callup_response(row_id:int,payload:FamilyCallupResponseIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
+    status=(payload.attendance or "").strip().lower()
+    if status not in {"yes","no","pending"}:raise HTTPException(400,"Respuesta inválida")
+    cp=db.get(CallUpPlayer,row_id)
+    if not cp:raise HTTPException(404,"Convocatoria inexistente")
+    linked=db.query(UserPlayerLink).filter(UserPlayerLink.user_id==user.id,UserPlayerLink.person_id==cp.person_id).first()
+    if not linked:raise HTTPException(403,"El jugador no pertenece a esta familia")
+    cp.attendance=status;db.commit()
+    return {"ok":True,"attendance":status}
+
 
 @router.get("/family/setup")
 def family_setup(db:Session=Depends(get_db),user=Depends(get_current_user)):
