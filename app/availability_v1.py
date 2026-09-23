@@ -305,7 +305,7 @@ def birthdays(category:str,competition:str="FEFI",db:Session=Depends(get_db),use
     return {"category":category,"birthdays":out}
 
 
-rom datetime import datetime, date
+from datetime import datetime, date
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException
