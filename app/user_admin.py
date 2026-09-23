@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from pydantic import BaseModel, field_validator
 from sqlalchemy.orm import Session
 
 from .auth import hash_password, create_token, require_roles
 from .db import get_db
-from .models import User, AuditLog, Favorite, Person, Team, TeamMember, Match, FefiCategorySchedule, Match, FefiCategorySchedule
+from .models import User, AuditLog, Favorite, Person, Team, TeamMember, Match, FefiCategorySchedule, CallUp, CallUpPlayer, Match, FefiCategorySchedule
 from .profe_scope import PROFE_TEAM_FAVORITE, normalize_selection, profe_selections
 from .sync import sync_fefi
 
@@ -133,6 +134,44 @@ def change_role(user_id: int, payload: RoleIn, db: Session = Depends(get_db), ad
     _audit(db, admin, "change_role", target.id, f"{old_role}->{target.role}")
 
     return {"ok": True, "id": target.id, "email": target.email, "role": target.role}
+
+
+class ProfeCallupIn(BaseModel):
+    match_id: int
+    category: str
+    person_ids: list[int]
+    citation_time: str | None = None
+    notes: str | None = None
+
+
+@router.post("/api/profe/callups")
+def publish_profe_callup(payload: ProfeCallupIn, db: Session = Depends(get_db), profe: User = Depends(require_roles("profe"))):
+    category = (payload.category or "").strip()
+    selection = normalize_selection(f"FEFI|{category}")
+    if not selection or selection not in profe_selections(db, profe):
+        raise HTTPException(status_code=403, detail="Categoría no asignada al profesor")
+    match = db.get(Match, payload.match_id)
+    if not match or match.competition != "FEFI":
+        raise HTTPException(status_code=404, detail="Partido FEFI inexistente")
+    team = db.query(Team).filter(Team.competition == "FEFI", Team.division == category, Team.is_active == True).order_by(Team.season.desc()).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Plantel FEFI inexistente")
+    allowed = {pid for (pid,) in db.query(TeamMember.person_id).filter(TeamMember.team_id == team.id).all()}
+    chosen = [pid for pid in payload.person_ids if pid in allowed]
+    if not chosen:
+        raise HTTPException(status_code=400, detail="La convocatoria debe incluir al menos un jugador del plantel")
+    callup = db.query(CallUp).filter(CallUp.match_id == match.id, CallUp.team_id == team.id).order_by(CallUp.id.desc()).first()
+    notes = (f"Citación {payload.citation_time} hs" if payload.citation_time else "") + (f" · {payload.notes.strip()}" if payload.notes and payload.notes.strip() else "")
+    if not callup:
+        callup = CallUp(match_id=match.id, team_id=team.id, created_by=profe.id, status="published", notes=notes or None)
+        db.add(callup); db.flush()
+    else:
+        callup.created_by=profe.id; callup.status="published"; callup.notes=notes or None
+        db.query(CallUpPlayer).filter(CallUpPlayer.callup_id == callup.id).delete(synchronize_session=False)
+    for pid in chosen:
+        db.add(CallUpPlayer(callup_id=callup.id, person_id=pid, attendance="pending"))
+    db.commit(); db.refresh(callup)
+    return {"ok": True, "id": callup.id, "players": len(chosen), "citation_time": payload.citation_time}
 
 
 @router.get("/api/profe/next-match")
