@@ -292,7 +292,7 @@ def birthdays(category:str,competition:str="FEFI",db:Session=Depends(get_db),use
     elif user.role not in ("admin","delegado"):
         raise HTTPException(status_code=403,detail="Sin acceso")
     rows=db.query(Person).join(TeamMember,TeamMember.person_id==Person.id).join(Team,Team.id==TeamMember.team_id).filter(Person.is_active==True,Person.birth_date.isnot(None),Team.is_active==True,Team.competition==competition,Team.division==category).distinct().all()
-    today=_today(); out=[]
+    today=datetime.now(AR_TZ).date(); out=[]
     for p in rows:
         b=p.birth_date
         try: nxt=date(today.year,b.month,b.day)
