@@ -94,9 +94,10 @@ def _fixture_blocks(html:str):
     return blocks
 
 @router.get('/fixture')
-def fixture(tournament:str=Query('clausura')):
+def fixture(tournament:str=Query('clausura'),category:str=Query('2013'),db:Session=Depends(get_db)):
     t=tournament.strip().lower()
     if t not in {'apertura','clausura'}:raise HTTPException(400,'Torneo inválido')
+    if category not in CATEGORIES:raise HTTPException(400,'Categoría inválida')
     try:
         r=requests.get(URL,headers=UA,timeout=25);r.raise_for_status()
         blocks=_fixture_blocks(r.text)
@@ -108,6 +109,7 @@ def fixture(tournament:str=Query('clausura')):
     for rnd in block:
         for match in rnd['matches']:
             if 'DEF. DE SANTOS LUGARES' in (match['home'].upper(),match['away'].upper()):
-                rows.append({'round':rnd['round'],'date':rnd['date'],'home':match['home'],'away':match['away'],'home_away':'local' if match['home'].upper()=='DEF. DE SANTOS LUGARES' else 'visitante'})
+                result=db.query(FefiCategoryResult).filter(FefiCategoryResult.round_number==rnd['round'],FefiCategoryResult.category==category,FefiCategoryResult.external_key.like("%|CLAUSURA|%")).order_by(FefiCategoryResult.id.desc()).first() if t=='clausura' else None
+                rows.append({'round':rnd['round'],'date':rnd['date'],'home':match['home'],'away':match['away'],'home_away':'local' if match['home'].upper()=='DEF. DE SANTOS LUGARES' else 'visitante','home_value':result.home_value if result else None,'away_value':result.away_value if result else None,'result_status':result.status if result else None})
                 break
     return {'tournament':t,'rows':rows,'available':bool(rows),'source_url':URL}
