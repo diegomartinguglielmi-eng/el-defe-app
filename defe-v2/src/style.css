@@ -368,3 +368,19 @@ button.primary,.familyApp button.primary,.coachApp button.primary,.adminApp butt
 .cleanWelcome .welcomeSub i{background:#1f4a9b!important}
 .cleanWelcome .loginHero{background:#1f4a9b!important}
 .cleanWelcome .registerHero{border-color:#1f4a9b!important;color:#1f4a9b!important}
+
+/* Mi DEFE V1 · visual system */
+:root{--md-blue:#1f4a9b;--md-blue-soft:#edf3ff;--md-ink:#17345f;--md-muted:#78869b;--md-line:#dce5f0;--md-bg:#f5f8fc;--md-radius:18px;--md-shadow:0 8px 24px rgba(26,64,121,.08)}
+body{background:var(--md-bg);color:var(--md-ink)}
+header{background:var(--md-blue)!important;border-bottom:0!important;box-shadow:0 5px 18px rgba(20,57,116,.13)}
+.brand .clubLogo{width:48px!important;height:48px!important;padding:3px!important;border-radius:12px!important;box-shadow:none!important}
+.brand b{font-size:19px!important}.brand small{font-size:8px!important}
+article>nav,.familyNav,.coachTabs,.adminTabs{background:#fff!important;border:1px solid var(--md-line)!important;border-radius:16px!important;padding:5px!important;box-shadow:0 4px 14px rgba(30,68,126,.05)}
+article>nav button,.familyNav button,.coachTabs button,.adminTabs button{border-radius:11px!important;font-weight:800!important}
+article>nav button.active,.familyNav button.active,.coachTabs button.active,.adminTabs button.active{background:var(--md-blue)!important;color:#fff!important;box-shadow:0 4px 10px rgba(31,74,155,.18)}
+section,.card,.matchCard,.nextMatch,.messageComposer,.sentMessageCard,.adminCoachCard,.adminControl,.adminFollowCard,.coachRoster{border-color:var(--md-line)!important;border-radius:var(--md-radius)!important;box-shadow:var(--md-shadow)}
+button{transition:transform .14s ease,box-shadow .14s ease,background .14s ease}button:active{transform:scale(.975)}
+button.primary,.primary.wide,.loginHero{background:var(--md-blue)!important;border-color:var(--md-blue)!important;border-radius:14px!important;box-shadow:0 6px 15px rgba(31,74,155,.18)!important}
+.addMini,.adminEditTeams,.clearSentBtn{border-radius:11px!important}
+.coachActive,.statusOk,.pill.active,.adminCoachCats span{background:var(--md-blue-soft)!important;color:var(--md-blue)!important}
+h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
