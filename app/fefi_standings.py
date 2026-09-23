@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
 from io import StringIO
 import time
+import re
+from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 from fastapi import APIRouter, HTTPException, Query
@@ -67,3 +69,45 @@ def standings(tournament:str=Query('clausura'),category:str=Query('GENERAL')):
     rows=block.get(c,[])
     rows=sorted(rows,key=lambda x:((x.get('pts') if x.get('pts') is not None else -1),(x.get('won') if x.get('won') is not None else -1)),reverse=True)
     return {'tournament':t,'category':c,'rows':rows,'available':bool(rows),'source_url':URL,'fetched_at':data['fetched_at'],'standings_tables_found':data['standings_tables_found']}
+
+
+_MONTHS={'ENERO':1,'FEBRERO':2,'MARZO':3,'ABRIL':4,'MAYO':5,'JUNIO':6,'JULIO':7,'AGOSTO':8,'SEPTIEMBRE':9,'OCTUBRE':10,'NOVIEMBRE':11,'DICIEMBRE':12}
+
+def _fixture_blocks(html:str):
+    soup=BeautifulSoup(html,'html.parser');blocks=[]
+    for table in soup.find_all('table'):
+        txt=' '.join(table.get_text(' ',strip=True).upper().split())
+        if 'LOCAL' not in txt or 'VISITANTE' not in txt or 'FECHA ' not in txt:continue
+        rounds=[];current=None
+        for tr in table.find_all('tr'):
+            cells=[' '.join(x.get_text(' ',strip=True).split()) for x in tr.find_all(['th','td'])]
+            if not cells:continue
+            joined=' '.join(cells)
+            m=re.search(r'Fecha\s+(\d+)\s*-\s*(\d{1,2})\s+de\s+([A-Za-zÁÉÍÓÚÑáéíóúñ]+)',joined,re.I)
+            if m:
+                month=_MONTHS.get(m.group(3).upper())
+                current={'round':int(m.group(1)),'date':f"2026-{month:02d}-{int(m.group(2)):02d}" if month else None,'matches':[]}
+                rounds.append(current);continue
+            if current and len(cells)>=3 and cells[1].strip().lower()=='vs':
+                current['matches'].append({'home':cells[0],'away':cells[2]})
+        if rounds:blocks.append(rounds)
+    return blocks
+
+@router.get('/fixture')
+def fixture(tournament:str=Query('clausura')):
+    t=tournament.strip().lower()
+    if t not in {'apertura','clausura'}:raise HTTPException(400,'Torneo inválido')
+    try:
+        r=requests.get(URL,headers=UA,timeout=25);r.raise_for_status()
+        blocks=_fixture_blocks(r.text)
+    except Exception as exc:raise HTTPException(502,f'No se pudo consultar FEFI: {exc}')
+    if not blocks:return {'tournament':t,'rows':[],'available':False,'source_url':URL}
+    # FEFI publica Apertura primero y Clausura después.
+    block=blocks[-1] if t=='clausura' else blocks[0]
+    rows=[]
+    for rnd in block:
+        for match in rnd['matches']:
+            if 'DEF. DE SANTOS LUGARES' in (match['home'].upper(),match['away'].upper()):
+                rows.append({'round':rnd['round'],'date':rnd['date'],'home':match['home'],'away':match['away'],'home_away':'local' if match['home'].upper()=='DEF. DE SANTOS LUGARES' else 'visitante'})
+                break
+    return {'tournament':t,'rows':rows,'available':bool(rows),'source_url':URL}
