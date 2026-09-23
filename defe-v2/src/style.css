@@ -356,3 +356,7 @@ button.primary,.familyApp button.primary,.coachApp button.primary,.adminApp butt
 /* Landing crest: preserve original shield proportions */
 .cleanWelcome .welcomeLogo{width:auto!important;height:172px!important;max-width:190px!important;object-fit:contain!important;object-position:center!important;aspect-ratio:auto!important;margin:0 auto 18px!important}
 @media(max-height:760px){.cleanWelcome .welcomeLogo{height:145px!important;max-width:165px!important}}
+
+/* Landing crest: stronger visual presence */
+.cleanWelcome .welcomeLogo{height:205px!important;max-width:235px!important;margin:0 auto 14px!important}
+@media(max-height:760px){.cleanWelcome .welcomeLogo{height:178px!important;max-width:205px!important}}
