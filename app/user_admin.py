@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from .auth import hash_password, create_token, require_roles
 from .db import get_db
-from .models import User, AuditLog, Favorite
+from .models import User, AuditLog, Favorite, Person, Team, TeamMember
 from .profe_scope import PROFE_TEAM_FAVORITE, normalize_selection, profe_selections
 
 router = APIRouter()
@@ -132,6 +132,28 @@ def change_role(user_id: int, payload: RoleIn, db: Session = Depends(get_db), ad
     _audit(db, admin, "change_role", target.id, f"{old_role}->{target.role}")
 
     return {"ok": True, "id": target.id, "email": target.email, "role": target.role}
+
+
+@router.get("/api/profe/squad")
+def get_profe_squad(category: str, db: Session = Depends(get_db), profe: User = Depends(require_roles("profe"))):
+    category = (category or "").strip()
+    selection = normalize_selection(f"FEFI|{category}")
+    if not selection or selection not in profe_selections(db, profe):
+        raise HTTPException(status_code=403, detail="Categoría no asignada al profesor")
+    rows = (db.query(Person, Team)
+        .join(TeamMember, TeamMember.person_id == Person.id)
+        .join(Team, Team.id == TeamMember.team_id)
+        .filter(Person.is_active == True, Team.is_active == True, Team.competition == "FEFI", Team.division == category)
+        .order_by(Person.last_name, Person.first_name)
+        .all())
+    players = []
+    seen = set()
+    for person, team in rows:
+        if person.id in seen:
+            continue
+        seen.add(person.id)
+        players.append({"id": person.id, "person_id": person.id, "full_name": f"{person.first_name} {person.last_name}".strip(), "category": team.division})
+    return {"category": category, "players": players}
 
 
 @router.get("/api/profe/me")
