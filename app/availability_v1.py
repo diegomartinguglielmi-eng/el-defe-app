@@ -177,7 +177,7 @@ def create_family_child(payload:FamilyChildIn,db:Session=Depends(get_db),user=De
     if payload.birth_date:
         try: birth=datetime.strptime(payload.birth_date,"%Y-%m-%d").date()
         except ValueError: raise HTTPException(400,"Fecha de nacimiento inválida")
-    p=Person(first_name=first,last_name=last,birth_year=birth.year if birth else None,birth_date=birth,role="player",is_active=True);db.add(p);db.flush()
+    p=Person(first_name=first,last_name=last,birth_year=birth.year if birth else None,birth_date=birth,nickname=(payload.nickname or "").strip() or None,role="player",is_active=True);db.add(p);db.flush()
     db.add(UserPlayerLink(user_id=user.id,person_id=p.id));_add_team(db,user.id,p.id,payload.competition,payload.category)
     db.commit();db.refresh(p);return {"ok":True,"child":_player(db,p)}
 
@@ -185,7 +185,7 @@ def create_family_child(payload:FamilyChildIn,db:Session=Depends(get_db),user=De
 def update_family_child(person_id:int,payload:FamilyChildIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
     p=_assert_family_child(db,user.id,person_id);first=(payload.first_name or '').strip();last=(payload.last_name or '').strip()
     if not first or not last: raise HTTPException(400,"Nombre y apellido son obligatorios")
-    p.first_name=first;p.last_name=last
+    p.first_name=first;p.last_name=last;p.nickname=(payload.nickname or '').strip() or None
     if payload.birth_date:
         try: p.birth_date=datetime.strptime(payload.birth_date,"%Y-%m-%d").date();p.birth_year=p.birth_date.year
         except ValueError: raise HTTPException(400,"Fecha de nacimiento inválida")
@@ -279,28 +279,51 @@ def admin_availability(db:Session=Depends(get_db),user=Depends(require_roles("ad
     items=list(grouped.values());items.sort(key=lambda x:((x.get("date") or "9999-99-99"),x.get("competition") or "",x.get("category") or ""));return {"today":_today(),"items":items}
 
 @router.get("/birthdays")
-def birthdays(category:str,competition:str="FEFI",db:Session=Depends(get_db),user=Depends(get_current_user)):
+def birthdays(category:str|None=None,competition:str="FEFI",db:Session=Depends(get_db),user=Depends(get_current_user)):
     category=(category or "").strip(); competition=(competition or "FEFI").strip().upper()
-    if not category: raise HTTPException(status_code=400,detail="Falta categoría")
     linked=_linked_players(db,user.id)
     linked_ids={p["person_id"] for p in linked}
-    allowed_family={f"{t['competition']}|{t['category']}".upper() for p in linked for t in p["teams"]}
-    if allowed_family:
-        if f"{competition}|{category}".upper() not in allowed_family: raise HTTPException(status_code=403,detail="Categoría no vinculada a la familia")
-    elif user.role=="profe":
-        from .profe_scope import profe_selections
-        if f"{competition}|{category}".upper() not in {x.upper() for x in profe_selections(db,user)}: raise HTTPException(status_code=403,detail="Categoría no asignada")
-    elif user.role not in ("admin","delegado"):
-        raise HTTPException(status_code=403,detail="Sin acceso")
-    rows=db.query(Person).join(TeamMember,TeamMember.person_id==Person.id).join(Team,Team.id==TeamMember.team_id).filter(Person.is_active==True,Person.birth_date.isnot(None),Team.is_active==True,Team.competition==competition,Team.division==category).distinct().all()
-    today=datetime.now(AR_TZ).date(); out=[]
-    for p in rows:
+    baby_categories={"2013","2014","2015","2016","2017","2018","2019"}
+
+    # Las familias ven los cumpleaños de todo Baby Fútbol FEFI, no sólo
+    # los de la categoría del hijo seleccionado.
+    if linked:
+        q=(db.query(Person,Team)
+           .join(TeamMember,TeamMember.person_id==Person.id)
+           .join(Team,Team.id==TeamMember.team_id)
+           .filter(Person.is_active==True,Person.birth_date.isnot(None),
+                   Team.is_active==True,Team.competition==competition,
+                   Team.division.in_(baby_categories)))
+    else:
+        if not category:
+            raise HTTPException(status_code=400,detail="Falta categoría")
+        if user.role=="profe":
+            from .profe_scope import profe_selections
+            if f"{competition}|{category}".upper() not in {x.upper() for x in profe_selections(db,user)}:
+                raise HTTPException(status_code=403,detail="Categoría no asignada")
+        elif user.role not in ("admin","delegado"):
+            raise HTTPException(status_code=403,detail="Sin acceso")
+        q=(db.query(Person,Team)
+           .join(TeamMember,TeamMember.person_id==Person.id)
+           .join(Team,Team.id==TeamMember.team_id)
+           .filter(Person.is_active==True,Person.birth_date.isnot(None),
+                   Team.is_active==True,Team.competition==competition,
+                   Team.division==category))
+
+    rows=q.all(); today=datetime.now(AR_TZ).date(); out=[]; seen=set()
+    for p,t in rows:
+        key=(p.id,t.division)
+        if key in seen: continue
+        seen.add(key)
         b=p.birth_date
         try: nxt=date(today.year,b.month,b.day)
         except ValueError: nxt=date(today.year,2,28)
         if nxt<today:
             try: nxt=date(today.year+1,b.month,b.day)
             except ValueError: nxt=date(today.year+1,2,28)
-        out.append({"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"category":category,"day":b.day,"month":b.month,"days_until":(nxt-today).days,"is_mine":p.id in linked_ids,"nickname":p.nickname})
-    out.sort(key=lambda x:(x["days_until"],x["name"]))
-    return {"category":category,"birthdays":out}
+        out.append({"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),
+                    "category":t.division,"day":b.day,"month":b.month,
+                    "days_until":(nxt-today).days,"is_mine":p.id in linked_ids,
+                    "nickname":p.nickname})
+    out.sort(key=lambda x:(x["days_until"],x["category"],x["name"]))
+    return {"category":category or "BABY_FUTBOL","birthdays":out}
