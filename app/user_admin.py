@@ -144,6 +144,19 @@ class ProfeCallupIn(BaseModel):
     notes: str | None = None
 
 
+@router.get("/api/profe/callups")
+def get_profe_callup(match_id:int, category:str, db:Session=Depends(get_db), profe:User=Depends(require_roles("profe"))):
+    category=(category or "").strip(); selection=normalize_selection(f"FEFI|{category}")
+    if not selection or selection not in profe_selections(db,profe):raise HTTPException(status_code=403,detail="Categoría no asignada al profesor")
+    team=db.query(Team).filter(Team.competition=="FEFI",Team.division==category,Team.is_active==True).order_by(Team.season.desc()).first()
+    if not team:return {"callup":None,"players":[],"summary":{"yes":0,"no":0,"pending":0}}
+    callup=db.query(CallUp).filter(CallUp.match_id==match_id,CallUp.team_id==team.id,CallUp.status=="published").order_by(CallUp.id.desc()).first()
+    if not callup:return {"callup":None,"players":[],"summary":{"yes":0,"no":0,"pending":0}}
+    rows=db.query(CallUpPlayer,Person).join(Person,Person.id==CallUpPlayer.person_id).filter(CallUpPlayer.callup_id==callup.id).order_by(Person.last_name,Person.first_name).all()
+    players=[{"row_id":cp.id,"person_id":p.id,"full_name":f"{p.first_name} {p.last_name}".strip(),"attendance":cp.attendance} for cp,p in rows]
+    return {"callup":{"id":callup.id,"notes":callup.notes},"players":players,"summary":{"yes":sum(x["attendance"]=="yes" for x in players),"no":sum(x["attendance"]=="no" for x in players),"pending":sum(x["attendance"]=="pending" for x in players)}}
+
+
 @router.post("/api/profe/callups")
 def publish_profe_callup(payload: ProfeCallupIn, db: Session = Depends(get_db), profe: User = Depends(require_roles("profe"))):
     category = (payload.category or "").strip()
