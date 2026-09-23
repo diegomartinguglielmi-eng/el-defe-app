@@ -257,3 +257,7 @@ button.primary,.familyApp button.primary,.coachApp button.primary,.adminApp butt
 
 /* Identidad Defensores de Santos Lugares */
 .siempreDefe{margin-top:18px;font-weight:900;letter-spacing:.18em;color:#183f8f;font-size:14px;text-transform:uppercase}.welcome.cleanWelcome{background:linear-gradient(180deg,#fff 0%,#f4f7fb 100%)}.greenStroke{background:#183f8f!important}.loginHero{background:#183f8f!important}.registerHero{border-color:#183f8f!important;color:#183f8f!important}.familyApp header{background:linear-gradient(135deg,#102d68,#183f8f)!important}.familyTabs .active{color:#183f8f!important}.clubLogo,.welcomeLogo{object-fit:contain}
+
+/* Familia: partido + convocatoria + resumen deportivo */
+.callupInline{margin-top:18px;padding-top:16px;border-top:1px solid #e1e8f0}.callupInline>small{font-weight:900;letter-spacing:.06em;color:#718096}.callupInline>p{margin:7px 0 12px}
+.familySports{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:center;background:#fff;border:1px solid #dbe4ef;border-radius:22px;padding:16px 18px;margin:14px 0 22px;box-shadow:0 8px 24px #143c6410;color:#174f80}.familySports>div:last-child{text-align:right}.familySports small{font-size:11px;font-weight:900;letter-spacing:.07em;color:#7b8ba0}.familySports h3{font-size:20px;margin:5px 0 1px}.familySports p{font-size:12px;color:#66788d;margin:0}@media(max-width:420px){.familySports{grid-template-columns:1fr 1fr;gap:8px;padding:14px}.familySports h3{font-size:18px}}
