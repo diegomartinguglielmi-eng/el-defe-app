@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from .db import Base, engine, SessionLocal
-from .models import Match, FefiCategorySchedule
+from .models import Match, FefiCategorySchedule, Person, Team, TeamMember
 from .notifications_v5 import NotificationEvent, publish_event
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
@@ -20,6 +20,31 @@ def reminder_body(match: Match, category: str | None = None, time: str | None = 
     if match.venue:
         base += f" · {match.venue}"
     return base
+
+
+def run_birthdays(force: bool = False) -> dict:
+    now = datetime.now(AR_TZ)
+    if not force and now.hour != 9:
+        return {"ok": True, "skipped": True, "reason": "outside_09h_window", "local_time": now.isoformat()}
+    Base.metadata.create_all(bind=engine); db=SessionLocal(); created=0; pushed=0
+    try:
+        today=now.date()
+        rows=(db.query(Person,Team).join(TeamMember,TeamMember.person_id==Person.id).join(Team,Team.id==TeamMember.team_id).filter(Person.is_active==True,Person.birth_date.isnot(None),Team.is_active==True).all())
+        seen=set()
+        for person,team in rows:
+            if person.birth_date.month!=today.month or person.birth_date.day!=today.day: continue
+            key=(person.id,team.competition,team.division)
+            if key in seen: continue
+            seen.add(key)
+            marker=f"birthday:{today.year}:{person.id}"
+            exists=db.query(NotificationEvent).filter(NotificationEvent.event_type==marker,NotificationEvent.competition==team.competition,NotificationEvent.category==team.division).first()
+            if exists: continue
+            event=publish_event(db,event_type=marker,title=f"🎂 ¡Hoy cumple {person.first_name}!",body=f"Mandale un saludo a {person.first_name} en su día 🎉",competition=team.competition,category=team.division,urgent=False)
+            created+=1; pushed+=getattr(event,"push_result",{}).get("sent",0)
+        db.commit(); return {"ok":True,"birthdays_created":created,"push_sent":pushed,"local_time":now.isoformat()}
+    except Exception:
+        db.rollback(); raise
+    finally: db.close()
 
 
 def run(force: bool = False) -> dict:
