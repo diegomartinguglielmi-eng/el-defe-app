@@ -402,3 +402,17 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .homeScore strong{color:var(--md-blue)!important;font-size:24px!important}
 .textAction{color:var(--md-blue)!important;font-weight:900!important}
 .familyMessagePreview .sectionTitleRow h3{color:var(--md-ink)!important}
+
+/* Familia · resultado compacto + inbox density */
+.homeLastResult{padding:12px 14px!important;margin:11px 0!important;border-radius:16px!important}
+.homeLastResult .sectionTitleRow{margin-bottom:6px!important}.homeLastResult .sectionTitleRow small{font-size:9px!important}
+.homeLastResult .homeScore{display:grid!important;grid-template-columns:1fr auto 1fr!important;align-items:center!important;gap:8px!important;padding:7px 0!important}
+.homeLastResult .homeScore b{font-size:10px!important;line-height:1.15!important}.homeLastResult .homeScore strong{font-size:23px!important;white-space:nowrap}
+.homeLastResult .textAction{font-size:10px!important}
+.familyTabPanel.messagesPanel{padding:16px!important}
+.messagesPanel .tabHeading{margin-bottom:14px!important}.messagesPanel .tabHeading h1{font-size:26px!important;margin-bottom:2px!important}.messagesPanel .tabHeading p{margin:0!important}
+.messageInboxCard{padding:12px 13px!important;margin-bottom:8px!important;min-height:0!important;border-radius:14px!important}
+.messageInboxCard h3{font-size:15px!important;line-height:1.2!important;margin-top:5px!important}
+.messageInboxCard>p{font-size:13px!important;line-height:1.35!important;margin:8px 0!important}
+.messageMeta span,.messageMeta time{font-size:9px!important}.messageCardFoot{min-height:18px!important}.messageCardFoot small,.readState,.newBadge{font-size:9px!important}
+.deleteMessage{width:28px!important;height:28px!important;flex-basis:28px!important;font-size:19px!important}
