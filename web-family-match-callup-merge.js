@@ -9,14 +9,15 @@
  const token=()=>localStorage.getItem('defe_token')||'';
  async function api(path){const h={};if(token())h.Authorization='Bearer '+token();const r=await fetch(API+path,{headers:h,cache:'no-store'});if(!r.ok)throw Error('No disponible');return r.json()}
  function leaf(re,root=document){return [...root.querySelectorAll('div,span,p,strong,b,h1,h2,h3,h4')].find(e=>e.children.length===0&&re.test(txt(e)))}
- function cardFor(el){let n=el;while(n&&n!==document.body){const t=txt(n),cs=getComputedStyle(n);if(t.length>35&&t.length<1400&&parseFloat(cs.borderRadius||'0')>=12)return n;n=n.parentElement}return null}
+ function cardFor(el){let n=el,best=null;while(n&&n!==document.body){const t=txt(n),cs=getComputedStyle(n),r=parseFloat(cs.borderRadius||'0');if(t.length>35&&t.length<1800&&r>=12){best=n;if(n.querySelectorAll('button,a').length||/PR[ÓO]XIMO PARTIDO|CONVOCATORIA/.test(t)){} }n=n.parentElement}return best||el.parentElement}
  function dateKey(t){const iso=t.match(/\b20\d{2}[-/]\d{2}[-/]\d{2}\b/);if(iso)return iso[0].replaceAll('/','-');const d=t.match(/\b(?:S[AÁ]B|DOM|LUN|MAR|MI[EÉ]|JUE|VIE)?\s*(\d{1,2})[-/]([01]?\d)\b/);if(!d)return '';return '2026-'+String(d[2]).padStart(2,'0')+'-'+String(d[1]).padStart(2,'0')}
  function teamsKey(t){const m=t.match(/(DEF\. DE SANTOS LUGARES|DEFENSORES DE SANTOS LUGARES)\s+VS\.?\s+([^\n]+?)(?=\s+(?:S[AÁ]B|DOM|LUN|MAR|MI[EÉ]|JUE|VIE|20\d{2}|CITACI[ÓO]N|SEDE:)|$)/);return m?norm(m[2]).replace(/[^A-Z0-9]/g,''):''}
  function sameEvent(a,b){const ta=txt(a),tb=txt(b),da=dateKey(ta),db=dateKey(tb),ra=teamsKey(ta),rb=teamsKey(tb);return !!da&&da===db&&(!ra||!rb||ra===rb)}
  function merge(){
    const nextLabel=leaf(/PR[ÓO]XIMO PARTIDO\s*[·•-]\s*FEFI/), callLabel=leaf(/^CONVOCATORIA\s*[·•-]\s*\d{4}/);
    if(!nextLabel||!callLabel)return null;
-   const next=cardFor(nextLabel),call=cardFor(callLabel); if(!next||!call||next===call||!sameEvent(next,call))return null;
+   const next=cardFor(nextLabel),call=cardFor(callLabel); if(!next||!call||next===call)return null;
+   const da=dateKey(txt(next)),db=dateKey(txt(call)); if(da&&db&&da!==db)return null;
    if(next.dataset.callupMerged!=='1'){
      const category=(txt(callLabel).match(/(20\d{2})/)||[])[1]||'';
      const section=document.createElement('div');section.className='defe-callup-merged';section.style.cssText='margin-top:18px;padding-top:16px;border-top:1px solid #e3eaf2';
