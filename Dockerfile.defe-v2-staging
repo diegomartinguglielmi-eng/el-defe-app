@@ -1,0 +1,19 @@
+# Staging workaround: build + serve in container
+# This avoids Metal builder snapshot sync failures by building in Dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy source
+COPY defe-v2/ ./
+
+# Install dependencies and build
+RUN npm install && npm run build
+
+# Install static server for preview
+RUN npm install -g serve
+
+# Expose and serve
+EXPOSE 3000
+ENV PORT=3000
+CMD ["serve", "-s", "dist", "-l", "3000"]
