@@ -456,3 +456,20 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .fixtureRival small{font-size:8px!important}.fixtureRival b{font-size:11px!important;line-height:1.2!important}
 .fixtureResult{min-width:54px!important;text-align:center!important;background:var(--md-blue-soft)!important;color:var(--md-blue)!important;border-radius:10px!important;padding:8px 7px!important;font-size:14px!important;font-weight:900!important;white-space:nowrap!important}
 .fixtureCurrent{font-size:8px!important;padding:6px 7px!important;border-radius:999px!important}
+
+/* Profesor · densidad visual: fixture + comunicaciones */
+.fixtureList{gap:6px!important}
+.fixtureRow{height:auto!important;min-height:58px!important;padding:8px 10px!important;gap:8px!important;grid-template-columns:52px minmax(0,1fr) auto!important}
+.fixtureRound{padding-right:8px!important}.fixtureRound b{font-size:14px!important}.fixtureRound small{margin-top:2px!important}
+.fixtureRival{padding:0!important;margin:0!important}.fixtureRival small{display:block!important;margin:0 0 2px!important;line-height:1!important}.fixtureRival b{display:block!important;margin:0!important;line-height:1.15!important}
+.fixtureResult{padding:6px 7px!important;min-width:50px!important;font-size:13px!important}
+.fixtureSheet .fixtureList article{min-height:58px!important}
+.coachMessages{padding:14px!important}
+.coachMessagesHead{margin-bottom:10px!important}.coachMessagesHead>span{min-width:34px!important;height:34px!important;font-size:13px!important}
+.messageComposer{padding:12px!important}.messageComposer>small{margin-bottom:7px!important}
+.messageComposer label{margin-bottom:8px!important}.messageComposer input,.messageComposer textarea{padding:9px 10px!important}
+.sentMessages{margin-top:12px!important}.sentMessagesTitle{margin-bottom:6px!important}
+.sentMessageCard{padding:9px 10px!important;margin-bottom:6px!important;border-radius:12px!important}
+.sentMessageMeta{margin-bottom:4px!important}.sentMessageMeta span{padding:3px 6px!important}
+.sentMessageCard>b{font-size:12px!important;line-height:1.2!important}.sentMessageCard>p{margin:4px 0 5px!important;font-size:10px!important;line-height:1.3!important}
+.sentMessageRead{padding-top:5px!important}
