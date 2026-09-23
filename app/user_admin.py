@@ -101,6 +101,9 @@ def list_users(db: Session = Depends(get_db), admin: User = Depends(require_role
         {
             "id": u.id,
             "email": u.email,
+            "first_name": u.first_name,
+            "last_name": u.last_name,
+            "phone": u.phone,
             "role": u.role,
             "is_active": u.is_active,
             "created_at": u.created_at,
