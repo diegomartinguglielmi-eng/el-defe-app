@@ -254,6 +254,42 @@ def _round_rows(db: Session, round_number: int):
     ).order_by(FefiCategoryResult.id).all()
 
 
+@router.get("/results/latest/{category}")
+def latest_category_result(category: str, db: Session = Depends(get_db)):
+    """Return the latest published Clausura result for one official FEFI category."""
+    rows = db.query(FefiCategoryResult).filter(
+        FefiCategoryResult.category == category,
+        FefiCategoryResult.external_key.like("%|CLAUSURA|%"),
+    ).order_by(FefiCategoryResult.round_number.desc()).all()
+
+    def valid(value):
+        return value is not None and str(value).strip() not in {"", "-"}
+
+    row = next((r for r in rows if valid(r.home_value) and valid(r.away_value)), None)
+    if row is None:
+        try:
+            sync_verified_results(db)
+        except Exception:
+            db.rollback()
+        rows = db.query(FefiCategoryResult).filter(
+            FefiCategoryResult.category == category,
+            FefiCategoryResult.external_key.like("%|CLAUSURA|%"),
+        ).order_by(FefiCategoryResult.round_number.desc()).all()
+        row = next((r for r in rows if valid(r.home_value) and valid(r.away_value)), None)
+
+    if row is None:
+        return {"result": None}
+    return {"result": {
+        "round": row.round_number,
+        "category": row.category,
+        "home": row.home,
+        "away": row.away,
+        "home_value": row.home_value,
+        "away_value": row.away_value,
+        "status": row.status,
+    }}
+
+
 @router.get("/results/{round_number}")
 def category_results(round_number: int, db: Session = Depends(get_db)):
     rows = _round_rows(db, round_number)
