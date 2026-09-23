@@ -360,3 +360,11 @@ button.primary,.familyApp button.primary,.coachApp button.primary,.adminApp butt
 /* Landing crest: stronger visual presence */
 .cleanWelcome .welcomeLogo{height:205px!important;max-width:235px!important;margin:0 auto 14px!important}
 @media(max-height:760px){.cleanWelcome .welcomeLogo{height:178px!important;max-width:205px!important}}
+
+/* Landing brand: single institutional blue */
+.cleanWelcome{--brand-blue:#1f4a9b!important}
+.cleanWelcome .greenStroke,.cleanWelcome .topStroke,.cleanWelcome .bottomStroke{background:#1f4a9b!important}
+.cleanWelcome .welcomeTitle,.cleanWelcome .welcomeSub,.cleanWelcome .welcomeSub i,.cleanWelcome .installButton,.cleanWelcome .installButton *{color:#1f4a9b!important;border-color:#1f4a9b!important}
+.cleanWelcome .welcomeSub i{background:#1f4a9b!important}
+.cleanWelcome .loginHero{background:#1f4a9b!important}
+.cleanWelcome .registerHero{border-color:#1f4a9b!important;color:#1f4a9b!important}
