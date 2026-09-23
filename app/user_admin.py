@@ -4,8 +4,9 @@ from sqlalchemy.orm import Session
 
 from .auth import hash_password, create_token, require_roles
 from .db import get_db
-from .models import User, AuditLog, Favorite, Person, Team, TeamMember, Match, FefiCategorySchedule
+from .models import User, AuditLog, Favorite, Person, Team, TeamMember, Match, FefiCategorySchedule, Match, FefiCategorySchedule
 from .profe_scope import PROFE_TEAM_FAVORITE, normalize_selection, profe_selections
+from .sync import sync_fefi
 
 router = APIRouter()
 
