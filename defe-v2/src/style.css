@@ -416,3 +416,14 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .messageInboxCard>p{font-size:13px!important;line-height:1.35!important;margin:8px 0!important}
 .messageMeta span,.messageMeta time{font-size:9px!important}.messageCardFoot{min-height:18px!important}.messageCardFoot small,.readState,.newBadge{font-size:9px!important}
 .deleteMessage{width:28px!important;height:28px!important;flex-basis:28px!important;font-size:19px!important}
+
+/* Familia · último resultado alineado al sistema visual */
+.homeLastResult{background:#fff!important;border:1px solid var(--md-line)!important;border-radius:18px!important;padding:16px!important;margin:14px 0!important;box-shadow:var(--md-shadow)!important}
+.homeLastResult .sectionTitleRow{display:flex!important;align-items:center!important;justify-content:space-between!important;margin:0 0 13px!important}
+.homeLastResult .sectionTitleRow small{font-size:10px!important;font-weight:900!important;letter-spacing:.075em!important;color:var(--md-muted)!important}
+.homeLastResult .sectionTitleRow span{font-size:10px!important;color:var(--md-muted)!important}
+.homeLastResult .homeScore{display:grid!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;align-items:center!important;gap:10px!important;padding:0 0 14px!important}
+.homeLastResult .homeScore b{font-size:11px!important;line-height:1.25!important;color:var(--md-ink)!important;font-weight:900!important}
+.homeLastResult .homeScore b:last-child{text-align:right!important}
+.homeLastResult .homeScore strong{font-size:23px!important;line-height:1!important;color:var(--md-blue)!important;background:var(--md-blue-soft)!important;border-radius:12px!important;padding:10px 12px!important;white-space:nowrap!important}
+.homeLastResult .textAction{display:flex!important;width:100%!important;align-items:center!important;justify-content:center!important;background:var(--md-blue-soft)!important;color:var(--md-blue)!important;border:0!important;border-radius:12px!important;padding:11px 12px!important;font-size:11px!important;font-weight:900!important}
