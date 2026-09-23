@@ -282,9 +282,10 @@ def birthdays(category:str,competition:str="FEFI",db:Session=Depends(get_db),use
     category=(category or "").strip(); competition=(competition or "FEFI").strip().upper()
     if not category: raise HTTPException(status_code=400,detail="Falta categoría")
     # La familia sólo puede consultar categorías de sus hijos; profesor/delegado/admin según su alcance operativo.
-    if user.role=="familia":
-        allowed={f"{t['competition']}|{t['category']}".upper() for p in _linked_players(db,user.id) for t in p["teams"]}
-        if f"{competition}|{category}".upper() not in allowed: raise HTTPException(status_code=403,detail="Categoría no vinculada a la familia")
+    linked=_linked_players(db,user.id)
+    allowed_family={f"{t['competition']}|{t['category']}".upper() for p in linked for t in p["teams"]}
+    if allowed_family:
+        if f"{competition}|{category}".upper() not in allowed_family: raise HTTPException(status_code=403,detail="Categoría no vinculada a la familia")
     elif user.role=="profe":
         from .profe_scope import profe_selections
         if f"{competition}|{category}".upper() not in {x.upper() for x in profe_selections(db,user)}: raise HTTPException(status_code=403,detail="Categoría no asignada")
