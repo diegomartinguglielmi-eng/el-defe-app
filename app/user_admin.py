@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from .auth import hash_password, create_token, require_roles
 from .db import get_db
-from .models import User, AuditLog, Favorite, Person, Team, TeamMember
+from .models import User, AuditLog, Favorite, Person, Team, TeamMember, Match, FefiCategorySchedule
 from .profe_scope import PROFE_TEAM_FAVORITE, normalize_selection, profe_selections
 
 router = APIRouter()
@@ -132,6 +132,24 @@ def change_role(user_id: int, payload: RoleIn, db: Session = Depends(get_db), ad
     _audit(db, admin, "change_role", target.id, f"{old_role}->{target.role}")
 
     return {"ok": True, "id": target.id, "email": target.email, "role": target.role}
+
+
+@router.get("/api/profe/next-match")
+def get_profe_next_match(category: str, db: Session = Depends(get_db), profe: User = Depends(require_roles("profe"))):
+    category = (category or "").strip()
+    selection = normalize_selection(f"FEFI|{category}")
+    if not selection or selection not in profe_selections(db, profe):
+        raise HTTPException(status_code=403, detail="Categoría no asignada al profesor")
+    from datetime import date
+    today = date.today().isoformat()
+    match = (db.query(Match)
+        .filter(Match.competition == "FEFI", Match.division == "Zona H", Match.status == "scheduled", Match.date != None, Match.date >= today)
+        .order_by(Match.date.asc(), Match.id.asc()).first())
+    if not match:
+        return {"match": None, "category": category}
+    row = db.query(FefiCategorySchedule).filter(FefiCategorySchedule.match_id == match.id, FefiCategorySchedule.category == category).first()
+    standard = {"2019":"14:30","2013":"15:15","2018":"16:10","2014":"16:55","2017":"17:50","2016":"18:45","2015":"19:40"}
+    return {"category": category, "match": {"id": match.id, "round_name": match.round_name, "date": match.date, "home": match.home, "away": match.away, "venue": match.venue, "home_away": "local" if "DEF. DE SANTOS LUGARES" in (match.home or "").upper() else "visitante", "time": row.time if row and row.time else standard.get(category), "time_source": "override" if row and row.time else "base", "source_url": match.source_url}}
 
 
 @router.get("/api/profe/squad")
