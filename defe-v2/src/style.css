@@ -448,3 +448,11 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .messageComposer{background:#fff!important;border:1px solid var(--md-line)!important;border-radius:15px!important;box-shadow:none!important}.messageAudience{background:var(--md-blue-soft)!important;border-radius:11px!important}.messageAudience b{color:var(--md-blue)!important}
 .birthdayTodayHero{background:linear-gradient(145deg,#edf3ff,#fff)!important;border:1px solid var(--md-line)!important;border-radius:15px!important}.coachBirthdayCard.today{border-color:#b8cef3!important;background:var(--md-blue-soft)!important}
 .fixtureSheet{border-radius:22px 22px 0 0!important}.fixtureRow{border-color:var(--md-line)!important;border-radius:13px!important}.fixtureRow.current{background:var(--md-blue-soft)!important;border-color:#b8cef3!important}.fixtureCurrent{background:var(--md-blue)!important;color:#fff!important}
+
+/* Profesor · fixture compacto con resultados */
+.fixtureList{display:flex!important;flex-direction:column!important;gap:8px!important}
+.fixtureRow{min-height:0!important;padding:11px 12px!important;margin:0!important;display:grid!important;grid-template-columns:58px minmax(0,1fr) auto!important;align-items:center!important;gap:10px!important}
+.fixtureRound{padding-right:10px!important}.fixtureRound b{font-size:15px!important}.fixtureRound small{font-size:9px!important}
+.fixtureRival small{font-size:8px!important}.fixtureRival b{font-size:11px!important;line-height:1.2!important}
+.fixtureResult{min-width:54px!important;text-align:center!important;background:var(--md-blue-soft)!important;color:var(--md-blue)!important;border-radius:10px!important;padding:8px 7px!important;font-size:14px!important;font-weight:900!important;white-space:nowrap!important}
+.fixtureCurrent{font-size:8px!important;padding:6px 7px!important;border-radius:999px!important}
