@@ -156,7 +156,7 @@ def _bootstrap_content():
 
 @app.on_event('startup')
 def v5_startup_hardening():
-    scheduler.add_job(run_birthdays,'cron',hour=9,minute=0,id='birthday-daily-push',replace_existing=True,max_instances=1,coalesce=True)
+    scheduler.add_job(run_birthdays,'cron',hour=9,minute=0,timezone='America/Argentina/Buenos_Aires',id='birthday-daily-push',replace_existing=True,max_instances=1,coalesce=True)
     try:scheduler.remove_job('daily-sync')
     except Exception:pass
     scheduler.add_job(_bootstrap_superliga,'interval',hours=1,id='superliga-hourly-sync',replace_existing=True,max_instances=1,coalesce=True)
