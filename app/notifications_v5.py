@@ -30,6 +30,13 @@ class NotificationEvent(Base):
     match_id: Mapped[Optional[int]] = mapped_column(ForeignKey("matches.id"), index=True); urgent: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
 
+class NotificationRead(Base):
+    __tablename__ = "notification_reads"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    event_id: Mapped[int] = mapped_column(ForeignKey("notification_events.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    read_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
 class PushSubscription(Base):
     __tablename__ = "push_subscriptions"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -170,7 +177,32 @@ def notification_feed(since_id:int=0,limit:int=50,db:Session=Depends(get_db),use
         if comp: return any(s.startswith(f"{comp}|") for s in family)
         return True
     rows=[x for x in rows if visible(x)]
-    return [{"id":x.id,"event_type":x.event_type,"title":x.title,"body":x.body,"competition":x.competition,"category":x.category,"match_id":x.match_id,"urgent":x.urgent,"created_at":x.created_at} for x in rows]
+    ids=[x.id for x in rows]
+    read_ids={r.event_id for r in db.query(NotificationRead).filter(NotificationRead.user_id==user.id,NotificationRead.event_id.in_(ids)).all()} if ids else set()
+    return [{"id":x.id,"event_type":x.event_type,"title":x.title,"body":x.body,"competition":x.competition,"category":x.category,"match_id":x.match_id,"urgent":x.urgent,"created_at":x.created_at,"read":x.id in read_ids} for x in rows]
+
+@router.post("/read/{event_id}")
+def mark_notification_read(event_id:int,db:Session=Depends(get_db),user=Depends(get_current_user)):
+    event=db.get(NotificationEvent,event_id)
+    if not event: raise HTTPException(status_code=404,detail="Comunicación inexistente")
+    exists=db.query(NotificationRead).filter(NotificationRead.event_id==event_id,NotificationRead.user_id==user.id).first()
+    if not exists:
+        db.add(NotificationRead(event_id=event_id,user_id=user.id));db.commit()
+    return {"ok":True,"event_id":event_id}
+
+@router.get("/communications/history")
+def communication_history(limit:int=20,db:Session=Depends(get_db),user=Depends(require_roles("admin","profe","delegado"))):
+    limit=max(1,min(limit,100))
+    q=db.query(NotificationEvent).filter(NotificationEvent.event_type=="communication")
+    if user.role=="profe":
+        assigned={x.upper() for x in profe_selections(db,user)}
+        rows=[x for x in q.order_by(NotificationEvent.id.desc()).limit(100).all() if x.competition and x.category and f"{x.competition}|{x.category}".upper() in assigned][:limit]
+    else: rows=q.order_by(NotificationEvent.id.desc()).limit(limit).all()
+    out=[]
+    for x in rows:
+        reads=db.query(NotificationRead).filter(NotificationRead.event_id==x.id).count()
+        out.append({"id":x.id,"title":x.title,"body":x.body,"competition":x.competition,"category":x.category,"created_at":x.created_at,"read_count":reads})
+    return {"communications":out}
 
 @router.post("/communication")
 def create_communication_notice(payload:CommunicationNoticeIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","profe","delegado"))):
