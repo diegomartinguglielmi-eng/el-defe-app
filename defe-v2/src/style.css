@@ -298,3 +298,10 @@ button.primary,.familyApp button.primary,.coachApp button.primary,.adminApp butt
 .homeScore b{font-size:11px;line-height:1.25}.homeScore b:last-child{text-align:right}.homeScore strong{font-size:19px;background:#f2f6fc;padding:7px 9px;border-radius:9px;white-space:nowrap}
 .homeLastResult .textAction{padding:4px 0}
 @media(max-width:420px){.homeScore{gap:7px}.homeScore strong{font-size:17px}.homeAttendance{font-size:9px}}
+
+/* Family standings sheet · official FEFI */
+.standingsOverlay{position:fixed;inset:0;z-index:80;background:#102d5066;display:flex;align-items:flex-end;justify-content:center;padding:18px}
+.standingsSheet{width:min(620px,100%);max-height:86vh;overflow:auto;background:#f8fafd;border-radius:24px 24px 18px 18px;padding:20px;box-shadow:0 -10px 40px #102d5030}
+.standingsSheetHead{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:16px}.standingsSheetHead small,.standingsTitle small{font-size:11px;font-weight:900;letter-spacing:.07em;color:#718096}.standingsSheetHead h2{margin:4px 0 0;color:#174f80}.standingsSheetHead button{border:0;background:#e9eff7;color:#174f80;width:34px;height:34px;border-radius:50%;font-size:24px;line-height:1}
+.standingsTournaments{display:grid;gap:12px}.standingsTournament{background:#fff;border:1px solid #dbe4ef;border-radius:17px;padding:16px}.standingsTitle{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid #edf1f5}.standingsTitle h3{margin:3px 0 0;font-size:16px}.standingsTitle>strong{font-size:28px;color:#174f80}
+.standingsClub{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 0 10px}.standingsClub b{font-size:14px}.standingsClub strong{white-space:nowrap;color:#174f80}.standingsStats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.standingsStats span{background:#f4f7fb;border-radius:9px;padding:8px 4px;text-align:center;font-size:11px;color:#66788d}.standingsStats span b{display:block;font-size:16px;color:#174f80}.standingsSource{font-size:11px;color:#718096;margin:14px 2px 2px}
