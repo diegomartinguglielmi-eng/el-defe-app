@@ -134,6 +134,21 @@ def change_role(user_id: int, payload: RoleIn, db: Session = Depends(get_db), ad
     return {"ok": True, "id": target.id, "email": target.email, "role": target.role}
 
 
+@router.get("/api/profe/me")
+def get_current_profe(db: Session = Depends(get_db), profe: User = Depends(require_roles("profe"))):
+    selections = sorted(profe_selections(db, profe))
+    return {
+        "id": profe.id,
+        "email": profe.email,
+        "role": profe.role,
+        "first_name": profe.first_name,
+        "last_name": profe.last_name,
+        "phone": profe.phone,
+        "selections": selections,
+        "categories": [value.split("|", 1)[1] for value in selections if "|" in value],
+    }
+
+
 @router.get("/api/admin/users/{user_id}/profe-teams")
 def get_profe_teams(user_id: int, db: Session = Depends(get_db), admin: User = Depends(require_roles("admin"))):
     target = db.get(User, user_id)
