@@ -5,7 +5,11 @@ import re
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
+from sqlalchemy.orm import Session
+
+from .db import get_db
+from .fefi_results import FefiCategoryResult
 
 router=APIRouter(tags=['FEFI'])
 URL='https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/'
