@@ -60,6 +60,7 @@ class FamilyChildIn(BaseModel):
     competition: str
     category: str
     birth_date: str | None = None
+    nickname: str | None = None
 class FamilyTeamIn(BaseModel):
     competition: str
     category: str
@@ -74,7 +75,7 @@ def _player_teams(db, person_id):
     rows=db.query(TeamMember,Team).join(Team,Team.id==TeamMember.team_id).filter(TeamMember.person_id==person_id,Team.is_active==True).order_by(Team.competition,Team.division).all()
     return [{"team_id":t.id,"competition":t.competition,"category":t.division,"season":t.season} for _,t in rows]
 def _player(db,p):
-    return {"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"first_name":p.first_name,"last_name":p.last_name,"birth_year":p.birth_year,"birth_date":p.birth_date.isoformat() if p.birth_date else None,"teams":_player_teams(db,p.id)}
+    return {"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"first_name":p.first_name,"last_name":p.last_name,"birth_year":p.birth_year,"birth_date":p.birth_date.isoformat() if p.birth_date else None,"nickname":p.nickname,"teams":_player_teams(db,p.id)}
 def _linked_players(db,user_id):
     rows=db.query(UserPlayerLink,Person).join(Person,Person.id==UserPlayerLink.person_id).filter(UserPlayerLink.user_id==user_id,Person.is_active==True).order_by(Person.last_name,Person.first_name).all()
     return [_player(db,p) for _,p in rows]
@@ -300,6 +301,6 @@ def birthdays(category:str,competition:str="FEFI",db:Session=Depends(get_db),use
         if nxt<today:
             try: nxt=date(today.year+1,b.month,b.day)
             except ValueError: nxt=date(today.year+1,2,28)
-        out.append({"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"category":category,"day":b.day,"month":b.month,"days_until":(nxt-today).days,"is_mine":p.id in linked_ids})
+        out.append({"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"category":category,"day":b.day,"month":b.month,"days_until":(nxt-today).days,"is_mine":p.id in linked_ids,"nickname":p.nickname})
     out.sort(key=lambda x:(x["days_until"],x["name"]))
     return {"category":category,"birthdays":out}
