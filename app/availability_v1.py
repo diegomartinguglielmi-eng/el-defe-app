@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -276,3 +276,25 @@ def admin_availability(db:Session=Depends(get_db),user=Depends(require_roles("ad
         response=db.query(AvailabilityResponse).filter(AvailabilityResponse.user_id==person.id,AvailabilityResponse.match_id==event["match_id"],AvailabilityResponse.selection==selection).first();status=response.status if response else "pending";players=_linked_players(db,person.id)
         bucket["followers"]+=1;bucket[status]=bucket.get(status,0)+1;bucket["people"].append({"user_id":person.id,"email":person.email,"name":" / ".join(p["name"] for p in players) if players else None,"players":players,"status":status,"note":response.note if response else None,"updated_at":response.updated_at if response else None})
     items=list(grouped.values());items.sort(key=lambda x:((x.get("date") or "9999-99-99"),x.get("competition") or "",x.get("category") or ""));return {"today":_today(),"items":items}
+
+@router.get("/birthdays")
+def birthdays(category:str,competition:str="FEFI",db:Session=Depends(get_db),user=Depends(get_current_user)):
+    category=(category or "").strip(); competition=(competition or "FEFI").strip().upper()
+    if not category: raise HTTPException(status_code=400,detail="Falta categoría")
+    # La familia sólo puede consultar categorías de sus hijos; profesor/delegado/admin según su alcance operativo.
+    if user.role=="familia":
+        allowed={f"{t['competition']}|{t['category']}".upper() for p in _linked_players(db,user.id) for t in p["teams"]}
+        if f"{competition}|{category}".upper() not in allowed: raise HTTPException(status_code=403,detail="Categoría no vinculada a la familia")
+    elif user.role=="profe":
+        from .profe_scope import profe_selections
+        if f"{competition}|{category}".upper() not in {x.upper() for x in profe_selections(db,user)}: raise HTTPException(status_code=403,detail="Categoría no asignada")
+    elif user.role not in ("admin","delegado"):
+        raise HTTPException(status_code=403,detail="Sin acceso")
+    rows=db.query(Person).join(TeamMember,TeamMember.person_id==Person.id).join(Team,Team.id==TeamMember.team_id).filter(Person.is_active==True,Person.birth_date.isnot(None),Team.is_active==True,Team.competition==competition,Team.division==category).distinct().all()
+    today=_today(); out=[]
+    for p in rows:
+        b=p.birth_date; nxt=date(today.year,b.month,b.day)
+        if nxt<today: nxt=date(today.year+1,b.month,b.day)
+        out.append({"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"category":category,"day":b.day,"month":b.month,"days_until":(nxt-today).days})
+    out.sort(key=lambda x:(x["days_until"],x["name"]))
+    return {"category":category,"birthdays":out}
