@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 630" role="img" aria-label="Escudo Defensores de Santos Lugares">
 <g transform="translate(300 315) scale(1.16 1) translate(-300 -315)">
-<path d="M300 28C225 92 139 91 55 74l25 238c16 160 94 271 220 318 126-47 204-158 220-318l25-238c-84 17-170 18-245-46z" fill="#40358d" stroke="#40358d" stroke-width="18"/>
+<path d="M300 28C225 92 139 91 55 74l25 238c16 160 94 271 220 318 126-47 204-158 220-318l25-238c-84 17-170 18-245-46z" fill="#1f4a9b" stroke="#1f4a9b" stroke-width="18"/>
 <path d="M300 52C229 108 149 108 80 96l22 213c14 145 84 225 198 288 114-63 184-143 198-288l22-213c-69 12-149 12-220-44z" fill="none" stroke="#fff" stroke-width="13"/>
 <rect x="116" y="274" width="368" height="62" fill="#fff"/>
-<circle cx="252" cy="305" r="10" fill="#40358d"/><circle cx="348" cy="305" r="10" fill="#40358d"/>
-<text x="300" y="375" text-anchor="middle" font-family="Georgia,serif" font-size="184" font-weight="700" fill="#40358d" stroke="#fff" stroke-width="9" paint-order="stroke">DSL</text>
+<circle cx="252" cy="305" r="10" fill="#1f4a9b"/><circle cx="348" cy="305" r="10" fill="#1f4a9b"/>
+<text x="300" y="375" text-anchor="middle" font-family="Georgia,serif" font-size="184" font-weight="700" fill="#1f4a9b" stroke="#fff" stroke-width="9" paint-order="stroke">DSL</text>
 </g></svg>
