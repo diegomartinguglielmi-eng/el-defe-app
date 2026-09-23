@@ -59,6 +59,7 @@ def startup():
         if "phone" not in existing: conn.execute(text("ALTER TABLE users ADD COLUMN phone VARCHAR(40)"))
         people_existing={c["name"] for c in inspect(engine).get_columns("people")}
         if "birth_date" not in people_existing: conn.execute(text("ALTER TABLE people ADD COLUMN birth_date DATE"))
+        if "nickname" not in people_existing: conn.execute(text("ALTER TABLE people ADD COLUMN nickname VARCHAR(60)"))
     db=SessionLocal()
     try:
         if not db.query(User).filter(User.email==settings.admin_email).first():
