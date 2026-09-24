@@ -126,7 +126,7 @@ def _category_matches(competition:str, selected:str, division:str|None)->bool:
 
 
 def _event_from_match(db:Session,m:Match,competition:str,category:str)->dict:
-    date,time=_date_parts(m.date);note=None
+    date,time=_date_parts(m.date);note=None\n    if competition=="ARGENLIGA" and (m.source_url or "").startswith("manual://argenliga?time="):\n        time=(m.source_url or "").split("time=",1)[1] or time
     if competition=="FEFI" and category.isdigit():
         sched=db.query(FefiCategorySchedule).filter(FefiCategorySchedule.match_id==m.id,FefiCategorySchedule.category==category).first()
         if sched:time=sched.time or time;note=sched.note
