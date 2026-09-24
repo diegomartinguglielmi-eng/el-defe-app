@@ -12,7 +12,7 @@ from .fefi_schedules import router as fefi_schedules_router
 from .fefi_freshness import router as fefi_freshness_router
 from .fefi_standings import router as fefi_standings_router
 from .notifications_v5 import router as notifications_router
-from .notification_reminders import run_birthdays
+from .notification_reminders import run_birthdays, run_callup_pending_alerts
 from .data_quality import router as data_quality_router
 from .home_v5 import router as home_router
 from .following_v5 import router as following_router
@@ -157,6 +157,7 @@ def _bootstrap_content():
 @app.on_event('startup')
 def v5_startup_hardening():
     scheduler.add_job(run_birthdays,'cron',hour=9,minute=0,timezone='America/Argentina/Buenos_Aires',id='birthday-daily-push',replace_existing=True,max_instances=1,coalesce=True)
+    scheduler.add_job(run_callup_pending_alerts,'cron',hour=10,minute=0,timezone='America/Argentina/Buenos_Aires',id='callup-72h-pending-push',replace_existing=True,max_instances=1,coalesce=True)
     try:scheduler.remove_job('daily-sync')
     except Exception:pass
     scheduler.add_job(_bootstrap_superliga,'interval',hours=1,id='superliga-hourly-sync',replace_existing=True,max_instances=1,coalesce=True)
