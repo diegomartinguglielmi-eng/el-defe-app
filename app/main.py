@@ -104,6 +104,10 @@ def startup():
                 db.add(qa_player); db.flush()
             if db.query(UserPlayerLink).filter(UserPlayerLink.user_id==qa.id,UserPlayerLink.person_id==qa_player.id).first() is None:
                 db.add(UserPlayerLink(user_id=qa.id,person_id=qa_player.id))
+            # Limpieza de datos legacy: FEFI usa categoría por año, nunca divisiones de futsal (1RA..8VA).
+            legacy_fefi=db.query(TeamMember).join(Team,Team.id==TeamMember.team_id).filter(TeamMember.person_id==qa_player.id,TeamMember.season==2026,Team.competition=="FEFI",func.upper(Team.division).in_(["1RA","3RA","4TA","5TA","6TA","7MA","8VA"])).all()
+            for tm in legacy_fefi: db.delete(tm)
+            if legacy_fefi: db.flush()
             # Seed de planteles sólo en el alta inicial. No volver a crear participaciones que la familia haya editado o eliminado.
             has_teams=db.query(TeamMember).filter(TeamMember.person_id==qa_player.id,TeamMember.season==2026).first() is not None
             if not has_teams:
