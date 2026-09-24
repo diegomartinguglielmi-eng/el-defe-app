@@ -529,3 +529,41 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .adminMessages .messageComposer{padding:14px!important;border:1px solid var(--md-line)!important;border-radius:16px!important;box-shadow:var(--md-shadow)!important}.adminMessages .messageComposer label{margin-bottom:9px!important}.adminMessages .messageComposer input,.adminMessages .messageComposer textarea,.adminMessages .messageComposer select{padding:10px!important;border-radius:11px!important}.adminMessages .sentMessages{margin-top:15px!important}.adminMessages .sentMessageCard{padding:10px 11px!important;margin-bottom:7px!important;border-radius:13px!important}
 .adminCoachCard{border-color:var(--md-line)!important;box-shadow:var(--md-shadow)!important;padding:12px!important}.adminCoachAvatar{background:var(--md-blue-soft)!important;color:var(--md-blue)!important}.adminCoachIdentity>div>b{color:var(--md-ink)!important;font-size:14px!important}.adminCoachCats span{background:var(--md-blue-soft)!important;color:var(--md-blue)!important}.adminEditTeams{background:#fff!important;color:var(--md-blue)!important;border-color:var(--md-line)!important}.coachCreatePanel{border-color:var(--md-line)!important;box-shadow:var(--md-shadow)!important}
 @media(max-width:600px){.adminKpis{grid-template-columns:repeat(2,1fr)!important}.adminDashboardWelcome h1{font-size:29px!important}.adminApp>article{padding-left:20px!important;padding-right:20px!important}}
+
+
+/* Admin · dashboard operativo v3 */
+.adminControl{position:relative;overflow:hidden!important;padding:15px!important}
+.adminControl:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--md-blue)}
+.adminControlHead{padding-left:2px!important}
+.adminKpis>div{box-shadow:none!important;border:1px solid #e8edf4!important;background:#f9fbfd!important}
+.adminKpis>div:last-child{background:#fff9ed!important;border-color:#f1dfb7!important}
+.adminKpis>div:last-child b{color:#8a6500!important}
+.adminFollow{box-shadow:var(--md-shadow)!important}
+.adminFollowCard{position:relative;box-shadow:none!important;background:#fbfcfe!important}
+.adminFollowCard:has(.pending){border-left:4px solid #e2b442!important}
+.adminFollowCard:has(.done){border-left:4px solid #4b9a68!important}
+.adminFollowTop{align-items:start!important}
+.adminFollowTop>div{display:grid!important;gap:1px!important}
+.adminFollowTop small{color:var(--md-muted)!important}
+.adminCoachLine,.adminCallupLine{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:8px!important}
+.adminCoachLine span{font-weight:900!important;letter-spacing:.05em!important;color:var(--md-muted)!important}
+.adminCoachLine b{font-size:9px!important;text-align:right!important;color:var(--md-ink)!important}
+.adminCallupLine .done{color:#187243!important;font-weight:900!important}
+.adminCallupLine .pending{color:#8a6500!important;font-weight:900!important}
+.adminCallupLine>b{font-size:9px!important;color:var(--md-muted)!important}
+.adminFollow .responseProgress{height:5px!important;margin:7px 0 0!important}
+.adminFollowCounts span:first-child{background:#eaf7ef!important;color:#187243!important}
+.adminFollowCounts span:nth-child(2){background:#fbecec!important;color:#a33b3b!important}
+.adminFollowCounts span:nth-child(3){background:#fff4dc!important;color:#8a6500!important}
+.adminQuick{box-shadow:none!important;background:transparent!important;border:0!important;padding:3px 0!important}
+.adminQuick>small{padding-left:2px!important}
+.adminQuick button{box-shadow:none!important;border:1px solid var(--md-line)!important;background:#fff!important}
+.adminQuick button:active{transform:scale(.985)}
+@media(max-width:600px){
+ .adminDashboardWelcome{margin:12px 0 12px!important}
+ .adminControl,.adminFollow{padding:12px!important}
+ .adminKpis{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}
+ .adminKpis>div{padding:9px 3px!important}
+ .adminKpis b{font-size:20px!important}.adminKpis span{font-size:7px!important}
+ .adminFollowCard{padding:10px!important}
+}
