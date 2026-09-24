@@ -6,6 +6,7 @@ from .models import Match, FefiCategorySchedule, Person, Team, TeamMember, CallU
 from .profe_scope import PROFE_TEAM_FAVORITE
 from .notifications_v5 import NotificationEvent, publish_event, PushSubscription
 from .availability_v1 import UserPlayerLink
+from .fefi_schedules import STANDARD_TIMES
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 FEFI_CATEGORIES = ["2019", "2013", "2018", "2014", "2017", "2016", "2015"]
@@ -155,13 +156,23 @@ def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, 
         target=(now.date()+timedelta(days=3)).isoformat()
         q=db.query(Match).filter(Match.competition=="FEFI",Match.status!="final")
         if match_id is not None: q=q.filter(Match.id==match_id)
-        elif not force: q=q.filter(Match.date==target)
+        elif not force: q=q.filter(Match.date>=now.date().isoformat(),Match.date<=(now.date()+timedelta(days=4)).isoformat())
         matches=q.order_by(Match.date.asc(),Match.id.asc()).all()
         if force and match_id is not None and not matches:
             debug.append({"requested_match_id":match_id,"match_found":False,"available_fefi_matches":[{"id":m.id,"date":m.date,"status":m.status,"division":m.division,"home":m.home,"away":m.away} for m in db.query(Match).filter(Match.competition=="FEFI").order_by(Match.date.desc(),Match.id.desc()).limit(15).all()]})
         categories=[str(category)] if category else FEFI_CATEGORIES
         for match in matches:
             for category in categories:
+                if not force:
+                    schedule=db.query(FefiCategorySchedule).filter(FefiCategorySchedule.match_id==match.id,FefiCategorySchedule.category==category).first()
+                    effective_time=(schedule.time if schedule and schedule.time else STANDARD_TIMES.get(category))
+                    if not effective_time: continue
+                    try:
+                        match_dt=datetime.strptime(f"{match.date} {effective_time}","%Y-%m-%d %H:%M").replace(tzinfo=AR_TZ)
+                    except (TypeError,ValueError):
+                        continue
+                    hours_to_match=(match_dt-now).total_seconds()/3600
+                    if not (0 < hours_to_match <= 72): continue
                 # El tablero del profe toma el Team activo de la categoria y, sobre ese
                 # Team, la ultima convocatoria publicada del partido. Replicar exactamente
                 # esa identidad evita mezclar Teams historicos de una misma categoria.
