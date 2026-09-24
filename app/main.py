@@ -101,7 +101,7 @@ def startup():
                 db.add(qa_player); db.flush()
             if db.query(UserPlayerLink).filter(UserPlayerLink.user_id==qa.id,UserPlayerLink.person_id==qa_player.id).first() is None:
                 db.add(UserPlayerLink(user_id=qa.id,person_id=qa_player.id))
-            for competition,division in [("FEFI","2013"),("LAAMBA","6ta")]:
+            for competition,division in [("FEFI","2013"),("LAAMBA","6ta"),("ARGENLIGA","6TA")]:
                 qa_team=db.query(Team).filter(Team.competition==competition,Team.division==division,Team.season==2026).first()
                 if qa_team is None:
                     qa_team=Team(competition=competition,division=division,season=2026,is_active=True)
@@ -117,7 +117,7 @@ def startup():
                 db.add(qa_profe); db.flush()
             else:
                 qa_profe.password_hash=hash_password(qa_seed); qa_profe.role="profe"; qa_profe.is_active=True
-            for profe_selection in ("LAAMBA|6TA", "FEFI|2013"):
+            for profe_selection in ("LAAMBA|6TA", "FEFI|2013", "ARGENLIGA|6TA"):
                 scope=db.query(Favorite).filter(Favorite.user_id==qa_profe.id,Favorite.favorite_type=="profe_team",Favorite.favorite_id==profe_selection).first()
                 if scope is None:
                     db.add(Favorite(user_id=qa_profe.id,favorite_type="profe_team",favorite_id=profe_selection))
