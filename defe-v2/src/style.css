@@ -599,3 +599,21 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .adminQuick button{padding:9px 10px!important;box-shadow:none!important;border:1px solid #dbe5f3!important}
 .adminQuick button b{font-size:10px!important}.adminQuick button span{font-size:8px!important}
 @media(max-width:420px){.adminApp>article{padding-left:16px!important;padding-right:16px!important}.adminDashboardWelcome h1{font-size:25px!important}.adminKpis{grid-template-columns:repeat(4,minmax(0,1fr))!important}.adminKpis>div{padding:8px 2px!important}.adminKpis b{font-size:19px!important}.adminKpis span{font-size:7px!important}.adminControl,.adminFollow,.adminQuick{border-radius:16px!important}}
+
+
+/* Admin Comunicaciones · mobile form fix */
+.adminMessages{padding:12px!important}
+.adminMessagesHead{display:flex!important;justify-content:space-between!important;align-items:center!important}
+.adminMessagesHead>div{min-width:0!important}.adminMessagesHead h2{font-size:17px!important}.adminMessagesHead p{font-size:9px!important}
+.adminMessages .messageComposer{display:grid!important;gap:9px!important;padding:12px!important}
+.adminMessages .messageComposer>small{margin:0!important;font-size:9px!important}
+.adminMessages .messageComposer label{display:grid!important;grid-template-columns:1fr!important;gap:5px!important;margin:0!important;font-size:10px!important;font-weight:850!important;color:var(--md-ink)!important}
+.adminMessages .messageComposer input,.adminMessages .messageComposer select,.adminMessages .messageComposer textarea{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;border:1px solid #d7e0eb!important;background:#fff!important;color:var(--md-ink)!important;font-size:14px!important;line-height:1.3!important}
+.adminMessages .messageComposer input,.adminMessages .messageComposer select{height:44px!important;min-height:44px!important;padding:0 12px!important}
+.adminMessages .messageComposer textarea{min-height:108px!important;padding:11px 12px!important;resize:vertical!important}
+.adminMessages .messageAudience{margin:1px 0!important;padding:9px 11px!important;border-radius:11px!important;display:flex!important;justify-content:space-between!important;align-items:center!important;gap:8px!important}
+.adminMessages .messageAudience span{font-size:8px!important}.adminMessages .messageAudience b{font-size:10px!important;text-align:right!important}
+.adminMessages .messageComposer .primary{margin:0!important;min-height:46px!important}
+.adminMessages .sentMessages{margin-top:13px!important}.adminMessages .sentMessagesTitle{margin-bottom:7px!important}
+.adminMessages .coachEmpty{padding:22px 14px!important;min-height:0!important}.adminMessages .coachEmpty h3{font-size:16px!important;margin:0 0 5px!important}.adminMessages .coachEmpty p{font-size:11px!important;margin:0!important}
+@media(max-width:600px){.adminMessages{margin-left:0!important;margin-right:0!important}.adminMessages .messageComposer{overflow:hidden!important}.adminMessages .messageComposer select{appearance:auto!important}}
