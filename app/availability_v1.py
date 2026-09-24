@@ -140,6 +140,14 @@ def update_family_child(person_id:int,payload:FamilyChildIn,db:Session=Depends(g
 def add_family_child_team(person_id:int,payload:FamilyTeamIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
     p=_assert_family_child(db,user.id,person_id);_add_team(db,user.id,p.id,payload.competition,payload.category);db.commit();return {"ok":True,"child":_player(db,p)}
 
+@router.delete("/family/children/{person_id}/teams/{team_id}")
+def delete_family_child_team(person_id:int,team_id:int,db:Session=Depends(get_db),user=Depends(get_current_user)):
+    p=_assert_family_child(db,user.id,person_id)
+    rows=db.query(TeamMember).filter(TeamMember.person_id==p.id,TeamMember.team_id==team_id).all()
+    for row in rows: db.delete(row)
+    db.commit()
+    return {"ok":True,"child":_player(db,p)}
+
 @router.post("/family/requests")
 def request_player(payload:PlayerRequestIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
     p=db.get(Person,payload.person_id)
