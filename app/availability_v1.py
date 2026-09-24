@@ -10,7 +10,7 @@ from sqlalchemy.sql import func
 from .auth import get_current_user, require_roles
 from .db import Base, get_db
 from .models import Favorite, User, Person, Team, TeamMember
-from .following_v5 import _current, _events_for_selection, FOLLOW_TYPE
+from .following_v5 import _current, _events_for_selection, _next_laamba_without_date, FOLLOW_TYPE
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 router = APIRouter(prefix="/api/availability", tags=["Availability"])
