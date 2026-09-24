@@ -713,3 +713,10 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 
 
 .familyNoPlayer{margin:28px 32px;padding:22px;border:1px solid var(--md-line);border-radius:18px;background:#fff;box-shadow:var(--md-shadow)}.familyNoPlayer h2{margin:0 0 7px;color:var(--md-ink);font-size:21px}.familyNoPlayer p{margin:0 0 16px;color:var(--md-muted);font-size:12px;line-height:1.45}.familyNoPlayer .primary{width:100%}
+
+
+/* Profesor · avisos de ausencia */
+.coachTabs button{position:relative}.absenceBadge{position:absolute;top:5px;right:9px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:#d99b1b;color:#fff;font-size:8px;font-weight:900;display:grid;place-items:center}
+.coachAbsences{background:#fff;border:1px solid var(--md-line);border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:var(--md-shadow)}
+.coachAbsenceHead{display:flex;justify-content:space-between;gap:10px;align-items:start}.coachAbsenceHead small{font-size:8px;font-weight:900;letter-spacing:.08em;color:var(--md-muted)}.coachAbsenceHead h2{font-size:17px;margin:2px 0;color:var(--md-ink)}.coachAbsenceHead p{font-size:9px;margin:0;color:var(--md-muted)}.coachAbsenceHead>span{min-width:36px;height:36px;border-radius:12px;background:#fff4dc;color:#8a6500;font-weight:900;display:grid;place-items:center}
+.coachAbsenceList{display:grid;gap:7px;margin-top:11px}.coachAbsenceCard{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:9px;align-items:center;padding:9px;border:1px solid #eee2c8;border-radius:13px;background:#fffaf0}.coachAbsenceIcon{width:36px;height:36px;border-radius:11px;background:#fff;display:grid;place-items:center;font-size:18px}.coachAbsenceCard>div{min-width:0;display:grid;gap:1px}.coachAbsenceCard b{font-size:12px;color:var(--md-ink)}.coachAbsenceCard small{font-size:9px;font-weight:800;color:#8a6500}.coachAbsenceCard p{font-size:9px;margin:3px 0 0;color:var(--md-muted)}.coachAbsenceCard time{font-size:8px;color:var(--md-muted);font-weight:800}.coachEmpty.compact{padding:18px 10px!important;margin-top:10px!important}
