@@ -157,6 +157,7 @@ def _live_fefi_next(db:Session,category:str,today:str)->dict|None:
                     home,away=cells[0].strip(),cells[2].strip()
                     if (_is_defe(home) or _is_defe(away)) and date and date>=today:
                         fixtures.append({"round":round_no,"date":date,"home":home,"away":away})
+        print({"fefi_v2_next":{"today":today,"fixtures":fixtures}})
         if not fixtures:return None
         fixtures.sort(key=lambda x:(x["date"],x["round"]));x=fixtures[0];local=_is_defe(x["home"])
         address="Ernesto Sábato 3162, Santos Lugares, Buenos Aires" if local else None
