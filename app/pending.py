@@ -59,8 +59,8 @@ def _nearby_tournament_marker(table) -> str | None:
     for node in table.find_all_previous(["h1","h2","h3","h4","h5","h6","button","a","span","div"], limit=40):
         txt = _norm(node.get_text(" ", strip=True))
         if not txt or len(txt) > 140: continue
-        if "CLAUSURA" in txt: return "CLAUSURA"
-        if "APERTURA" in txt: return "APERTURA"
+        if "FIXTURE CLAUSURA" in txt or txt == "CLAUSURA": return "CLAUSURA"
+        if "FIXTURE APERTURA" in txt or txt == "APERTURA": return "APERTURA"
     return None
 
 def _prefer_clausura(candidates: list) -> list:
