@@ -36,6 +36,24 @@ async def security_headers(request, call_next):
 
 scheduler=BackgroundScheduler()
 
+@app.get("/api/location-search")
+def location_search(q: str):
+    import requests
+    query=(q or "").strip()
+    if len(query)<4:
+        return {"results":[]}
+    # Bias manual venue searches to Argentina while still allowing a full address.
+    params={"q":query,"format":"jsonv2","addressdetails":1,"limit":6,"countrycodes":"ar"}
+    headers={"User-Agent":"MiDEFE/2.0 (Defensores de Santos Lugares; location validator)","Accept-Language":"es-AR,es;q=0.9"}
+    try:
+        resp=requests.get("https://nominatim.openstreetmap.org/search",params=params,headers=headers,timeout=8)
+        resp.raise_for_status()
+        rows=resp.json()
+        return {"results":[{"place_id":x.get("place_id"),"display_name":x.get("display_name"),"lat":x.get("lat"),"lon":x.get("lon")} for x in rows]}
+    except Exception:
+        raise HTTPException(status_code=503,detail="No pudimos consultar el validador de ubicaciones")
+
+
 def audit(db,user,action,entity,entity_id=None,detail=None):
     db.add(AuditLog(user_id=user.id if user else None,action=action,entity=entity,entity_id=str(entity_id) if entity_id else None,detail=detail))
     db.commit()
