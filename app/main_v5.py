@@ -24,7 +24,7 @@ from .league_tournaments import router as league_tournaments_router
 from .league_stats import router as league_stats_router
 from .db import SessionLocal
 from .models import User, Match, SyncRun, Person, TeamMember, CallUpPlayer, PlayerMatchStat, Suspension, MediaItem, PlayerOfMatch, Favorite
-from .auth import hash_password, require_roles
+from .auth import hash_password, require_roles, require_roles
 from .availability_v1 import UserPlayerLink, UserPlayerRequest
 from .availability_player_v2 import PlayerAvailabilityResponse
 from .profe_scope import PROFE_TEAM_FAVORITE
@@ -161,6 +161,10 @@ def _bootstrap_content():
 
 @app.post("/api/admin/test-callup-alert/{match_id}/{category}")
 def test_callup_alert(match_id:int,category:str,admin:User=Depends(require_roles("admin"))):
+    return run_callup_pending_alerts(force=True,match_id=match_id,category=category)
+
+@app.post("/api/admin/test-callup-72h/{match_id}/{category}")
+def test_callup_72h(match_id:int,category:str,admin:User=Depends(require_roles("admin"))):
     return run_callup_pending_alerts(force=True,match_id=match_id,category=category)
 
 @app.on_event('startup')
