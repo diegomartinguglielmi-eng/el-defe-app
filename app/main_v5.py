@@ -169,6 +169,8 @@ def test_callup_72h(match_id:int,category:str,admin:User=Depends(require_roles("
 
 @app.on_event('startup')
 def v5_startup_hardening():
+    try: print({'callup_72h_staging_test':run_callup_pending_alerts(force=True,category='2016')})
+    except Exception as exc: print({'callup_72h_staging_test_error':str(exc)})
     scheduler.add_job(run_birthdays,'cron',hour=9,minute=0,timezone='America/Argentina/Buenos_Aires',id='birthday-daily-push',replace_existing=True,max_instances=1,coalesce=True)
     scheduler.add_job(run_callup_pending_alerts,'cron',hour=10,minute=0,timezone='America/Argentina/Buenos_Aires',id='callup-72h-pending-push',replace_existing=True,max_instances=1,coalesce=True)
     try:scheduler.remove_job('daily-sync')
