@@ -9,7 +9,7 @@ from sqlalchemy.sql import func
 
 from .auth import get_current_user, require_roles
 from .db import Base, get_db
-from .models import User, Team, TeamMember, Person
+from .models import User, Team, TeamMember, Person, CallUp, CallUpPlayer
 from .availability_v1 import UserPlayerLink, AvailabilityResponse, _linked_players, _next_event
 from .profe_scope import profe_selections, normalize_selection
 
@@ -187,3 +187,62 @@ def profe_roster_v2(selection: str, db: Session = Depends(get_db), user=Depends(
             for tm, p in rows
         ],
     }
+
+
+class ProfeCallupIn(BaseModel):
+    selection: str
+    person_ids: list[int]
+    notes: str | None = None
+
+@router.post("/profe/callup")
+def save_profe_callup(payload: ProfeCallupIn, db: Session = Depends(get_db), user=Depends(require_roles("profe", "admin", "delegado", "dt"))):
+    key = normalize_selection(payload.selection)
+    if user.role == "profe" and key not in profe_selections(db, user):
+        raise HTTPException(403, "Equipo fuera del alcance del profesor")
+    if "|" not in key:
+        raise HTTPException(400, "Liga y categoría inválidas")
+    competition, category = key.split("|", 1)
+    event = _next_event(db, key)
+    if not event or not event.get("match_id"):
+        raise HTTPException(409, "No hay un próximo partido persistido para convocar")
+    team = db.query(Team).filter(func.upper(Team.competition) == competition, func.upper(Team.division) == category, Team.is_active == True).order_by(Team.season.desc()).first()
+    if not team:
+        raise HTTPException(404, "Plantel inexistente")
+    valid = {x.person_id for x in db.query(TeamMember).filter(TeamMember.team_id == team.id).all()}
+    chosen = {int(x) for x in payload.person_ids if int(x) in valid}
+    row = db.query(CallUp).filter(CallUp.match_id == int(event["match_id"]), CallUp.team_id == team.id).order_by(CallUp.id.desc()).first()
+    if not row:
+        row = CallUp(match_id=int(event["match_id"]), team_id=team.id, created_by=user.id, status="draft")
+        db.add(row)
+        db.flush()
+    row.status = "sent"
+    row.notes = (payload.notes or "").strip()[:1000] or None
+    existing = {x.person_id: x for x in db.query(CallUpPlayer).filter(CallUpPlayer.callup_id == row.id).all()}
+    for person_id in chosen:
+        if person_id not in existing:
+            db.add(CallUpPlayer(callup_id=row.id, person_id=person_id, attendance="pending"))
+    for person_id, item in existing.items():
+        if person_id not in chosen:
+            db.delete(item)
+    db.commit()
+    return {"ok": True, "callup_id": row.id, "selection": key, "status": "sent", "players": len(chosen)}
+
+@router.get("/profe/callup")
+def get_profe_callup(selection: str, db: Session = Depends(get_db), user=Depends(require_roles("profe", "admin", "delegado", "dt"))):
+    key = normalize_selection(selection)
+    if user.role == "profe" and key not in profe_selections(db, user):
+        raise HTTPException(403, "Equipo fuera del alcance del profesor")
+    if "|" not in key:
+        raise HTTPException(400, "Liga y categoría inválidas")
+    competition, category = key.split("|", 1)
+    event = _next_event(db, key)
+    team = db.query(Team).filter(func.upper(Team.competition) == competition, func.upper(Team.division) == category, Team.is_active == True).order_by(Team.season.desc()).first()
+    if not event or not event.get("match_id") or not team:
+        return {"selection": key, "callup": None}
+    row = db.query(CallUp).filter(CallUp.match_id == int(event["match_id"]), CallUp.team_id == team.id).order_by(CallUp.id.desc()).first()
+    if not row:
+        return {"selection": key, "callup": None}
+    people = db.query(CallUpPlayer, Person).join(Person, Person.id == CallUpPlayer.person_id).filter(CallUpPlayer.callup_id == row.id).order_by(Person.last_name, Person.first_name).all()
+    items = [{"row_id": cp.id, "person_id": p.id, "name": f"{p.first_name} {p.last_name}".strip(), "attendance": cp.attendance} for cp, p in people]
+    counts = {s: sum(1 for x in items if x["attendance"] == s) for s in ("yes", "no", "maybe", "pending")}
+    return {"selection": key, "callup": {"id": row.id, "status": row.status, "notes": row.notes, "match": event, "players": items, "counts": counts}}
