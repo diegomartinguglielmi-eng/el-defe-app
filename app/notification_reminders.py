@@ -200,7 +200,7 @@ def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, 
                 total=len(rows); pending=sum((x.attendance or "pending")=="pending" for x in rows)
                 if force: debug.append({"match_id":match.id,"match_date":match.date,"category":category,"team_id":team.id,"callup_id":callup.id,"callup_status":callup.status,"total":total,"pending":pending,"attendance":[x.attendance for x in rows]})
                 if not total or pending/total<=0.25: continue
-                marker=f"callup_72h:{match.id}:{category}" if not force else f"callup_72h_test5:{match.id}:{category}"
+                marker=f"callup_72h:{match.id}:{category}" if not force else f"callup_72h_linktest:{match.id}:{category}"
                 if db.query(NotificationEvent).filter(NotificationEvent.event_type==marker).first(): continue
                 profe_ids=[uid for (uid,) in db.query(Favorite.user_id).filter(Favorite.favorite_type==PROFE_TEAM_FAVORITE,Favorite.favorite_id==f"FEFI|{category}").all()]
                 profes=db.query(User).filter(User.id.in_(profe_ids),User.role=="profe",User.is_active==True).all() if profe_ids else []
