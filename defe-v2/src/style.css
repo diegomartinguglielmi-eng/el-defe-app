@@ -567,3 +567,35 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
  .adminKpis b{font-size:20px!important}.adminKpis span{font-size:7px!important}
  .adminFollowCard{padding:10px!important}
 }
+
+
+/* Admin dashboard · tablero operativo v2 */
+.adminDashboardWelcome{padding:10px 2px 12px!important;margin:8px 0 8px!important}
+.adminDashboardWelcome h1{font-size:26px!important}
+.adminControl{padding:12px!important;margin-bottom:9px!important}
+.adminControlHead{margin-bottom:8px!important}
+.adminKpis{gap:5px!important}
+.adminKpis>div{padding:9px 4px!important;box-shadow:none!important;border:1px solid var(--md-line)!important;background:#f8fafd!important}
+.adminKpis b{font-size:20px!important}
+.adminKpis span{font-size:8px!important}
+.adminFollow{padding:12px!important;margin-bottom:9px!important}
+.adminFollowHead{margin-bottom:8px!important}
+.adminFollowCard{padding:9px 10px!important;margin-bottom:6px!important;box-shadow:none!important}
+.adminFollowTop{grid-template-columns:52px minmax(0,1fr)!important}
+.adminCatBadge{text-align:center!important}
+.adminCoachLine{display:flex!important;justify-content:space-between!important;gap:8px!important;align-items:center!important}
+.adminCoachLine b{font-size:9px!important;text-align:right!important}
+.adminCallupLine{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:8px!important}
+.adminCallupLine span{font-size:9px!important;font-weight:850!important}
+.adminCallupLine .done{color:#187243!important}.adminCallupLine .pending{color:#8a6500!important}
+.adminCallupLine b{font-size:9px!important;color:var(--md-ink)!important}
+.adminFollow .responseProgress{height:5px!important;margin:6px 0 0!important}
+.adminFollowCounts{margin-top:5px!important}
+.adminFollowCounts span:nth-child(1){background:#eaf7ef!important;color:#187243!important}
+.adminFollowCounts span:nth-child(2){background:#fbecec!important;color:#a33b3b!important}
+.adminFollowCounts span:nth-child(3){background:#fff4dc!important;color:#8a6500!important}
+.adminQuick{padding:11px 12px!important}
+.adminQuick>div{margin-top:7px!important}
+.adminQuick button{padding:9px 10px!important;box-shadow:none!important;border:1px solid #dbe5f3!important}
+.adminQuick button b{font-size:10px!important}.adminQuick button span{font-size:8px!important}
+@media(max-width:420px){.adminApp>article{padding-left:16px!important;padding-right:16px!important}.adminDashboardWelcome h1{font-size:25px!important}.adminKpis{grid-template-columns:repeat(4,minmax(0,1fr))!important}.adminKpis>div{padding:8px 2px!important}.adminKpis b{font-size:19px!important}.adminKpis span{font-size:7px!important}.adminControl,.adminFollow,.adminQuick{border-radius:16px!important}}
