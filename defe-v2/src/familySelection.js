@@ -10,3 +10,10 @@ export function familyTeams(player){
   if(!player)return [];
   return player?.teams?.length?player.teams:[{competition:'FEFI',category:player.category}].filter(x=>x.category);
 }
+export function familyHeader(team){
+  const c=String(team?.competition||'FEFI').toUpperCase();
+  if(c==='FEFI')return 'BABY FÚTBOL · FEFI';
+  if(c==='LAAMBA')return 'FUTSAL · LAAMBA';
+  if(c==='ARGENLIGA')return 'FUTSAL · ARGENLIGA';
+  return c;
+}
