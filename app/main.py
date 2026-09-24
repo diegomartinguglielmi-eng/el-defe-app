@@ -8,7 +8,8 @@ from sqlalchemy import func
 from apscheduler.schedulers.background import BackgroundScheduler
 from .db import Base, engine, get_db, SessionLocal
 from .models import User, Match, Standing, News, AuditLog, Team, Person, TeamMember, CallUp, CallUpPlayer, PlayerMatchStat, Suspension, Favorite, NotificationPreference, MediaItem, PlayerOfMatch
-from .availability_v1 import UserPlayerLink\nfrom .config import settings
+from .availability_v1 import UserPlayerLink
+from .config import settings
 from .auth import hash_password, verify_password, create_token, get_current_user, require_roles
 from .schemas import UserCreate, NewsIn, MatchIn, ArgenImport, TeamIn, PersonIn, TeamMemberIn, CallUpIn, AttendanceIn, PlayerStatIn, SuspensionIn, FavoriteIn, NotificationPrefsIn, MediaIn, PlayerOfMatchIn
 from .sync import sync_fefi, sync_laamba, upsert_match
