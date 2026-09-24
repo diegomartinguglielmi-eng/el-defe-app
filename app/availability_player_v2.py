@@ -9,7 +9,7 @@ from sqlalchemy.sql import func
 
 from .auth import get_current_user, require_roles
 from .db import Base, get_db
-from .models import User
+from .models import User, Team, TeamMember, Person
 from .availability_v1 import UserPlayerLink, AvailabilityResponse, _linked_players, _next_event
 from .profe_scope import profe_selections, normalize_selection
 
@@ -158,3 +158,32 @@ def admin_player_availability(db: Session = Depends(get_db), user=Depends(requir
         item["followers"] = item["players"]
     items.sort(key=lambda x: ((x.get("date") or "9999-99-99"), x.get("selection") or ""))
     return {"items": items}
+
+
+@router.get("/profe/roster")
+def profe_roster_v2(selection: str, db: Session = Depends(get_db), user=Depends(require_roles("profe", "admin", "delegado", "dt"))):
+    key = normalize_selection(selection)
+    if user.role == "profe" and key not in profe_selections(db, user):
+        raise HTTPException(403, "Equipo fuera del alcance del profesor")
+    if "|" not in key:
+        raise HTTPException(400, "Liga y categoría inválidas")
+    competition, category = key.split("|", 1)
+    team = db.query(Team).filter(
+        func.upper(Team.competition) == competition,
+        func.upper(Team.division) == category,
+        Team.is_active == True,
+    ).order_by(Team.season.desc()).first()
+    if not team:
+        return {"selection": key, "team_id": None, "items": []}
+    rows = db.query(TeamMember, Person).join(Person, Person.id == TeamMember.person_id).filter(
+        TeamMember.team_id == team.id,
+        Person.is_active == True,
+    ).order_by(Person.last_name, Person.first_name).all()
+    return {
+        "selection": key,
+        "team_id": team.id,
+        "items": [
+            {"person_id": p.id, "name": f"{p.first_name} {p.last_name}".strip(), "member_role": tm.member_role}
+            for tm, p in rows
+        ],
+    }
