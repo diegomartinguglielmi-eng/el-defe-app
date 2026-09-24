@@ -122,7 +122,15 @@ def _wants(db, sub, event):
     if competition: return any(x.startswith(f"{competition}|") for x in followed)
     return True
 
-def _push_payload(event): return json.dumps({"id":event.id,"title":event.title,"body":event.body,"urgent":event.urgent,"competition":event.competition,"category":event.category,"match_id":event.match_id,"url":f"https://defe-v2-staging-2-production.up.railway.app/?tab=mensajes&message={event.id}" if event.event_type=="communication" else "https://defe-v2-staging-2-production.up.railway.app/"},ensure_ascii=False)
+def _push_payload(event):
+    base="https://defe-v2-staging-2-production.up.railway.app/"
+    if event.event_type=="communication":
+        url=f"{base}?tab=mensajes&message={event.id}"
+    elif str(event.event_type or "").startswith("callup_72h"):
+        url=f"{base}?tab=convocatoria&category={event.category or ''}&match={event.match_id or ''}"
+    else:
+        url=base
+    return json.dumps({"id":event.id,"title":event.title,"body":event.body,"urgent":event.urgent,"competition":event.competition,"category":event.category,"match_id":event.match_id,"url":url},ensure_ascii=False)
 
 def deliver_pushes(db, event, target_user_id=None):
     private_key, public_key, subject=_vapid(db)
