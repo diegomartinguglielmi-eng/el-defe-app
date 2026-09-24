@@ -124,10 +124,11 @@ def _wants(db, sub, event):
 
 def _push_payload(event): return json.dumps({"id":event.id,"title":event.title,"body":event.body,"urgent":event.urgent,"competition":event.competition,"category":event.category,"match_id":event.match_id,"url":f"https://defe-v2-staging-2-production.up.railway.app/?tab=mensajes&message={event.id}" if event.event_type=="communication" else "https://defe-v2-staging-2-production.up.railway.app/"},ensure_ascii=False)
 
-def deliver_pushes(db, event):
+def deliver_pushes(db, event, target_user_id=None):
     private_key, public_key, subject=_vapid(db)
     rows=db.query(PushSubscription).filter(PushSubscription.enabled==True).all(); sent=disabled=failed=eligible=0; first_error=None
     for sub in rows:
+        if target_user_id is not None and sub.user_id != target_user_id: continue
         if not _wants(db,sub,event): continue
         eligible+=1
         try:
@@ -145,8 +146,8 @@ def deliver_pushes(db, event):
     if disabled: db.flush()
     return {"sent":sent,"failed":failed,"disabled":disabled,"eligible":eligible,"configured":True,"error":first_error}
 
-def publish_event(db,*,event_type,title,body,competition=None,category=None,match_id=None,urgent=False):
-    event=NotificationEvent(event_type=event_type,title=title[:180],body=body,competition=competition,category=category,match_id=match_id,urgent=urgent); db.add(event); db.flush(); setattr(event,"push_result",deliver_pushes(db,event)); return event
+def publish_event(db,*,event_type,title,body,competition=None,category=None,match_id=None,urgent=False,target_user_id=None):
+    event=NotificationEvent(event_type=event_type,title=title[:180],body=body,competition=competition,category=category,match_id=match_id,urgent=urgent); db.add(event); db.flush(); setattr(event,"push_result",deliver_pushes(db,event,target_user_id=target_user_id)); return event
 
 router=APIRouter(prefix="/api/notifications",tags=["Notifications"])
 
