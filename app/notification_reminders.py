@@ -2,7 +2,8 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from .db import Base, engine, SessionLocal
-from .models import Match, FefiCategorySchedule, Person, Team, TeamMember
+from .models import Match, FefiCategorySchedule, Person, Team, TeamMember, CallUp, CallUpPlayer, User, Favorite
+from .profe_scope import PROFE_TEAM_FAVORITE
 from .notifications_v5 import NotificationEvent, publish_event
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
@@ -145,3 +146,30 @@ def run(force: bool = False) -> dict:
 
 if __name__ == "__main__":
     run(force=True)
+
+
+def run_callup_pending_alerts(force: bool = False) -> dict:
+    now=datetime.now(AR_TZ); Base.metadata.create_all(bind=engine); db=SessionLocal(); created=pushed=0
+    try:
+        target=(now.date()+timedelta(days=3)).isoformat()
+        matches=db.query(Match).filter(Match.competition=="FEFI",Match.date==target,Match.status!="final").all()
+        for match in matches:
+            for category in FEFI_CATEGORIES:
+                team=db.query(Team).filter(Team.competition=="FEFI",Team.division==category,Team.is_active==True).order_by(Team.season.desc()).first()
+                if not team: continue
+                callup=db.query(CallUp).filter(CallUp.match_id==match.id,CallUp.team_id==team.id,CallUp.status=="published").order_by(CallUp.id.desc()).first()
+                if not callup: continue
+                rows=db.query(CallUpPlayer).filter(CallUpPlayer.callup_id==callup.id).all()
+                total=len(rows); pending=sum((x.attendance or "pending")=="pending" for x in rows)
+                if not total or pending/total<=0.25: continue
+                marker=f"callup_72h:{match.id}:{category}"
+                if db.query(NotificationEvent).filter(NotificationEvent.event_type==marker).first(): continue
+                profe_ids=[uid for (uid,) in db.query(Favorite.user_id).filter(Favorite.favorite_type==PROFE_TEAM_FAVORITE,Favorite.favorite_id==f"FEFI|{category}").all()]
+                profes=db.query(User).filter(User.id.in_(profe_ids),User.role=="profe",User.is_active==True).all() if profe_ids else []
+                for profe in profes:
+                    event=publish_event(db,event_type=marker,title=f"⚠️ Convocatoria Cat. {category}",body=f"{pending} de {total} convocados todavía no respondieron. Faltan 72 horas para el partido.",competition="FEFI",category=category,match_id=match.id,urgent=False,target_user_id=profe.id)
+                    created+=1; pushed+=getattr(event,"push_result",{}).get("sent",0)
+        db.commit(); return {"ok":True,"target_date":target,"alerts_created":created,"push_sent":pushed}
+    except Exception:
+        db.rollback(); raise
+    finally: db.close()
