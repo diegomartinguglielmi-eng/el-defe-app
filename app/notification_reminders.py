@@ -149,7 +149,7 @@ if __name__ == "__main__":
 
 
 def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, category: str | None = None) -> dict:
-    now=datetime.now(AR_TZ); Base.metadata.create_all(bind=engine); db=SessionLocal(); created=pushed=0
+    now=datetime.now(AR_TZ); Base.metadata.create_all(bind=engine); db=SessionLocal(); created=pushed=0; debug=[]
     try:
         target=(now.date()+timedelta(days=3)).isoformat()
         q=db.query(Match).filter(Match.competition=="FEFI",Match.status!="final")
@@ -169,7 +169,9 @@ def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, 
                         Team.is_active==True,
                     )
                     .order_by(Team.season.desc()).first())
-                if not team: continue
+                if not team:
+                    if force: debug.append({"match_id":match.id,"category":category,"team":None})
+                    continue
                 callup=(db.query(CallUp)
                     .filter(
                         CallUp.match_id==match.id,
@@ -177,9 +179,12 @@ def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, 
                         CallUp.status=="published",
                     )
                     .order_by(CallUp.id.desc()).first())
-                if not callup: continue
+                if not callup:
+                    if force: debug.append({"match_id":match.id,"match_date":match.date,"category":category,"team_id":team.id,"callup":None})
+                    continue
                 rows=db.query(CallUpPlayer).filter(CallUpPlayer.callup_id==callup.id).all()
                 total=len(rows); pending=sum((x.attendance or "pending")=="pending" for x in rows)
+                if force: debug.append({"match_id":match.id,"match_date":match.date,"category":category,"team_id":team.id,"callup_id":callup.id,"callup_status":callup.status,"total":total,"pending":pending,"attendance":[x.attendance for x in rows]})
                 if not total or pending/total<=0.25: continue
                 marker=f"callup_72h:{match.id}:{category}" if not force else f"callup_72h_test:{match.id}:{category}"
                 if db.query(NotificationEvent).filter(NotificationEvent.event_type==marker).first(): continue
@@ -188,7 +193,7 @@ def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, 
                 for profe in profes:
                     event=publish_event(db,event_type=marker,title=f"⚠️ Convocatoria Cat. {category}",body=f"{pending} de {total} convocados todavía no respondieron. Faltan 72 horas para el partido." if not force else f"PRUEBA · {pending} de {total} convocados todavía no respondieron.",competition="FEFI",category=category,match_id=match.id,urgent=False,target_user_id=profe.id)
                     created+=1; pushed+=getattr(event,"push_result",{}).get("sent",0)
-        db.commit(); return {"ok":True,"target_date":target,"alerts_created":created,"push_sent":pushed}
+        db.commit(); return {"ok":True,"target_date":target,"alerts_created":created,"push_sent":pushed,"debug":debug if force else None}
     except Exception:
         db.rollback(); raise
     finally: db.close()
