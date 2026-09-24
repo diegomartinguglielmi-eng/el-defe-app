@@ -1,1 +1,16 @@
-{"id":"/","name":"Mi DEFE","short_name":"Mi DEFE","description":"Baby fútbol Defensores de Santos Lugares: partidos, convocatorias, asistencia y comunicaciones.","start_url":"/","scope":"/","display":"standalone","background_color":"#f5f8fc","theme_color":"#174a87","icons":[]}
+{
+  "id": "/",
+  "name": "Mi DEFE",
+  "short_name": "Mi DEFE",
+  "description": "Baby fútbol Defensores de Santos Lugares: partidos, convocatorias, asistencia y comunicaciones.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f8fc",
+  "theme_color": "#1f4a9b",
+  "icons": [
+    {"src":"/defe-logo.svg","sizes":"any","type":"image/svg+xml","purpose":"any"},
+    {"src":"/defe-logo.svg","sizes":"any","type":"image/svg+xml","purpose":"maskable"}
+  ]
+}
