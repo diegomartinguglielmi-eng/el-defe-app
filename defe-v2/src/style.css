@@ -702,3 +702,11 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .adminCategoryPicker button.selected{background:var(--md-blue)!important;color:#fff!important;border-color:var(--md-blue)!important}
 .coachCreatePanel{padding:12px!important}.coachCreatePanel>small{font-size:9px!important;font-weight:900!important;letter-spacing:.08em!important}.coachCreatePanel label{display:grid!important;gap:4px!important;font-size:9px!important;font-weight:850!important}.coachCreatePanel input{width:100%!important;min-height:42px!important;padding:0 11px!important}.coachCreatePanel .primary{margin-top:9px!important}
 @media(max-width:420px){.adminPeopleHead h1{font-size:25px!important}.adminCoachSection{padding:10px!important}.adminCoachCard{padding:9px!important}}
+
+
+/* Familia · aviso de ausencia */
+.familyAbsence{background:#fff;border:1px solid var(--md-line);box-shadow:var(--md-shadow);padding:16px!important;margin-top:12px!important}
+.familyAbsence h3{margin:2px 0 0!important;font-size:17px!important;color:var(--md-ink)}.familyAbsence>p{font-size:10px;margin:7px 0 0}
+.absenceForm{margin-top:11px;padding-top:11px;border-top:1px solid var(--md-line)}
+.absenceReasons{display:grid;grid-template-columns:1fr 1fr;gap:7px}.absenceReasons button{min-height:64px;padding:9px;border:1px solid var(--md-line);border-radius:13px;background:#f9fbfd;color:var(--md-ink);display:flex;align-items:center;gap:8px;text-align:left}.absenceReasons button span{font-size:21px}.absenceReasons button b{font-size:10px;line-height:1.15}.absenceReasons button.selected{border-color:var(--md-blue);background:var(--md-blue-soft);box-shadow:inset 0 0 0 1px var(--md-blue)}
+.absenceForm textarea{width:100%;margin-top:8px;border:1px solid var(--md-line);border-radius:12px;padding:10px;font:inherit;font-size:12px;resize:none}.absenceCounter{display:block;text-align:right;font-size:8px;color:var(--md-muted);margin:2px 2px 7px}.absenceForm .primary{margin-top:9px}
