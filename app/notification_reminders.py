@@ -2,9 +2,9 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from .db import Base, engine, SessionLocal
-from .models import Match, FefiCategorySchedule, Person, Team, TeamMember, CallUp, CallUpPlayer, User, Favorite
+from .models import Match, FefiCategorySchedule, Person, Team, TeamMember, CallUp, CallUpPlayer, User, Favorite, UserPlayerLink
 from .profe_scope import PROFE_TEAM_FAVORITE
-from .notifications_v5 import NotificationEvent, publish_event
+from .notifications_v5 import NotificationEvent, publish_event, PushSubscription
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 FEFI_CATEGORIES = ["2019", "2013", "2018", "2014", "2017", "2016", "2015"]
@@ -188,13 +188,22 @@ def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, 
                 total=len(rows); pending=sum((x.attendance or "pending")=="pending" for x in rows)
                 if force: debug.append({"match_id":match.id,"match_date":match.date,"category":category,"team_id":team.id,"callup_id":callup.id,"callup_status":callup.status,"total":total,"pending":pending,"attendance":[x.attendance for x in rows]})
                 if not total or pending/total<=0.25: continue
-                marker=f"callup_72h:{match.id}:{category}" if not force else f"callup_72h_test2:{match.id}:{category}"
+                marker=f"callup_72h:{match.id}:{category}" if not force else f"callup_72h_test3:{match.id}:{category}"
                 if db.query(NotificationEvent).filter(NotificationEvent.event_type==marker).first(): continue
                 profe_ids=[uid for (uid,) in db.query(Favorite.user_id).filter(Favorite.favorite_type==PROFE_TEAM_FAVORITE,Favorite.favorite_id==f"FEFI|{category}").all()]
                 profes=db.query(User).filter(User.id.in_(profe_ids),User.role=="profe",User.is_active==True).all() if profe_ids else []
-                if force: debug.append({"professor_lookup":{"favorite_type":PROFE_TEAM_FAVORITE,"favorite_id":f"FEFI|{category}","profe_ids":profe_ids,"active_profes":[{"id":p.id,"email":p.email} for p in profes]}})
-                for profe in profes:
-                    event=publish_event(db,event_type=marker,title=f"⚠️ Convocatoria Cat. {category}",body=f"{pending} de {total} convocados todavía no respondieron. Faltan 72 horas para el partido." if not force else f"PRUEBA · {pending} de {total} convocados todavía no respondieron.",competition="FEFI",category=category,match_id=match.id,urgent=False,target_user_id=profe.id)
+                pending_person_ids=[x.person_id for x in rows if (x.attendance or "pending")=="pending"]
+                family_ids=[uid for (uid,) in db.query(UserPlayerLink.user_id).filter(UserPlayerLink.person_id.in_(pending_person_ids)).distinct().all()] if pending_person_ids else []
+                families=db.query(User).filter(User.id.in_(family_ids),User.is_active==True).all() if family_ids else []
+                targets={u.id:u for u in [*profes,*families]}
+                if force:
+                    sub_counts={uid:db.query(PushSubscription).filter(PushSubscription.user_id==uid,PushSubscription.enabled==True).count() for uid in targets}
+                    debug.append({"targets":{"profes":[{"id":p.id,"email":p.email} for p in profes],"families":[{"id":f.id,"email":f.email} for f in families],"enabled_push_subscriptions":sub_counts}})
+                for target_user in targets.values():
+                    is_profe=target_user.role=="profe"
+                    title=f"⚠️ Convocatoria Cat. {category}" if is_profe else f"⚽ Falta confirmar · Cat. {category}"
+                    body=(f"{pending} de {total} convocados todavía no respondieron. Faltan 72 horas para el partido." if is_profe else "Todavía tenés pendiente confirmar la asistencia al próximo partido.") if not force else (f"PRUEBA · {pending} de {total} convocados todavía no respondieron." if is_profe else "PRUEBA · Todavía tenés pendiente confirmar la asistencia al próximo partido.")
+                    event=publish_event(db,event_type=marker,title=title,body=body,competition="FEFI",category=category,match_id=match.id,urgent=True,target_user_id=target_user.id)
                     created+=1; pushed+=getattr(event,"push_result",{}).get("sent",0)
         db.commit(); return {"ok":True,"target_date":target,"alerts_created":created,"push_sent":pushed,"debug":debug if force else None}
     except Exception:
