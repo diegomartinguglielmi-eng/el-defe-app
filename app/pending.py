@@ -84,7 +84,13 @@ def parse_fefi(html: str) -> dict[str, Any]:
     for table in tables:
         text=_norm(table.get_text(" ",strip=True))
         if "LOCAL" in text and "VISITANTE" in text and " VS " in f" {text} ": fixture_candidates.append(table)
-    for table in _prefer_clausura(fixture_candidates):
+    # En la página Zona H el fixture de Clausura es el bloque que contiene las
+    # fechas vigentes. La detección por ancestros puede confundirse con tablas
+    # de resultados/posiciones; preferimos explícitamente el último fixture
+    # que contenga al club.
+    club_candidates=[t for t in fixture_candidates if FEFI_CLUB in _norm(t.get_text(" ",strip=True))]
+    selected=club_candidates[-1:] if club_candidates else _prefer_clausura(fixture_candidates)
+    for table in selected:
         current_round=current_date=None
         for row in table.find_all("tr"):
             cs=_cells(row)
