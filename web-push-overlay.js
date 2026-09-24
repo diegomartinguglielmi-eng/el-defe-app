@@ -15,7 +15,26 @@
   function isLegacy(el){const t=(el.textContent||'').replace(/\s+/g,' ').trim();if(!/^(🔔\s*)?(avisos activos|activar avisos)$/i.test(t))return false;if(el.closest('[data-defe-notifications-panel]'))return false;const s=getComputedStyle(el),r=el.getBoundingClientRect();return s.position==='fixed'||r.bottom>window.innerHeight-220}
   function removeLegacyButton(){document.getElementById('defe-push-btn')?.remove();document.querySelectorAll('.defe-push-btn').forEach(el=>el.remove());[...document.querySelectorAll('button,a,div,span')].filter(isLegacy).forEach(el=>{const target=el.closest('button,a')||el;if(target.style.display!=='none'){target.style.setProperty('display','none','important');target.setAttribute('aria-hidden','true')}})}
 
-  async function registerPushSW(){const reg=await navigator.serviceWorker.register(SW,{scope:BASE,updateViaCache:'none'});await reg.update().catch(()=>{});return reg}
+  async function cleanupLegacyPushWorkers(){
+    if(!('serviceWorker' in navigator))return;
+    try{
+      const regs=await navigator.serviceWorker.getRegistrations();
+      for(const reg of regs){
+        const urls=[reg.active?.scriptURL,reg.waiting?.scriptURL,reg.installing?.scriptURL].filter(Boolean);
+        const current=urls.some(u=>{try{const x=new URL(u);return x.origin===location.origin&&x.pathname===BASE+'push-sw.js'}catch{return false}});
+        if(current)continue;
+        const legacy=urls.some(u=>{try{const x=new URL(u);return x.origin===location.origin&&(x.pathname.endsWith('/sw.js')||x.pathname.endsWith('/registerSW.js')||x.pathname.includes('firebase-messaging-sw'))}catch{return false}});
+        if(legacy){
+          try{
+            const sub=await reg.pushManager?.getSubscription?.();
+            if(sub)await retire(reg,sub);
+          }catch(_){}
+          await reg.unregister().catch(()=>{});
+        }
+      }
+    }catch(e){console.warn('El Defe legacy push cleanup',e)}
+  }
+  async function registerPushSW(){await cleanupLegacyPushWorkers();const reg=await navigator.serviceWorker.register(SW,{scope:BASE,updateViaCache:'none'});await reg.update().catch(()=>{});return reg}
   async function detectActualPush(){
     if(!supported()||Notification.permission!=='granted'){actualPush=false;if(Notification.permission!=='granted')localStorage.removeItem(ENABLED);return false}
     try{
