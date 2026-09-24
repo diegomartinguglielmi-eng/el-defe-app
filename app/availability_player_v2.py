@@ -226,25 +226,24 @@ def profe_roster_v2(selection: str, db: Session = Depends(get_db), user=Depends(
     if "|" not in key:
         raise HTTPException(400, "Liga y categoría inválidas")
     competition, category = key.split("|", 1)
-    team = db.query(Team).filter(
+    teams = db.query(Team).filter(
         func.upper(Team.competition) == competition,
         func.upper(Team.division) == category,
         Team.is_active == True,
-    ).order_by(Team.season.desc()).first()
-    if not team:
+    ).order_by(Team.season.desc(), Team.id.desc()).all()
+    if not teams:
         return {"selection": key, "team_id": None, "items": []}
+    team_ids = [t.id for t in teams]
     rows = db.query(TeamMember, Person).join(Person, Person.id == TeamMember.person_id).filter(
-        TeamMember.team_id == team.id,
+        TeamMember.team_id.in_(team_ids),
         Person.is_active == True,
     ).order_by(Person.last_name, Person.first_name).all()
-    return {
-        "selection": key,
-        "team_id": team.id,
-        "items": [
-            {"person_id": p.id, "name": f"{p.first_name} {p.last_name}".strip(), "member_role": tm.member_role}
-            for tm, p in rows
-        ],
-    }
+    seen=set(); items=[]
+    for tm,p in rows:
+        if p.id in seen: continue
+        seen.add(p.id)
+        items.append({"person_id": p.id, "name": f"{p.first_name} {p.last_name}".strip(), "member_role": tm.member_role})
+    return {"selection": key, "team_id": teams[0].id, "items": items}
 
 
 class ProfeCallupIn(BaseModel):
