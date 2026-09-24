@@ -107,6 +107,21 @@ def _selection_roster_ids(db, teams):
     ids=[t.id for t in teams]
     return {x.person_id for x in db.query(TeamMember).filter(TeamMember.team_id.in_(ids)).all()} if ids else set()
 
+def _callup_player(db, match_id, selection, person_id):
+    key=normalize_selection(selection)
+    if "|" not in key:return None
+    competition,category=key.split("|",1); teams=_selection_teams(db,competition,category)
+    if not teams:return None
+    team_ids=[t.id for t in teams]
+    return db.query(CallUpPlayer,CallUp).join(CallUp,CallUp.id==CallUpPlayer.callup_id).filter(CallUp.match_id==int(match_id),CallUp.team_id.in_(team_ids),CallUp.status=="sent",CallUpPlayer.person_id==int(person_id)).order_by(CallUp.id.desc()).first()
+
+def _sync_callup_from_response(db, user_id, person_id, match_id, selection):
+    pair=_callup_player(db,match_id,selection,person_id)
+    if not pair:return None
+    cp,_=pair; status,_,_,_=_status(db,user_id,person_id,match_id,selection)
+    if status in {"yes","no","maybe"} and cp.attendance!=status: cp.attendance=status
+    return cp
+
 @router.get("/me")
 def my_player_availability(db:Session=Depends(get_db),user=Depends(get_current_user)):
     items=[]
@@ -122,11 +137,14 @@ def my_player_availability(db:Session=Depends(get_db),user=Depends(get_current_u
 def set_player_availability(match_id:int,payload:PlayerAvailabilityIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
     status=(payload.status or "").strip().lower()
     if status not in {"yes","no","maybe"}: raise HTTPException(400,"Estado inválido")
-    selection=(payload.selection or "").strip(); _family_player(db,user.id,payload.person_id,selection); event=_next_event(db,selection)
+    selection=normalize_selection((payload.selection or "").strip()); _family_player(db,user.id,payload.person_id,selection); event=_next_event(db,selection)
     if not event or int(event["match_id"])!=int(match_id): raise HTTPException(409,"La próxima fecha cambió. Actualizá la pantalla e intentá nuevamente.")
+    pair=_callup_player(db,match_id,selection,payload.person_id)
+    if not pair: raise HTTPException(409,"El jugador todavía no fue convocado para este partido")
+    cp,_=pair
     row=_player_response(db,payload.person_id,match_id,selection)
     if not row: row=PlayerAvailabilityResponse(user_id=user.id,person_id=payload.person_id,match_id=match_id,selection=selection); db.add(row)
-    row.user_id=user.id; row.status=status; row.note=(payload.note or "").strip()[:200] or None; db.commit(); db.refresh(row)
+    row.user_id=user.id; row.status=status; row.note=(payload.note or "").strip()[:200] or None; cp.attendance=status; db.commit(); db.refresh(row)
     return {"ok":True,"person_id":payload.person_id,"match_id":match_id,"selection":selection,"status":row.status,"updated_at":row.updated_at}
 
 @router.get("/admin")
@@ -186,7 +204,10 @@ def save_profe_callup(payload:ProfeCallupIn,db:Session=Depends(get_db),user=Depe
     row.status="sent"; row.notes=(payload.notes or "").strip()[:1000] or None
     existing={x.person_id:x for x in db.query(CallUpPlayer).filter(CallUpPlayer.callup_id==row.id).all()}
     for person_id in chosen:
-        if person_id not in existing: db.add(CallUpPlayer(callup_id=row.id,person_id=person_id,attendance="pending"))
+        if person_id not in existing:
+            cp=CallUpPlayer(callup_id=row.id,person_id=person_id,attendance="pending"); db.add(cp); db.flush()
+            prior=_player_response(db,person_id,int(event["match_id"]),key)
+            if prior and prior.status in {"yes","no","maybe"}: cp.attendance=prior.status
     for person_id,item in existing.items():
         if person_id not in chosen: db.delete(item)
     db.commit(); return {"ok":True,"callup_id":row.id,"selection":key,"status":"sent","players":len(chosen)}
@@ -203,7 +224,14 @@ def get_profe_callup(selection:str,db:Session=Depends(get_db),user=Depends(requi
     elif competition=="FEFI": row=db.query(CallUp).join(Match,Match.id==CallUp.match_id).filter(CallUp.team_id.in_(team_ids),Match.competition=="FEFI",Match.date==event.get("date"),Match.status!="final").order_by(CallUp.id.desc()).first()
     if not row:return {"selection":key,"callup":None}
     if not event.get("match_id"): event=dict(event); event["match_id"]=row.match_id
-    people=db.query(CallUpPlayer,Person).join(Person,Person.id==CallUpPlayer.person_id).filter(CallUpPlayer.callup_id==row.id).order_by(Person.last_name,Person.first_name).all(); items=[{"row_id":cp.id,"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"attendance":cp.attendance} for cp,p in people]; counts={s:sum(1 for x in items if x["attendance"]==s) for s in ("yes","no","maybe","pending")}
+    people=db.query(CallUpPlayer,Person).join(Person,Person.id==CallUpPlayer.person_id).filter(CallUpPlayer.callup_id==row.id).order_by(Person.last_name,Person.first_name).all(); items=[]; changed=False
+    for cp,p in people:
+        prior=_player_response(db,p.id,row.match_id,key)
+        if prior and prior.status in {"yes","no","maybe"} and cp.attendance!=prior.status:
+            cp.attendance=prior.status; changed=True
+        items.append({"row_id":cp.id,"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"attendance":cp.attendance})
+    if changed: db.commit()
+    counts={s:sum(1 for x in items if x["attendance"]==s) for s in ("yes","no","maybe","pending")}
     return {"selection":key,"callup":{"id":row.id,"status":row.status,"notes":row.notes,"match":event,"players":items,"counts":counts}}
 
 class FamilyCallupAttendanceIn(BaseModel): attendance:str
@@ -212,11 +240,14 @@ class FamilyCallupAttendanceIn(BaseModel): attendance:str
 def family_callups_v2(db:Session=Depends(get_db),user=Depends(get_current_user)):
     linked={int(p["person_id"]):p for p in _linked_players(db,user.id)}
     if not linked:return {"items":[]}
-    rows=db.query(CallUpPlayer,CallUp,Team,Person).join(CallUp,CallUp.id==CallUpPlayer.callup_id).join(Team,Team.id==CallUp.team_id).join(Person,Person.id==CallUpPlayer.person_id).filter(CallUpPlayer.person_id.in_(linked.keys()),CallUp.status=="sent").order_by(CallUp.id.desc()).all(); items=[]
+    rows=db.query(CallUpPlayer,CallUp,Team,Person).join(CallUp,CallUp.id==CallUpPlayer.callup_id).join(Team,Team.id==CallUp.team_id).join(Person,Person.id==CallUpPlayer.person_id).filter(CallUpPlayer.person_id.in_(linked.keys()),CallUp.status=="sent").order_by(CallUp.id.desc()).all(); items=[]; changed=False
     for cp,callup,team,person in rows:
         selection=normalize_selection(f"{team.competition}|{team.division}"); player=linked.get(int(person.id))
         if not player or not _belongs_to_selection(player,selection):continue
+        prior=_player_response(db,person.id,callup.match_id,selection)
+        if prior and prior.status in {"yes","no","maybe"} and cp.attendance!=prior.status: cp.attendance=prior.status; changed=True
         items.append({"row_id":cp.id,"callup_id":callup.id,"person_id":person.id,"player_name":f"{person.first_name} {person.last_name}".strip(),"competition":team.competition,"category":team.division,"selection":selection,"attendance":cp.attendance,"notes":callup.notes,"match_id":callup.match_id})
+    if changed: db.commit()
     return {"items":items}
 
 @router.patch("/family/callups/{row_id}")
@@ -227,4 +258,8 @@ def answer_family_callup_v2(row_id:int,payload:FamilyCallupAttendanceIn,db:Sessi
     if not row:raise HTTPException(404,"Convocatoria inexistente")
     cp,callup,team=row; player=next((p for p in _linked_players(db,user.id) if int(p["person_id"])==int(cp.person_id)),None); selection=normalize_selection(f"{team.competition}|{team.division}")
     if not player or not _belongs_to_selection(player,selection):raise HTTPException(403,"La convocatoria no pertenece a esta familia")
-    cp.attendance=attendance; db.commit(); return {"ok":True,"row_id":cp.id,"selection":selection,"attendance":cp.attendance}
+    cp.attendance=attendance
+    response=_player_response(db,cp.person_id,callup.match_id,selection)
+    if not response: response=PlayerAvailabilityResponse(user_id=user.id,person_id=cp.person_id,match_id=callup.match_id,selection=selection); db.add(response)
+    response.user_id=user.id; response.status=attendance
+    db.commit(); return {"ok":True,"row_id":cp.id,"selection":selection,"attendance":cp.attendance}
