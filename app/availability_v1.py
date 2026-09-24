@@ -58,6 +58,8 @@ class FamilyChildIn(BaseModel):
     last_name: str
     competition: str
     category: str
+    birth_date: str | None = None
+    nickname: str | None = None
 class FamilyTeamIn(BaseModel):
     competition: str
     category: str
@@ -75,7 +77,7 @@ def _player_teams(db, person_id):
     rows=db.query(TeamMember,Team).join(Team,Team.id==TeamMember.team_id).filter(TeamMember.person_id==person_id,Team.is_active==True).order_by(Team.competition,Team.division).all()
     return [{"team_id":t.id,"competition":t.competition,"category":t.division,"season":t.season} for _,t in rows]
 def _player(db,p):
-    return {"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"first_name":p.first_name,"last_name":p.last_name,"birth_year":p.birth_year,"teams":_player_teams(db,p.id)}
+    return {"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"first_name":p.first_name,"last_name":p.last_name,"birth_year":p.birth_year,"birth_date":p.birth_date,"nickname":p.nickname,"teams":_player_teams(db,p.id)}
 def _linked_players(db,user_id):
     rows=db.query(UserPlayerLink,Person).join(Person,Person.id==UserPlayerLink.person_id).filter(UserPlayerLink.user_id==user_id,Person.is_active==True).order_by(Person.last_name,Person.first_name).all()
     return [_player(db,p) for _,p in rows]
@@ -123,7 +125,7 @@ def family_setup(db:Session=Depends(get_db),user=Depends(get_current_user)):
 def create_family_child(payload:FamilyChildIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
     first=(payload.first_name or '').strip(); last=(payload.last_name or '').strip()
     if not first or not last: raise HTTPException(400,"Nombre y apellido son obligatorios")
-    p=Person(first_name=first,last_name=last,role="player",is_active=True);db.add(p);db.flush()
+    p=Person(first_name=first,last_name=last,birth_date=(payload.birth_date or None),nickname=((payload.nickname or "").strip() or None),role="player",is_active=True);db.add(p);db.flush()
     db.add(UserPlayerLink(user_id=user.id,person_id=p.id));_add_team(db,user.id,p.id,payload.competition,payload.category)
     db.commit();db.refresh(p);return {"ok":True,"child":_player(db,p)}
 
@@ -131,7 +133,7 @@ def create_family_child(payload:FamilyChildIn,db:Session=Depends(get_db),user=De
 def update_family_child(person_id:int,payload:FamilyChildIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
     p=_assert_family_child(db,user.id,person_id);first=(payload.first_name or '').strip();last=(payload.last_name or '').strip()
     if not first or not last: raise HTTPException(400,"Nombre y apellido son obligatorios")
-    p.first_name=first;p.last_name=last;_add_team(db,user.id,p.id,payload.competition,payload.category);db.commit();db.refresh(p)
+    p.first_name=first;p.last_name=last;p.birth_date=(payload.birth_date or None);p.nickname=((payload.nickname or "").strip() or None);_add_team(db,user.id,p.id,payload.competition,payload.category);db.commit();db.refresh(p)
     return {"ok":True,"child":_player(db,p)}
 
 @router.post("/family/children/{person_id}/teams")
