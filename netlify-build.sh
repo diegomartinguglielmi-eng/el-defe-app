@@ -105,8 +105,9 @@ sha = sys.argv[1]
 p = Path('defe-web-build/dist/index.html')
 s = p.read_text()
 pwa = '<link rel="manifest" href="/el-defe-app/manifest.webmanifest"><link rel="icon" type="image/png" href="/el-defe-app/icon.png"><meta name="theme-color" content="#0b3a7a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="El Defe">'
-clean = f'''<script>(async function(){{var k='defe-clean-{sha}';try{{if(localStorage.getItem(k))return;localStorage.setItem(k,'1');if('serviceWorker' in navigator){{var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){{return r.unregister()}}));}}if('caches' in window){{var ks=await caches.keys();await Promise.all(ks.map(function(x){{return caches.delete(x)}}));}}}}catch(e){{}}}})();</script>'''
-s = s.replace('<head>', '<head>' + clean + pwa, 1)
+# Do not unregister service workers or clear caches on every deploy: that breaks
+# cold-start launches from Web Push in the installed PWA.
+s = s.replace('<head>', '<head>' + pwa, 1)
 p.write_text(s)
 PY
 
@@ -121,6 +122,10 @@ cat > netlify-publish/_headers <<'HDR'
 /el-defe-app/sw.js
   Cache-Control: no-cache, no-store, must-revalidate
 /el-defe-app/registerSW.js
+  Cache-Control: no-cache, no-store, must-revalidate
+/el-defe-app/push-sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+/el-defe-app/manifest.webmanifest
   Cache-Control: no-cache, no-store, must-revalidate
 HDR
 
