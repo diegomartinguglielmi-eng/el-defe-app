@@ -72,10 +72,13 @@ def startup():
     # create_all does not add columns to an existing table.
     from sqlalchemy import inspect, text
     existing={c["name"] for c in inspect(engine).get_columns("users")}
+    people_existing={c["name"] for c in inspect(engine).get_columns("people")}
     with engine.begin() as conn:
         if "first_name" not in existing: conn.execute(text("ALTER TABLE users ADD COLUMN first_name VARCHAR(100)"))
         if "last_name" not in existing: conn.execute(text("ALTER TABLE users ADD COLUMN last_name VARCHAR(100)"))
         if "phone" not in existing: conn.execute(text("ALTER TABLE users ADD COLUMN phone VARCHAR(40)"))
+        if "birth_date" not in people_existing: conn.execute(text("ALTER TABLE people ADD COLUMN birth_date VARCHAR(10)"))
+        if "nickname" not in people_existing: conn.execute(text("ALTER TABLE people ADD COLUMN nickname VARCHAR(100)"))
     db=SessionLocal()
     try:
         if not db.query(User).filter(User.email==settings.admin_email).first():
@@ -101,12 +104,14 @@ def startup():
                 db.add(qa_player); db.flush()
             if db.query(UserPlayerLink).filter(UserPlayerLink.user_id==qa.id,UserPlayerLink.person_id==qa_player.id).first() is None:
                 db.add(UserPlayerLink(user_id=qa.id,person_id=qa_player.id))
-            for competition,division in [("FEFI","2013"),("LAAMBA","6ta"),("ARGENLIGA","6TA")]:
-                qa_team=db.query(Team).filter(Team.competition==competition,Team.division==division,Team.season==2026).first()
-                if qa_team is None:
-                    qa_team=Team(competition=competition,division=division,season=2026,is_active=True)
-                    db.add(qa_team); db.flush()
-                if db.query(TeamMember).filter(TeamMember.team_id==qa_team.id,TeamMember.person_id==qa_player.id,TeamMember.season==2026).first() is None:
+            # Seed de planteles sólo en el alta inicial. No volver a crear participaciones que la familia haya editado o eliminado.
+            has_teams=db.query(TeamMember).filter(TeamMember.person_id==qa_player.id,TeamMember.season==2026).first() is not None
+            if not has_teams:
+                for competition,division in [("FEFI","2013"),("LAAMBA","6ta"),("ARGENLIGA","6TA")]:
+                    qa_team=db.query(Team).filter(Team.competition==competition,Team.division==division,Team.season==2026).first()
+                    if qa_team is None:
+                        qa_team=Team(competition=competition,division=division,season=2026,is_active=True)
+                        db.add(qa_team); db.flush()
                     db.add(TeamMember(team_id=qa_team.id,person_id=qa_player.id,season=2026,member_role="player"))
             db.commit()
             # Staging-only professor QA: reuses the existing QA secret; no credential is stored in source.
