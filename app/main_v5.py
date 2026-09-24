@@ -28,6 +28,7 @@ from .availability_player_v2 import PlayerAvailabilityResponse
 from .profe_scope import PROFE_TEAM_FAVORITE
 from .config import settings
 from .sync import sync_laamba
+from .laamba_period_sync import sync_laamba_periods
 from .argenliga_baseline import bootstrap_argenliga_2026
 from .argenliga_sync import sync_argenliga
 from .fefi_mayores import sync_fefi_mayores_b
@@ -58,7 +59,7 @@ def _with_lock(key,fn,label):
             except Exception as exc:db.rollback();print({label:{'status':'unlock_error','detail':str(exc)}})
         db.close()
 
-def _bootstrap_laamba_clausura():_with_lock(LAAMBA_BOOTSTRAP_LOCK,sync_laamba,'laamba_sync')
+def _bootstrap_laamba_clausura():_with_lock(LAAMBA_BOOTSTRAP_LOCK,sync_laamba_periods,'laamba_period_sync')
 def _bootstrap_argenliga():
     print({'argenliga_bootstrap':{'status':'thread_started'}})
     def run(db):
