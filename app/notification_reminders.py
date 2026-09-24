@@ -154,6 +154,7 @@ def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, 
         target=(now.date()+timedelta(days=3)).isoformat()
         q=db.query(Match).filter(Match.competition=="FEFI",Match.status!="final")
         if match_id is not None: q=q.filter(Match.id==match_id)
+        elif force and category: q=q.filter(Match.date=="2026-09-26")
         elif not force: q=q.filter(Match.date==target)
         matches=q.all()
         categories=[str(category)] if category else FEFI_CATEGORIES
