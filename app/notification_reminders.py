@@ -159,10 +159,18 @@ def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, 
         matches=q.all()
         categories=[str(category)] if category else FEFI_CATEGORIES
         for match in matches:
-            for category in FEFI_CATEGORIES:
-                team=db.query(Team).filter(Team.competition=="FEFI",Team.division==category,Team.is_active==True).order_by(Team.season.desc()).first()
-                if not team: continue
-                callup=db.query(CallUp).filter(CallUp.match_id==match.id,CallUp.team_id==team.id,CallUp.status=="published").order_by(CallUp.id.desc()).first()
+            for category in categories:
+                # Buscar la convocatoria publicada por categoria, igual que el tablero del profe.
+                # Puede haber Teams historicos duplicados para una misma categoria.
+                callup=(db.query(CallUp)
+                    .join(Team,Team.id==CallUp.team_id)
+                    .filter(
+                        CallUp.match_id==match.id,
+                        CallUp.status=="published",
+                        Team.competition=="FEFI",
+                        Team.division==category,
+                    )
+                    .order_by(CallUp.id.desc()).first())
                 if not callup: continue
                 rows=db.query(CallUpPlayer).filter(CallUpPlayer.callup_id==callup.id).all()
                 total=len(rows); pending=sum((x.attendance or "pending")=="pending" for x in rows)
