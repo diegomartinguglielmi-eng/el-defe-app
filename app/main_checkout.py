@@ -9,6 +9,7 @@ from .availability_player_v2 import router as availability_player_v2_router
 from .family_manage_v1 import router as family_manage_router
 from .family_catalog_v1 import router as family_catalog_router
 from .family_context_v1 import router as family_context_router
+from .callup_repair_v2 import repair_empty_sent_callups
 
 app.include_router(store_submit_router)
 # Debe registrarse antes del router histórico: FastAPI resuelve la primera ruta coincidente.
@@ -34,6 +35,13 @@ def family_targeting_schema():
         print({'family_targeting_schema': 'error', 'detail': str(exc)}, flush=True)
     finally:
         db.close()
+
+
+@app.on_event('startup')
+def repair_legacy_empty_callups():
+    # Reparación idempotente: recupera únicamente jugadores que ya habían respondido
+    # una convocatoria legacy y siguen perteneciendo al plantel de esa selección.
+    repair_empty_sent_callups()
 
 
 @app.middleware('http')
