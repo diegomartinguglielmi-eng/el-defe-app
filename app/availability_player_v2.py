@@ -260,11 +260,23 @@ def get_profe_callup(selection: str, db: Session = Depends(get_db), user=Depends
     competition, category = key.split("|", 1)
     event = _next_event(db, key)
     team = db.query(Team).filter(func.upper(Team.competition) == competition, func.upper(Team.division) == category, Team.is_active == True).order_by(Team.season.desc()).first()
-    if not event or not event.get("match_id") or not team:
+    if not event or not team:
         return {"selection": key, "callup": None}
-    row = db.query(CallUp).filter(CallUp.match_id == int(event["match_id"]), CallUp.team_id == team.id).order_by(CallUp.id.desc()).first()
+    row = None
+    if event.get("match_id"):
+        row = db.query(CallUp).filter(CallUp.match_id == int(event["match_id"]), CallUp.team_id == team.id).order_by(CallUp.id.desc()).first()
+    elif competition == "FEFI":
+        row = db.query(CallUp).join(Match, Match.id == CallUp.match_id).filter(
+            CallUp.team_id == team.id,
+            Match.competition == "FEFI",
+            Match.date == event.get("date"),
+            Match.status != "final",
+        ).order_by(CallUp.id.desc()).first()
     if not row:
         return {"selection": key, "callup": None}
+    if not event.get("match_id"):
+        event = dict(event)
+        event["match_id"] = row.match_id
     people = db.query(CallUpPlayer, Person).join(Person, Person.id == CallUpPlayer.person_id).filter(CallUpPlayer.callup_id == row.id).order_by(Person.last_name, Person.first_name).all()
     items = [{"row_id": cp.id, "person_id": p.id, "name": f"{p.first_name} {p.last_name}".strip(), "attendance": cp.attendance} for cp, p in people]
     counts = {s: sum(1 for x in items if x["attendance"] == s) for s in ("yes", "no", "maybe", "pending")}
