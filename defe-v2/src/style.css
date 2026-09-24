@@ -624,3 +624,31 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .adminMessages .messageComposer{gap:8px!important}
 .adminMessages .messageComposer input,.adminMessages .messageComposer select{height:42px!important;min-height:42px!important}
 @media(max-width:600px){.adminMessages .messageComposer textarea{height:116px!important;min-height:116px!important}.adminMessages .messageComposer{padding:11px!important}}
+
+
+/* Admin Profesores · panel de gestión compacto */
+.adminPeopleHead{margin:12px 0 10px!important;padding:8px 2px!important}
+.adminPeopleHead>div{min-width:0!important}.adminPeopleHead small{font-size:9px!important;font-weight:900!important;letter-spacing:.08em!important;color:var(--md-muted)!important}
+.adminPeopleHead h1{font-size:27px!important;margin:2px 0!important}.adminPeopleHead p{font-size:10px!important;margin:0!important}
+.adminPeopleHead .addMini{background:var(--md-blue)!important;color:#fff!important;border:0!important;min-width:72px!important}
+.adminCoachSection{padding:12px!important}
+.adminCoachSectionTitle{padding:0 1px 2px!important}
+.adminCoachCards{gap:8px!important}
+.adminCoachCard{padding:10px!important;background:#fbfcfe!important}
+.adminCoachIdentity{grid-template-columns:40px minmax(0,1fr) auto!important}
+.adminCoachAvatar{width:38px!important;height:38px!important;border-radius:12px!important;display:grid!important;place-items:center!important;font-weight:900!important}
+.adminCoachIdentity>div{min-width:0!important}.adminCoachIdentity>div>b{display:block!important;font-size:13px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.adminCoachIdentity>div>small{display:block!important;font-size:8px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;color:var(--md-muted)!important}
+.coachActive{background:#eaf7ef!important;color:#187243!important}.coachInactive{background:#fbecec!important;color:#a33b3b!important}
+.adminCoachCats{margin:7px 0!important;padding-top:7px!important;border-top:1px solid #edf1f6!important}
+.adminCoachCats:empty:after{content:"Sin categorías asignadas";font-size:8px;color:var(--md-muted)}
+.adminEditTeams{height:34px!important;background:#fff!important;font-size:9px!important;font-weight:900!important}
+.adminTeamEditor{padding:9px 0 0!important}.adminTeamEditor>small{font-size:8px!important;font-weight:900!important;letter-spacing:.06em!important;color:var(--md-muted)!important}
+.adminCategoryPicker{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;margin-top:7px!important}
+.adminCategoryPicker button{min-width:0!important;padding:8px 3px!important;border-radius:10px!important;font-size:9px!important;font-weight:900!important}
+.adminCategoryPicker button.selected{background:var(--md-blue)!important;color:#fff!important;border-color:var(--md-blue)!important}
+.coachCreatePanel{padding:12px!important}.coachCreatePanel>small{font-size:9px!important;font-weight:900!important;letter-spacing:.07em!important}
+.coachCreatePanel label{display:grid!important;gap:4px!important;font-size:9px!important;font-weight:850!important;color:var(--md-ink)!important}
+.coachCreatePanel input{width:100%!important;min-height:42px!important;height:42px!important;padding:0 11px!important;font-size:13px!important}
+.coachCreatePanel .primary{margin-top:9px!important}
+@media(max-width:420px){.adminPeopleHead h1{font-size:25px!important}.adminCoachSection{padding:10px!important}.adminCategoryPicker{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
