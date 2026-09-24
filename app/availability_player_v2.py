@@ -48,6 +48,19 @@ class ArgenligaProgrammingIn(BaseModel):
     times: dict[str, str]
 
 
+@router.get("/admin/argenliga/programming")
+def list_argenliga_programming(db: Session = Depends(get_db), user=Depends(require_roles("admin"))):
+    rows=db.query(Match).filter(func.upper(Match.competition)=="ARGENLIGA", Match.status!="final", Match.date>=_today()).order_by(Match.date, Match.division).all()
+    items=[]
+    for m in rows:
+        match_time=""
+        if (m.source_url or "").startswith("manual://argenliga?time="): match_time=(m.source_url or "").split("time=",1)[1]
+        local=(m.home or "").upper().startswith("DEF.")
+        opponent=m.away if local else m.home
+        items.append({"id":m.id,"category":m.division,"opponent":opponent,"match_date":m.date,"match_time":match_time,"home_away":"local" if local else "visitante","location":m.venue,"round_name":m.round_name})
+    return {"matches":items}
+
+
 @router.post("/admin/argenliga/programming")
 def create_argenliga_programming(payload: ArgenligaProgrammingIn, db: Session = Depends(get_db), user=Depends(require_roles("admin"))):
     categories = ["8VA", "7MA", "6TA", "5TA", "4TA", "3RA", "1RA"]
