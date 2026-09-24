@@ -64,7 +64,10 @@ class FamilyTeamIn(BaseModel):
 
 def _today(): return datetime.now(AR_TZ).date().isoformat()
 def _next_event(db, selection):
-    found=_events_for_selection(db,selection,_today()); return found[0] if found else None
+    found=_events_for_selection(db,selection,_today())
+    if found: return found[0]
+    if selection.startswith('LAAMBA|'): return _next_laamba_without_date(db,selection.split('|',1)[1])
+    return None
 def _serialize(event,response=None):
     if not event:return None
     return {**event,"response":response.status if response else None,"response_note":response.note if response else None,"response_updated_at":response.updated_at if response else None}
