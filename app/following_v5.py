@@ -13,6 +13,8 @@ from .db import get_db
 from .home_v5 import _canonical
 from .models import Favorite, FefiCategorySchedule, Match, Team
 from .fefi_results import FefiCategoryResult, sync_verified_results
+from .pending import parse_fefi, FEFI_URL as FEFI_FIXTURE_URL, USER_AGENT as FEFI_FIXTURE_UA
+import requests
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 router = APIRouter(prefix="/api/following", tags=["Following"])
@@ -133,8 +135,33 @@ def _event_from_match(db:Session,m:Match,competition:str,category:str)->dict:
     return {"available":True,"match_id":m.id,"competition":competition,"category":category,"selection":f"{competition}|{category}","date":date,"time":time,"rival":rival,"home":m.home,"away":m.away,"local":local,"club":club,"venue":venue,"address":address,"maps_url":_maps_url(address or venue or club),"round_name":m.round_name,"status":m.status,"note":note,"source_url":m.source_url}
 
 
+def _live_fefi_next(db:Session,category:str,today:str)->dict|None:
+    """Lee el fixture oficial FEFI para V2 sin modificar ni depender del flujo validado de V1."""
+    try:
+        response=requests.get(FEFI_FIXTURE_URL,timeout=20,headers={"User-Agent":FEFI_FIXTURE_UA,"Accept":"text/html,application/xhtml+xml"})
+        response.raise_for_status()
+        fixtures=parse_fefi(response.text).get("fixtures") or []
+        future=[x for x in fixtures if x.get("date") and x["date"]>=today]
+        if not future:return None
+        future.sort(key=lambda x:(x.get("date") or "9999-99-99",x.get("round") or 999))
+        x=future[0]
+        local=_is_defe(x.get("home"));venue=x.get("venue")
+        return {"available":True,"match_id":None,"competition":"FEFI","category":category,"selection":f"FEFI|{category}",
+                "date":x.get("date"),"time":None,"rival":x.get("away") if local else x.get("home"),
+                "home":x.get("home"),"away":x.get("away"),"local":local,"club":x.get("home"),
+                "venue":venue,"address":venue or ("Ernesto Sábato 3162, Santos Lugares, Buenos Aires" if local else None),
+                "maps_url":_maps_url(venue or ("Ernesto Sábato 3162, Santos Lugares, Buenos Aires" if local else None)),
+                "round_name":x.get("round_name"),"status":"scheduled","note":None,"source_url":FEFI_FIXTURE_URL}
+    except Exception:
+        return None
+
+
 def _events_for_selection(db:Session,selection:str,today:str)->list[dict]:
-    competition,category=selection.split("|",1);rows=_canonical(db.query(Match).filter(Match.competition==competition).all());candidates=[]
+    competition,category=selection.split("|",1)
+    if competition=="FEFI" and category.isdigit():
+        live=_live_fefi_next(db,category,today)
+        if live:return [live]
+    rows=_canonical(db.query(Match).filter(Match.competition==competition).all());candidates=[]
     for m in rows:
         date,_=_date_parts(m.date)
         if not date or date<today or (m.status or "").lower()=="final" or (m.home_score is not None and m.away_score is not None):continue
