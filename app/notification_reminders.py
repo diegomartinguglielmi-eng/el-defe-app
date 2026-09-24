@@ -154,21 +154,27 @@ def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, 
         target=(now.date()+timedelta(days=3)).isoformat()
         q=db.query(Match).filter(Match.competition=="FEFI",Match.status!="final")
         if match_id is not None: q=q.filter(Match.id==match_id)
-        elif force and category: q=q.filter(Match.date=="2026-09-26")
         elif not force: q=q.filter(Match.date==target)
-        matches=q.all()
+        matches=q.order_by(Match.date.asc(),Match.id.asc()).all()
         categories=[str(category)] if category else FEFI_CATEGORIES
         for match in matches:
             for category in categories:
-                # Buscar la convocatoria publicada por categoria, igual que el tablero del profe.
-                # Puede haber Teams historicos duplicados para una misma categoria.
-                callup=(db.query(CallUp)
-                    .join(Team,Team.id==CallUp.team_id)
+                # El tablero del profe toma el Team activo de la categoria y, sobre ese
+                # Team, la ultima convocatoria publicada del partido. Replicar exactamente
+                # esa identidad evita mezclar Teams historicos de una misma categoria.
+                team=(db.query(Team)
                     .filter(
-                        CallUp.match_id==match.id,
-                        CallUp.status=="published",
                         Team.competition=="FEFI",
                         Team.division==category,
+                        Team.is_active==True,
+                    )
+                    .order_by(Team.season.desc()).first())
+                if not team: continue
+                callup=(db.query(CallUp)
+                    .filter(
+                        CallUp.match_id==match.id,
+                        CallUp.team_id==team.id,
+                        CallUp.status=="published",
                     )
                     .order_by(CallUp.id.desc()).first())
                 if not callup: continue
