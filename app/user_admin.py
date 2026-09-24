@@ -32,6 +32,13 @@ class RegisterIn(BaseModel):
         return value
 
 
+class ReactivateProfeIn(BaseModel):
+    email: str
+    password: str
+    first_name: str | None = None
+    last_name: str | None = None
+    phone: str | None = None
+
 class ProfeTeamsIn(BaseModel):
     selections: list[str]
 
@@ -241,6 +248,21 @@ def get_current_profe(db: Session = Depends(get_db), profe: User = Depends(requi
         "categories": [value.split("|", 1)[1] for value in selections if "|" in value],
     }
 
+
+@router.post("/api/admin/profes/reactivate")
+def reactivate_profe(payload:ReactivateProfeIn,db:Session=Depends(get_db),admin:User=Depends(require_roles("admin"))):
+    email=payload.email.strip().lower()
+    target=db.query(User).filter(User.email==email).first()
+    if not target: raise HTTPException(status_code=404,detail="No existe una baja previa con ese email")
+    if target.role!="profe" or target.is_active: raise HTTPException(status_code=409,detail="Ese email ya está en uso")
+    target.password_hash=hash_password(payload.password)
+    target.first_name=(payload.first_name or target.first_name)
+    target.last_name=(payload.last_name or target.last_name)
+    target.phone=payload.phone or target.phone
+    target.is_active=True
+    db.commit()
+    _audit(db,admin,"reactivate_profe",target.id,target.email)
+    return {"ok":True,"id":target.id,"email":target.email,"reactivated":True}
 
 @router.delete("/api/admin/users/{user_id}/profe")
 def remove_profe(user_id:int,db:Session=Depends(get_db),admin:User=Depends(require_roles("admin"))):
