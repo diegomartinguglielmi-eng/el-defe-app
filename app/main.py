@@ -99,9 +99,10 @@ def startup():
                 db.add(qa_profe); db.flush()
             else:
                 qa_profe.password_hash=hash_password(qa_seed); qa_profe.role="profe"; qa_profe.is_active=True
-            scope=db.query(Favorite).filter(Favorite.user_id==qa_profe.id,Favorite.favorite_type=="profe_team",Favorite.favorite_id=="LAAMBA|6TA").first()
-            if scope is None:
-                db.add(Favorite(user_id=qa_profe.id,favorite_type="profe_team",favorite_id="LAAMBA|6TA"))
+            for profe_selection in ("LAAMBA|6TA", "FEFI|2013"):
+                scope=db.query(Favorite).filter(Favorite.user_id==qa_profe.id,Favorite.favorite_type=="profe_team",Favorite.favorite_id==profe_selection).first()
+                if scope is None:
+                    db.add(Favorite(user_id=qa_profe.id,favorite_type="profe_team",favorite_id=profe_selection))
             db.commit()
         if not db.query(News).first():
             db.add(News(title="Bienvenidos a El Defe",body="FEFI, LAAMBA y Argenliga en una sola aplicación."))
