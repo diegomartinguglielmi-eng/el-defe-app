@@ -62,7 +62,7 @@ def create_argenliga_programming(payload: ArgenligaProgrammingIn, db: Session = 
             raise HTTPException(400, f"Falta el horario de {category}")
         team=db.query(Team).filter(func.upper(Team.competition)=="ARGENLIGA", func.upper(Team.division)==category, Team.is_active==True).first()
         if not team:
-            team=Team(competition="ARGENLIGA", division=category, season=2026, name=f"Defensores SL · {category}", is_active=True)
+            team=Team(competition="ARGENLIGA", division=category, season=2026, is_active=True)
             db.add(team); db.flush()
         local=(payload.home_away or "local").lower()=="local"
         home="DEF. DE SANTOS LUGARES" if local else opponent
