@@ -66,7 +66,7 @@ def startup():
         import os
         qa_seed=os.getenv("STAGING_QA_SEED","").strip()
         if qa_seed and os.getenv("RAILWAY_PROJECT_NAME","").strip()=="el-defe-staging":
-            qa_email="usuario@mail.com"
+            qa_email=os.getenv("STAGING_QA_EMAIL","usuario@mail.com").strip().lower()
             qa=db.query(User).filter(User.email==qa_email).first()
             if qa is None:
                 qa=User(email=qa_email,password_hash=hash_password(qa_seed),role="lector",is_active=True)
