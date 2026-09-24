@@ -246,3 +246,59 @@ def get_profe_callup(selection: str, db: Session = Depends(get_db), user=Depends
     items = [{"row_id": cp.id, "person_id": p.id, "name": f"{p.first_name} {p.last_name}".strip(), "attendance": cp.attendance} for cp, p in people]
     counts = {s: sum(1 for x in items if x["attendance"] == s) for s in ("yes", "no", "maybe", "pending")}
     return {"selection": key, "callup": {"id": row.id, "status": row.status, "notes": row.notes, "match": event, "players": items, "counts": counts}}
+
+
+class FamilyCallupAttendanceIn(BaseModel):
+    attendance: str
+
+@router.get("/family/callups")
+def family_callups_v2(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    linked = {int(p["person_id"]): p for p in _linked_players(db, user.id)}
+    if not linked:
+        return {"items": []}
+    rows = db.query(CallUpPlayer, CallUp, Team, Person).join(
+        CallUp, CallUp.id == CallUpPlayer.callup_id
+    ).join(Team, Team.id == CallUp.team_id).join(
+        Person, Person.id == CallUpPlayer.person_id
+    ).filter(
+        CallUpPlayer.person_id.in_(linked.keys()),
+        CallUp.status == "sent",
+    ).order_by(CallUp.id.desc()).all()
+    items = []
+    for cp, callup, team, person in rows:
+        selection = normalize_selection(f"{team.competition}|{team.division}")
+        player = linked.get(int(person.id))
+        if not player or not _belongs_to_selection(player, selection):
+            continue
+        items.append({
+            "row_id": cp.id,
+            "callup_id": callup.id,
+            "person_id": person.id,
+            "player_name": f"{person.first_name} {person.last_name}".strip(),
+            "competition": team.competition,
+            "category": team.division,
+            "selection": selection,
+            "attendance": cp.attendance,
+            "notes": callup.notes,
+            "match_id": callup.match_id,
+        })
+    return {"items": items}
+
+@router.patch("/family/callups/{row_id}")
+def answer_family_callup_v2(row_id: int, payload: FamilyCallupAttendanceIn, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    attendance = (payload.attendance or "").strip().lower()
+    if attendance not in {"yes", "no", "maybe"}:
+        raise HTTPException(400, "Estado inválido")
+    row = db.query(CallUpPlayer, CallUp, Team).join(
+        CallUp, CallUp.id == CallUpPlayer.callup_id
+    ).join(Team, Team.id == CallUp.team_id).filter(CallUpPlayer.id == row_id).first()
+    if not row:
+        raise HTTPException(404, "Convocatoria inexistente")
+    cp, callup, team = row
+    player = next((p for p in _linked_players(db, user.id) if int(p["person_id"]) == int(cp.person_id)), None)
+    selection = normalize_selection(f"{team.competition}|{team.division}")
+    if not player or not _belongs_to_selection(player, selection):
+        raise HTTPException(403, "La convocatoria no pertenece a esta familia")
+    cp.attendance = attendance
+    db.commit()
+    return {"ok": True, "row_id": cp.id, "selection": selection, "attendance": cp.attendance}
