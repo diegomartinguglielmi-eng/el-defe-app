@@ -58,6 +58,13 @@ class UrgentNoticeIn(BaseModel):
     title: str; body: str; competition: Optional[str] = None; category: Optional[str] = None
 class CommunicationNoticeIn(BaseModel):
     title: str; body: str; competition: Optional[str] = None; category: Optional[str] = None; priority: Optional[str] = None
+class AbsenceNoticeIn(BaseModel):
+    person_id: int
+    competition: str = "FEFI"
+    category: str
+    reason: str
+    note: Optional[str] = None
+
 class PushKeysIn(BaseModel): p256dh: str; auth: str
 class PushSubscriptionIn(BaseModel):
     endpoint: str; keys: PushKeysIn; followed: list[str] = []
@@ -218,4 +225,25 @@ def create_communication_notice(payload:CommunicationNoticeIn,db:Session=Depends
 def create_urgent_notice(payload:UrgentNoticeIn,db:Session=Depends(get_db),user=Depends(require_roles("admin","profe","delegado"))):
     if not selection_allowed(db, user, payload.competition, payload.category): raise HTTPException(status_code=403,detail="Ese equipo/categoría no está asignado a este Profe")
     event=publish_event(db,event_type="urgent",title=payload.title.strip() or "Aviso urgente",body=payload.body.strip(),competition=payload.competition,category=payload.category,urgent=True); db.commit(); db.refresh(event)
+    return {"ok":True,"id":event.id,"push":getattr(event,"push_result",None)}
+
+
+@router.post("/absence")
+def create_absence_notice(payload:AbsenceNoticeIn,db:Session=Depends(get_db),user=Depends(get_current_user)):
+    allowed={"sick":"Está enfermo","study":"Tiene que estudiar","vacation":"Estamos de vacaciones","other":"Otro"}
+    reason=(payload.reason or "").strip().lower()
+    if reason not in allowed: raise HTTPException(status_code=400,detail="Motivo de ausencia inválido")
+    note=(payload.note or "").strip()
+    if reason=="other" and not note: raise HTTPException(status_code=400,detail="Contanos brevemente el motivo")
+    if len(note)>120: raise HTTPException(status_code=400,detail="El comentario puede tener hasta 120 caracteres")
+    ctx=family_context(db,user.id)
+    child=next((x for x in ctx.get("children",[]) if int(x.get("person_id") or x.get("id") or 0)==payload.person_id),None)
+    if not child: raise HTTPException(status_code=403,detail="Ese jugador no pertenece a tu familia")
+    selection=f"{payload.competition}|{payload.category}".upper()
+    selections={x.upper() for x in ctx.get("selections",[])}
+    if selection not in selections: raise HTTPException(status_code=403,detail="La categoría no corresponde al jugador")
+    name=child.get("name") or "Jugador"
+    body=f"{name} · {allowed[reason]}" + (f" · {note}" if note else "")
+    event=publish_event(db,event_type="absence",title="Aviso de ausencia",body=body,competition=payload.competition,category=payload.category,urgent=False)
+    db.commit();db.refresh(event)
     return {"ok":True,"id":event.id,"push":getattr(event,"push_result",None)}
