@@ -65,7 +65,7 @@ def startup():
         # QA de staging: el secreto vive en Railway, nunca en el repositorio.
         import os
         qa_seed=os.getenv("STAGING_QA_SEED","").strip()
-        if qa_seed and os.getenv("RAILWAY_PROJECT_NAME","").strip()=="el-defe-staging":
+        if qa_seed and (os.getenv("STAGING_QA_EMAIL","").strip() or os.getenv("RAILWAY_PROJECT_NAME","").strip()=="el-defe-staging"):
             qa_email=os.getenv("STAGING_QA_EMAIL","usuario@mail.com").strip().lower()
             qa=db.query(User).filter(User.email==qa_email).first()
             if qa is None:
