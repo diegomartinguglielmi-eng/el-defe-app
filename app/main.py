@@ -91,6 +91,18 @@ def startup():
                 if db.query(TeamMember).filter(TeamMember.team_id==qa_team.id,TeamMember.person_id==qa_player.id,TeamMember.season==2026).first() is None:
                     db.add(TeamMember(team_id=qa_team.id,person_id=qa_player.id,season=2026,member_role="player"))
             db.commit()
+            # Staging-only professor QA: reuses the existing QA secret; no credential is stored in source.
+            qa_profe_email=os.getenv("STAGING_QA_PROFE_EMAIL","profe.laamba.qa@invalid.local").strip().lower()
+            qa_profe=db.query(User).filter(User.email==qa_profe_email).first()
+            if qa_profe is None:
+                qa_profe=User(email=qa_profe_email,password_hash=hash_password(qa_seed),role="profe",is_active=True,first_name="Profe",last_name="QA")
+                db.add(qa_profe); db.flush()
+            else:
+                qa_profe.password_hash=hash_password(qa_seed); qa_profe.role="profe"; qa_profe.is_active=True
+            scope=db.query(Favorite).filter(Favorite.user_id==qa_profe.id,Favorite.favorite_type=="profe_team",Favorite.favorite_id=="LAAMBA|6TA").first()
+            if scope is None:
+                db.add(Favorite(user_id=qa_profe.id,favorite_type="profe_team",favorite_id="LAAMBA|6TA"))
+            db.commit()
         if not db.query(News).first():
             db.add(News(title="Bienvenidos a El Defe",body="FEFI, LAAMBA y Argenliga en una sola aplicación."))
             db.commit()
