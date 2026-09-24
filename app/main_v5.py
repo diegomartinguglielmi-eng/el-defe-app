@@ -25,7 +25,7 @@ from .models import User, Match, SyncRun, Person, TeamMember, CallUpPlayer, Play
 from .auth import hash_password
 from .availability_v1 import UserPlayerLink, UserPlayerRequest
 from .family_catalog_v1 import router as family_catalog_router
-from .availability_player_v2 import PlayerAvailabilityResponse
+from .availability_player_v2 import PlayerAvailabilityResponse, router as availability_player_v2_router
 from .profe_scope import PROFE_TEAM_FAVORITE
 from .config import settings
 from .sync import sync_laamba
@@ -35,7 +35,7 @@ from .argenliga_sync import sync_argenliga
 from .fefi_mayores import sync_fefi_mayores_b
 from .superliga_sync import sync_superliga
 
-app.include_router(router);app.include_router(family_catalog_router);app.include_router(fefi_results_router);app.include_router(fefi_schedules_router);app.include_router(fefi_freshness_router);app.include_router(fefi_standings_router);app.include_router(notifications_router);app.include_router(data_quality_router);app.include_router(home_router);app.include_router(following_router);app.include_router(store_router);app.include_router(user_admin_router);app.include_router(sponsors_router);app.include_router(league_tournaments_router);app.include_router(league_stats_router)
+app.include_router(router);app.include_router(availability_player_v2_router);app.include_router(family_catalog_router);app.include_router(fefi_results_router);app.include_router(fefi_schedules_router);app.include_router(fefi_freshness_router);app.include_router(fefi_standings_router);app.include_router(notifications_router);app.include_router(data_quality_router);app.include_router(home_router);app.include_router(following_router);app.include_router(store_router);app.include_router(user_admin_router);app.include_router(sponsors_router);app.include_router(league_tournaments_router);app.include_router(league_stats_router)
 BASE=Path(__file__).resolve().parent
 LAAMBA_BOOTSTRAP_LOCK=2026090701;ARGENLIGA_BOOTSTRAP_LOCK=2026090702;FEFI_BOOTSTRAP_LOCK=2026090703;FEFI_MAYORES_BOOTSTRAP_LOCK=2026090704;SUPERLIGA_BOOTSTRAP_LOCK=2026090705
 
