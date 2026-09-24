@@ -1,4 +1,5 @@
 name: Deploy Mi DEFE V2 staging
+# trigger: jornada-unica-argenliga
 
 on:
   push:
