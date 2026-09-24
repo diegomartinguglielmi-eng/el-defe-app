@@ -26,4 +26,4 @@ jobs:
       - name: Publicar SOLO en staging V2
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        run: npx netlify-cli deploy --dir=dist --prod --site=a1ae8bc5-87e2-442f-851d-bf54c8937651 --auth="$NETLIFY_AUTH_TOKEN"
+        run: npx netlify-cli deploy --dir=dist --prod --no-build --site=a1ae8bc5-87e2-442f-851d-bf54c8937651 --auth="$NETLIFY_AUTH_TOKEN"
