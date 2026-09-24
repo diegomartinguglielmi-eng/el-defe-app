@@ -251,7 +251,7 @@ def remove_profe(user_id:int,db:Session=Depends(get_db),admin:User=Depends(requi
     target.is_active=False
     db.commit()
     _audit(db,admin,"remove_profe",target.id,target.email)
-    return {"ok":True,"id":target.id,"email":target.email,"is_active":False}
+    return {"ok":True,"id":target.id,"email":target.email,"hidden":True}
 
 @router.get("/api/admin/users/{user_id}/profe-teams")
 def get_profe_teams(user_id: int, db: Session = Depends(get_db), admin: User = Depends(require_roles("admin"))):
