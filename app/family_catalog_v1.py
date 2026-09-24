@@ -6,7 +6,8 @@ from .following_v5 import _options
 
 router = APIRouter(prefix="/api/family", tags=["Family"])
 
-LAAMBA_CATEGORIES = ["1ra", "3ra", "4ta", "5ta", "6ta", "7ma", "8va", "9na"]
+LAAMBA_CATEGORIES = ["1ra", "3ra", "4ta", "5ta", "6ta", "7ma", "8va"]
+LAAMBA_PROMO_CATEGORIES = ["Promocional 2016", "Promocional 2017", "Promocional 2018", "Promocional 2019/20"]
 ARGENLIGA_CATEGORIES = ["1ra", "3ra", "4ta", "5ta", "6ta", "7ma", "8va", "9na"]
 
 
@@ -26,8 +27,8 @@ def family_catalog(db: Session = Depends(get_db)):
                 "competition": "LAAMBA",
                 "mode": "branch_category",
                 "branches": [
-                    {"branch": "Masculino", "categories": LAAMBA_CATEGORIES},
-                    {"branch": "Femenino", "categories": LAAMBA_CATEGORIES},
+                    {"branch": "Masculino · M-Elite I", "categories": LAAMBA_CATEGORIES},
+                    {"branch": "Promocionales · Zona II", "categories": LAAMBA_PROMO_CATEGORIES},
                 ],
             })
         elif competition == "ARGENLIGA":
