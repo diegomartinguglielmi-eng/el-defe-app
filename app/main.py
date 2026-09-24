@@ -77,6 +77,20 @@ def startup():
                 qa.role="lector"
                 qa.is_active=True
             db.commit()
+            qa_player=db.query(Person).filter(Person.first_name=="Benjamín",Person.last_name=="Guglielmi",Person.role=="player").first()
+            if qa_player is None:
+                qa_player=Person(first_name="Benjamín",last_name="Guglielmi",role="player",is_active=True)
+                db.add(qa_player); db.flush()
+            if db.query(UserPlayerLink).filter(UserPlayerLink.user_id==qa.id,UserPlayerLink.person_id==qa_player.id).first() is None:
+                db.add(UserPlayerLink(user_id=qa.id,person_id=qa_player.id))
+            for competition,division in [("FEFI","2013"),("LAAMBA","6ta")]:
+                qa_team=db.query(Team).filter(Team.competition==competition,Team.division==division,Team.season==2026).first()
+                if qa_team is None:
+                    qa_team=Team(competition=competition,division=division,season=2026,is_active=True)
+                    db.add(qa_team); db.flush()
+                if db.query(TeamMember).filter(TeamMember.team_id==qa_team.id,TeamMember.person_id==qa_player.id,TeamMember.season==2026).first() is None:
+                    db.add(TeamMember(team_id=qa_team.id,person_id=qa_player.id,season=2026,member_role="player"))
+            db.commit()
         if not db.query(News).first():
             db.add(News(title="Bienvenidos a El Defe",body="FEFI, LAAMBA y Argenliga en una sola aplicación."))
             db.commit()
