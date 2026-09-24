@@ -1,0 +1,31 @@
+name: Deploy Mi DEFE V2 staging
+
+on:
+  push:
+    branches: [mi-defe-v2-laamba]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: defe-v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: defe-v2/package-lock.json
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Construir V2
+        run: npm run build
+      - name: Publicar SOLO en staging V2
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: npx netlify-cli deploy --dir=dist --prod --site=a1ae8bc5-87e2-442f-851d-bf54c8937651 --auth="$NETLIFY_AUTH_TOKEN"
