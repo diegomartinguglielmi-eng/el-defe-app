@@ -2,9 +2,10 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from .db import Base, engine, SessionLocal
-from .models import Match, FefiCategorySchedule, Person, Team, TeamMember, CallUp, CallUpPlayer, User, Favorite, UserPlayerLink
+from .models import Match, FefiCategorySchedule, Person, Team, TeamMember, CallUp, CallUpPlayer, User, Favorite
 from .profe_scope import PROFE_TEAM_FAVORITE
 from .notifications_v5 import NotificationEvent, publish_event, PushSubscription
+from .availability_v1 import UserPlayerLink
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 FEFI_CATEGORIES = ["2019", "2013", "2018", "2014", "2017", "2016", "2015"]
