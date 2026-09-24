@@ -92,7 +92,7 @@ def run(force: bool = False) -> dict:
                     FefiCategorySchedule.match_id == match.id
                 ).all()
                 by_category = {x.category: x for x in schedules}
-                for category in FEFI_CATEGORIES:
+                for category in categories:
                     schedule = by_category.get(category)
                     body = reminder_body(match, category, schedule.time if schedule else None)
                     exists = db.query(NotificationEvent).filter(
@@ -148,11 +148,15 @@ if __name__ == "__main__":
     run(force=True)
 
 
-def run_callup_pending_alerts(force: bool = False) -> dict:
+def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, category: str | None = None) -> dict:
     now=datetime.now(AR_TZ); Base.metadata.create_all(bind=engine); db=SessionLocal(); created=pushed=0
     try:
         target=(now.date()+timedelta(days=3)).isoformat()
-        matches=db.query(Match).filter(Match.competition=="FEFI",Match.date==target,Match.status!="final").all()
+        q=db.query(Match).filter(Match.competition=="FEFI",Match.status!="final")
+        if match_id is not None: q=q.filter(Match.id==match_id)
+        elif not force: q=q.filter(Match.date==target)
+        matches=q.all()
+        categories=[str(category)] if category else FEFI_CATEGORIES
         for match in matches:
             for category in FEFI_CATEGORIES:
                 team=db.query(Team).filter(Team.competition=="FEFI",Team.division==category,Team.is_active==True).order_by(Team.season.desc()).first()
@@ -162,12 +166,12 @@ def run_callup_pending_alerts(force: bool = False) -> dict:
                 rows=db.query(CallUpPlayer).filter(CallUpPlayer.callup_id==callup.id).all()
                 total=len(rows); pending=sum((x.attendance or "pending")=="pending" for x in rows)
                 if not total or pending/total<=0.25: continue
-                marker=f"callup_72h:{match.id}:{category}"
+                marker=f"callup_72h:{match.id}:{category}" if not force else f"callup_72h_test:{match.id}:{category}"
                 if db.query(NotificationEvent).filter(NotificationEvent.event_type==marker).first(): continue
                 profe_ids=[uid for (uid,) in db.query(Favorite.user_id).filter(Favorite.favorite_type==PROFE_TEAM_FAVORITE,Favorite.favorite_id==f"FEFI|{category}").all()]
                 profes=db.query(User).filter(User.id.in_(profe_ids),User.role=="profe",User.is_active==True).all() if profe_ids else []
                 for profe in profes:
-                    event=publish_event(db,event_type=marker,title=f"⚠️ Convocatoria Cat. {category}",body=f"{pending} de {total} convocados todavía no respondieron. Faltan 72 horas para el partido.",competition="FEFI",category=category,match_id=match.id,urgent=False,target_user_id=profe.id)
+                    event=publish_event(db,event_type=marker,title=f"⚠️ Convocatoria Cat. {category}",body=f"{pending} de {total} convocados todavía no respondieron. Faltan 72 horas para el partido." if not force else f"PRUEBA · {pending} de {total} convocados todavía no respondieron.",competition="FEFI",category=category,match_id=match.id,urgent=False,target_user_id=profe.id)
                     created+=1; pushed+=getattr(event,"push_result",{}).get("sent",0)
         db.commit(); return {"ok":True,"target_date":target,"alerts_created":created,"push_sent":pushed}
     except Exception:
