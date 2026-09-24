@@ -148,11 +148,16 @@ def _next_laamba_without_date(db:Session,category:str)->dict|None:
     """Fallback: LAAMBA publica el fixture futuro por número de fecha, aunque a veces no publica fecha calendario."""
     rows=_canonical(db.query(Match).filter(Match.competition=="LAAMBA").all())
     relevant=[m for m in rows if _category_matches("LAAMBA",category,m.division) and (_is_defe(m.home) or _is_defe(m.away))]
-    finals=[m for m in relevant if (m.status or "").lower()=="final" or (m.home_score is not None and m.away_score is not None)]
-    last_round=max([_round_number(m.round_name) for m in finals] or [0])
-    scheduled=[m for m in relevant if (m.status or "").lower()!="final" and m.home_score is None and m.away_score is None and _round_number(m.round_name)>last_round]
+    # No asumir que el número de fecha crece cronológicamente: LAAMBA puede
+    # publicar/reprogramar fechas fuera de orden. Tomamos cualquier fixture sin
+    # resultado y priorizamos Clausura + número de fecha.
+    scheduled=[m for m in relevant if (m.status or "").lower()!="final" and m.home_score is None and m.away_score is None]
     if not scheduled:return None
-    scheduled.sort(key=lambda m:(_round_number(m.round_name),m.id))
+    def rank(m):
+        key=(m.external_key or "").upper()
+        period=0 if "CLAUSURA" in key else 1
+        return (period,_round_number(m.round_name) or 999,m.id)
+    scheduled.sort(key=rank)
     event=_event_from_match(db,scheduled[0],"LAAMBA",category)
     event["date_pending"]=event.get("date") is None
     return event
