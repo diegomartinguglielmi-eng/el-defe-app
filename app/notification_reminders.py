@@ -192,6 +192,7 @@ def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, 
                 if db.query(NotificationEvent).filter(NotificationEvent.event_type==marker).first(): continue
                 profe_ids=[uid for (uid,) in db.query(Favorite.user_id).filter(Favorite.favorite_type==PROFE_TEAM_FAVORITE,Favorite.favorite_id==f"FEFI|{category}").all()]
                 profes=db.query(User).filter(User.id.in_(profe_ids),User.role=="profe",User.is_active==True).all() if profe_ids else []
+                if force: debug.append({"professor_lookup":{"favorite_type":PROFE_TEAM_FAVORITE,"favorite_id":f"FEFI|{category}","profe_ids":profe_ids,"active_profes":[{"id":p.id,"email":p.email} for p in profes]}})
                 for profe in profes:
                     event=publish_event(db,event_type=marker,title=f"⚠️ Convocatoria Cat. {category}",body=f"{pending} de {total} convocados todavía no respondieron. Faltan 72 horas para el partido." if not force else f"PRUEBA · {pending} de {total} convocados todavía no respondieron.",competition="FEFI",category=category,match_id=match.id,urgent=False,target_user_id=profe.id)
                     created+=1; pushed+=getattr(event,"push_result",{}).get("sent",0)
