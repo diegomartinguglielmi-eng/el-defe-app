@@ -144,6 +144,20 @@ def _events_for_selection(db:Session,selection:str,today:str)->list[dict]:
     candidates.sort(key=lambda x:((x["date"] or "9999-99-99"),(x["time"] or "99:99"),x["match_id"]));return candidates
 
 
+def _next_laamba_without_date(db:Session,category:str)->dict|None:
+    """Fallback: LAAMBA publica el fixture futuro por número de fecha, aunque a veces no publica fecha calendario."""
+    rows=_canonical(db.query(Match).filter(Match.competition=="LAAMBA").all())
+    relevant=[m for m in rows if _category_matches("LAAMBA",category,m.division) and (_is_defe(m.home) or _is_defe(m.away))]
+    finals=[m for m in relevant if (m.status or "").lower()=="final" or (m.home_score is not None and m.away_score is not None)]
+    last_round=max([_round_number(m.round_name) for m in finals] or [0])
+    scheduled=[m for m in relevant if (m.status or "").lower()!="final" and m.home_score is None and m.away_score is None and _round_number(m.round_name)>last_round]
+    if not scheduled:return None
+    scheduled.sort(key=lambda m:(_round_number(m.round_name),m.id))
+    event=_event_from_match(db,scheduled[0],"LAAMBA",category)
+    event["date_pending"]=event.get("date") is None
+    return event
+
+
 def _round_number(value:str|None)->int:
     m=re.search(r"(\d+)",str(value or ""));return int(m.group(1)) if m else 0
 
