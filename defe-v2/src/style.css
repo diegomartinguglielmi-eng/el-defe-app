@@ -652,3 +652,29 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .coachCreatePanel input{width:100%!important;min-height:42px!important;height:42px!important;padding:0 11px!important;font-size:13px!important}
 .coachCreatePanel .primary{margin-top:9px!important}
 @media(max-width:420px){.adminPeopleHead h1{font-size:25px!important}.adminCoachSection{padding:10px!important}.adminCategoryPicker{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+
+
+/* Admin Profesores · gestión compacta v2 */
+.adminPeopleHead{padding:12px 2px!important;margin:6px 0 8px!important}
+.adminPeopleHead>div small{font-size:9px!important}.adminPeopleHead h1{font-size:26px!important}.adminPeopleHead p{font-size:10px!important}
+.adminPeopleHead .addMini{background:var(--md-blue)!important;color:#fff!important;border:0!important;min-width:74px!important}
+.adminCoachSection{padding:12px!important}
+.adminCoachSectionTitle{margin-bottom:9px!important}
+.adminCoachCards{gap:8px!important}
+.adminCoachCard{padding:10px!important;background:#fbfcfe!important}
+.adminCoachIdentity{grid-template-columns:40px minmax(0,1fr) auto!important}
+.adminCoachAvatar{width:38px!important;height:38px!important;border-radius:12px!important}
+.adminCoachIdentity>div{min-width:0!important}.adminCoachIdentity>div>b{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.adminCoachIdentity>div>small{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;color:var(--md-muted)!important}
+.coachActive{background:#eaf7ef!important;color:#187243!important}.coachInactive{background:#fbecec!important;color:#a33b3b!important}
+.adminCoachCats{margin:7px 0!important}.adminCoachCats:empty:after{content:"Sin categorías";font-size:8px;color:var(--md-muted)}
+.adminEditTeams{min-height:34px!important;background:#fff!important;font-weight:850!important}
+.adminTeamEditor{padding-top:9px!important}.adminTeamEditor>small{font-size:8px!important;font-weight:900!important;letter-spacing:.06em!important;color:var(--md-muted)!important}
+.adminCategoryPicker{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;margin-top:7px!important}
+.adminCategoryPicker button{min-height:34px!important;padding:6px 3px!important;border-radius:10px!important;border:1px solid var(--md-line)!important;background:#fff!important;color:var(--md-muted)!important;font-size:9px!important;font-weight:850!important}
+.adminCategoryPicker button.selected{background:var(--md-blue)!important;color:#fff!important;border-color:var(--md-blue)!important}
+.coachCreatePanel{padding:12px!important}.coachCreatePanel>small{font-size:9px!important;font-weight:900!important;letter-spacing:.07em!important}
+.coachCreatePanel label{display:grid!important;gap:4px!important;font-size:9px!important;font-weight:850!important;color:var(--md-ink)!important}
+.coachCreatePanel input{width:100%!important;min-height:42px!important;padding:0 11px!important;font-size:13px!important}
+.coachCreatePanel .primary{margin-top:9px!important}
+@media(max-width:380px){.adminCategoryPicker{grid-template-columns:repeat(3,minmax(0,1fr))!important}.adminCoachIdentity{grid-template-columns:36px minmax(0,1fr) auto!important}.adminCoachAvatar{width:34px!important;height:34px!important}}
