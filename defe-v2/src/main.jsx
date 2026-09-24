@@ -7,6 +7,7 @@ window.fetch=(input,init)=>{
   return nativeFetch(input,init);
 };
 const LOGO="/defe-logo.svg";
+// V2 staging frontend build: Argenliga jornada única 2026-09-24
 const FEFI_CATEGORIES=["2013","2014","2015","2016","2017","2018","2019"];
 const LAAMBA_CATEGORIES=["1ra","3ra","4ta","5ta","6ta","7ma","8va","Promocional 2016","Promocional 2017","Promocional 2018","Promocional 2019/20"];
 const FEFI_URL="https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/";
