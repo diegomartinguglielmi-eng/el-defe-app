@@ -156,6 +156,8 @@ def run_callup_pending_alerts(force: bool = False, match_id: int | None = None, 
         if match_id is not None: q=q.filter(Match.id==match_id)
         elif not force: q=q.filter(Match.date==target)
         matches=q.order_by(Match.date.asc(),Match.id.asc()).all()
+        if force and match_id is not None and not matches:
+            debug.append({"requested_match_id":match_id,"match_found":False,"available_fefi_matches":[{"id":m.id,"date":m.date,"status":m.status,"division":m.division,"home":m.home,"away":m.away} for m in db.query(Match).filter(Match.competition=="FEFI").order_by(Match.date.desc(),Match.id.desc()).limit(15).all()]})
         categories=[str(category)] if category else FEFI_CATEGORIES
         for match in matches:
             for category in categories:
