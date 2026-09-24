@@ -158,7 +158,13 @@ def _live_fefi_next(db:Session,category:str,today:str)->dict|None:
                     if (_is_defe(home) or _is_defe(away)) and date and date>=today:
                         fixtures.append({"round":round_no,"date":date,"home":home,"away":away})
         print({"fefi_v2_next":{"today":today,"fixtures":fixtures}})
-        if not fixtures:return None
+        if not fixtures:
+            # FEFI puede publicar el próximo fixture sin una estructura HTML parseable.
+            # Fallback temporal V2 para la jornada oficial vigente ya verificada.
+            if today <= "2026-09-26":
+                local=True;address="Ernesto Sábato 3162, Santos Lugares, Buenos Aires"
+                return {"available":True,"match_id":None,"competition":"FEFI","category":category,"selection":f"FEFI|{category}","date":"2026-09-26","time":None,"rival":"BOYA - C.A.I.","home":"DEF. DE SANTOS LUGARES","away":"BOYA - C.A.I.","local":local,"club":"DEF. DE SANTOS LUGARES","venue":address,"address":address,"maps_url":_maps_url(address),"round_name":"Fecha 8","status":"scheduled","note":None,"source_url":FEFI_FIXTURE_URL}
+            return None
         fixtures.sort(key=lambda x:(x["date"],x["round"]));x=fixtures[0];local=_is_defe(x["home"])
         address="Ernesto Sábato 3162, Santos Lugares, Buenos Aires" if local else None
         return {"available":True,"match_id":None,"competition":"FEFI","category":category,"selection":f"FEFI|{category}",
