@@ -9,7 +9,7 @@ from sqlalchemy.sql import func
 
 from .auth import get_current_user, require_roles
 from .db import Base, get_db
-from .models import User, Team, TeamMember, Person, CallUp, CallUpPlayer
+from .models import User, Team, TeamMember, Person, CallUp, CallUpPlayer, Match
 from .availability_v1 import UserPlayerLink, AvailabilityResponse, _linked_players, _next_event
 from .profe_scope import profe_selections, normalize_selection
 
@@ -203,6 +203,29 @@ def save_profe_callup(payload: ProfeCallupIn, db: Session = Depends(get_db), use
         raise HTTPException(400, "Liga y categoría inválidas")
     competition, category = key.split("|", 1)
     event = _next_event(db, key)
+    if event and not event.get("match_id") and competition == "FEFI":
+        external_key = "FEFI|FALLBACK|" + str(event.get("date") or "") + "|" + str(event.get("round_name") or "") + "|" + str(event.get("home") or "") + "|" + str(event.get("away") or "")
+        match = db.query(Match).filter(Match.external_key == external_key).first()
+        if not match:
+            match = Match(
+                external_key=external_key,
+                competition="FEFI",
+                division=category,
+                round_name=event.get("round_name"),
+                date=event.get("date"),
+                home=event.get("home") or "DEF. DE SANTOS LUGARES",
+                away=event.get("away") or "A CONFIRMAR",
+                home_score=None,
+                away_score=None,
+                status=event.get("status") or "scheduled",
+                venue=event.get("venue") or event.get("address"),
+                source_url=event.get("source_url"),
+                source_kind="official_fallback",
+            )
+            db.add(match)
+            db.flush()
+        event = dict(event)
+        event["match_id"] = match.id
     if not event or not event.get("match_id"):
         raise HTTPException(409, "No hay un próximo partido persistido para convocar")
     team = db.query(Team).filter(func.upper(Team.competition) == competition, func.upper(Team.division) == category, Team.is_active == True).order_by(Team.season.desc()).first()
