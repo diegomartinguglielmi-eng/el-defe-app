@@ -12,6 +12,7 @@ from .db import Base, get_db
 from .models import User, Team, TeamMember, Person, CallUp, CallUpPlayer, Match
 from .availability_v1 import UserPlayerLink, AvailabilityResponse, _linked_players, _next_event
 from .profe_scope import profe_selections, normalize_selection
+from .notifications_v5 import publish_event
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 router = APIRouter(prefix="/api/availability/v2", tags=["Availability v2 - player"])
@@ -35,6 +36,50 @@ class PlayerAvailabilityIn(BaseModel):
     selection: str
     status: str
     note: str | None = None
+
+
+class ArgenligaProgrammingIn(BaseModel):
+    opponent: str
+    match_date: str
+    home_away: str = "local"
+    venue: str | None = None
+    location: str
+    round_name: str | None = None
+    times: dict[str, str]
+
+
+@router.post("/admin/argenliga/programming")
+def create_argenliga_programming(payload: ArgenligaProgrammingIn, db: Session = Depends(get_db), user=Depends(require_roles("admin"))):
+    categories = ["8VA", "7MA", "6TA", "5TA", "4TA", "3RA", "1RA"]
+    opponent = payload.opponent.strip()
+    location = payload.location.strip()
+    if not opponent or not payload.match_date or not location:
+        raise HTTPException(400, "Completá rival, fecha y ubicación validada")
+    created=[]
+    for category in categories:
+        match_time=(payload.times.get(category) or "").strip()
+        if not match_time:
+            raise HTTPException(400, f"Falta el horario de {category}")
+        team=db.query(Team).filter(func.upper(Team.competition)=="ARGENLIGA", func.upper(Team.division)==category, Team.is_active==True).first()
+        if not team:
+            team=Team(competition="ARGENLIGA", division=category, season=2026, name=f"Defensores SL · {category}", is_active=True)
+            db.add(team); db.flush()
+        local=(payload.home_away or "local").lower()=="local"
+        home="DEF. DE SANTOS LUGARES" if local else opponent
+        away=opponent if local else "DEF. DE SANTOS LUGARES"
+        external_key=f"ARGENLIGA|MANUAL|{payload.match_date}|{category}|{home}|{away}"
+        match=db.query(Match).filter(Match.external_key==external_key).first()
+        if not match:
+            match=Match(external_key=external_key,competition="ARGENLIGA",division=category,round_name=payload.round_name or None,date=payload.match_date,home=home,away=away,status="scheduled",venue=location,source_kind="manual_admin")
+            db.add(match); db.flush()
+        else:
+            match.round_name=payload.round_name or match.round_name; match.date=payload.match_date; match.home=home; match.away=away; match.venue=location; match.status="scheduled"
+        # Preserve category time in source_url until Match has a dedicated time field.
+        match.source_url=f"manual://argenliga?time={match_time}"
+        event=publish_event(db,event_type="programming",title=f"Argenliga · {category}",body=f"Nueva fecha vs {opponent} · {payload.match_date} {match_time} hs",competition="ARGENLIGA",category=category,match_id=match.id)
+        created.append({"category":category,"match_id":match.id,"time":match_time,"push":getattr(event,"push_result",None)})
+    db.commit()
+    return {"ok":True,"competition":"ARGENLIGA","matches":created}
 
 
 def _today():
