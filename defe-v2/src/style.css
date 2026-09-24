@@ -617,3 +617,10 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .adminMessages .sentMessages{margin-top:13px!important}.adminMessages .sentMessagesTitle{margin-bottom:7px!important}
 .adminMessages .coachEmpty{padding:22px 14px!important;min-height:0!important}.adminMessages .coachEmpty h3{font-size:16px!important;margin:0 0 5px!important}.adminMessages .coachEmpty p{font-size:11px!important;margin:0!important}
 @media(max-width:600px){.adminMessages{margin-left:0!important;margin-right:0!important}.adminMessages .messageComposer{overflow:hidden!important}.adminMessages .messageComposer select{appearance:auto!important}}
+
+
+/* Admin Comunicaciones · compactación final */
+.adminMessages .messageComposer textarea{height:118px!important;min-height:118px!important;max-height:180px!important}
+.adminMessages .messageComposer{gap:8px!important}
+.adminMessages .messageComposer input,.adminMessages .messageComposer select{height:42px!important;min-height:42px!important}
+@media(max-width:600px){.adminMessages .messageComposer textarea{height:116px!important;min-height:116px!important}.adminMessages .messageComposer{padding:11px!important}}
