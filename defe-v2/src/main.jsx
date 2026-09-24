@@ -1,6 +1,6 @@
 import React,{useEffect,useState}from'react';import{createRoot}from'react-dom/client';import{Users,Trophy,Home,CalendarDays,MessageCircle,ClipboardCheck,LayoutDashboard,Megaphone,Cake}from'lucide-react';import'./style.css';import{loadNextMatch,answerCallup}from'./familyApi';import{registerPWA,enableNotifications}from'./pwa';
 registerPWA();
-const API_BASE="https://el-defe-v2-staging-production.up.railway.app";
+const API_BASE="https://defe-v2-laamba-staging-production.up.railway.app";
 const nativeFetch=window.fetch.bind(window);
 window.fetch=(input,init)=>{
   if(typeof input==="string"&&input.startsWith("/api/")) return nativeFetch(API_BASE+input,init);
