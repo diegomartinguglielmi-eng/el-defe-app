@@ -35,6 +35,10 @@ from .argenliga_sync import sync_argenliga
 from .fefi_mayores import sync_fefi_mayores_b
 from .superliga_sync import sync_superliga
 
+@app.post('/api/admin/test-callup-reminder/{match_id}/{category}')
+def test_callup_reminder(match_id:int,category:str,admin:User=Depends(require_roles('admin'))):
+    return run_callup_pending_alerts(force=True,match_id=match_id,category=category)
+
 app.include_router(router);app.include_router(fefi_results_router);app.include_router(fefi_schedules_router);app.include_router(fefi_freshness_router);app.include_router(fefi_standings_router);app.include_router(notifications_router);app.include_router(data_quality_router);app.include_router(home_router);app.include_router(following_router);app.include_router(store_router);app.include_router(user_admin_router);app.include_router(sponsors_router);app.include_router(league_tournaments_router);app.include_router(league_stats_router)
 BASE=Path(__file__).resolve().parent
 LAAMBA_BOOTSTRAP_LOCK=2026090701;ARGENLIGA_BOOTSTRAP_LOCK=2026090702;FEFI_BOOTSTRAP_LOCK=2026090703;FEFI_MAYORES_BOOTSTRAP_LOCK=2026090704;SUPERLIGA_BOOTSTRAP_LOCK=2026090705
