@@ -136,25 +136,37 @@ def _event_from_match(db:Session,m:Match,competition:str,category:str)->dict:
 
 
 def _live_fefi_next(db:Session,category:str,today:str)->dict|None:
-    """Lee el fixture oficial FEFI para V2 sin modificar ni depender del flujo validado de V1."""
+    """Extrae el próximo partido directamente del HTML oficial FEFI Zona H."""
     try:
         response=requests.get(FEFI_FIXTURE_URL,timeout=20,headers={"User-Agent":FEFI_FIXTURE_UA,"Accept":"text/html,application/xhtml+xml"})
         response.raise_for_status()
-        fixtures=parse_fefi(response.text).get("fixtures") or []
-        future=[x for x in fixtures if x.get("date") and x["date"]>=today]
-        if not future:return None
-        future.sort(key=lambda x:(x.get("date") or "9999-99-99",x.get("round") or 999))
-        x=future[0]
-        local=_is_defe(x.get("home"));venue=x.get("venue")
+        from bs4 import BeautifulSoup
+        soup=BeautifulSoup(response.text,"html.parser")
+        months={"enero":"01","febrero":"02","marzo":"03","abril":"04","mayo":"05","junio":"06","julio":"07","agosto":"08","septiembre":"09","octubre":"10","noviembre":"11","diciembre":"12"}
+        fixtures=[]
+        for table in soup.find_all("table"):
+            rows=table.find_all("tr");round_no=None;date=None
+            for row in rows:
+                cells=[re.sub(r"\\s+"," ",x.get_text(" ",strip=True)).strip() for x in row.find_all(["th","td"])]
+                if not cells:continue
+                joined=" ".join(cells)
+                mm=re.search(r"Fecha\\s+(\\d+)\\s*-\\s*(\\d{1,2})\\s+de\\s+([A-Za-zÁÉÍÓÚáéíóúÑñ]+)",joined,re.I)
+                if mm:
+                    mon=months.get(mm.group(3).lower());round_no=int(mm.group(1));date=f"2026-{mon}-{int(mm.group(2)):02d}" if mon else None;continue
+                if round_no and len(cells)>=3 and _norm(cells[1])=="vs":
+                    home,away=cells[0].strip(),cells[2].strip()
+                    if (_is_defe(home) or _is_defe(away)) and date and date>=today:
+                        fixtures.append({"round":round_no,"date":date,"home":home,"away":away})
+        if not fixtures:return None
+        fixtures.sort(key=lambda x:(x["date"],x["round"]));x=fixtures[0];local=_is_defe(x["home"])
+        address="Ernesto Sábato 3162, Santos Lugares, Buenos Aires" if local else None
         return {"available":True,"match_id":None,"competition":"FEFI","category":category,"selection":f"FEFI|{category}",
-                "date":x.get("date"),"time":None,"rival":x.get("away") if local else x.get("home"),
-                "home":x.get("home"),"away":x.get("away"),"local":local,"club":x.get("home"),
-                "venue":venue,"address":venue or ("Ernesto Sábato 3162, Santos Lugares, Buenos Aires" if local else None),
-                "maps_url":_maps_url(venue or ("Ernesto Sábato 3162, Santos Lugares, Buenos Aires" if local else None)),
-                "round_name":x.get("round_name"),"status":"scheduled","note":None,"source_url":FEFI_FIXTURE_URL}
-    except Exception:
+                "date":x["date"],"time":None,"rival":x["away"] if local else x["home"],"home":x["home"],"away":x["away"],
+                "local":local,"club":x["home"],"venue":address,"address":address,"maps_url":_maps_url(address),
+                "round_name":f"Fecha {x['round']}","status":"scheduled","note":None,"source_url":FEFI_FIXTURE_URL}
+    except Exception as exc:
+        print({"fefi_v2_next_error":str(exc)})
         return None
-
 
 def _events_for_selection(db:Session,selection:str,today:str)->list[dict]:
     competition,category=selection.split("|",1)
