@@ -93,7 +93,7 @@ def run(force: bool = False) -> dict:
                     FefiCategorySchedule.match_id == match.id
                 ).all()
                 by_category = {x.category: x for x in schedules}
-                for category in categories:
+                for category in FEFI_CATEGORIES:
                     schedule = by_category.get(category)
                     body = reminder_body(match, category, schedule.time if schedule else None)
                     exists = db.query(NotificationEvent).filter(
