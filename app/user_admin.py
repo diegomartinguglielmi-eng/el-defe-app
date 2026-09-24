@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, field_validator
 from sqlalchemy.orm import Session
 
-from .auth import hash_password, create_token, require_roles
+from .auth import hash_password, create_token, require_roles, get_current_user
 from .db import get_db
 from .models import User, AuditLog, Favorite
 from .profe_scope import PROFE_TEAM_FAVORITE, normalize_selection, profe_selections
@@ -152,3 +152,21 @@ def set_profe_teams(user_id: int, payload: ProfeTeamsIn, db: Session = Depends(g
     db.commit()
     _audit(db, admin, "set_profe_teams", target.id, ",".join(payload.selections))
     return {"ok": True, "user_id": target.id, "selections": sorted(payload.selections)}
+
+
+@router.get("/api/profe/me")
+def profe_me(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    if user.role != "profe":
+        raise HTTPException(status_code=403, detail="El usuario no tiene perfil de profesor")
+    selections = sorted(profe_selections(db, user))
+    categories = [x.split("|", 1)[1] for x in selections if "|" in x]
+    return {
+        "id": user.id,
+        "email": user.email,
+        "role": user.role,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "phone": user.phone,
+        "selections": selections,
+        "categories": categories,
+    }
