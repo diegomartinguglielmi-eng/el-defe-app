@@ -1,63 +1,15 @@
-// Temporary V2 bridge: render the selected ARGENLIGA activity in Family > Partidos
-// without falling through to the FEFI-only block in the current React bundle.
+// V2 bridge: ARGENLIGA must show the same next match + attendance in Inicio and Partidos.
 (() => {
-  const API_BASE = 'https://defe-v2-laamba-staging-production.up.railway.app';
-  let lastKey = '';
-  let busy = false;
-
-  const selectedArgenliga = () => {
-    const app = document.querySelector('.familyApp');
-    if (!app) return null;
-    const active = app.querySelector('.activitySwitch button.active');
-    if (!active) return null;
-    const league = (active.querySelector('b')?.textContent || '').toUpperCase();
-    if (!league.includes('ARGENLIGA')) return null;
-    const category = (active.querySelector('small')?.textContent || '').trim();
-    return category ? `ARGENLIGA|${category}` : null;
-  };
-
-  const fmtDate = value => {
-    if (!value) return 'Fecha a confirmar';
-    try {
-      return new Date(String(value).slice(0,10) + 'T12:00:00').toLocaleDateString('es-AR', {
-        weekday: 'short', day: '2-digit', month: '2-digit'
-      });
-    } catch (_) { return String(value); }
-  };
-
-  async function render() {
-    const key = selectedArgenliga();
-    const panel = document.querySelector('.familyApp .familyTabPanel');
-    if (!key || !panel || busy) { if (!key) lastKey = ''; return; }
-    const signature = key + '|' + (panel.querySelector('h1')?.textContent || '');
-    if (panel.dataset.argenligaRendered === signature && lastKey === signature) return;
-    busy = true;
-    try {
-      const token = localStorage.getItem('defe_token');
-      const r = await fetch(API_BASE + '/api/availability/v2/me', {headers: token ? {Authorization:'Bearer '+token} : {}});
-      if (!r.ok) return;
-      const d = await r.json();
-      const ev = (d.items || []).find(x => String(x.selection || '').toUpperCase() === key.toUpperCase());
-      const small = panel.querySelector(':scope > small');
-      if (small) small.textContent = 'PRÓXIMO PARTIDO · ARGENLIGA';
-      const h3 = panel.querySelector('h3');
-      const p = h3?.nextElementSibling;
-      if (ev?.available) {
-        if (h3) h3.textContent = `${ev.home || 'DEF. DE SANTOS LUGARES'} vs. ${ev.away || 'Rival a confirmar'}`;
-        if (p) p.innerHTML = `<b>${fmtDate(ev.date)}</b> · ${ev.match_time || ev.time || 'Horario a confirmar'} hs · ${(ev.home_away === 'local' || ev.local === true) ? 'Local' : 'Visitante'}`;
-        const status = panel.querySelector('.matchStatus b');
-        if (status && !status.textContent.includes('CONFIRM')) status.textContent = 'FECHA CONFIRMADA';
-      } else {
-        if (h3) h3.textContent = 'Próxima fecha a confirmar';
-        if (p) { p.textContent = 'ARGENLIGA todavía no publicó o programó el próximo partido de esta categoría.'; p.classList.add('muted'); }
-      }
-      panel.dataset.argenligaRendered = signature;
-      lastKey = signature;
-    } finally { busy = false; }
-  }
-
-  const observer = new MutationObserver(() => queueMicrotask(render));
-  observer.observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['class']});
-  document.addEventListener('click', () => setTimeout(render, 0), true);
-  render();
+  const API_BASE='https://defe-v2-laamba-staging-production.up.railway.app';
+  let busy=false;
+  const token=()=>localStorage.getItem('defe_token');
+  const key=()=>{const b=document.querySelector('.familyApp .activitySwitch button.active');if(!b)return null;const l=(b.querySelector('b')?.textContent||'').toUpperCase(),c=(b.querySelector('small')?.textContent||'').trim();return l.includes('ARGENLIGA')&&c?`ARGENLIGA|${c}`:null};
+  const tab=()=>{const b=[...document.querySelectorAll('.familyApp .familyTabs button')].find(x=>x.classList.contains('active'));return (b?.textContent||'').trim().toLowerCase()};
+  const fmt=v=>{if(!v)return'Fecha a confirmar';try{return new Date(String(v).slice(0,10)+'T12:00:00').toLocaleDateString('es-AR',{weekday:'short',day:'2-digit',month:'2-digit'})}catch{return String(v)}};
+  const statusText=s=>s==='yes'?'✓ Asistencia confirmada':s==='no'?'✕ No asiste':s==='maybe'?'? A confirmar':'Confirmá la asistencia';
+  function controls(ev){const wrap=document.createElement('div');wrap.className='argenligaAttendance';wrap.style.cssText='margin-top:18px;padding-top:16px;border-top:1px solid #dbe3ef';wrap.innerHTML=`<div style="font-weight:800;color:#244f88;margin-bottom:10px">${statusText(ev.response)}</div><div style="display:flex;gap:10px;flex-wrap:wrap"><button data-a="yes" style="flex:1;min-width:120px;padding:12px;border-radius:12px;border:1px solid #1f5fae;background:${ev.response==='yes'?'#1f5fae':'#fff'};color:${ev.response==='yes'?'#fff':'#1f5fae'};font-weight:800">✓ Confirmo</button><button data-a="no" style="flex:1;min-width:120px;padding:12px;border-radius:12px;border:1px solid #b64a4a;background:${ev.response==='no'?'#b64a4a':'#fff'};color:${ev.response==='no'?'#fff':'#a33'};font-weight:800">No asiste</button></div>`;wrap.querySelectorAll('button').forEach(b=>b.onclick=async()=>{b.disabled=true;try{const r=await fetch(API_BASE+'/api/availability/v2/'+ev.match_id,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token()},body:JSON.stringify({person_id:ev.person_id,selection:ev.selection,status:b.dataset.a,note:null})});if(!r.ok)throw new Error();await render(true)}catch{alert('No pudimos guardar la asistencia. Intentá nuevamente.')}finally{b.disabled=false}});return wrap}
+  function fillCard(card,ev){card.querySelectorAll('.argenligaAttendance').forEach(x=>x.remove());const small=card.querySelector(':scope > small');if(small)small.textContent='PRÓXIMO PARTIDO · ARGENLIGA';const h3=card.querySelector('h3');const p=h3?.nextElementSibling;if(ev?.available){if(h3)h3.textContent=`${ev.home||'DEF. DE SANTOS LUGARES'} vs. ${ev.away||'Rival a confirmar'}`;if(p){p.innerHTML=`<b>${fmt(ev.date)}</b> · ${ev.match_time||ev.time||'Horario a confirmar'} hs · ${(ev.home_away==='local'||ev.local===true)?'Local':'Visitante'}`;p.classList.remove('muted')}card.appendChild(controls(ev))}else{if(h3)h3.textContent='Próxima fecha a confirmar';if(p){p.textContent='ARGENLIGA todavía no publicó o programó el próximo partido de esta categoría.';p.classList.add('muted')}}}
+  function homeCard(ev){let card=document.querySelector('.familyApp #argenliga-home-match');if(!card){card=document.createElement('section');card.id='argenliga-home-match';card.className='familyTabPanel';card.style.marginTop='22px';const sw=document.querySelector('.familyApp .activitySwitch');if(!sw)return;sw.insertAdjacentElement('afterend',card)}card.innerHTML='<small>PRÓXIMO PARTIDO · ARGENLIGA</small><h3></h3><p></p>';fillCard(card,ev)}
+  async function render(force=false){const k=key();if(!k||busy){document.querySelector('#argenliga-home-match')?.remove();return}busy=true;try{const r=await fetch(API_BASE+'/api/availability/v2/me',{headers:{Authorization:'Bearer '+token()}});if(!r.ok)return;const d=await r.json();const ev=(d.items||[]).find(x=>String(x.selection||'').toUpperCase()===k.toUpperCase());const t=tab();if(t.includes('partidos')){document.querySelector('#argenliga-home-match')?.remove();const card=document.querySelector('.familyApp .familyTabPanel');if(card)fillCard(card,ev)}else if(t.includes('inicio'))homeCard(ev);else document.querySelector('#argenliga-home-match')?.remove()}finally{busy=false}}
+  const obs=new MutationObserver(()=>setTimeout(()=>render(),0));obs.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});document.addEventListener('click',()=>setTimeout(()=>render(true),30),true);render(true);
 })();
