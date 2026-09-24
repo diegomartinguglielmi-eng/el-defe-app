@@ -735,3 +735,19 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .coachMessages .messageComposer textarea{height:116px!important;min-height:116px!important;max-height:180px!important;padding:11px 12px!important;resize:vertical!important}
 .coachMessages .messageAudience{margin:1px 0!important}
 .coachMessages .messageComposer .primary{margin:0!important;min-height:46px!important}
+
+
+/* Profesor Mensajes · compactar ausencias y corregir composer */
+.coachAbsenceCard{min-height:0!important;padding:8px 9px!important}
+.coachAbsenceList .coachAbsenceCard{height:auto!important}
+.coachAbsenceCard>div{min-height:0!important}.coachAbsenceCard p{margin:2px 0 0!important}
+.coachAbsences article{padding-bottom:8px!important}
+.coachApp>article{padding-bottom:90px!important}
+.coachMessages .messageComposer{display:grid!important;gap:8px!important;padding:12px!important;overflow:hidden!important}
+.coachMessages .messageComposer>small{margin:0!important;font-size:9px!important}
+.coachMessages .messageComposer label{display:grid!important;grid-template-columns:1fr!important;gap:5px!important;margin:0!important;font-size:10px!important;font-weight:850!important;color:var(--md-ink)!important}
+.coachMessages .messageComposer input,.coachMessages .messageComposer textarea{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;border:1px solid #d7e0eb!important;background:#fff!important;color:var(--md-ink)!important;font-size:14px!important;line-height:1.3!important}
+.coachMessages .messageComposer input{height:42px!important;min-height:42px!important;padding:0 12px!important}
+.coachMessages .messageComposer textarea{height:116px!important;min-height:116px!important;max-height:180px!important;padding:11px 12px!important;resize:vertical!important}
+.coachMessages .messageAudience{margin:1px 0!important;padding:9px 11px!important;border-radius:11px!important}
+.coachMessages .messageComposer .primary{margin:0!important;min-height:46px!important}
