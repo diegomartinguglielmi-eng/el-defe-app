@@ -50,7 +50,7 @@ jobs:
       - name: Build V2
         working-directory: defe-v2
         run: |
-          npm ci
+          npm install --no-audit --no-fund
           npm run build
       - name: Commit only after validation succeeds
         run: |
