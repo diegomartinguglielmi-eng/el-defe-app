@@ -1,57 +1,40 @@
-name: Upgrade admin professor to multileague
+name: Inspect admin professor form safely
 on:
   push:
     branches: [mi-defe-v2-laamba]
     paths: ['.github/workflows/patch-family-view.yml']
 permissions:
-  contents: write
+  contents: read
 jobs:
-  patch:
+  inspect:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: mi-defe-v2-laamba
-      - name: Patch professor create/edit selectors
+      - name: Inspect exact professor implementation without changing app
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          p=Path('defe-v2/src/main.jsx'); s=p.read_text(); before=s
-          # Locate admin professor area and upgrade the category selector using the same
-          # shared league/category constants already used by Family.
-          anchor=s.find('PROFESORES REGISTRADOS')
-          if anchor<0: anchor=s.find('Profesores registrados')
-          if anchor<0: raise SystemExit('Professor admin anchor not found')
-          start=max(0,s.rfind('function ',0,anchor)); end=s.find('function ',anchor)
-          if end<0: end=len(s)
-          block=s[start:end]
           import re
-          # Expand professor form state from a single categories array to three league arrays.
-          block=re.sub(r"categories:\[\]", "categories:[],laambaCategories:[],argenligaCategories:[]", block, count=1)
-          # Replace the first create-form category picker with three independent grouped pickers.
-          picker=re.search(r"<div className=\"categoryPicker\">[\s\S]*?</div>",block)
-          if not picker:
-            picker=re.search(r"<div className=\"categories[^\"]*\">[\s\S]*?</div>",block)
-          if not picker: raise SystemExit('Professor category picker not found')
-          multi='''<div className="profLeagueGroups"><div className="profLeagueGroup"><small>BABY · FEFI</small><div className="categoryPicker">{FEFI_CATEGORIES.map(c=><button type="button" key={'fefi-'+c} className={(profForm.categories||[]).includes(c)?'selected':''} onClick={()=>setProfForm(x=>({...x,categories:(x.categories||[]).includes(c)?x.categories.filter(v=>v!==c):[...(x.categories||[]),c]}))}>{c}</button>)}</div></div><div className="profLeagueGroup"><small>FUTSAL · ARGENLIGA</small><div className="categoryPicker">{ARGENLIGA_CATEGORIES.map(c=><button type="button" key={'argen-'+c} className={(profForm.argenligaCategories||[]).includes(c)?'selected':''} onClick={()=>setProfForm(x=>({...x,argenligaCategories:(x.argenligaCategories||[]).includes(c)?x.argenligaCategories.filter(v=>v!==c):[...(x.argenligaCategories||[]),c]}))}>{c}</button>)}</div></div><div className="profLeagueGroup"><small>FUTSAL · LAAMBA</small><div className="categoryPicker">{LAAMBA_CATEGORIES.map(c=><button type="button" key={'laamba-'+c} className={(profForm.laambaCategories||[]).includes(c)?'selected':''} onClick={()=>setProfForm(x=>({...x,laambaCategories:(x.laambaCategories||[]).includes(c)?x.laambaCategories.filter(v=>v!==c):[...(x.laambaCategories||[]),c]}))}>{c}</button>)}</div></div></div>'''
-          # Only apply if this block actually uses profForm; otherwise stop rather than corrupt source.
-          if 'profForm' not in block or 'setProfForm' not in block: raise SystemExit('Professor form state names differ; refusing unsafe patch')
-          block=block[:picker.start()]+multi+block[picker.end():]
-          s=s[:start]+block+s[end:]
-          if s==before: raise SystemExit('No source change')
-          p.write_text(s)
+          s=Path('defe-v2/src/main.jsx').read_text()
+          terms=['Profesores registrados','PROFESORES REGISTRADOS','Nuevo profesor','NUEVO PROFESOR','Crear profesor','Editar planteles','professor','profesor']
+          hits=[]
+          for term in terms:
+            pos=0
+            while True:
+              i=s.lower().find(term.lower(),pos)
+              if i<0: break
+              hits.append((i,term)); pos=i+1
+          hits=sorted(set(hits))
+          print('TOTAL HITS',len(hits))
+          for n,(i,term) in enumerate(hits[:30],1):
+            a=max(0,i-1800); b=min(len(s),i+4200)
+            print(f'\n===== HIT {n}: {term} @ {i} =====')
+            print(s[a:b])
+          print('\n===== STATE CANDIDATES =====')
+          for m in re.finditer(r'useState\([^\n]{0,500}',s):
+            x=m.group(0)
+            if any(k in x.lower() for k in ['prof','category','categor']): print(x[:1000])
+          if not hits: raise SystemExit('No professor implementation found')
           PY
-      - name: Verify and build
-        run: |
-          grep -q 'BABY · FEFI' defe-v2/src/main.jsx
-          grep -q 'FUTSAL · ARGENLIGA' defe-v2/src/main.jsx
-          grep -q 'FUTSAL · LAAMBA' defe-v2/src/main.jsx
-          cd defe-v2 && npm install && npm run build
-      - name: Commit
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add defe-v2/src/main.jsx
-          git diff --cached --quiet && { echo 'No app change'; exit 1; }
-          git commit -m 'feat: multileague professor assignments in admin'
-          git push origin HEAD:mi-defe-v2-laamba
