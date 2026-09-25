@@ -1,40 +1,62 @@
-name: Inspect admin professor form safely
+name: Apply multileague professor assignments safely
 on:
   push:
     branches: [mi-defe-v2-laamba]
     paths: ['.github/workflows/patch-family-view.yml']
 permissions:
-  contents: read
+  contents: write
 jobs:
-  inspect:
+  patch-validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: mi-defe-v2-laamba
-      - name: Inspect exact professor implementation without changing app
+      - name: Patch exact verified professor implementation
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re
-          s=Path('defe-v2/src/main.jsx').read_text()
-          terms=['Profesores registrados','PROFESORES REGISTRADOS','Nuevo profesor','NUEVO PROFESOR','Crear profesor','Editar planteles','professor','profesor']
-          hits=[]
-          for term in terms:
-            pos=0
-            while True:
-              i=s.lower().find(term.lower(),pos)
-              if i<0: break
-              hits.append((i,term)); pos=i+1
-          hits=sorted(set(hits))
-          print('TOTAL HITS',len(hits))
-          for n,(i,term) in enumerate(hits[:30],1):
-            a=max(0,i-1800); b=min(len(s),i+4200)
-            print(f'\n===== HIT {n}: {term} @ {i} =====')
-            print(s[a:b])
-          print('\n===== STATE CANDIDATES =====')
-          for m in re.finditer(r'useState\([^\n]{0,500}',s):
-            x=m.group(0)
-            if any(k in x.lower() for k in ['prof','category','categor']): print(x[:1000])
-          if not hits: raise SystemExit('No professor implementation found')
+          p=Path('defe-v2/src/main.jsx')
+          s=p.read_text()
+          reps=[
+          ("categories:(td.selections||[]).map(x=>x.split('|')[1]).filter(Boolean)","selections:(td.selections||[]),categories:(td.selections||[]).filter(x=>x.startsWith('FEFI|')).map(x=>x.split('|')[1]).filter(Boolean)"),
+          ("const[f,setF]=useState({fullName:'',phone:'',email:'',password:'',categories:['2013']})","const[f,setF]=useState({fullName:'',phone:'',email:'',password:'',selections:['FEFI|2013']})"),
+          ("if(!first_name||!f.email.trim()||f.password.length<8||!f.categories.length)throw new Error('Completá los datos y elegí al menos una categoría.')","if(!first_name||!f.email.trim()||f.password.length<8||!f.selections.length)throw new Error('Completá los datos y elegí al menos una liga y categoría.')"),
+          ("body:JSON.stringify({selections:f.categories.map(x=>'FEFI|'+x)})","body:JSON.stringify({selections:f.selections})"),
+          ("setF({fullName:'',phone:'',email:'',password:'',categories:['2013']})","setF({fullName:'',phone:'',email:'',password:'',selections:['FEFI|2013']})"),
+          ("<small>CATEGORÍAS</small><div className=\"adminCategoryPicker\">{cats.map(x=><button type=\"button\" key={x} className={f.categories.includes(x)?'selected':''} onClick={()=>setF({...f,categories:f.categories.includes(x)?f.categories.filter(y=>y!==x):[...f.categories,x]})}>{x}</button>)}</div>","<small>LIGAS Y CATEGORÍAS</small>{[['BABY · FEFI','FEFI',FEFI_CATEGORIES],['FUTSAL · ARGENLIGA','ARGENLIGA',ARGENLIGA_CATEGORIES],['FUTSAL · LAAMBA','LAAMBA',LAAMBA_CATEGORIES]].map(([label,league,list])=><div className=\"adminLeagueGroup\" key={league}><b>{label}</b><div className=\"adminCategoryPicker\">{list.map(x=>{const sel=league+'|'+x;return <button type=\"button\" key={sel} className={f.selections.includes(sel)?'selected':''} onClick={()=>setF({...f,selections:f.selections.includes(sel)?f.selections.filter(y=>y!==sel):[...f.selections,sel]})}>{x}</button>})}</div></div>)}"),
+          ("<div className=\"adminCoachCats\">{(c.categories||[]).map(x=><span key={x}>Cat. {x}</span>)}</div>","<div className=\"adminCoachCats\">{(c.selections||[]).map(x=><span key={x}>{x.replace('|',' · ')}</span>)}</div>"),
+          ("<small>CATEGORÍAS HABILITADAS</small><div className=\"adminCategoryPicker\">{cats.map(x=><button type=\"button\" key={x} className={(c.categories||[]).includes(x)?'selected':''} onClick={async()=>{const next=(c.categories||[]).includes(x)?(c.categories||[]).filter(y=>y!==x):[...(c.categories||[]),x];if(!next.length){setMsg('El profesor debe tener al menos una categoría.');return}const rr=await fetch('/api/admin/users/'+c.id+'/profe-teams',{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.token},body:JSON.stringify({selections:next.map(y=>'FEFI|'+y)})});if(rr.ok)loadCoaches()}}>{x}</button>)}</div>","<small>LIGAS Y CATEGORÍAS HABILITADAS</small>{[['BABY · FEFI','FEFI',FEFI_CATEGORIES],['FUTSAL · ARGENLIGA','ARGENLIGA',ARGENLIGA_CATEGORIES],['FUTSAL · LAAMBA','LAAMBA',LAAMBA_CATEGORIES]].map(([label,league,list])=><div className=\"adminLeagueGroup\" key={league}><b>{label}</b><div className=\"adminCategoryPicker\">{list.map(x=>{const sel=league+'|'+x;return <button type=\"button\" key={sel} className={(c.selections||[]).includes(sel)?'selected':''} onClick={async()=>{const current=c.selections||[],next=current.includes(sel)?current.filter(y=>y!==sel):[...current,sel];if(!next.length){setMsg('El profesor debe tener al menos una liga y categoría.');return}const rr=await fetch('/api/admin/users/'+c.id+'/profe-teams',{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.token},body:JSON.stringify({selections:next})});if(rr.ok)loadCoaches()}}>{x}</button>})}</div></div>)}")]
+          for old,new in reps:
+            n=s.count(old)
+            if n!=1: raise SystemExit(f'Expected exactly 1 match, got {n}: {old[:100]}')
+            s=s.replace(old,new)
+          p.write_text(s)
+          print('Applied',len(reps),'verified replacements')
           PY
+      - name: Validate multileague invariants
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('defe-v2/src/main.jsx').read_text()
+          required=["selections:(td.selections||[])","f.selections","BABY · FEFI","FUTSAL · ARGENLIGA","FUTSAL · LAAMBA","body:JSON.stringify({selections:next})","x.replace('|',' · ')"]
+          for x in required:
+            assert x in s, x
+          forbidden=["selections:f.categories.map(x=>'FEFI|'+x)","selections:next.map(y=>'FEFI|'+y)"]
+          for x in forbidden:
+            assert x not in s, x
+          print('Multileague professor invariants OK')
+          PY
+      - name: Build V2
+        working-directory: defe-v2
+        run: |
+          npm ci
+          npm run build
+      - name: Commit only after validation succeeds
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add defe-v2/src/main.jsx
+          git diff --cached --check
+          git commit -m "fix: support multileague professor assignments"
+          git push origin HEAD:mi-defe-v2-laamba
