@@ -1,5 +1,5 @@
 name: Deploy Mi DEFE V2 staging
-# trigger: deploy-canonical-multileague-jsx-71990adb
+# trigger: deploy-argenliga-canonical-46da561
 
 on:
   push:
