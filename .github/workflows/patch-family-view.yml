@@ -18,29 +18,14 @@ jobs:
           from pathlib import Path
           p=Path('defe-v2/src/main.jsx')
           s=p.read_text()
-          start=s.index('function FamilyHome(')
-          end=s.index('function CoachCommunications(',start)
-          pre,fam,post=s[:start],s[start:end],s[end:]
-          # The old special Argenliga/LAAMBA branch renders before the common FEFI-style home.
-          # Remove that branch so every competition reaches the shared blue next-match card.
-          marker="familyTab==='inicio'&&activeTeam?.competition!=='FEFI'"
-          i=fam.find(marker)
-          assert i!=-1, 'non-FEFI special home branch not found'
-          # Find the conditional JSX expression boundaries: {condition&&(...)}
-          open_brace=fam.rfind('{',0,i)
-          assert open_brace!=-1
-          paren=fam.find('(',i)
-          assert paren!=-1
-          depth=1; j=paren+1
-          while j<len(fam) and depth:
-            if fam[j]=='(': depth+=1
-            elif fam[j]==')': depth-=1
-            j+=1
-          assert depth==0
-          close_brace=fam.find('}',j)
-          assert close_brace!=-1
-          fam=fam[:open_brace]+fam[close_brace+1:]
-          p.write_text(pre+fam+post)
+          old='active&&activeTeam?.competition==="FEFI"&&<><section className="familyNext familyNextCompact"><div className="sectionTitleRow"><small>PRÓXIMO PARTIDO · FEFI</small>'
+          new='active&&activeTeam&&<><section className="familyNext familyNextCompact"><div className="sectionTitleRow"><small>PRÓXIMO PARTIDO · {activeTeam.competition}</small>'
+          assert old in s, 'FEFI home card not found'
+          s=s.replace(old,new,1)
+          old_la='activeTeam?.competition==="LAAMBA"&&(()=>{'
+          assert old_la in s, 'LAAMBA special card not found'
+          s=s.replace(old_la,'false&&(()=>{',1)
+          p.write_text(s)
           PY
       - name: Verify build
         run: |
@@ -52,5 +37,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add defe-v2/src/main.jsx
-          git commit -m 'fix: standardize family home across competitions' || exit 0
+          git commit -m 'fix: use shared family home card for every competition' || exit 0
           git push origin HEAD:mi-defe-v2-laamba
