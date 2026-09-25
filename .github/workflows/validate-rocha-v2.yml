@@ -1,0 +1,29 @@
+name: Validate Rocha V2 build
+
+on:
+  push:
+    branches:
+      - codex/consolidar-vista-de-convocatorias-para-rocha
+    paths:
+      - defe-v2/**
+      - .github/workflows/validate-rocha-v2.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: defe-v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --package-lock=false
+      - name: Build V2
+        run: npm run build
