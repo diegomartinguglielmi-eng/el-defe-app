@@ -1,0 +1,35 @@
+name: Restore validated V2 main
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore validated main.jsx
+        run: git checkout a78aac38f64ecac0699ce1ac967edb5df773c376 -- defe-v2/src/main.jsx
+      - name: Validate multileague professor code exists
+        run: |
+          grep -q 'ARGENLIGA_CATEGORIES' defe-v2/src/main.jsx
+          grep -q 'LAAMBA_CATEGORIES' defe-v2/src/main.jsx
+          grep -q 'FEFI_CATEGORIES' defe-v2/src/main.jsx
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install and build
+        working-directory: defe-v2
+        run: |
+          npm install
+          npm run build
+      - name: Commit only after successful build
+        run: |
+          if git diff --quiet; then echo 'No changes needed'; exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add defe-v2/src/main.jsx
+          git commit -m 'fix: restore validated multileague V2 main'
+          git push
