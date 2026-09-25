@@ -12,53 +12,44 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: mi-defe-v2-laamba
-      - name: Enforce one Inicio composition for every league
+      - name: Normalize Family Inicio using current JSX
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p=Path('defe-v2/src/main.jsx')
           s=p.read_text()
-          # The blue next-match card is the canonical primary card. Remove the extra
-          # white availability/callup card from Inicio so ARGENLIGA does not get a
-          # league-specific composition. Callup actions remain available in Partidos.
-          start=s.find("{familyTab==='inicio'&&activeCallup&&")
-          if start!=-1:
-              end=s.find("{familyTab==='inicio'&&", start+10)
-              if end!=-1:
-                  block=s[start:end]
-                  if 'availabilityCard' in block or 'Asistencia' in block or 'Confirmo' in block:
-                      s=s[:start]+s[end:]
-          # LAAMBA summary cards must be complementary information, never precede
-          # the canonical next-match card. Move the whole summary block after the
-          # blue hero card when recognizable.
-          marker="laambaSummary"
-          hero="familyHero"
-          li=s.find(marker)
-          hi=s.find(hero)
-          if li!=-1 and hi!=-1 and li<hi:
-              # find JSX conditional boundaries conservatively
-              ls=s.rfind('{',0,li)
-              le=s.find('}</>',li)
-              if le!=-1:
-                  le+=4
-                  block=s[ls:le]
-                  s=s[:ls]+s[le:]
-                  hi=s.find(hero)
-                  hero_end=s.find('</section>',hi)
-                  if hero_end!=-1:
-                      hero_end+=10
-                      s=s[:hero_end]+block+s[hero_end:]
+          before=s
+          # Current app has league-specific blocks. Instead of guessing old class names,
+          # normalize their order at render time with CSS order on stable content markers.
+          # Add semantic wrapper classes to the known LAAMBA complementary blocks.
+          s=s.replace('className="laambaResultCard"','className="laambaResultCard familyComplementary"')
+          s=s.replace('className="laambaStandingsCard"','className="laambaStandingsCard familyComplementary"')
+          # ARGENLIGA/other callup card is not a primary Inicio block; keep attendance in Partidos.
+          # Hide any callup/availability card that is rendered inside Inicio via a scoped marker class.
+          s=s.replace('className="familyCallupCard"','className="familyCallupCard familyInicioCallup"')
+          s=s.replace('className="availabilityCard"','className="availabilityCard familyInicioCallup"')
+          # Make the article explicitly use a common family layout hook.
+          s=s.replace('<article>{familyTab===\'inicio\'&&<div className="familyWelcome"','<article className={familyTab===\'inicio\'?\'familyUnifiedInicio\':\'\'}>{familyTab===\'inicio\'&&<div className="familyWelcome"',1)
+          if s==before:
+              raise SystemExit('No current JSX markers changed; aborting instead of fake success')
           p.write_text(s)
+          css=Path('defe-v2/src/style.css')
+          c=css.read_text()
+          rules='''\n/* Unified Family UI: league/category changes data, never screen composition */\n.familyUnifiedInicio{display:flex;flex-direction:column}\n.familyUnifiedInicio .familyWelcome{order:1}\n.familyUnifiedInicio .familyPlayerSelector,.familyUnifiedInicio .familyKidSelector,.familyUnifiedInicio .familyActivitySelector{order:2}\n.familyUnifiedInicio .familyHero,.familyUnifiedInicio .nextMatchCard{order:3}\n.familyUnifiedInicio .familyTraining,.familyUnifiedInicio .trainingCard{order:4}\n.familyUnifiedInicio .familyCommunications{order:5}\n.familyUnifiedInicio .familyComplementary{order:6}\n.familyUnifiedInicio .familyInicioCallup{display:none!important}\n'''
+          if 'Unified Family UI: league/category changes data' not in c:
+              css.write_text(c+rules)
           PY
-      - name: Verify no league-specific primary layout regression
+      - name: Verify real source change and build
         run: |
+          git diff --exit-code -- defe-v2/src/main.jsx defe-v2/src/style.css && { echo 'ERROR: no app source changed'; exit 1; } || true
           cd defe-v2
           npm install
           npm run build
-      - name: Commit patch
+      - name: Commit real app change
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add defe-v2/src/main.jsx
-          git commit -m 'refactor: standardize Family screens across leagues' || exit 0
+          git add defe-v2/src/main.jsx defe-v2/src/style.css
+          git diff --cached --quiet && { echo 'ERROR: nothing to commit'; exit 1; }
+          git commit -m 'refactor: one Family UI across all leagues'
           git push origin HEAD:mi-defe-v2-laamba
