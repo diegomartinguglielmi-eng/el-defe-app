@@ -12,26 +12,34 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: mi-defe-v2-laamba
-      - name: Patch main.jsx
+      - name: Standardize family home card
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p=Path('defe-v2/src/main.jsx')
           s=p.read_text()
-          old="import{loadNextMatch,answerCallup}from'./familyApi';"
-          new=old+"import{buildFamilyView}from'./familyView';"
-          assert old in s and "from'./familyView'" not in s
-          s=s.replace(old,new,1)
           start=s.index('function FamilyHome(')
           end=s.index('function CoachCommunications(',start)
           pre,fam,post=s[:start],s[start:end],s[end:]
-          old2="const activeCallup=callups.find(x=>x.person_id===active?.id&&String(x.competition||'').toUpperCase()===String(activeTeam?.competition||'').toUpperCase()&&String(x.category||'').toUpperCase()===String(activeTeam?.category||'').toUpperCase());const activeFefiEvent=multiEvents.find(x=>x.selection===\"FEFI|\"+activeTeam?.category&&x.available);const visibleFefiMatch=fefiFamilyMatch||activeFefiEvent;"
-          new2="const familyView=buildFamilyView({players,kid,activity,events:multiEvents,callups,fefiMatch:fefiFamilyMatch});const activeCallup=familyView.activeCallup;const visibleFefiMatch=familyView.visibleMatch;"
-          assert old2 in fam
-          fam=fam.replace(old2,new2,1)
-          old3='<small>BABY FÚTBOL · FEFI</small>'
-          assert old3 in fam
-          fam=fam.replace(old3,'<small>{familyView.header}</small>',1)
+          # The old special Argenliga/LAAMBA branch renders before the common FEFI-style home.
+          # Remove that branch so every competition reaches the shared blue next-match card.
+          marker="familyTab==='inicio'&&activeTeam?.competition!=='FEFI'"
+          i=fam.find(marker)
+          assert i!=-1, 'non-FEFI special home branch not found'
+          # Find the conditional JSX expression boundaries: {condition&&(...)}
+          open_brace=fam.rfind('{',0,i)
+          assert open_brace!=-1
+          paren=fam.find('(',i)
+          assert paren!=-1
+          depth=1; j=paren+1
+          while j<len(fam) and depth:
+            if fam[j]=='(': depth+=1
+            elif fam[j]==')': depth-=1
+            j+=1
+          assert depth==0
+          close_brace=fam.find('}',j)
+          assert close_brace!=-1
+          fam=fam[:open_brace]+fam[close_brace+1:]
           p.write_text(pre+fam+post)
           PY
       - name: Verify build
@@ -44,5 +52,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add defe-v2/src/main.jsx
-          git commit -m 'fix: unify FamilyHome participation source' || exit 0
+          git commit -m 'fix: standardize family home across competitions' || exit 0
           git push origin HEAD:mi-defe-v2-laamba
