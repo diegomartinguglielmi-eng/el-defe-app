@@ -1,4 +1,4 @@
-name: Fix Family single multiliga screen
+name: Fix Family initial hydration
 on:
   push:
     branches: [mi-defe-v2-laamba]
@@ -12,30 +12,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: mi-defe-v2-laamba
-      - name: Remove legacy FEFI fallback from Family
+      - name: Refresh complete family data on first mount
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p=Path('defe-v2/src/main.jsx')
           s=p.read_text()
-          # Legacy FEFI next-match must only load when FEFI is the selected participation.
-          old="useEffect(()=>{setFefiFamilyMatch(null);if(active?.id)fetch('/api/availability/family/next-match/'+active.id,{headers:{Authorization:'Bearer '+localStorage.getItem('defe_token')}}).then(r=>r.json()).then(d=>setFefiFamilyMatch(d.match||null)).catch(()=>{})},[active?.id]);"
-          new="useEffect(()=>{setFefiFamilyMatch(null);if(active?.id&&activeTeam?.competition==='FEFI')fetch('/api/availability/family/next-match/'+active.id,{headers:{Authorization:'Bearer '+localStorage.getItem('defe_token')}}).then(r=>r.json()).then(d=>setFefiFamilyMatch(d.match||null)).catch(()=>{})},[active?.id,activeTeam?.competition,activeTeam?.category]);"
-          assert old in s
-          s=s.replace(old,new,1)
-          # FEFI birthdays are competition-specific too.
-          oldb="useEffect(()=>{setBirthdays([]);if(!active?.category)return;fetch('/api/availability/birthdays?competition=FEFI',{headers:{Authorization:'Bearer '+familyToken}}).then(r=>r.ok?r.json():Promise.reject()).then(d=>setBirthdays(d.birthdays||[])).catch(()=>setBirthdays([]))},[players.length,active?.birth_date,active?.nickname]);"
-          newb="useEffect(()=>{setBirthdays([]);if(activeTeam?.competition!=='FEFI'||!activeTeam?.category)return;fetch('/api/availability/birthdays?competition=FEFI',{headers:{Authorization:'Bearer '+familyToken}}).then(r=>r.ok?r.json():Promise.reject()).then(d=>setBirthdays(d.birthdays||[])).catch(()=>setBirthdays([]))},[players.length,active?.birth_date,active?.nickname,activeTeam?.competition,activeTeam?.category]);"
-          assert oldb in s
-          s=s.replace(oldb,newb,1)
-          # FEFI sports/standings effect must not run for ARGENLIGA or LAAMBA and must use selected category.
-          oldstart="useEffect(()=>{let alive=true;setSports(null);if(!active?.category)return()=>{alive=false};(async()=>{try{"
-          newstart="useEffect(()=>{let alive=true;setSports(null);if(activeTeam?.competition!=='FEFI'||!activeTeam?.category)return()=>{alive=false};(async()=>{try{"
-          assert oldstart in s
-          s=s.replace(oldstart,newstart,1)
-          s=s.replace("encodeURIComponent(active.category)).then(r=>r.json())));","encodeURIComponent(activeTeam.category)).then(r=>r.json())));",1)
-          s=s.replace("fetch('/api/fefi/results/latest/'+encodeURIComponent(active.category))","fetch('/api/fefi/results/latest/'+encodeURIComponent(activeTeam.category))",1)
-          s=s.replace("},[active?.category]);\nasync function answerFamilyCallup","},[active?.id,activeTeam?.competition,activeTeam?.category]);\nasync function answerFamilyCallup",1)
+          needle="function FamilyHome({family,players=[],refresh}){const pushParams="
+          replacement="function FamilyHome({family,players=[],refresh}){useEffect(()=>{if(typeof refresh==='function')refresh()},[]);const pushParams="
+          assert needle in s, 'FamilyHome signature not found'
+          s=s.replace(needle,replacement,1)
           p.write_text(s)
           PY
       - name: Verify build
@@ -48,5 +34,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add defe-v2/src/main.jsx
-          git commit -m 'fix: remove legacy FEFI fallback from multiliga Family' || exit 0
+          git commit -m 'fix: hydrate complete multiliga family data on login' || exit 0
           git push origin HEAD:mi-defe-v2-laamba
