@@ -782,3 +782,14 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .familyUnifiedInicio .familyCommunications{order:5}
 .familyUnifiedInicio .familyComplementary{order:6}
 .familyUnifiedInicio .familyInicioCallup{display:none!important}
+
+/* Canonical Inicio: identical composition for FEFI, ARGENLIGA and LAAMBA. League only changes data. */
+.familyCanonicalInicio{display:flex!important;flex-direction:column!important;gap:16px!important}
+.familyCanonicalInicio .canonicalGreeting{order:1!important}
+.familyCanonicalInicio .canonicalViewing{order:2!important}
+.familyCanonicalInicio .canonicalNextMatch{order:3!important}
+.familyCanonicalInicio .canonicalTraining{order:4!important}
+.familyCanonicalInicio .canonicalCommunications{order:5!important}
+.familyCanonicalInicio .familyComplementary,.familyCanonicalInicio .laambaResultCard,.familyCanonicalInicio .laambaStandingsCard,.familyCanonicalInicio .familyInicioCallup,.familyCanonicalInicio .availabilityCard{display:none!important}
+.familyCanonicalInicio .canonicalNextMatch{background:linear-gradient(135deg,#1657b8,#2871d8)!important;color:#fff!important;border:0!important;border-radius:24px!important;box-shadow:0 14px 30px rgba(24,84,170,.18)!important}
+.familyCanonicalInicio .canonicalNextMatch h1,.familyCanonicalInicio .canonicalNextMatch h2,.familyCanonicalInicio .canonicalNextMatch h3,.familyCanonicalInicio .canonicalNextMatch strong,.familyCanonicalInicio .canonicalNextMatch p,.familyCanonicalInicio .canonicalNextMatch small{color:inherit}
