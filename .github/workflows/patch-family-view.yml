@@ -1,4 +1,4 @@
-name: Fix Argenliga Family Inicio legacy card
+name: Remove legacy callup card from Family Inicio
 on:
   push:
     branches: [mi-defe-v2-laamba]
@@ -12,45 +12,63 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: mi-defe-v2-laamba
-      - name: Remove legacy Argenliga callup card from Inicio and normalize event
+      - name: Make Inicio structurally independent from legacy callup UI
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p=Path('defe-v2/src/main.jsx')
-          s=p.read_text()
-          before=s
-          # ARGENLIGA event objects expose opponent/match_date/home_away; normalize them
-          # to the same fields consumed by the canonical blue hero.
-          old="const event=multiEvents.find(x=>String(x.selection||'').toUpperCase()===(competition+'|'+category).toUpperCase());const nextMatch=competition==='FEFI'?visibleFefiMatch:event;"
-          new="const rawEvent=multiEvents.find(x=>String(x.selection||'').toUpperCase()===(competition+'|'+category).toUpperCase());const event=rawEvent?{...rawEvent,home:rawEvent.home||(rawEvent.home_away==='local'?'DEF. DE SANTOS LUGARES':rawEvent.opponent),away:rawEvent.away||(rawEvent.home_away==='local'?rawEvent.opponent:'DEF. DE SANTOS LUGARES'),date:rawEvent.date||rawEvent.match_date,time:rawEvent.time||rawEvent.match_time,local:rawEvent.local??rawEvent.home_away==='local'}:null;const nextMatch=competition==='FEFI'?visibleFefiMatch:event;"
-          if old not in s: raise SystemExit('canonical event expression not found')
-          s=s.replace(old,new,1)
-          # Critical: activeCallup must match selected league/category. Previously an
-          # Argenliga selection could inherit a FEFI/legacy callup and render the old state.
-          old2="const activeCallup=familyView.activeCallup;const visibleFefiMatch=familyView.visibleMatch;"
-          new2="const rawActiveCallup=familyView.activeCallup;const activeCallup=(rawActiveCallup&&String(rawActiveCallup.competition||'FEFI').toUpperCase()===String(activeTeam?.competition||'FEFI').toUpperCase()&&String(rawActiveCallup.category||'')===String(activeTeam?.category||active?.category||''))?rawActiveCallup:null;const visibleFefiMatch=familyView.visibleMatch;"
-          if old2 not in s: raise SystemExit('activeCallup expression not found')
-          s=s.replace(old2,new2,1)
-          if s==before: raise SystemExit('no source change')
+          s=p.read_text(); before=s
+          # Keep callup only as status data for the blue canonical card.
+          # Remove any standalone legacy callup card rendered before canonical Inicio.
+          import re
+          family_start=s.index('function FamilyHome')
+          canonical=s.index("{familyTab==='inicio'&&(()=>", family_start)
+          prefix=s[family_start:canonical]
+          patterns=[
+            r"\{familyTab==='inicio'&&activeCallup&&<section[\s\S]*?</section>\}",
+            r"\{familyTab==='inicio'&&activeCallup&&<div[\s\S]*?</div>\}",
+            r"\{activeCallup&&familyTab==='inicio'&&<section[\s\S]*?</section>\}",
+            r"\{activeCallup&&familyTab==='inicio'&&<div[\s\S]*?</div>\}",
+          ]
+          removed=0
+          for pat in patterns:
+            prefix,n=re.subn(pat,'',prefix,count=1); removed+=n
+          # The screenshot text is a stronger guard: if a pre-canonical block contains
+          # the legacy attendance actions, remove its surrounding section.
+          if 'Confirmo' in prefix or 'Asistencia confirmada' in prefix:
+            last=prefix.rfind('<section')
+            if last!=-1:
+              close=prefix.find('</section>',last)
+              if close!=-1:
+                block=prefix[last:close+10]
+                if 'Confirmo' in block or 'Asistencia confirmada' in block or 'No asiste' in block:
+                  prefix=prefix[:last]+prefix[close+10:]; removed+=1
+          s=s[:family_start]+prefix+s[canonical:]
+          if s==before: raise SystemExit('Legacy pre-canonical callup block not found; refusing fake success')
           p.write_text(s)
+          print('removed legacy blocks:',removed)
           PY
-      - name: Verify and build
+      - name: Verify exact Family Inicio contract and build
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          s=Path('defe-v2/src/main.jsx').read_text()
-          assert 'rawActiveCallup' in s
-          assert 'rawEvent' in s and 'rawEvent.match_date' in s
-          print('Argenliga canonical Inicio normalization verified')
+          s=Path('defe-v2/src/main.jsx').read_text(); a=s.index('function FamilyHome'); c=s.index("{familyTab==='inicio'&&(()=>",a); pre=s[a:c]
+          assert 'Asistencia confirmada' not in pre
+          assert '>Confirmo<' not in pre
+          assert '>No asiste<' not in pre
+          body=s[c:s.index("{showStandings&&",c)]
+          assert 'canonicalNextMatch' in body and 'canonicalTraining' in body and 'canonicalCommunications' in body
+          assert "activeCallup.attendance" in body
+          print('PASS: Inicio has no standalone legacy attendance card; status remains inside canonical blue card')
           PY
           cd defe-v2
           npm install
           npm run build
-      - name: Commit
+      - name: Commit real app change
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add defe-v2/src/main.jsx
           git diff --cached --quiet && { echo 'No app change'; exit 1; }
-          git commit -m 'fix: normalize Argenliga Family Inicio to canonical card'
+          git commit -m 'fix: remove standalone legacy attendance card from Family Inicio'
           git push origin HEAD:mi-defe-v2-laamba
