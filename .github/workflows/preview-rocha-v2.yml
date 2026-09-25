@@ -6,6 +6,7 @@ on:
       - codex/consolidar-vista-de-convocatorias-para-rocha
     paths:
       - .github/workflows/preview-rocha-v2.yml
+      - defe-v2/src/**
 
 permissions:
   contents: read
