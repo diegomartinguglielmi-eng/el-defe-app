@@ -24,8 +24,21 @@ jobs:
           node-version: '22'
       - name: Install dependencies
         run: npm install --no-audit --no-fund --package-lock=false
+      - name: Use same-origin API only in preview build
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("src/main.jsx")
+          source = path.read_text()
+          old = 'const API_BASE="https://defe-v2-laamba-staging-production.up.railway.app";'
+          assert old in source, "Expected V2 API endpoint was not found"
+          path.write_text(source.replace(old, "const API_BASE=window.location.origin;", 1))
+          PY
       - name: Build V2
         run: npm run build
+      - name: Proxy preview API to staging backend
+        run: |
+          printf '%s\n' '/api/* https://defe-v2-laamba-staging-production.up.railway.app/api/:splat 200' > dist/_redirects
       - name: Deploy isolated preview to V2 staging site
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
