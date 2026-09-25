@@ -1,0 +1,32 @@
+name: Preview Rocha V2
+
+on:
+  push:
+    branches:
+      - codex/consolidar-vista-de-convocatorias-para-rocha
+    paths:
+      - .github/workflows/preview-rocha-v2.yml
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: defe-v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --package-lock=false
+      - name: Build V2
+        run: npm run build
+      - name: Deploy isolated preview to V2 staging site
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: npx --yes netlify-cli deploy --dir=dist --no-build --site=a1ae8bc5-87e2-442f-851d-bf54c8937651 --auth="$NETLIFY_AUTH_TOKEN" --json
