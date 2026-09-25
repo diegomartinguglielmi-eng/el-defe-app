@@ -1,5 +1,5 @@
 name: Deploy Mi DEFE V2 staging
-# trigger: deploy-canonical-five-block-family-inicio-4bbb6d0a
+# trigger: deploy-canonical-multileague-jsx-71990adb
 
 on:
   push:
