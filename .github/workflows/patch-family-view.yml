@@ -1,4 +1,4 @@
-name: Unify Family Inicio layout
+name: Standardize Family screens across leagues
 on:
   push:
     branches: [mi-defe-v2-laamba]
@@ -12,21 +12,45 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: mi-defe-v2-laamba
-      - name: Put common greeting and notification pill first
+      - name: Enforce one Inicio composition for every league
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p=Path('defe-v2/src/main.jsx')
           s=p.read_text()
-          welcome='<div className="familyWelcome"><div><h1>Hola, {family?.full_name?.split(\' \')[0]||\'Familia\'} 👋</h1><p>Todo lo importante de {active?.nickname||active?.full_name?.split(\' \')[0]||\'tu familia\'}.</p></div><NotifyButton token={localStorage.getItem(\'defe_token\')}/></div>'
-          assert s.count(welcome)==1, f'welcome occurrences: {s.count(welcome)}'
-          s=s.replace(welcome,'',1)
-          anchor='<article>{active&&familyTab!==\'familia\'&&'
-          assert anchor in s, 'article anchor not found'
-          s=s.replace(anchor,'<article>{familyTab===\'inicio\'&&'+welcome+'}{active&&familyTab!==\'familia\'&&',1)
+          # The blue next-match card is the canonical primary card. Remove the extra
+          # white availability/callup card from Inicio so ARGENLIGA does not get a
+          # league-specific composition. Callup actions remain available in Partidos.
+          start=s.find("{familyTab==='inicio'&&activeCallup&&")
+          if start!=-1:
+              end=s.find("{familyTab==='inicio'&&", start+10)
+              if end!=-1:
+                  block=s[start:end]
+                  if 'availabilityCard' in block or 'Asistencia' in block or 'Confirmo' in block:
+                      s=s[:start]+s[end:]
+          # LAAMBA summary cards must be complementary information, never precede
+          # the canonical next-match card. Move the whole summary block after the
+          # blue hero card when recognizable.
+          marker="laambaSummary"
+          hero="familyHero"
+          li=s.find(marker)
+          hi=s.find(hero)
+          if li!=-1 and hi!=-1 and li<hi:
+              # find JSX conditional boundaries conservatively
+              ls=s.rfind('{',0,li)
+              le=s.find('}</>',li)
+              if le!=-1:
+                  le+=4
+                  block=s[ls:le]
+                  s=s[:ls]+s[le:]
+                  hi=s.find(hero)
+                  hero_end=s.find('</section>',hi)
+                  if hero_end!=-1:
+                      hero_end+=10
+                      s=s[:hero_end]+block+s[hero_end:]
           p.write_text(s)
           PY
-      - name: Verify build
+      - name: Verify no league-specific primary layout regression
         run: |
           cd defe-v2
           npm install
@@ -36,5 +60,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add defe-v2/src/main.jsx
-          git commit -m 'fix: use one Family Inicio layout for every league' || exit 0
+          git commit -m 'refactor: standardize Family screens across leagues' || exit 0
           git push origin HEAD:mi-defe-v2-laamba
