@@ -772,3 +772,13 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .familyApp .activitySwitch button.active{border-color:#1f5cac;background:#eaf2ff;box-shadow:0 0 0 1px #1f5cac inset;color:#1f5cac}
 .familyApp .activitySwitch button.active small{color:#173d75}
 @media(max-width:380px){.familyApp .activitySwitch{grid-template-columns:1fr}.familyApp .activitySwitch button{flex-direction:row;align-items:center;justify-content:space-between}}
+
+/* Unified Family UI: league/category changes data, never screen composition */
+.familyUnifiedInicio{display:flex;flex-direction:column}
+.familyUnifiedInicio .familyWelcome{order:1}
+.familyUnifiedInicio .familyPlayerSelector,.familyUnifiedInicio .familyKidSelector,.familyUnifiedInicio .familyActivitySelector{order:2}
+.familyUnifiedInicio .familyHero,.familyUnifiedInicio .nextMatchCard{order:3}
+.familyUnifiedInicio .familyTraining,.familyUnifiedInicio .trainingCard{order:4}
+.familyUnifiedInicio .familyCommunications{order:5}
+.familyUnifiedInicio .familyComplementary{order:6}
+.familyUnifiedInicio .familyInicioCallup{display:none!important}
