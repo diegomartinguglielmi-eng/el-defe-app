@@ -1,4 +1,4 @@
-name: Fix Family initial hydration
+name: Unify Family Inicio layout
 on:
   push:
     branches: [mi-defe-v2-laamba]
@@ -12,16 +12,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: mi-defe-v2-laamba
-      - name: Refresh complete family data on first mount
+      - name: Put common greeting and notification pill first
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p=Path('defe-v2/src/main.jsx')
           s=p.read_text()
-          needle="function FamilyHome({family,players=[],refresh}){const pushParams="
-          replacement="function FamilyHome({family,players=[],refresh}){useEffect(()=>{if(typeof refresh==='function')refresh()},[]);const pushParams="
-          assert needle in s, 'FamilyHome signature not found'
-          s=s.replace(needle,replacement,1)
+          welcome='<div className="familyWelcome"><div><h1>Hola, {family?.full_name?.split(\' \')[0]||\'Familia\'} 👋</h1><p>Todo lo importante de {active?.nickname||active?.full_name?.split(\' \')[0]||\'tu familia\'}.</p></div><NotifyButton token={localStorage.getItem(\'defe_token\')}/></div>'
+          assert s.count(welcome)==1, f'welcome occurrences: {s.count(welcome)}'
+          s=s.replace(welcome,'',1)
+          anchor='<article>{active&&familyTab!==\'familia\'&&'
+          assert anchor in s, 'article anchor not found'
+          s=s.replace(anchor,'<article>{familyTab===\'inicio\'&&'+welcome+'}{active&&familyTab!==\'familia\'&&',1)
           p.write_text(s)
           PY
       - name: Verify build
@@ -34,5 +36,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add defe-v2/src/main.jsx
-          git commit -m 'fix: hydrate complete multiliga family data on login' || exit 0
+          git commit -m 'fix: use one Family Inicio layout for every league' || exit 0
           git push origin HEAD:mi-defe-v2-laamba
