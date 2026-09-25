@@ -1,5 +1,5 @@
 name: Deploy Mi DEFE V2 staging
-# trigger: deploy-unified-family-inicio-08a6a916
+# trigger: deploy-one-family-ui-ab3e272a
 
 on:
   push:
