@@ -37,7 +37,7 @@ jobs:
       - name: Verify build
         run: |
           cd defe-v2
-          npm ci
+          npm install
           npm run build
       - name: Commit patch
         run: |
