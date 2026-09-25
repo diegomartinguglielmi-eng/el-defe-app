@@ -1,6 +1,6 @@
 // El Defe · Mis pedidos + avisos de estado para compradores
 (function(){
-  const API='https://el-defe-v5-production.up.railway.app';
+  const API=String(window.EL_DEFE_API_URL||'https://el-defe-v5-production.up.railway.app').replace(/\/$/,'');
   const PHONE_KEY='defe_store_buyer_phone';
   const SEEN_KEY='defe_store_order_status_seen';
   const READ_KEY='defe_store_order_status_read';

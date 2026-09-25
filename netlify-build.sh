@@ -66,9 +66,15 @@ STOREROLEVIEW="store-role-view-${SHA}.js"
 BUYERORDERS="store-buyer-orders-${SHA}.js"
 STOREDASHBOARD="store-dashboard-role-${SHA}.js"
 AVAILABILITY="availability-ui-${SHA}.js"
+DEFECORE="web-defe-core-${SHA}.js"
+FAMILYONBOARD="web-family-onboarding-${SHA}.js"
+FAMILYACCOUNT="web-family-account-fix-${SHA}.js"
+FAMILYLAAMBA="web-family-laamba-level-${SHA}.js"
+ATTENDANCEPLAYER="web-attendance-player-v2-${SHA}.js"
+HOMEFAMILY="web-home-family-${SHA}.js"
 
 cp web-auth-overlay.js "defe-web-build/dist/${AUTH}"
-cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"
+if [ "${CONTEXT:-}" = "production" ]; then cp web-comms-push-bridge.js "defe-web-build/dist/${BRIDGE}"; else printf "// push fuera del piloto\n" > "defe-web-build/dist/${BRIDGE}"; fi
 cp web-comms-overlay.js "defe-web-build/dist/${COMMS}"
 cp web-acompanan-overlay.js "defe-web-build/dist/${ACOMP}"
 cp web-sponsors-home-sync.js "defe-web-build/dist/${SPONSORSHOME}"
@@ -88,11 +94,17 @@ cp app/static/store-role-view.js "defe-web-build/dist/${STOREROLEVIEW}"
 cp app/static/store-buyer-orders.js "defe-web-build/dist/${BUYERORDERS}"
 cp app/static/store-dashboard-role.js "defe-web-build/dist/${STOREDASHBOARD}"
 cp app/static/availability-ui.js "defe-web-build/dist/${AVAILABILITY}"
+cp web-defe-core.js "defe-web-build/dist/${DEFECORE}"
+cp web-family-onboarding.js "defe-web-build/dist/${FAMILYONBOARD}"
+cp web-family-account-fix.js "defe-web-build/dist/${FAMILYACCOUNT}"
+cp web-family-laamba-level.js "defe-web-build/dist/${FAMILYLAAMBA}"
+cp web-attendance-player-v2.js "defe-web-build/dist/${ATTENDANCEPLAYER}"
+cp web-home-family.js "defe-web-build/dist/${HOMEFAMILY}"
 cp push-sw.js defe-web-build/dist/push-sw.js
 cp manifest.webmanifest defe-web-build/dist/manifest.webmanifest
 cp mobile/assets/icon.png defe-web-build/dist/icon.png
 
-sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${MATCHAUTH}\"></script><script src=\"./${UIHOTFIX}\"></script><script src=\"./${STOREADMINOVERLAY}\"></script><script src=\"./${FEFIDEDUPE}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${FOLLOWING}\"></script><script src=\"./${MIDEFE}\"></script><script src=\"./${DESIGN}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script><script src=\"./${BUYERORDERS}\"></script><script src=\"./${STOREDASHBOARD}\"></script><script src=\"./${AVAILABILITY}\"></script></body>#" defe-web-build/dist/index.html
+sed -i "s#</body>#<script src=\"./${AUTH}\"></script><script src=\"./${BRIDGE}\"></script><script src=\"./${COMMS}\"></script><script src=\"./${MATCHES}\"></script><script src=\"./${MATCHAUTH}\"></script><script src=\"./${UIHOTFIX}\"></script><script src=\"./${STOREADMINOVERLAY}\"></script><script src=\"./${FEFIDEDUPE}\"></script><script src=\"./${ACOMP}\"></script><script src=\"./${SPONSORSHOME}\"></script><script src=\"./${FOLLOWING}\"></script><script src=\"./${MIDEFE}\"></script><script src=\"./${DESIGN}\"></script><script src=\"./${PICKUPHARDENING}\"></script><script src=\"./${ORDERSAFETY}\"></script><script src=\"./${STORERECEIVING}\"></script><script src=\"./${STORESTOCKALERTS}\"></script><script src=\"./${STOREROLEVIEW}\"></script><script src=\"./${BUYERORDERS}\"></script><script src=\"./${STOREDASHBOARD}\"></script><script src=\"./${AVAILABILITY}\"></script><script src=\"./${DEFECORE}\"></script><script src=\"./${FAMILYONBOARD}\"></script><script src=\"./${FAMILYACCOUNT}\"></script><script src=\"./${FAMILYLAAMBA}\"></script><script src=\"./${ATTENDANCEPLAYER}\"></script><script src=\"./${HOMEFAMILY}\"></script></body>#" defe-web-build/dist/index.html
 
 sed -i 's#<script id="vite-plugin-pwa:register-sw" src="/el-defe-app/registerSW.js"></script>##g' defe-web-build/dist/index.html
 echo "// inert" > defe-web-build/dist/sw.js
@@ -104,6 +116,8 @@ import sys
 sha = sys.argv[1]
 p = Path('defe-web-build/dist/index.html')
 s = p.read_text()
+if 'deploy-preview-' in __import__('os').environ.get('DEPLOY_PRIME_URL',''):
+    s = s.replace('<head>', '<head><script>window.EL_DEFE_API_URL="https://el-defe-v2-staging-production.up.railway.app";</script>', 1)
 pwa = '<link rel="manifest" href="/el-defe-app/manifest.webmanifest"><link rel="icon" type="image/png" href="/el-defe-app/icon.png"><meta name="theme-color" content="#0b3a7a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="El Defe">'
 clean = f'''<script>(async function(){{var k='defe-clean-{sha}';try{{if(localStorage.getItem(k))return;localStorage.setItem(k,'1');if('serviceWorker' in navigator){{var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(r){{return r.unregister()}}));}}if('caches' in window){{var ks=await caches.keys();await Promise.all(ks.map(function(x){{return caches.delete(x)}}));}}}}catch(e){{}}}})();</script>'''
 s = s.replace('<head>', '<head>' + clean + pwa, 1)

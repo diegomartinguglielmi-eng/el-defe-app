@@ -1,7 +1,7 @@
 // El Defe · Mi Defe v5 · todas las selecciones seguidas visibles
 (() => {
   if(window.__defeMiDefeLoaded)return;window.__defeMiDefeLoaded=true;
-  const API='https://el-defe-v5-production.up.railway.app';
+  const API=String(window.EL_DEFE_API_URL||'https://el-defe-v5-production.up.railway.app').replace(/\/$/,'');
   const CFG='defe_mi_defe_config_v1';
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   function jwtFromValue(v){if(!v||typeof v!=='string')return null;const m=v.match(/eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/);if(m)return m[0];try{const p=JSON.parse(v);if(p&&typeof p==='object')for(const x of Object.values(p)){const f=jwtFromValue(typeof x==='string'?x:JSON.stringify(x));if(f)return f}}catch(_){}return null}
