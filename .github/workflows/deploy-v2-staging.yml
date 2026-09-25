@@ -1,5 +1,5 @@
 name: Deploy Mi DEFE V2 staging
-# trigger: jornada-unica-argenliga
+# trigger: deploy-family-hydration-22f86df5
 
 on:
   push:
