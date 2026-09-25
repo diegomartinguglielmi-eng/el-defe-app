@@ -1,5 +1,5 @@
 name: Deploy Mi DEFE V2 staging
-# trigger: deploy-one-family-ui-ab3e272a
+# trigger: deploy-canonical-five-block-family-inicio-4bbb6d0a
 
 on:
   push:
