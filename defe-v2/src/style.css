@@ -793,3 +793,10 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .familyCanonicalInicio .familyComplementary,.familyCanonicalInicio .laambaResultCard,.familyCanonicalInicio .laambaStandingsCard,.familyCanonicalInicio .familyInicioCallup,.familyCanonicalInicio .availabilityCard{display:none!important}
 .familyCanonicalInicio .canonicalNextMatch{background:linear-gradient(135deg,#1657b8,#2871d8)!important;color:#fff!important;border:0!important;border-radius:24px!important;box-shadow:0 14px 30px rgba(24,84,170,.18)!important}
 .familyCanonicalInicio .canonicalNextMatch h1,.familyCanonicalInicio .canonicalNextMatch h2,.familyCanonicalInicio .canonicalNextMatch h3,.familyCanonicalInicio .canonicalNextMatch strong,.familyCanonicalInicio .canonicalNextMatch p,.familyCanonicalInicio .canonicalNextMatch small{color:inherit}
+
+/* Profesor · Rocha: fecha y convocatoria consolidadas en una vista */
+.coachApp .coachTopTabs{grid-template-columns:repeat(4,1fr)!important}
+.coachCallupOverview{margin-bottom:10px!important}
+.coachCallupUnified{margin-top:0!important}
+.coachCallupUnified .callupMatchRef{display:none!important}
+.coachCallupOverview+.coachCallupUnified{border-top:3px solid var(--md-blue-soft)!important}
