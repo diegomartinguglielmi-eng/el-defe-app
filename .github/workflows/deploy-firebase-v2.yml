@@ -1,0 +1,49 @@
+name: Deploy DEFE V2 to Firebase Hosting
+
+on:
+  push:
+    branches: [mi-defe-v2-laamba]
+    paths:
+      - "defe-v2/**"
+      - "firebase.json"
+      - ".firebaserc"
+      - ".github/workflows/deploy-firebase-v2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependencias
+        working-directory: defe-v2
+        run: npm install
+
+      - name: Construir V2
+        working-directory: defe-v2
+        run: npm run build
+
+      - name: Verificar autorización Firebase
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEFE_APP }}
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "::error::Falta el secreto FIREBASE_SERVICE_ACCOUNT_DEFE_APP en GitHub."
+            exit 1
+          fi
+
+      - name: Publicar V2 en Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEFE_APP }}
+          channelId: live
+          projectId: defe-app
