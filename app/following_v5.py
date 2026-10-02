@@ -136,15 +136,16 @@ def _fefi_venue_info(club:str)->dict|None:
         soup=BeautifulSoup(response.text,"html.parser"); target=_norm(club)
         for row in soup.find_all("tr"):
             cells=[re.sub(r"\s+"," ",x.get_text(" ",strip=True)).strip() for x in row.find_all(["th","td"])]
-            if len(cells)!=4: continue
-            name,address,locality,roof=cells
+            if len(cells)<4: continue
+            name=cells[0]
+            roof=cells[-1]
             if not name or _norm(name) in {"NOMBRE DEL EQUIPO","EQUIPO","EQUIPOS"}: continue
             n=_norm(name)
             if n==target or n in target or target in n:
                 code=(roof or "").strip().upper()
                 cover="uncovered" if code=="NO" else ("semi-covered" if code.startswith("SEMI") else ("covered" if code=="SI" else None))
-                full=(address or "").strip()
-                if locality and locality.strip() and locality.strip().upper() not in full.upper(): full+=((", "+locality.strip()) if full else locality.strip())
+                location_parts=[x.strip() for x in cells[1:-1] if x.strip()]
+                full=", ".join(dict.fromkeys(location_parts))
                 return {"address":full or None,"roof_code":code or None,"court_cover":cover}
     except Exception as exc:
         print({"fefi_venue_info_error":str(exc),"club":club})
