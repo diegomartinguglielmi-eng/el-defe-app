@@ -126,12 +126,12 @@ def _category_matches(competition:str, selected:str, division:str|None)->bool:
     return False
 
 
-@lru_cache(maxsize=64)
 FEFI_VENUE_FALLBACKS={
     "el trebol":{"address":"Gándara 2840, CABA","roof_code":"NO","court_cover":"uncovered"},
 }
 
 
+@lru_cache(maxsize=64)
 def _fefi_venue_info(club:str)->dict|None:
     """Lee DIRECCIONES de la Zona H oficial: equipo, dirección, localidad, T."""
     try:
