@@ -51,7 +51,14 @@ export function normalizeFamilyMatch({competition,category,event,callup,fefiMatc
 // Unico view-model para Inicio y Partidos. Evita que cada liga arme una tarjeta distinta.
 export function buildFamilyParticipation({playerId,competition,category,events,callups,fefiMatch}){
   const event=findParticipationEvent(events,competition,category);
-  const callup=findParticipationCallup(callups,playerId,competition,category);
+  const candidate=findParticipationCallup(callups,playerId,competition,category);
+  const comp=upper(competition);
+  const currentMatch=comp==='FEFI'?(fefiMatch||event):event;
+  const currentMatchId=currentMatch?.match_id??currentMatch?.id??null;
+  const callupMatchId=candidate?.match_id??candidate?.match?.id??null;
+  // Una respuesta pertenece a una convocatoria/partido concreto. Nunca se
+  // reutiliza la asistencia de la fecha anterior para el próximo partido.
+  const callup=(candidate&&currentMatchId!=null&&callupMatchId!=null&&sameId(callupMatchId,currentMatchId))?candidate:null;
   return normalizeFamilyMatch({competition,category,event,callup,fefiMatch});
 }
 
