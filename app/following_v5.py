@@ -16,6 +16,7 @@ from .fefi_results import FefiCategoryResult, sync_verified_results
 from .fefi_schedules import STANDARD_TIMES
 from .pending import parse_fefi, FEFI_URL as FEFI_FIXTURE_URL, USER_AGENT as FEFI_FIXTURE_UA
 import requests
+from functools import lru_cache
 
 AR_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 router = APIRouter(prefix="/api/following", tags=["Following"])
@@ -125,6 +126,31 @@ def _category_matches(competition:str, selected:str, division:str|None)->bool:
     return False
 
 
+@lru_cache(maxsize=64)
+def _fefi_venue_info(club:str)->dict|None:
+    """Lee DIRECCIONES de la Zona H oficial: equipo, dirección, localidad, T."""
+    try:
+        response=requests.get(FEFI_FIXTURE_URL,timeout=15,headers={"User-Agent":FEFI_FIXTURE_UA,"Accept":"text/html,application/xhtml+xml"})
+        response.raise_for_status()
+        from bs4 import BeautifulSoup
+        soup=BeautifulSoup(response.text,"html.parser"); target=_norm(club)
+        for row in soup.find_all("tr"):
+            cells=[re.sub(r"\s+"," ",x.get_text(" ",strip=True)).strip() for x in row.find_all(["th","td"])]
+            if len(cells)!=4: continue
+            name,address,locality,roof=cells
+            if not name or _norm(name) in {"NOMBRE DEL EQUIPO","EQUIPO","EQUIPOS"}: continue
+            n=_norm(name)
+            if n==target or n in target or target in n:
+                code=(roof or "").strip().upper()
+                cover="uncovered" if code=="NO" else ("semi-covered" if code.startswith("SEMI") else ("covered" if code=="SI" else None))
+                full=(address or "").strip()
+                if locality and locality.strip() and locality.strip().upper() not in full.upper(): full+=((", "+locality.strip()) if full else locality.strip())
+                return {"address":full or None,"roof_code":code or None,"court_cover":cover}
+    except Exception as exc:
+        print({"fefi_venue_info_error":str(exc),"club":club})
+    return None
+
+
 def _event_from_match(db:Session,m:Match,competition:str,category:str)->dict:
     date,time=_date_parts(m.date);note=None
     if competition=="ARGENLIGA" and (m.source_url or "").startswith("manual://argenliga?time="):
@@ -132,10 +158,7 @@ def _event_from_match(db:Session,m:Match,competition:str,category:str)->dict:
     if competition=="FEFI" and category.isdigit():
         sched=db.query(FefiCategorySchedule).filter(FefiCategorySchedule.match_id==m.id,FefiCategorySchedule.category==category).first()
         if sched:time=sched.time or time;note=sched.note
-    local=_is_defe(m.home);club=m.home or None;venue=(m.venue or "").strip() or None;address=venue
-    if not address and competition=="FEFI" and local:address="Ernesto Sábato 3162, Santos Lugares, Buenos Aires"
-    rival=m.away if local else m.home
-    return {"available":True,"match_id":m.id,"competition":competition,"category":category,"selection":f"{competition}|{category}","date":date,"time":time,"rival":rival,"home":m.home,"away":m.away,"local":local,"club":club,"venue":venue,"address":address,"maps_url":_maps_url(address or venue or club),"round_name":m.round_name,"status":m.status,"note":note,"source_url":m.source_url}
+    local=_is_defe(m.home);club=m.home or None;venue=(m.venue or "").strip() or None;address=venue;venue_info=None\n    if competition=="FEFI": venue_info=_fefi_venue_info(club) if club else None\n    if venue_info and venue_info.get("address"): address=venue_info["address"];venue=address\n    if not address and competition=="FEFI" and local:address="Ernesto Sábato 3162, Santos Lugares, Buenos Aires"\n    rival=m.away if local else m.home\n    return {"available":True,"match_id":m.id,"competition":competition,"category":category,"selection":f"{competition}|{category}","date":date,"time":time,"rival":rival,"home":m.home,"away":m.away,"local":local,"club":club,"venue":venue,"address":address,"maps_url":_maps_url(address or venue or club),"court_cover":venue_info.get("court_cover") if venue_info else None,"roof_code":venue_info.get("roof_code") if venue_info else None,"round_name":m.round_name,"status":m.status,"note":note,"source_url":m.source_url}
 
 
 def _live_fefi_next(db:Session,category:str,today:str)->dict|None:
