@@ -863,3 +863,5 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 /* FEFI · aviso de cancha no totalmente cubierta */
 .fefiCourtAlert{margin:8px 0!important;padding:9px 11px!important;border-radius:12px!important;background:#fff6df!important;border:1px solid #f2d58b!important;color:#76520a!important;font-size:11px!important;line-height:1.35!important}
 .fefiCourtAlert b{color:#684600!important}
+
+.homeCourtAlert{margin:8px 0 0!important;display:inline-flex!important;align-items:center!important;width:auto!important;padding:5px 9px!important;border-radius:999px!important;background:rgba(255,255,255,.16)!important;border:1px solid rgba(255,255,255,.35)!important;color:#fff!important;font-size:11px!important;font-weight:800!important}
