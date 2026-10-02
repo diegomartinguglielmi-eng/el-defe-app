@@ -811,3 +811,18 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .coachBackBoard{margin:0 0 10px;border:0;background:#edf4ff;color:#1553a4;border-radius:10px;padding:8px 10px;font-size:9px;font-weight:900}
 @media(max-width:620px){.coachAllGrid{grid-template-columns:1fr}.coachAllCard{padding:12px;gap:8px}.coachAllCardHead h3{font-size:18px}.coachAllIntro h2{font-size:22px}}
 @media(max-width:390px){.coachAllCard{border-radius:15px}.coachAllCounts small{font-size:6.5px}}
+
+
+/* Profesor · tablero consolidado compacto v2 */
+.coachAllBoard{gap:8px!important}
+.coachAllIntro{padding:0 2px!important}.coachAllIntro h2{font-size:20px!important}.coachAllIntro p{font-size:10px!important}
+.coachAllGrid{gap:8px!important}
+.coachAllCard{gap:6px!important;padding:10px 11px!important;border-radius:14px!important;box-shadow:0 4px 12px rgba(21,59,108,.055)!important}
+.coachAllCardHead{align-items:center!important}.coachAllCardHead small{font-size:8px!important}.coachAllCardHead h3{font-size:17px!important;margin-top:1px!important}
+.coachAllSent,.coachAllWaiting{padding:4px 7px!important;font-size:7px!important}
+.coachAllMatch{min-height:0!important;padding-top:6px!important;column-gap:5px!important}.coachAllMatch small{font-size:7px!important}.coachAllMatch b{font-size:11px!important;margin-top:1px!important}.coachAllMatch span{font-size:9px!important;margin-top:1px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.coachAllNotice{padding:7px 8px!important;font-size:8px!important;border-radius:8px!important}
+.coachAllProgress{font-size:8px!important;margin-top:1px}.coachAllTrack{height:4px!important}
+.coachAllCounts{gap:4px!important}.coachAllCounts span{padding:5px 3px!important;border-radius:8px!important}.coachAllCounts b{font-size:13px!important}.coachAllCounts small{font-size:6.5px!important}
+.coachAllOpen{min-height:32px!important;border-radius:9px!important;font-size:9px!important;margin-top:1px!important}
+@media(max-width:620px){.coachAllCard{min-height:0!important}.coachAllGrid{gap:7px!important}}
