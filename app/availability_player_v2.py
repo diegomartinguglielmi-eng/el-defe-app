@@ -165,6 +165,37 @@ def admin_player_availability(db:Session=Depends(get_db),user=Depends(require_ro
     for item in items:item["followers"]=item["players"]
     items.sort(key=lambda x:((x.get("date") or "9999-99-99"),x.get("selection") or "")); return {"items":items}
 
+@router.get("/profe/dashboard")
+def profe_dashboard_v2(db:Session=Depends(get_db),user=Depends(require_roles("profe","admin","delegado","dt"))):
+    selections=profe_selections(db,user) if user.role=="profe" else []
+    items=[]
+    for key in selections:
+        if "|" not in key: continue
+        competition,category=key.split("|",1)
+        event=_next_event(db,key)
+        teams=_selection_teams(db,competition,category)
+        callup=None
+        if event and teams:
+            team_ids=[t.id for t in teams]
+            row=None
+            if event.get("match_id"):
+                row=db.query(CallUp).filter(CallUp.match_id==int(event["match_id"]),CallUp.team_id.in_(team_ids),CallUp.status=="sent").order_by(CallUp.id.desc()).first()
+            elif competition=="FEFI":
+                row=db.query(CallUp).join(Match,Match.id==CallUp.match_id).filter(CallUp.team_id.in_(team_ids),Match.competition=="FEFI",Match.date==event.get("date"),CallUp.status=="sent").order_by(CallUp.id.desc()).first()
+            if row and (user.role!="profe" or int(row.created_by or 0)==int(user.id)):
+                people=db.query(CallUpPlayer,Person).join(Person,Person.id==CallUpPlayer.person_id).filter(CallUpPlayer.callup_id==row.id).order_by(Person.last_name,Person.first_name).all()
+                players=[]; changed=False
+                for cp,p in people:
+                    prior=_player_response(db,p.id,row.match_id,key)
+                    if prior and prior.status in {"yes","no","maybe"} and cp.attendance!=prior.status:
+                        cp.attendance=prior.status; changed=True
+                    players.append({"row_id":cp.id,"person_id":p.id,"name":f"{p.first_name} {p.last_name}".strip(),"attendance":cp.attendance})
+                if changed: db.commit()
+                counts={s:sum(1 for x in players if x["attendance"]==s) for s in ("yes","no","maybe","pending")}
+                callup={"id":row.id,"status":row.status,"notes":row.notes,"match":event,"players":players,"counts":counts}
+        items.append({"selection":key,"competition":competition,"category":category,"event":event,"callup":callup})
+    return {"items":items}
+
 @router.get("/profe/roster")
 def profe_roster_v2(selection:str,db:Session=Depends(get_db),user=Depends(require_roles("profe","admin","delegado","dt"))):
     key=normalize_selection(selection)
