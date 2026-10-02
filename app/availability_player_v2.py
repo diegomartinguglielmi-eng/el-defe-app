@@ -259,6 +259,11 @@ def family_callups_v2(db:Session=Depends(get_db),user=Depends(get_current_user))
         sender=db.get(User,callup.created_by) if callup.created_by else None
         if sender is None or sender.role!="profe" or selection not in profe_selections(db,sender):
             continue
+        # Never expose the staging-only QA professor's synthetic callups to families.
+        import os
+        qa_profe_email=os.getenv("STAGING_QA_PROFE_EMAIL","profe.laamba.qa@invalid.local").strip().lower()
+        if str(sender.email or "").strip().lower()==qa_profe_email:
+            continue
         prior=_player_response(db,person.id,callup.match_id,selection)
         if prior and prior.status in {"yes","no","maybe"} and cp.attendance!=prior.status: cp.attendance=prior.status; changed=True
         items.append({"row_id":cp.id,"callup_id":callup.id,"person_id":person.id,"player_name":f"{person.first_name} {person.last_name}".strip(),"competition":team.competition,"category":team.division,"selection":selection,"attendance":cp.attendance,"notes":callup.notes,"match_id":callup.match_id})
