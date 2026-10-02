@@ -108,7 +108,7 @@ def _wants(db, sub, event):
     if competition: return any(x.startswith(f"{competition}|") for x in followed)
     return True
 
-def _push_payload(event): return json.dumps({"id":event.id,"title":event.title,"body":event.body,"urgent":event.urgent,"competition":event.competition,"category":event.category,"match_id":event.match_id,"url":"/el-defe-app/"},ensure_ascii=False)
+def _push_payload(event): return json.dumps({"id":event.id,"title":event.title,"body":event.body,"urgent":event.urgent,"competition":event.competition,"category":event.category,"match_id":event.match_id,"url":"/?tab=mensajes"},ensure_ascii=False)
 
 def deliver_pushes(db, event):
     private_key, public_key, subject=_vapid(db)
