@@ -834,3 +834,27 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .coachApp .coachAllCard .coachAllOpen{margin:0!important;min-height:30px!important}
 .coachApp .coachAllCardHead,.coachApp .coachAllMatch,.coachApp .coachAllProgress,.coachApp .coachAllCounts{margin:0!important}
 .coachApp .coachAllGrid{align-items:start!important;grid-auto-rows:max-content!important}
+
+
+/* Profesor · convocatorias alineadas al lenguaje visual del resto de la app */
+.coachApp .coachAllBoard{gap:14px!important}
+.coachApp .coachAllIntro{padding:0!important}
+.coachApp .coachAllIntro small{font-size:11px!important;letter-spacing:.06em!important}
+.coachApp .coachAllIntro h2{margin:3px 0 3px!important;font-size:22px!important;line-height:1.1!important}
+.coachApp .coachAllIntro p{font-size:13px!important;line-height:1.35!important}
+.coachApp .coachAllGrid{display:flex!important;flex-direction:column!important;gap:12px!important}
+.coachApp .coachAllGrid>.coachAllCard{width:100%!important;padding:14px 16px!important;border-radius:20px!important;border:1px solid #dfe7f1!important;box-shadow:0 6px 16px rgba(21,59,108,.055)!important;gap:9px!important}
+.coachApp .coachAllCardHead small{font-size:10px!important;letter-spacing:.05em!important}
+.coachApp .coachAllCardHead h3{font-size:20px!important;line-height:1.1!important}
+.coachApp .coachAllSent,.coachApp .coachAllWaiting{font-size:8px!important;padding:5px 8px!important}
+.coachApp .coachAllMatch{padding-top:8px!important}
+.coachApp .coachAllMatch small{font-size:9px!important}
+.coachApp .coachAllMatch b{font-size:14px!important}
+.coachApp .coachAllMatch span{font-size:11px!important;line-height:1.35!important}
+.coachApp .coachAllCard .coachAllNotice{padding:8px 10px!important;font-size:10px!important;border-radius:10px!important}
+.coachApp .coachAllProgress{font-size:10px!important}
+.coachApp .coachAllCounts{gap:7px!important}
+.coachApp .coachAllCounts span{padding:7px 4px!important;border-radius:10px!important}
+.coachApp .coachAllCounts b{font-size:15px!important}
+.coachApp .coachAllCounts small{font-size:8px!important}
+.coachApp .coachAllCard .coachAllOpen{min-height:36px!important;border-radius:11px!important;font-size:10px!important}
