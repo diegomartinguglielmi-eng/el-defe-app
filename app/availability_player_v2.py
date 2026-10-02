@@ -222,7 +222,11 @@ def get_profe_callup(selection:str,db:Session=Depends(get_db),user=Depends(requi
     team_ids=[t.id for t in teams]; row=None
     if event.get("match_id"): row=db.query(CallUp).filter(CallUp.match_id==int(event["match_id"]),CallUp.team_id.in_(team_ids)).order_by(CallUp.id.desc()).first()
     elif competition=="FEFI": row=db.query(CallUp).join(Match,Match.id==CallUp.match_id).filter(CallUp.team_id.in_(team_ids),Match.competition=="FEFI",Match.date==event.get("date"),Match.status!="final").order_by(CallUp.id.desc()).first()
-    if not row:return {"selection":key,"callup":None}
+    if not row or row.status!="sent":return {"selection":key,"callup":None}
+    # Staging QA must never make a real professor's board look as if they sent a callup.
+    # A callup is visible to a professor only when it was sent by that same professor.
+    if user.role=="profe" and int(row.created_by or 0)!=int(user.id):
+        return {"selection":key,"callup":None}
     if not event.get("match_id"): event=dict(event); event["match_id"]=row.match_id
     people=db.query(CallUpPlayer,Person).join(Person,Person.id==CallUpPlayer.person_id).filter(CallUpPlayer.callup_id==row.id).order_by(Person.last_name,Person.first_name).all(); items=[]; changed=False
     for cp,p in people:
