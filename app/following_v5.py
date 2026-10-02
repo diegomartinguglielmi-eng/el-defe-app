@@ -158,7 +158,12 @@ def _event_from_match(db:Session,m:Match,competition:str,category:str)->dict:
     if competition=="FEFI" and category.isdigit():
         sched=db.query(FefiCategorySchedule).filter(FefiCategorySchedule.match_id==m.id,FefiCategorySchedule.category==category).first()
         if sched:time=sched.time or time;note=sched.note
-    local=_is_defe(m.home);club=m.home or None;venue=(m.venue or "").strip() or None;address=venue;venue_info=None\n    if competition=="FEFI": venue_info=_fefi_venue_info(club) if club else None\n    if venue_info and venue_info.get("address"): address=venue_info["address"];venue=address\n    if not address and competition=="FEFI" and local:address="Ernesto Sábato 3162, Santos Lugares, Buenos Aires"\n    rival=m.away if local else m.home\n    return {"available":True,"match_id":m.id,"competition":competition,"category":category,"selection":f"{competition}|{category}","date":date,"time":time,"rival":rival,"home":m.home,"away":m.away,"local":local,"club":club,"venue":venue,"address":address,"maps_url":_maps_url(address or venue or club),"court_cover":venue_info.get("court_cover") if venue_info else None,"roof_code":venue_info.get("roof_code") if venue_info else None,"round_name":m.round_name,"status":m.status,"note":note,"source_url":m.source_url}
+    local=_is_defe(m.home);club=m.home or None;venue=(m.venue or "").strip() or None;address=venue;venue_info=None
+    if competition=="FEFI": venue_info=_fefi_venue_info(club) if club else None
+    if venue_info and venue_info.get("address"): address=venue_info["address"];venue=address
+    if not address and competition=="FEFI" and local:address="Ernesto Sábato 3162, Santos Lugares, Buenos Aires"
+    rival=m.away if local else m.home
+    return {"available":True,"match_id":m.id,"competition":competition,"category":category,"selection":f"{competition}|{category}","date":date,"time":time,"rival":rival,"home":m.home,"away":m.away,"local":local,"club":club,"venue":venue,"address":address,"maps_url":_maps_url(address or venue or club),"court_cover":venue_info.get("court_cover") if venue_info else None,"roof_code":venue_info.get("roof_code") if venue_info else None,"round_name":m.round_name,"status":m.status,"note":note,"source_url":m.source_url}
 
 
 def _live_fefi_next(db:Session,category:str,today:str)->dict|None:
