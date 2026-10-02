@@ -127,7 +127,14 @@ def _category_matches(competition:str, selected:str, division:str|None)->bool:
 
 
 @lru_cache(maxsize=64)
-FEFI_VENUE_FALLBACKS={\n    "el trebol":{"address":"Gándara 2840, CABA","roof_code":"NO","court_cover":"uncovered"},\n}\n\n\ndef _fefi_venue_info(club:str)->dict|None:\n    """Lee DIRECCIONES de la Zona H oficial: equipo, dirección, localidad, T."""\n    try:
+FEFI_VENUE_FALLBACKS={
+    "el trebol":{"address":"Gándara 2840, CABA","roof_code":"NO","court_cover":"uncovered"},
+}
+
+
+def _fefi_venue_info(club:str)->dict|None:
+    """Lee DIRECCIONES de la Zona H oficial: equipo, dirección, localidad, T."""
+    try:
         response=requests.get(FEFI_FIXTURE_URL,timeout=15,headers={"User-Agent":FEFI_FIXTURE_UA,"Accept":"text/html,application/xhtml+xml"})
         response.raise_for_status()
         from bs4 import BeautifulSoup
