@@ -248,6 +248,11 @@ def family_callups_v2(db:Session=Depends(get_db),user=Depends(get_current_user))
     for cp,callup,team,person in rows:
         selection=normalize_selection(f"{team.competition}|{team.division}"); player=linked.get(int(person.id))
         if not player or not _belongs_to_selection(player,selection):continue
+        # Family must only see a callup that is actually the current match for this selection.
+        current_event=_next_event(db,selection)
+        current_match_id=current_event.get("match_id") if current_event else None
+        if current_match_id is None or int(callup.match_id)!=int(current_match_id):
+            continue
         prior=_player_response(db,person.id,callup.match_id,selection)
         if prior and prior.status in {"yes","no","maybe"} and cp.attendance!=prior.status: cp.attendance=prior.status; changed=True
         items.append({"row_id":cp.id,"callup_id":callup.id,"person_id":person.id,"player_name":f"{person.first_name} {person.last_name}".strip(),"competition":team.competition,"category":team.division,"selection":selection,"attendance":cp.attendance,"notes":callup.notes,"match_id":callup.match_id})
