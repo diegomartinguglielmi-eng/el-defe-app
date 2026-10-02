@@ -198,10 +198,16 @@ def save_profe_callup(payload:ProfeCallupIn,db:Session=Depends(get_db),user=Depe
     teams=_selection_teams(db,competition,category)
     if not teams: raise HTTPException(404,"Plantel inexistente")
     team_ids=[t.id for t in teams]; valid=_selection_roster_ids(db,teams); chosen={int(x) for x in payload.person_ids if int(x) in valid}
-    row=db.query(CallUp).filter(CallUp.match_id==int(event["match_id"]),CallUp.team_id.in_(team_ids)).order_by(CallUp.id.desc()).first()
+    # A callup belongs to the professor who sends it. Do not reuse a staging/QA
+    # professor's row for the real professor, otherwise Family will correctly hide it.
+    row=db.query(CallUp).filter(
+        CallUp.match_id==int(event["match_id"]),
+        CallUp.team_id.in_(team_ids),
+        CallUp.created_by==user.id
+    ).order_by(CallUp.id.desc()).first()
     if not row:
         row=CallUp(match_id=int(event["match_id"]),team_id=teams[0].id,created_by=user.id,status="draft"); db.add(row); db.flush()
-    row.status="sent"; row.notes=(payload.notes or "").strip()[:1000] or None
+    row.status="sent"; row.created_by=user.id; row.notes=(payload.notes or "").strip()[:1000] or None
     existing={x.person_id:x for x in db.query(CallUpPlayer).filter(CallUpPlayer.callup_id==row.id).all()}
     for person_id in chosen:
         if person_id not in existing:
