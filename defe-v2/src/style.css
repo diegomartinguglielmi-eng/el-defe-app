@@ -826,3 +826,11 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .coachAllCounts{gap:4px!important}.coachAllCounts span{padding:5px 3px!important;border-radius:8px!important}.coachAllCounts b{font-size:13px!important}.coachAllCounts small{font-size:6.5px!important}
 .coachAllOpen{min-height:32px!important;border-radius:9px!important;font-size:9px!important;margin-top:1px!important}
 @media(max-width:620px){.coachAllCard{min-height:0!important}.coachAllGrid{gap:7px!important}}
+
+
+/* Profesor · tarjetas realmente compactas: evita el padding global de article */
+.coachApp .coachAllGrid>.coachAllCard{padding:9px 10px!important;padding-bottom:9px!important;min-height:0!important;height:auto!important;align-self:start!important}
+.coachApp .coachAllCard .coachAllNotice{padding:6px 8px!important;margin:0!important}
+.coachApp .coachAllCard .coachAllOpen{margin:0!important;min-height:30px!important}
+.coachApp .coachAllCardHead,.coachApp .coachAllMatch,.coachApp .coachAllProgress,.coachApp .coachAllCounts{margin:0!important}
+.coachApp .coachAllGrid{align-items:start!important;grid-auto-rows:max-content!important}
