@@ -858,3 +858,8 @@ h1,h2,h3,.welcomeTitle{letter-spacing:-.02em}
 .coachApp .coachAllCounts b{font-size:15px!important}
 .coachApp .coachAllCounts small{font-size:8px!important}
 .coachApp .coachAllCard .coachAllOpen{min-height:36px!important;border-radius:11px!important;font-size:10px!important}
+
+
+/* FEFI · aviso de cancha no totalmente cubierta */
+.fefiCourtAlert{margin:8px 0!important;padding:9px 11px!important;border-radius:12px!important;background:#fff6df!important;border:1px solid #f2d58b!important;color:#76520a!important;font-size:11px!important;line-height:1.35!important}
+.fefiCourtAlert b{color:#684600!important}
