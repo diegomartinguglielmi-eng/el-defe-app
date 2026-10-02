@@ -172,10 +172,33 @@ def _live_fefi_next(db:Session,category:str,today:str)->dict|None:
                 return {"available":True,"match_id":None,"competition":"FEFI","category":category,"selection":f"FEFI|{category}","date":"2026-09-26","time":category_time,"rival":"BOYA - C.A.I.","home":"DEF. DE SANTOS LUGARES","away":"BOYA - C.A.I.","local":local,"club":"DEF. DE SANTOS LUGARES","venue":address,"address":address,"maps_url":_maps_url(address),"round_name":"Fecha 8","status":"scheduled","note":None,"source_url":FEFI_FIXTURE_URL}
             return None
         fixtures.sort(key=lambda x:(x["date"],x["round"]));x=fixtures[0];local=_is_defe(x["home"])
+        # La tabla DIRECCIONES de FEFI incluye T.: SI / NO / SEMI. Tomamos el dato
+        # oficial del club local para avisar a las familias sólo si no es cubierta.
+        venue_info=None
+        home_norm=_norm(x["home"])
+        for table in soup.find_all("table"):
+            rows=table.find_all("tr")
+            if not rows: continue
+            header=[re.sub(r"\\s+"," ",z.get_text(" ",strip=True)).strip().lower() for z in rows[0].find_all(["th","td"])]
+            if not any("direcci" in h for h in header) or not any(h in {"t.","t"} for h in header): continue
+            for row in rows[1:]:
+                cells=[re.sub(r"\\s+"," ",z.get_text(" ",strip=True)).strip() for z in row.find_all(["th","td"])]
+                if len(cells)<4: continue
+                if _norm(cells[0])==home_norm or home_norm in _norm(cells[0]) or _norm(cells[0]) in home_norm:
+                    roof=(cells[3] or "").strip().upper()
+                    venue_info={"address":cells[1] if cells[1] not in {"","-"} else None,
+                                "locality":cells[2] if cells[2] not in {"","-"} else None,
+                                "roof_code":roof,
+                                "court_cover":"uncovered" if roof=="NO" else ("semi-covered" if roof.startswith("SEMI") else "covered" if roof=="SI" else None)}
+                    break
+            if venue_info: break
         address="Ernesto Sábato 3162, Santos Lugares, Buenos Aires" if local else None
+        if venue_info and venue_info.get("address"):
+            address=venue_info["address"]+((", "+venue_info["locality"]) if venue_info.get("locality") else "")
         return {"available":True,"match_id":None,"competition":"FEFI","category":category,"selection":f"FEFI|{category}",
                 "date":x["date"],"time":None,"rival":x["away"] if local else x["home"],"home":x["home"],"away":x["away"],
                 "local":local,"club":x["home"],"venue":address,"address":address,"maps_url":_maps_url(address),
+                "court_cover":venue_info.get("court_cover") if venue_info else None,"roof_code":venue_info.get("roof_code") if venue_info else None,
                 "round_name":f"Fecha {x['round']}","status":"scheduled","note":None,"source_url":FEFI_FIXTURE_URL}
     except Exception as exc:
         print({"fefi_v2_next_error":str(exc)})
