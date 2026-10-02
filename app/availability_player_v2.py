@@ -208,12 +208,18 @@ def save_profe_callup(payload:ProfeCallupIn,db:Session=Depends(get_db),user=Depe
     if not row:
         row=CallUp(match_id=int(event["match_id"]),team_id=teams[0].id,created_by=user.id,status="draft"); db.add(row); db.flush()
     row.status="sent"; row.created_by=user.id; row.notes=(payload.notes or "").strip()[:1000] or None
+    # A newly sent callup starts pending. Responses from another/QA callup for the
+    # same match must not pre-confirm players before the family answers this callup.
+    db.query(PlayerAvailabilityResponse).filter(
+        PlayerAvailabilityResponse.match_id==int(event["match_id"]),
+        PlayerAvailabilityResponse.selection==key,
+        PlayerAvailabilityResponse.person_id.in_(chosen)
+    ).delete(synchronize_session=False)
     existing={x.person_id:x for x in db.query(CallUpPlayer).filter(CallUpPlayer.callup_id==row.id).all()}
     for person_id in chosen:
         if person_id not in existing:
             cp=CallUpPlayer(callup_id=row.id,person_id=person_id,attendance="pending"); db.add(cp); db.flush()
-            prior=_player_response(db,person_id,int(event["match_id"]),key)
-            if prior and prior.status in {"yes","no","maybe"}: cp.attendance=prior.status
+            cp.attendance="pending"
     for person_id,item in existing.items():
         if person_id not in chosen: db.delete(item)
     db.commit(); return {"ok":True,"callup_id":row.id,"selection":key,"status":"sent","players":len(chosen)}
