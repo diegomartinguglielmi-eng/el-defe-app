@@ -141,7 +141,9 @@ def _fefi_venue_info(club:str)->dict|None:
             roof=cells[-1]
             if not name or _norm(name) in {"NOMBRE DEL EQUIPO","EQUIPO","EQUIPOS"}: continue
             n=_norm(name)
-            if n==target or n in target or target in n:
+            aliases={"el trebol":["trebol","el trebol"],"def de santos lugares":["defensores de santos lugares","def santos lugares","def de santos lugares"]}
+            candidates=[target]+[_norm(x) for x in aliases.get(target,[])]
+            if any(n==x or n in x or x in n for x in candidates if x):
                 code=(roof or "").strip().upper()
                 cover="uncovered" if code=="NO" else ("semi-covered" if code.startswith("SEMI") else ("covered" if code=="SI" else None))
                 location_parts=[x.strip() for x in cells[1:-1] if x.strip()]
