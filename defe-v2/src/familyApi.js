@@ -43,6 +43,8 @@ export function normalizeFamilyMatch({competition,category,event,callup,fefiMatc
     roundName:source.round_name||source.roundName||null,
     venue:source.venue||source.address||source.location||null,
     mapsUrl:source.maps_url||source.mapsUrl||null,
+    court_cover:source.court_cover||source.courtCover||null,
+    roof_code:source.roof_code||source.roofCode||null,
     available:source.available!==false
   };
   return {competition:comp,category,match,callup:callup||null,attendance:normalizeAttendance(callup?.attendance),canAnswer:Boolean(callup?.id||callup?.row_id)};
