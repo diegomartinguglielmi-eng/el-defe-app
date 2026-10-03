@@ -178,6 +178,12 @@ def fixture(tournament:str=Query('clausura'),category:str=Query('GENERAL')):
                     defe_score,rival_score=score[0],score[1]
                     item['home_value']=defe_score if local else rival_score
                     item['away_value']=rival_score if local else defe_score
+                elif isinstance(score,str) and score.strip().upper() in {'GP','NP'}:
+                    # FEFI también publica resultados administrativos GP/NP.
+                    defe_score=score.strip().upper()
+                    rival_score='NP' if defe_score=='GP' else 'GP'
+                    item['home_value']=defe_score if local else rival_score
+                    item['away_value']=rival_score if local else defe_score
                 defe.append(item)
         except Exception as exc:
             print({'fefi_fixture_json_fallback_error':str(exc)})
