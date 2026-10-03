@@ -1,13 +1,7 @@
 name: Deploy DEFE V2 to Firebase Hosting
 
+# Firebase pausado temporalmente. Reactivar el trigger push cuando retomemos la migración.
 on:
-  push:
-    branches: [mi-defe-v2-laamba]
-    paths:
-      - "defe-v2/**"
-      - "firebase.json"
-      - ".firebaserc"
-      - ".github/workflows/deploy-firebase-v2.yml"
   workflow_dispatch:
 
 permissions:
