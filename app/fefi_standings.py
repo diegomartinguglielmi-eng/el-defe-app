@@ -147,6 +147,44 @@ def fixture(tournament:str=Query('clausura'),category:str=Query('GENERAL')):
             finally:db.close()
         except Exception as exc:
             print({'fefi_fixture_persisted_fallback_error':str(exc)})
+    # Resultados Clausura oficiales FEFI: la tabla publicada usa columnas
+    # 19,13,18,14,17,16,15; para Cat. 2013 corresponde la segunda columna.
+    # Extraemos únicamente el cruce de Defe de cada F# y lo aplicamos al fixture.
+    official_scores={}
+    try:
+        rr=requests.get(URL,headers=UA,timeout=25);rr.raise_for_status()
+        tabs=pd.read_html(rr.text)
+        for tb in tabs:
+            cols=[str(x).strip() for x in tb.columns]
+            # localizar tabla de resultados por encabezados de categorías
+            if not ('13' in cols and any(str(x).strip() in {'F.T.','FT'} for x in cols)):continue
+            ftcol=next((x for x in tb.columns if str(x).strip() in {'F.T.','FT'}),None)
+            teamcol=next((x for x in tb.columns if str(x).strip().upper()=='EQUIPOS'),None)
+            catcol=next((x for x in tb.columns if str(x).strip()==cat[-2:] if cat=='2013'),None)
+            if ftcol is None or teamcol is None or catcol is None:continue
+            rows=tb.to_dict('records')
+            for i,row in enumerate(rows):
+                team=_clean(row.get(teamcol,''))
+                if 'santos lugares' not in _norm_team(team):continue
+                rm=re.search(r'(\\d+)',str(row.get(ftcol,'')))
+                if not rm:continue
+                rnd=int(rm.group(1));a=row.get(catcol)
+                if i+1>=len(rows):continue
+                opp=_clean(rows[i+1].get(teamcol,''));b=rows[i+1].get(catcol)
+                if not opp:continue
+                official_scores[rnd]=(a,b,team,opp)
+    except Exception as exc:
+        print({'fefi_official_scores_error':str(exc)})
+    if defe and official_scores:
+        for x in defe:
+            sc=official_scores.get(x['round'])
+            if not sc:continue
+            a,b,team,opp=sc
+            local='santos lugares' in _norm_team(x.get('home',''))
+            # fila oficial detectada tiene Defe primero; ordenar al marcador Local-Visitante
+            x['home_value']=a if local else b
+            x['away_value']=b if local else a
+
     # Último respaldo: fixture FEFI Zona H versionado en el repositorio.
     # Es la misma fuente base usada para las jornadas 1-15 de la temporada.
     if not defe:
