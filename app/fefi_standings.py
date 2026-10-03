@@ -147,6 +147,33 @@ def fixture(tournament:str=Query('clausura'),category:str=Query('GENERAL')):
             finally:db.close()
         except Exception as exc:
             print({'fefi_fixture_persisted_fallback_error':str(exc)})
+    # Último respaldo: fixture FEFI Zona H versionado en el repositorio.
+    # Es la misma fuente base usada para las jornadas 1-15 de la temporada.
+    if not defe:
+        try:
+            from pathlib import Path
+            import json
+            data=json.loads((Path(__file__).resolve().parents[1]/'defe-datos'/'datos.json').read_text(encoding='utf-8'))
+            # localizar recursivamente la lista que contiene las jornadas FEFI
+            def find_rounds(obj):
+                if isinstance(obj,list) and obj and all(isinstance(z,dict) for z in obj):
+                    if any('nro' in z and 'rival' in z and 'fecha' in z for z in obj):return obj
+                if isinstance(obj,dict):
+                    for v in obj.values():
+                        got=find_rounds(v)
+                        if got:return got
+                if isinstance(obj,list):
+                    for v in obj:
+                        got=find_rounds(v)
+                        if got:return got
+                return None
+            rounds=find_rounds(data) or []
+            for z in rounds:
+                if not all(k in z for k in ('nro','rival','fecha')):continue
+                local=bool(z.get('local'))
+                defe.append({'round':int(z['nro']),'round_name':f"Fecha {z['nro']}",'date':z.get('fecha'),'home':'DEF. DE SANTOS LUGARES' if local else z.get('rival'),'away':z.get('rival') if local else 'DEF. DE SANTOS LUGARES'})
+        except Exception as exc:
+            print({'fefi_fixture_json_fallback_error':str(exc)})
     # Campos esperados por la UI del profesor.
     for x in defe:
         x['home_away']='local' if 'santos lugares' in _norm_team(x.get('home','')) else 'visitante'
