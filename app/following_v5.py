@@ -206,6 +206,18 @@ def _live_fefi_next(db:Session,category:str,today:str)->dict|None:
                 sched=db.query(FefiCategorySchedule).filter(FefiCategorySchedule.category==category).order_by(FefiCategorySchedule.id.desc()).first()
                 category_time=sched.time if sched and sched.time else STANDARD_TIMES.get(category)
                 return {"available":True,"match_id":None,"competition":"FEFI","category":category,"selection":f"FEFI|{category}","date":"2026-09-26","time":category_time,"rival":"BOYA - C.A.I.","home":"DEF. DE SANTOS LUGARES","away":"BOYA - C.A.I.","local":local,"club":"DEF. DE SANTOS LUGARES","venue":address,"address":address,"maps_url":_maps_url(address),"round_name":"Fecha 8","status":"scheduled","note":None,"source_url":FEFI_FIXTURE_URL}
+            # Si el vivo no pudo parsearse, reutilizamos una jornada FEFI futura ya
+            # persistida (Zona H es una jornada común a todas las categorías baby).
+            persisted=[]
+            for m in _canonical(db.query(Match).filter(Match.competition=="FEFI").all()):
+                mdate,_=_date_parts(m.date)
+                if not mdate or mdate<today or (m.status or "").lower()=="final": continue
+                if not (_is_defe(m.home) or _is_defe(m.away)): continue
+                if _norm(m.division) not in {"zona h","h"}: continue
+                persisted.append(m)
+            if persisted:
+                persisted.sort(key=lambda m:((_date_parts(m.date)[0] or "9999-99-99"),_round_number(m.round_name) or 999,m.id))
+                return _event_from_match(db,persisted[0],"FEFI",category)
             return None
         fixtures.sort(key=lambda x:(x["date"],x["round"]));x=fixtures[0];local=_is_defe(x["home"])
         # La tabla DIRECCIONES de FEFI incluye T.: SI / NO / SEMI. Tomamos el dato
