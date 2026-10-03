@@ -4,6 +4,8 @@ import time
 import requests
 import pandas as pd
 from fastapi import APIRouter, HTTPException, Query
+import re
+import unicodedata
 
 router=APIRouter(tags=['FEFI'])
 URL='https://fefi.com.ar/2026-torneo-anual-baby-futbol/h/'
@@ -67,3 +69,59 @@ def standings(tournament:str=Query('clausura'),category:str=Query('GENERAL')):
     rows=block.get(c,[])
     rows=sorted(rows,key=lambda x:((x.get('pts') if x.get('pts') is not None else -1),(x.get('won') if x.get('won') is not None else -1)),reverse=True)
     return {'tournament':t,'category':c,'rows':rows,'available':bool(rows),'source_url':URL,'fetched_at':data['fetched_at'],'standings_tables_found':data['standings_tables_found']}
+
+
+def _norm_team(v):
+    s=unicodedata.normalize('NFD',_clean(v).lower())
+    return ' '.join(''.join(ch for ch in s if unicodedata.category(ch)!='Mn').replace('.',' ').replace('-',' ').split())
+
+def _fixture_rows():
+    """Extrae el fixture completo de Zona H desde la página oficial FEFI."""
+    r=requests.get(URL,headers=UA,timeout=25);r.raise_for_status()
+    tables=pd.read_html(StringIO(r.text));months={'enero':'01','febrero':'02','marzo':'03','abril':'04','mayo':'05','junio':'06','julio':'07','agosto':'08','septiembre':'09','octubre':'10','noviembre':'11','diciembre':'12'}
+    out=[]
+    for df in tables:
+        # Las tablas de fixture/resultados FEFI tienen columnas LOCAL / VISITANTE
+        cols=[_clean(x).upper() for x in df.columns]
+        if not any('LOCAL' in x for x in cols) or not any('VISIT' in x for x in cols):continue
+        for _,row in df.iterrows():
+            vals=[_clean(x) for x in row.tolist()]
+            joined=' '.join(vals)
+            rm=re.search(r'Fecha\s*(\d+)',joined,re.I)
+            dm=re.search(r'(\d{1,2})\s+de\s+([A-Za-zÁÉÍÓÚáéíóúÑñ]+)',joined,re.I)
+            # En read_html la fecha puede estar en una fila separada; se conserva por tabla.
+        # fallback DOM-like sobre el HTML para no depender de la forma del dataframe
+    from bs4 import BeautifulSoup
+    soup=BeautifulSoup(r.text,'html.parser');round_no=None;date=None
+    for row in soup.find_all('tr'):
+        cells=[_clean(x.get_text(' ',strip=True)) for x in row.find_all(['th','td'])]
+        if not cells:continue
+        joined=' '.join(cells)
+        rm=re.search(r'Fecha\s*(\d+)',joined,re.I)
+        dm=re.search(r'(\d{1,2})\s+de\s+([A-Za-zÁÉÍÓÚáéíóúÑñ]+)',joined,re.I)
+        if rm:
+            round_no=int(rm.group(1))
+            if dm:
+                mon=months.get(dm.group(2).lower());date=f"2026-{mon}-{int(dm.group(1)):02d}" if mon else None
+            continue
+        if round_no and len(cells)>=3:
+            vs=next((i for i,x in enumerate(cells) if _norm_team(x)=='vs'),None)
+            if vs is not None and vs>0 and vs+1<len(cells):
+                home,away=cells[vs-1],cells[vs+1]
+                if home and away:out.append({'round':round_no,'round_name':f'Fecha {round_no}','date':date,'home':home,'away':away})
+    # dedup
+    seen=set();rows=[]
+    for x in out:
+        k=(x['round'],_norm_team(x['home']),_norm_team(x['away']))
+        if k not in seen:seen.add(k);rows.append(x)
+    return rows
+
+@router.get('/fixture')
+def fixture(tournament:str=Query('clausura'),category:str=Query('GENERAL')):
+    t=tournament.strip().lower();cat=category.strip().upper()
+    if t not in {'apertura','clausura','anual'}:raise HTTPException(400,'Torneo inválido')
+    if cat not in CATEGORIES:raise HTTPException(400,'Categoría inválida')
+    try:rows=_fixture_rows()
+    except Exception as exc:raise HTTPException(502,f'No se pudo consultar fixture FEFI: {exc}')
+    defe=[x for x in rows if 'santos lugares' in _norm_team(x['home']) or 'santos lugares' in _norm_team(x['away'])]
+    return {'tournament':t,'category':cat,'rows':defe,'available':bool(defe),'source_url':URL,'fetched_at':datetime.now(timezone.utc).isoformat()}
