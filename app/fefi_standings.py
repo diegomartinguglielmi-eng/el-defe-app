@@ -123,4 +123,32 @@ def fixture(tournament:str=Query('clausura'),category:str=Query('GENERAL')):
     try:rows=_fixture_rows()
     except Exception as exc:raise HTTPException(502,f'No se pudo consultar fixture FEFI: {exc}')
     defe=[x for x in rows if 'santos lugares' in _norm_team(x['home']) or 'santos lugares' in _norm_team(x['away'])]
+    # Respaldo seguro: la base ya contiene jornadas FEFI sincronizadas que usa
+    # Próxima fecha. Si el HTML oficial cambia y no se puede parsear, mostramos
+    # esas jornadas persistidas en vez de dejar el fixture vacío.
+    if not defe:
+        try:
+            from .db import SessionLocal
+            from .models import Match
+            db=SessionLocal()
+            try:
+                persisted=db.query(Match).filter(Match.competition=='FEFI').all()
+                seen=set()
+                for m in persisted:
+                    if 'santos lugares' not in _norm_team(m.home or '') and 'santos lugares' not in _norm_team(m.away or ''):continue
+                    rm=re.search(r'(\\d+)',m.round_name or '')
+                    if not rm:continue
+                    rnd=int(rm.group(1));key=(rnd,_norm_team(m.home or ''),_norm_team(m.away or ''))
+                    if key in seen:continue
+                    seen.add(key)
+                    raw=str(m.date or '');md=re.search(r'(20\\d{2}-\\d{2}-\\d{2})',raw)
+                    defe.append({'round':rnd,'round_name':f'Fecha {rnd}','date':md.group(1) if md else None,'home':m.home,'away':m.away})
+                defe.sort(key=lambda x:x['round'])
+            finally:db.close()
+        except Exception as exc:
+            print({'fefi_fixture_persisted_fallback_error':str(exc)})
+    # Campos esperados por la UI del profesor.
+    for x in defe:
+        x['home_away']='local' if 'santos lugares' in _norm_team(x.get('home','')) else 'visitante'
+    print({'fefi_fixture_endpoint':{'parsed':len(rows),'defe':len(defe),'category':cat}})
     return {'tournament':t,'category':cat,'rows':defe,'available':bool(defe),'source_url':URL,'fetched_at':datetime.now(timezone.utc).isoformat()}
