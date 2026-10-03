@@ -104,11 +104,19 @@ def _fixture_rows():
             if dm:
                 mon=months.get(dm.group(2).lower());date=f"2026-{mon}-{int(dm.group(1)):02d}" if mon else None
             continue
-        if round_no and len(cells)>=3:
+        if round_no and len(cells)>=2:
+            # FEFI cambia el marcado de las filas: a veces VS viene en una celda
+            # propia y otras queda embebido en el texto del partido.
             vs=next((i for i,x in enumerate(cells) if _norm_team(x)=='vs'),None)
             if vs is not None and vs>0 and vs+1<len(cells):
                 home,away=cells[vs-1],cells[vs+1]
                 if home and away:out.append({'round':round_no,'round_name':f'Fecha {round_no}','date':date,'home':home,'away':away})
+            else:
+                joined=' | '.join(cells)
+                mm=re.search(r'(.+?)\\s+(?:VS|vs\\.?)\\s+(.+)',joined,re.I)
+                if mm:
+                    home,away=_clean(mm.group(1).split('|')[-1]),_clean(mm.group(2).split('|')[0])
+                    if home and away:out.append({'round':round_no,'round_name':f'Fecha {round_no}','date':date,'home':home,'away':away})
     # dedup
     seen=set();rows=[]
     for x in out:
