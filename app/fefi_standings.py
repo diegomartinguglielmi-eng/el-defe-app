@@ -76,48 +76,39 @@ def _norm_team(v):
     return ' '.join(''.join(ch for ch in s if unicodedata.category(ch)!='Mn').replace('.',' ').replace('-',' ').split())
 
 def _fixture_rows():
-    """Extrae el fixture completo de Zona H desde la página oficial FEFI."""
+    """Extrae el fixture completo de Zona H desde la página oficial FEFI.
+    FEFI usa tablas con layouts variables; detectamos partidos por texto VS y
+    heredamos Fecha/fecha calendario desde las filas precedentes.
+    """
     r=requests.get(URL,headers=UA,timeout=25);r.raise_for_status()
-    tables=pd.read_html(StringIO(r.text));months={'enero':'01','febrero':'02','marzo':'03','abril':'04','mayo':'05','junio':'06','julio':'07','agosto':'08','septiembre':'09','octubre':'10','noviembre':'11','diciembre':'12'}
-    out=[]
-    for df in tables:
-        # Las tablas de fixture/resultados FEFI tienen columnas LOCAL / VISITANTE
-        cols=[_clean(x).upper() for x in df.columns]
-        if not any('LOCAL' in x for x in cols) or not any('VISIT' in x for x in cols):continue
-        for _,row in df.iterrows():
-            vals=[_clean(x) for x in row.tolist()]
-            joined=' '.join(vals)
-            rm=re.search(r'Fecha\s*(\d+)',joined,re.I)
-            dm=re.search(r'(\d{1,2})\s+de\s+([A-Za-zÁÉÍÓÚáéíóúÑñ]+)',joined,re.I)
-            # En read_html la fecha puede estar en una fila separada; se conserva por tabla.
-        # fallback DOM-like sobre el HTML para no depender de la forma del dataframe
     from bs4 import BeautifulSoup
-    soup=BeautifulSoup(r.text,'html.parser');round_no=None;date=None
-    for row in soup.find_all('tr'):
-        cells=[_clean(x.get_text(' ',strip=True)) for x in row.find_all(['th','td'])]
-        if not cells:continue
-        joined=' '.join(cells)
-        rm=re.search(r'Fecha\s*(\d+)',joined,re.I)
-        dm=re.search(r'(\d{1,2})\s+de\s+([A-Za-zÁÉÍÓÚáéíóúÑñ]+)',joined,re.I)
-        if rm:
-            round_no=int(rm.group(1))
+    soup=BeautifulSoup(r.text,'html.parser')
+    months={'enero':'01','febrero':'02','marzo':'03','abril':'04','mayo':'05','junio':'06','julio':'07','agosto':'08','septiembre':'09','octubre':'10','noviembre':'11','diciembre':'12'}
+    out=[];round_no=None;date=None
+    for table in soup.find_all('table'):
+        tround=round_no;tdate=date
+        for row in table.find_all('tr'):
+            cells=[_clean(x.get_text(' ',strip=True)) for x in row.find_all(['th','td'])]
+            if not cells:continue
+            joined=' '.join(cells)
+            rm=re.search(r'Fecha\\s*(?:N[°º]?\\s*)?(\\d+)',joined,re.I)
+            dm=re.search(r'(\\d{1,2})\\s+de\\s+([A-Za-zÁÉÍÓÚáéíóúÑñ]+)',joined,re.I)
+            if rm:tround=int(rm.group(1));round_no=tround
             if dm:
-                mon=months.get(dm.group(2).lower());date=f"2026-{mon}-{int(dm.group(1)):02d}" if mon else None
-            continue
-        if round_no and len(cells)>=2:
-            # FEFI cambia el marcado de las filas: a veces VS viene en una celda
-            # propia y otras queda embebido en el texto del partido.
-            vs=next((i for i,x in enumerate(cells) if _norm_team(x)=='vs'),None)
-            if vs is not None and vs>0 and vs+1<len(cells):
-                home,away=cells[vs-1],cells[vs+1]
-                if home and away:out.append({'round':round_no,'round_name':f'Fecha {round_no}','date':date,'home':home,'away':away})
+                mon=months.get(dm.group(2).lower())
+                if mon:tdate=f"2026-{mon}-{int(dm.group(1)):02d}";date=tdate
+            # Caso normal: LOCAL | VS | VISITANTE
+            vi=next((i for i,x in enumerate(cells) if re.fullmatch(r'\\s*v(?:s|s\\.)\\s*',x,re.I)),None)
+            home=away=None
+            if vi is not None and vi>0 and vi+1<len(cells):
+                home,away=cells[vi-1],cells[vi+1]
             else:
-                joined=' | '.join(cells)
-                mm=re.search(r'(.+?)\\s+(?:VS|vs\\.?)\\s+(.+)',joined,re.I)
-                if mm:
-                    home,away=_clean(mm.group(1).split('|')[-1]),_clean(mm.group(2).split('|')[0])
-                    if home and away:out.append({'round':round_no,'round_name':f'Fecha {round_no}','date':date,'home':home,'away':away})
-    # dedup
+                # Caso FEFI: VS puede quedar embebido en una única celda.
+                for cell in cells:
+                    mm=re.match(r'^\\s*(.+?)\\s+v(?:s|s\\.)\\s+(.+?)\\s*$',cell,re.I)
+                    if mm:home,away=mm.group(1),mm.group(2);break
+            if home and away and tround:
+                out.append({'round':tround,'round_name':f'Fecha {tround}','date':tdate,'home':_clean(home),'away':_clean(away)})
     seen=set();rows=[]
     for x in out:
         k=(x['round'],_norm_team(x['home']),_norm_team(x['away']))
